@@ -1,0 +1,16 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "../..",
+			"file_exclude_patterns" : [
+				"Cargo.lock"
+			],
+			"folder_exclude_patterns" : [
+				"target",
+				".git",
+			],
+		},
+	]
+}
