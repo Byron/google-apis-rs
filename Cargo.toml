@@ -1,6 +1,6 @@
 [package]
 
-name = "youtube"
+name = "youtube3"
 version = "0.0.1"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A library to facilitate interacting with your youtube account"
@@ -9,4 +9,10 @@ license = "MIT"
 keywords = ["youtube", "google", "protocol"]
 
 [dependencies]
+openssl = "= 0.4.3"
+cookie = "= 0.1.13"
 hyper = "*"
+rustc-serialize = "*"
+
+[dev-dependencies]
+yup-hyper-mock = "*"
