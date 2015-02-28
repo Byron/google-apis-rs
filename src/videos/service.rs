@@ -2,9 +2,13 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::marker::PhantomData;
 
+use rustc_serialize;
+
 use hyper;
 
-pub struct VideosService<'a, C, NC>
+
+/// The videos service - provides actual functionality through builders.
+pub struct Service<'a, C, NC>
     where NC: 'a,
            C: 'a {
 
@@ -13,12 +17,12 @@ pub struct VideosService<'a, C, NC>
     _m: PhantomData<NC>
 }
 
-impl<'a, C, NC> VideosService<'a, C, NC>
+impl<'a, C, NC> Service<'a, C, NC>
     where  NC: hyper::net::NetworkConnector,
             C: BorrowMut<hyper::Client<NC>> + 'a {
 
-    pub fn new(client: &'a RefCell<C>) -> VideosService<'a, C, NC> {
-        VideosService {
+    pub fn new(client: &'a RefCell<C>) -> Service<'a, C, NC> {
+        Service {
             client: client,
             _m: PhantomData,
         }
