@@ -8,11 +8,16 @@
 	gen_root = directories.output + '/' + a.name + '_' + a.version
 	api_name = a.name + a.version
 	api_clean = api_name + '-clean'
+	# source, destination
+	sds = [(directories.mako_src + '/' + i.source + '.mako', gen_root + i.get('output_dir', '') + '/' + i.source) 
+																								for i in api.templates]
+	api_json = directories.api_base + '/' + a.name + '/' + a.version + '/' + a.name + '-api.json'
+	api_json_inputs = api_json + " $(API_SHARED_INFO)"
 	api_info.append((api_name, api_clean, gen_root))
 %>\
-${gen_root}: ${directories.api_base}/${a.name}/${a.version}/${a.name}-api.json $(API_SHARED_INFO)
+${gen_root}: ${' '.join(i[0] for i in sds)} ${api_json_inputs}
 	@mkdir -p $@
-	$(TPL) -io ${directories.mako_src}/cargo.toml.mako=$@/cargo.toml --data-files $^
+	$(TPL) -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
 
 ${api_name}: ${gen_root}
 	
