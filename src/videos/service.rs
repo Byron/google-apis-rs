@@ -5,6 +5,7 @@ use std::marker::PhantomData;
 use rustc_serialize;
 
 use hyper;
+use oauth2;
 
 /// Reresents all aspects of a youtube video resource. May only be partially 
 /// available
@@ -69,29 +70,34 @@ pub struct GeoPoint {
 }
 
 /// The videos service - provides actual functionality through builders.
-pub struct Service<'a, C, NC>
+pub struct Service<'a, C, NC, A>
     where NC: 'a,
-           C: 'a {
+           C: 'a,
+           A: 'a, {
 
     client: &'a RefCell<C>,
+    auth:  &'a RefCell<A>,
 
     _m: PhantomData<NC>
 }
 
-impl<'a, C, NC> Service<'a, C, NC>
+impl<'a, C, NC, A> Service<'a, C, NC, A>
     where  NC: hyper::net::NetworkConnector,
-            C: BorrowMut<hyper::Client<NC>> + 'a {
+            C: BorrowMut<hyper::Client<NC>> + 'a,
+            A: oauth2::GetToken + 'a {
 
-    pub fn new(client: &'a RefCell<C>) -> Service<'a, C, NC> {
+    pub fn new(client: &'a RefCell<C>, authenticator: &'a RefCell<A>) -> Service<'a, C, NC, A> {
         Service {
             client: client,
+            auth: authenticator,
             _m: PhantomData,
         }
     }
 
-    pub fn insert(&self, parts: &str, video: &Video) -> VideosInsertBuilder<'a, C, NC> {
+    pub fn insert(&self, parts: &str, video: &Video) -> VideosInsertBuilder<'a, C, NC, A> {
         VideosInsertBuilder {
             client: self.client,
+            auth: self.auth,
             video: video.clone(),
             parts: parts.to_string(),
             _m: PhantomData,
@@ -99,11 +105,13 @@ impl<'a, C, NC> Service<'a, C, NC>
     }
 }
 
-pub struct VideosInsertBuilder<'a, C, NC> 
+pub struct VideosInsertBuilder<'a, C, NC, A> 
     where NC: 'a,
-           C: 'a {
+           C: 'a,
+           A: 'a {
 
     client: &'a RefCell<C>,
+    auth: &'a RefCell<A>,
     video: Video,
     parts: String,
 
@@ -111,9 +119,10 @@ pub struct VideosInsertBuilder<'a, C, NC>
 }
 
 
-impl<'a, C, NC> VideosInsertBuilder<'a, C, NC>
+impl<'a, C, NC, A> VideosInsertBuilder<'a, C, NC, A>
     where  NC: hyper::net::NetworkConnector,
-            C: BorrowMut<hyper::Client<NC>> + 'a {
+            C: BorrowMut<hyper::Client<NC>> + 'a,
+            A: oauth2::GetToken + 'a {
 
 }
 
@@ -123,18 +132,5 @@ impl<'a, C, NC> VideosInsertBuilder<'a, C, NC>
 mod tests {
     use std::default::Default;
     use super::*;
-    use hyper;
-
-    use std::cell::RefCell;
-
-    #[test]
-    fn insert() {
-        let c = RefCell::new(hyper::Client::new());
-        let s = Service::new(&c);
-        let v = <Video as Default>::default();
-        // todo: set data
-        let mut ib = s.insert("id, snippet", &v);
-    }
-
 
 }
