@@ -293,7 +293,7 @@ def cmdline(argv=None):
     data = load_data(datafiles)
     data = dict((k, DictObject(v)) for k, v in data.items())
     data.update(dict([varsplit(var) for var in options.var]))
-
+    
     try:
         print(template.render(**data))
     except:

@@ -15,8 +15,7 @@ API_SHARED_INFO = ./etc/api/shared.yaml
 API_JSON_FILES = $(shell find ./etc -type f -name '*-api.json')
 
 help:
-	$(info Programs)
-	$(info ----> templat engine: '$(TPL)')
+	$(info using template engine: '$(TPL)')
 	$(info )
 	$(info Targets)
 	$(info help         -   print this help)
@@ -30,13 +29,13 @@ $(PYTHON):
 $(MAKO_RENDER): $(PYTHON)
 
 $(API_DEPS): $(API_SHARED_INFO) $(API_DEPS_TPL) $(MAKO_RENDER)
-	$(TPL) --data-files $(API_SHARED_INFO) $(API_DEPS_TPL) > $@
+	$(TPL) --data-files $(API_SHARED_INFO) --var SHARED_INFO_FILE=$(API_SHARED_INFO) $(API_DEPS_TPL) > $@
 
 api-deps: $(API_DEPS)
 
 include $(API_DEPS)
 
-clean:
+clean: clean-api
 	-rm -Rf $(VENV_DIR)
 	-rm $(API_DEPS)
 
