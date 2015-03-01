@@ -14,4 +14,20 @@ which require the token to be refreshed.
 You will need authorization to perform most of the operations implemented here - it can be obtained
 and handled using the [yup-oauth2 library][oauth].
 
-[oauth]: [https://crates.io/crates/yup-oauth2]
+
+# License
+
+The license of everything not explicitly under a different license are licensed as specified in `LICENSE.md`.
+
+What follows is a list of other material that is licensed differently.
+
+* **./etc/bin/json2xml.py** is licensed like MIT, as shown in the header of the file. See original source [on github][html2json].
+* **./etc/bin/gsl_\*** is licensed under [GNU GPL][imatix-copying]. The source code is [on github][gsl]
+* **./etc/api/\*\*/*.json** are licensed under a [MIT-like google license][google-lic]
+
+
+[oauth]: https://crates.io/crates/yup-oauth2
+[html2json]: https://github.com/hay/xml2json
+[imatix-copying]: https://github.com/imatix/gsl/blob/master/COPYING
+[gsl]: https://github.com/imatix/gsl
+[google-lic]: https://github.com/google/google-api-go-client/blob/master/LICENSE

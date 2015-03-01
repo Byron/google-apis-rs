@@ -1,0 +1,35 @@
+OS := $(shell uname)
+ifeq ($(OS), "")
+    OS = Windows
+endif
+
+ARCH :=
+
+# based on http://stackoverflow.com/questions/714100/os-detecting-makefile
+ifeq ($(OS),Windows)
+    ARCH = WIN32
+    ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+        ARCH = AMD64
+    endif
+    ifeq ($(PROCESSOR_ARCHITECTURE),x86)
+        ARCH = IA32
+    endif
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        OS = LINUX
+    endif
+    ifeq ($(UNAME_S),Darwin)
+        OS = OSX
+    endif
+    UNAME_M := $(shell uname -m)
+    ifeq ($(UNAME_M),x86_64)
+        ARCH = AMD64
+    endif
+    ifneq ($(filter %86,$(UNAME_M)),)
+        ARCH = IA32
+    endif
+    ifneq ($(filter arm%,$(UNAME_M)),)
+        ARCH = ARM
+    endif
+endif
