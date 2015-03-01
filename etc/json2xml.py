@@ -45,9 +45,9 @@ R. White, 2006 November 6
 import json
 import optparse
 import sys
-import os
 
 import xml.etree.cElementTree as ET
+from xml.dom import minidom
 
 
 def strip_tag(tag):
@@ -126,14 +126,6 @@ def internal_to_elem(pfsh, factory=ET.Element):
     sublist = []
     tags = list(pfsh.keys())
 
-    # workaround 'cannot convert boolean error'
-    def sani_value(v):
-        if v == u'true':
-            return '1'
-        elif v == u'false':
-            return '0'
-        return v
-
     # Allow deeply nested structures
     for tag in tags:
         value = pfsh[tag]
@@ -156,13 +148,13 @@ def internal_to_elem(pfsh, factory=ET.Element):
                 else:
                     sublist.append(internal_to_elem({k: v}, factory=factory))
         else:
-            text = sani_value(value)
+            text = value
         e = factory(tag, attribs)
 
     for sub in sublist:
         e.append(sub)
-    e.text = text
-    e.tail = tail
+    e.text = unicode(text)
+    e.tail = unicode(tail)
     return e
 
 
@@ -211,7 +203,7 @@ def json2xml(json_data, factory=ET.Element):
         json_data = json.loads(json_data)
 
     elem = internal_to_elem(json_data, factory)
-    return ET.tostring(elem)
+    return minidom.parseString(ET.tostring(elem)).toprettyxml(indent='\t')
 
 
 def main():
