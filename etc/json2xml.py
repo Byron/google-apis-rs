@@ -126,35 +126,48 @@ def internal_to_elem(pfsh, factory=ET.Element):
     sublist = []
     tags = list(pfsh.keys())
 
-    # Allow deeply nested structures
-    for tag in tags:
-        value = pfsh[tag]
-        # we santize values automatically
-        # $ref -> _ref
-        if tag.startswith('$'):
-            tag = '_' + tag[1:]
+    if len(tags) > 1:
+        raise ValueError("Illegal structure with multiple tags: %s" % tag)
 
-        if isinstance(value, dict):
-            for k, v in value.items():
-                if k[:1] == "@":
-                    attribs[k[1:]] = v
-                elif k == "#text":
-                    text = v
-                elif k == "#tail":
-                    tail = v
-                elif isinstance(v, list):
-                    for v2 in v:
-                        sublist.append(internal_to_elem({k: v2}, factory=factory))
-                else:
-                    sublist.append(internal_to_elem({k: v}, factory=factory))
-        else:
-            text = value
-        e = factory(tag, attribs)
+    tag = tags[0]
+    value = pfsh[tag]
+
+    def sani_value(v):
+        if v is None:
+            return v
+        return unicode(v)
+
+    # we santize values automatically
+    # $ref -> _ref
+    if tag.startswith('$'):
+        tag = '_' + tag[1:]
+    if ':' in tag:
+        assert isinstance(value, dict), "hardcoded requirement: value must be dict for us to sanitize tag"
+        tk = 'value'
+        assert tk not in value
+        value[tk] = tag
+        tag = 'item'
+    if isinstance(value, dict):
+        for k, v in value.items():
+            if k[:1] == "@":
+                attribs[k[1:]] = v
+            elif k == "#text":
+                text = v
+            elif k == "#tail":
+                tail = v
+            elif isinstance(v, list):
+                for v2 in v:
+                    sublist.append(internal_to_elem({k: v2}, factory=factory))
+            else:
+                sublist.append(internal_to_elem({k: v}, factory=factory))
+    else:
+        text = value
+    e = factory(tag, attribs)
 
     for sub in sublist:
         e.append(sub)
-    e.text = unicode(text)
-    e.tail = unicode(tail)
+    e.text = sani_value(text)
+    e.tail = sani_value(tail)
     return e
 
 
@@ -191,7 +204,7 @@ def xml2json(xmlstring, options, strip_ns=1, strip=1):
     return elem2json(elem, options, strip_ns=strip_ns, strip=strip)
 
 
-def json2xml(json_data, factory=ET.Element):
+def json2xml(json_data, options, factory=ET.Element):
 
     """Convert a JSON string into an XML string.
 
@@ -202,8 +215,16 @@ def json2xml(json_data, factory=ET.Element):
     if not isinstance(json_data, dict):
         json_data = json.loads(json_data)
 
+    if len(json_data.keys()) > 1:
+        json_data = dict(root = json_data)
+
     elem = internal_to_elem(json_data, factory)
-    return minidom.parseString(ET.tostring(elem)).toprettyxml(indent='\t')
+
+    xml_str = ET.tostring(elem)
+
+    if options.pretty:
+        xml_str = minidom.parseString(xml_str).toprettyxml(indent='\t')
+    return xml_str
 
 
 def main():
@@ -219,7 +240,7 @@ def main():
         dest="strip_text", help="Strip text for xml2json")
     p.add_option(
         '--pretty', action="store_true",
-        dest="pretty", help="Format JSON output so it is easier to read")
+        dest="pretty", help="Format JSON/HTML output so it is easier to read")
     p.add_option(
         '--strip_namespace', action="store_true",
         dest="strip_ns", help="Strip namespace for xml2json")
@@ -250,14 +271,14 @@ def main():
     if (options.type == "xml2json"):
         out = xml2json(input, options, strip_ns, strip)
     else:
-        out = json2xml(input)
+        out = json2xml(input, options)
 
     if (options.out):
-        file = open(options.out, 'w')
+        file = open(options.out, 'wb')
         file.write(out)
         file.close()
     else:
-        print(out)
+        print(out.encode('utf-8'))
 
 if __name__ == "__main__":
     main()
