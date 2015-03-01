@@ -1,4 +1,5 @@
 target
+.api.deps
 Cargo.lock
 *.sublime-workspace
 *.xml

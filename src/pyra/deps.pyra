@@ -1,0 +1,24 @@
+$!setvar("api_info", "[]")!$#!
+
+<!--(for a in api.list)-->
+$!setvar("gen_root", "directories.output + '/' + a.name + '_' + a.version")!$#!
+$!setvar("api_name", "a.name+a.version")!$#!
+$!setvar("api_clean", "api_name+'-clean'")!$#!
+$!gen_root!$: $!directories.api_base!$/$!a.name!$/$!a.version!$/$!a.name!$-api.json
+$!api_name!$: $!gen_root!$
+$!api_clean!$:
+	rm -Rf $!gen_root!$
+$!api_info.append((api_name, api_clean, gen_root))!$#!
+
+<!--(end)-->
+
+.PHONY += $(.PHONY) $!' '.join(a[0] for a in api_info)!$ $!' '.join(a[1] for a in api_info)!$
+
+help-api:
+<!--(for a in api_info)-->
+	$(info $!a[0]!$    -    build the $!a[0]!$ api)
+	$(info $!a[1]!$    -    clean all generated files of the $!a[0]!$ api)
+<!--(end)-->
+
+
+clean-api: $!' '.join(a[1] for a in api_info)!$

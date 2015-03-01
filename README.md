@@ -21,7 +21,7 @@ The license of everything not explicitly under a different license are licensed 
 
 What follows is a list of other material that is licensed differently.
 
-* **./etc/bin/pyratemp.py** is licensed under MIT, as shown in [the header][pyratemp-header] of the file.
+* **./etc/bin/pyratemp.py** is licensed under MIT-like, as shown in [the header][pyratemp-header] of the file.
 * **./etc/api/\*\*/*.json** are licensed under a [MIT-like google license][google-lic].
 
 
