@@ -3,35 +3,31 @@
 include Makefile.helpers
 
 PYTHON = python2.7
-CONVERT = $(PYTHON) ./etc/bin/json2xml.py
-GSL = ./etc/bin/gsl_$(OS)-$(ARCH) -q
+TPL = etc/bin/pyratemp.py
 
+API_DEPS_TPL = src/pyra/deps.pyra
+API_MAIN_TPL = src/pyra/main.pyra
 API_DEPS = .api.deps
-API_SHARED_XML = ./etc/api/shared.xml
+API_SHARED_INFO = ./etc/api/shared.yaml
 API_JSON_FILES = $(shell find ./etc -type f -name '*-api.json')
-API_XML_FILES = $(patsubst %.json,%.xml,$(API_JSON_FILES))
 
 help:
 	$(info Programs)
-	$(info ----> GSL: '$(GSL)')
-	$(info ----> json2xml: '$(CONVERT)')
+	$(info ----> templat engine: '$(TPL)')
 	$(info )
 	$(info Targets)
 	$(info help         -   print this help)
-	$(info json-to-xml  -   convert json API files to xml for consumption by GSL)
 	$(info api-deps     -   generate a file to tell make what API file dependencies will be)
+	$(info help-api     -   show all api targets to build individually)
 
-json-to-xml: $(API_XML_FILES)
-$(API_DEPS): $(API_SHARED_XML)
-	$(GSL) -script:src/gsl/deps.gsl $(API_SHARED_XML)
-
-%.xml: %.json
-	$(CONVERT) --pretty -o $@ < $<
+$(API_DEPS): $(API_SHARED_INFO) $(API_DEPS_TPL)
+	$(TPL) -f $(API_SHARED_INFO) $(API_DEPS_TPL) > $@
 
 api-deps: $(API_DEPS)
 
-clean:
+include $(API_DEPS)
+
+clean: clean-api
 	-rm $(API_DEPS)
-	-rm $(API_XML_FILES)
 
 

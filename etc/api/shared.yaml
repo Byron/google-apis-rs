@@ -1,0 +1,20 @@
+# Contains values shared among all API implementations
+directories:
+  # directory under which all generated sources should reside
+  output: ./generated
+  # how to get from `output` back to common library
+  common: ../
+  # where are all the API meta files
+  api_base: ./etc/api
+api:
+  list:
+    - name: youtube
+      version: v3
+  base_path: "etc/api"
+cargo:
+  build_version: "0.0.1"
+  authors:
+    - Sebastian Thiel <byronimo@gmail>
+  keywords: [google, protocol]
+  # All APIs should live in the same repository
+  repository_url: https://github.com/Byron/youtube-rs
