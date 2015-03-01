@@ -275,7 +275,7 @@ def main():
 
     if (options.out):
         file = open(options.out, 'wb')
-        file.write(out)
+        file.write(out.encode('utf-8'))
         file.close()
     else:
         print(out.encode('utf-8'))
