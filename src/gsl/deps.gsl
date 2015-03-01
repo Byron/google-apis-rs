@@ -1,0 +1,9 @@
+.template 0
+ amount = 1000
+ year = 2006
+ while year < 2026
+     amount = amount * 1.05
+     year = year + 1
+ endwhile
+ echo amount
+.endtemplate
