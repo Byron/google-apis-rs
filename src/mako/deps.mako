@@ -10,9 +10,12 @@
 	api_clean = api_name + '-clean'
 	api_info.append((api_name, api_clean, gen_root))
 %>\
-${gen_root}: ${directories.api_base}/${a.name}/${a.version}/${a.name}-api.json ${SHARED_INFO_FILE}
+${gen_root}: ${directories.api_base}/${a.name}/${a.version}/${a.name}-api.json $(API_SHARED_INFO)
+	@mkdir -p $@
+	$(TPL) -io ${directories.mako_src}/cargo.toml.mako=$@/cargo.toml --data-files $^
+
 ${api_name}: ${gen_root}
-	@echo TODO ${api_name} command
+	
 ${api_clean}:
 	-rm -Rf ${gen_root}
 % endfor

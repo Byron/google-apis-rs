@@ -1,4 +1,5 @@
 .pyenv
+generated/
 target
 .api.deps
 Cargo.lock

@@ -257,47 +257,64 @@ def _exit():
 
 def cmdline(argv=None):
 
-    parser = ArgumentParser("usage: %prog [FILENAME]")
-    parser.add_argument("--var", default=[], action="append",
-                  help="variable (can be used multiple times, use name=value)")
-    parser.add_argument("--data-files", default=[], action="append",
+    parser = ArgumentParser("mako-render")
+    parser.add_argument("--var",  nargs="*", default=[],
+                  help="variable (can be used multiple times, use NAME=VALUE)")
+    parser.add_argument("--data-files", nargs="*", default=[],
                   help="data file (can be used multiple times, use path[=namespace])")
-    parser.add_argument("--template-dir", default=[], action="append",
+    parser.add_argument("--template-dir", nargs="*", default=[],
                   help="Directory to use for template lookup (multiple "
                     "directories may be provided). If not given then if the "
                     "template is read from stdin, the value defaults to be "
                     "the current directory, otherwise it defaults to be the "
                     "parent directory of the file provided.")
-    parser.add_argument('input', nargs='?', default='-')
+    parser.add_argument('-io', nargs="+",
+                        help="input and ouptut pairs. can be used multiple times, use TEMPLATE_FILE_IN=[OUTPUT_FILE])")
 
     options = parser.parse_args(argv)
-    if options.input == '-':
-        lookup_dirs = options.template_dir or ["."]
-        lookup = TemplateLookup(lookup_dirs)
-        try:
-            template = Template(sys.stdin.read(), lookup=lookup)
-        except:
-            _exit()
-    else:
-        filename = options.input
-        if not isfile(filename):
-            raise SystemExit("error: can't find %s" % filename)
-        lookup_dirs = options.template_dir or [dirname(filename)]
-        lookup = TemplateLookup(lookup_dirs)
-        try:
-            template = Template(filename=filename, lookup=lookup)
-        except:
-            _exit()
+    if len(options.io) == 0:
+        options.io.append('-')
+    options.io = [varsplit(v) for v in options.io]
 
     datafiles = [varsplit(var) for var in options.data_files]
     data = load_data(datafiles)
-    data = dict((k, DictObject(v)) for k, v in data.items())
-    data.update(dict([varsplit(var) for var in options.var]))
-    
-    try:
-        print(template.render(**data))
-    except:
-        _exit()
+    data_converted = dict((k, DictObject(v)) for k, v in data.items() if isinstance(v, dict))
+    data_converted.update((k, v) for k, v in data.items() if not isinstance(v, dict))
+    data_converted.update(dict([varsplit(var) for var in options.var]))
+    del data
+
+    seen_stdin = False
+    for input_file, output_file in options.io:
+        if input_file == '-':
+            assert not seen_stdin, "STDIN (-) can only be named once"
+            seen_stdin = True
+            lookup_dirs = options.template_dir or ["."]
+            lookup = TemplateLookup(lookup_dirs)
+            try:
+                template = Template(sys.stdin.read(), lookup=lookup)
+            except:
+                _exit()
+        else:
+            if not isfile(input_file):
+                raise SystemExit("error: can't find %s" % input_file)
+            lookup_dirs = options.template_dir or [dirname(input_file)]
+            lookup = TemplateLookup(lookup_dirs)
+            try:
+                template = Template(filename=input_file, lookup=lookup)
+            except:
+                _exit()
+
+        try:
+            result = template.render(**data_converted)
+            if output_file:
+                fh = open(output_file, "wb")
+                fh.write(result)
+                fh.close()
+            else:
+                print(result)
+        except:
+            _exit()
+    # end for each input file
 
 
 if __name__ == "__main__":

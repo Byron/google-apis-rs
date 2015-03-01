@@ -29,7 +29,7 @@ $(PYTHON):
 $(MAKO_RENDER): $(PYTHON)
 
 $(API_DEPS): $(API_SHARED_INFO) $(API_DEPS_TPL) $(MAKO_RENDER)
-	$(TPL) --data-files $(API_SHARED_INFO) --var SHARED_INFO_FILE=$(API_SHARED_INFO) $(API_DEPS_TPL) > $@
+	$(TPL) -io $(API_DEPS_TPL) --data-files $(API_SHARED_INFO) > $@
 
 api-deps: $(API_DEPS)
 
