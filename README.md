@@ -22,8 +22,8 @@ The license of everything not explicitly under a different license are licensed 
 What follows is a list of other material that is licensed differently.
 
 * **./etc/bin/json2xml.py** is licensed like MIT, as shown in the header of the file. See original source [on github][html2json].
-* **./etc/bin/gsl_\*** is licensed under [GNU GPL][imatix-copying]. The source code is [on github][gsl]
-* **./etc/api/\*\*/*.json** are licensed under a [MIT-like google license][google-lic]
+* **./etc/bin/gsl_\*** is licensed under [GNU GPL][imatix-copying]. The source code is [on github][gsl].
+* **./etc/api/\*\*/*.json** are licensed under a [MIT-like google license][google-lic].
 
 
 [oauth]: https://crates.io/crates/yup-oauth2
