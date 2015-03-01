@@ -124,27 +124,41 @@ def internal_to_elem(pfsh, factory=ET.Element):
     text = None
     tail = None
     sublist = []
-    tag = list(pfsh.keys())
-    if len(tag) != 1:
-        raise ValueError("Illegal structure with multiple tags: %s" % tag)
-    tag = tag[0]
-    value = pfsh[tag]
-    if isinstance(value, dict):
-        for k, v in list(value.items()):
-            if k[:1] == "@":
-                attribs[k[1:]] = v
-            elif k == "#text":
-                text = v
-            elif k == "#tail":
-                tail = v
-            elif isinstance(v, list):
-                for v2 in v:
-                    sublist.append(internal_to_elem({k: v2}, factory=factory))
-            else:
-                sublist.append(internal_to_elem({k: v}, factory=factory))
-    else:
-        text = value
-    e = factory(tag, attribs)
+    tags = list(pfsh.keys())
+
+    # workaround 'cannot convert boolean error'
+    def sani_value(v):
+        if v == u'true':
+            return '1'
+        elif v == u'false':
+            return '0'
+        return v
+
+    # Allow deeply nested structures
+    for tag in tags:
+        value = pfsh[tag]
+        # we santize values automatically
+        # $ref -> _ref
+        if tag.startswith('$'):
+            tag = '_' + tag[1:]
+
+        if isinstance(value, dict):
+            for k, v in value.items():
+                if k[:1] == "@":
+                    attribs[k[1:]] = v
+                elif k == "#text":
+                    text = v
+                elif k == "#tail":
+                    tail = v
+                elif isinstance(v, list):
+                    for v2 in v:
+                        sublist.append(internal_to_elem({k: v2}, factory=factory))
+                else:
+                    sublist.append(internal_to_elem({k: v}, factory=factory))
+        else:
+            text = sani_value(value)
+        e = factory(tag, attribs)
+
     for sub in sublist:
         e.append(sub)
     e.text = text
@@ -206,7 +220,7 @@ def main():
         prog='xml2json',
         usage='%prog -t xml2json -o file.json [file]'
     )
-    p.add_option('--type', '-t', help="'xml2json' or 'json2xml'", default="xml2json")
+    p.add_option('--type', '-t', help="'xml2json' or 'json2xml'", default="json2xml")
     p.add_option('--out', '-o', help="Write to OUT instead of stdout")
     p.add_option(
         '--strip_text', action="store_true",
