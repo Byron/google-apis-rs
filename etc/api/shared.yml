@@ -1,20 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Contains values shared among all API implementations -->
-<shared>
-	<!-- All APIs we are able to supposed build -->
-	<apis base-path="etc/api">
-		<api name="youtube" version="v3"/>
-	</apis>
-	<cargo>	
-		<build version="0.0.1"/>
-		<authors>
-			<author name="Sebastian Thiel" email="byronimo@gmail"/>
-		</authors>
-		<keywords>
-			<word name="google"/>
-			<word name="protocol"/>
-		</keywords>
-		<!-- All APIs should live in the same repository -->
-		<repository url="https://github.com/Byron/youtube-rs"/>
-	</cargo>
-</shared>
+# Contains values shared among all API implementations
+apis:
+	base_path: "etc/api"
+	- name: youtube
+		version: v3
+cargo:
+	build_version: "0.0.1"
+	authors:
+		- Sebastian Thiel <byronimo@gmail>
+	keywords: [google, protocol]
+	# All APIs should live in the same repository
+	repository_url: https://github.com/Byron/youtube-rs
