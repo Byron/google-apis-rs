@@ -5,7 +5,7 @@
 <%api_info=[]%>\
 % for a in api.list:
 <%
-	gen_root = directories.output + '/' + a.name + '_' + a.version
+	gen_root = directories.output + '/' + a.name + a.version[1:]
 	api_name = a.name + a.version
 	api_clean = api_name + '-clean'
 	# source, destination
@@ -17,7 +17,7 @@
 %>\
 ${gen_root}: ${' '.join(i[0] for i in sds)} ${api_json_inputs}
 	@mkdir -p $@
-	$(TPL) -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
+	$(TPL) --var OUTPUT_DIR=$@ -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
 
 ${api_name}: ${gen_root}
 	

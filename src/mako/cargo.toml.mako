@@ -1,12 +1,14 @@
 [package]
 
-name = "youtube3-dev"
-version = "0.0.1"
-authors = ["Sebastian Thiel <byronimo@gmail.com>"]
-description = "A library to facilitate interacting with your youtube account"
-repository = "https://github.com/Byron/youtube-rs"
+name = "${name}${version[1:]}"
+version = "${cargo.build_version}"
+authors = [${",\n           ".join('"%s"' % a for a in cargo.authors)}]
+description = "A library to interact with ${canonicalName} (protocol ${version})"
+repository = "${cargo.repo_base_url}/${OUTPUT_DIR}"
+homepage = "${documentationLink}"
+documentation = "${cargo.doc_base_url}"
 license = "MIT"
-keywords = ["youtube", "google", "protocol"]
+keywords = ["${name}", ${", ".join('"%s"' % k for k in cargo.keywords)}]
 
 [dependencies]
 # Just to get hyper to work !

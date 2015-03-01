@@ -1,13 +1,13 @@
 # Contains values shared among all API implementations
 directories:
   # directory under which all generated sources should reside
-  output: ./generated
+  output: generated
   # how to get from `output` back to common library
   common: ../
   # where are all the API meta files
-  api_base: ./etc/api
+  api_base: etc/api
   # all mako source files
-  mako_src: ./src/mako
+  mako_src: src/mako
 api:
   list:
     - name: youtube
@@ -19,8 +19,10 @@ api:
       # output_dir:  optional - not there if unset
 cargo:
   build_version: "0.0.1"
+  repo_base_url: https://github.com/Byron/youtube-rs
+  doc_base_url: http://byron.github.io/youtube-rs
   authors:
     - Sebastian Thiel <byronimo@gmail>
-  keywords: [google, protocol]
+  keywords: [google, protocol, web, api]
   # All APIs should live in the same repository
   repository_url: https://github.com/Byron/youtube-rs
