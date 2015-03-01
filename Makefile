@@ -22,7 +22,7 @@ help:
 	$(info api-deps     -   generate a file to tell make what API file dependencies will be)
 
 json-to-xml: $(API_XML_FILES)
-$(API_DEPS): $(API_XML_FILES)
+$(API_DEPS): $(API_SHARED_XML)
 	$(GSL) -script:src/gsl/deps.gsl $(API_SHARED_XML)
 
 %.xml: %.json
