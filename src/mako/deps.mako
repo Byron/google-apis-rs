@@ -1,11 +1,15 @@
-<%api_info=[]%>
+# DO NOT EDIT !
+# This file was generated automatically by '${self.uri}'
+# DO NOT EDIT !
+
+<%api_info=[]%>\
 % for a in api.list:
 <%
 	gen_root = directories.output + '/' + a.name + '_' + a.version
 	api_name = a.name + a.version
 	api_clean = api_name + '-clean'
 	api_info.append((api_name, api_clean, gen_root))
-%>
+%>\
 ${gen_root}: ${directories.api_base}/${a.name}/${a.version}/${a.name}-api.json ${SHARED_INFO_FILE}
 ${api_name}: ${gen_root}
 	@echo TODO ${api_name} command
