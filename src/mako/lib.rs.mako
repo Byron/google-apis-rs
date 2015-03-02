@@ -11,7 +11,6 @@ extern crate cmn;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate "yup-oauth2" as oauth2;
 
-use std::default::Default;
 use std::collections::HashMap;
 
 ## SCHEMAS - normal ones
