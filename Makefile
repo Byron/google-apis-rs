@@ -39,7 +39,7 @@ api-deps: $(API_DEPS)
 
 include $(API_DEPS)
 
-clean: clean-api
+clean: clean-apis
 	-rm -Rf $(VENV_DIR)
 	-rm $(API_DEPS)
 

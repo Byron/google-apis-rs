@@ -31,9 +31,11 @@ ${api_clean}:
 .PHONY += $(.PHONY) ${' '.join(a[0] for a in api_info)} ${' '.join(a[1] for a in api_info)}
 
 help-api:
+	$(info apis       -    make all APIs)
 % for a in api_info:
 	$(info ${a[0]}    -    build the ${a[0]} api)
 	$(info ${a[1]}    -    clean all generated files of the ${a[0]} api)
 % endfor
 
-clean-api: ${' '.join(a[1] for a in api_info)}
+clean-apis: ${' '.join(a[1] for a in api_info)}
+apis: ${' '.join(a[0] for a in api_info)}
