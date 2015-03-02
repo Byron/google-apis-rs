@@ -1,12 +1,13 @@
+<%! import util %>\
 # DO NOT EDIT !
 # This file was generated automatically by '${self.uri}'
 # DO NOT EDIT !
 [package]
 
-name = "${name}${version[1:]}"
+name = "${name}${util.to_api_version(version)}"
 version = "${cargo.build_version}"
 authors = [${",\n           ".join('"%s"' % a for a in cargo.authors)}]
-description = "A library to interact with ${canonicalName} (protocol ${version})"
+description = "A complete library to interact with ${canonicalName} (protocol ${version})"
 repository = "${cargo.repo_base_url}/${OUTPUT_DIR}"
 homepage = "${documentationLink}"
 documentation = "${cargo.doc_base_url}"

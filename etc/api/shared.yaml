@@ -19,10 +19,10 @@ api:
       # output_dir:  optional - not there if unset
 cargo:
   build_version: "0.0.1"
-  repo_base_url: https://github.com/Byron/youtube-rs
-  doc_base_url: http://byron.github.io/youtube-rs
+  repo_base_url: https://github.com/Byron/google-apis-rs
+  doc_base_url: http://byron.github.io/google-apis-rs
   authors:
     - Sebastian Thiel <byronimo@gmail>
   keywords: [google, protocol, web, api]
   # All APIs should live in the same repository
-  repository_url: https://github.com/Byron/youtube-rs
+  repository_url: https://github.com/Byron/google-apis-rs
