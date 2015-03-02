@@ -3,3 +3,4 @@
 The `${util.library_name(name, version)}` library allows access to all features of *${canonicalName}*.
 
 <%lib:docs />
+<%lib:license />

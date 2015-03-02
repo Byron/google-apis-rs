@@ -46,7 +46,7 @@ LICENSE.md: $(MAKO_SRC)/LICENSE.md.mako $(API_SHARED_INFO)
 
 license: LICENSE.md
 
-rebuild-apis: clean-apis apis
+rebuild-apis: clean-apis apis license
 
 clean: clean-apis
 	-rm -Rf $(VENV_DIR)

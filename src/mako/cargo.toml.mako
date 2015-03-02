@@ -1,4 +1,5 @@
 <%! import util %>\
+<%namespace name="mutil" file="lib/util.mako"/>\
 # DO NOT EDIT !
 # This file was generated automatically by '${self.uri}'
 # DO NOT EDIT !
@@ -8,10 +9,10 @@ name = "${name}${util.to_api_version(version)}"
 version = "${cargo.build_version}"
 authors = [${",\n           ".join('"%s"' % a for a in cargo.authors)}]
 description = "A complete library to interact with ${canonicalName} (protocol ${version})"
-repository = "${cargo.repo_base_url}/${OUTPUT_DIR}"
+repository = "${mutil.repository_url()}"
 homepage = "${documentationLink}"
 documentation = "${cargo.doc_base_url}"
-license = "MIT"
+license = "${copyright.license_abbrev}"
 keywords = ["${name}", ${", ".join('"%s"' % k for k in cargo.keywords)}]
 
 [dependencies]

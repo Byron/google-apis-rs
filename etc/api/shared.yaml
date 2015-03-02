@@ -31,6 +31,7 @@ cargo:
   repository_url: https://github.com/Byron/google-apis-rs
 
 copyright:
+  license_abbrev: "MIT"
   # should at some point be 2015-2016 ... 
   years: '2015'
   authors:
