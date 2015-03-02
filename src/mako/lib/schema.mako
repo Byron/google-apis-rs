@@ -21,5 +21,5 @@ pub struct ${s.id}\
 </%def>
 
 <%def name="doc(s)">\
-${s.get('description', 'There is no detailed description.')}
+${s.get('description', 'There is no detailed description.')}\
 </%def>
