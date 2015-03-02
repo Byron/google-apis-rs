@@ -1,6 +1,9 @@
 <%! import util %>\
+<%namespace name="util" file="lib/util.mako"/>\
+
 <%def name="docs()">\
 TODO: Library level fully fledged documentation, incuding **summary** and **usage**.
+And another line, for testing
 </%def>
 
 <%def name="license()">\

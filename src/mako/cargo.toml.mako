@@ -24,5 +24,8 @@ hyper = "*"
 rustc-serialize = "*"
 yup-oauth2 = "*"
 
+[dependencies.cmn]
+path = "${directories.common}/.."
+
 [dev-dependencies]
 yup-hyper-mock = "*"

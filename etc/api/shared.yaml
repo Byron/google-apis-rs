@@ -1,9 +1,9 @@
 # Contains values shared among all API implementations
 directories:
   # directory under which all generated sources should reside
-  output: lib
+  output: gen
   # how to get from `output` back to common library
-  common: ../
+  common: ..
   # where are all the API meta files
   api_base: etc/api
   # all mako source files
@@ -18,7 +18,8 @@ api:
     - source: README.md
     - source: LICENSE.md
     - source: cargo.toml
-      # output_dir:  optional - not there if unset
+    - source: lib.rs
+      output_dir: src
 cargo:
   build_version: "0.0.1"
   repo_base_url: https://github.com/Byron/google-apis-rs

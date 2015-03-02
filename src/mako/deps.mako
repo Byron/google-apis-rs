@@ -10,7 +10,7 @@
 	api_name = util.library_name(a.name, a.version)
 	api_clean = api_name + '-clean'
 	# source, destination of individual output files
-	sds = [(directories.mako_src + '/' + i.source + '.mako', gen_root + i.get('output_dir', '') + '/' + i.source) 
+	sds = [(directories.mako_src + '/' + i.source + '.mako', gen_root + '/' + i.get('output_dir', '') + '/' + i.source) 
 																								for i in api.templates]
 	api_json = directories.api_base + '/' + a.name + '/' + a.version + '/' + a.name + '-api.json'
 	api_json_inputs = api_json + " $(API_SHARED_INFO)"

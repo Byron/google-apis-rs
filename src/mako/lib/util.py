@@ -1,11 +1,13 @@
+import re
+re_linestart = re.compile('^', flags=re.MULTILINE)
 
 # rust module doc comment filter
-def rmdc(s):
-    return '//! ' + s
+def rust_module_doc_comment(s):
+    return re_linestart.sub('//! ', s)
 
 # rust doc comment filter
-def rdc(s):
-    return '/// ' + s
+def rust_doc_comment(s):
+    return re_linestart.sub('/// ', s)
 
 # Expects v to be 'v\d+', throws otherwise
 def to_api_version(v):
@@ -22,7 +24,7 @@ def put_and(l):
 
 # escape each string in l with "s" and return the new list
 def estr(l):
-    return ["%s" % i for i in l]
+    return ['"%s"' % i for i in l]
 
 # build a full library name (non-canonical)
 def library_name(name, version):
