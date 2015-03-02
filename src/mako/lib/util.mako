@@ -1,4 +1,4 @@
-
+<%! import util %>\
 
 
 ## This will only work within a substitution, not within python code
@@ -10,4 +10,8 @@ ${v[1:]}\
 
 <%def name="repository_url()">\
 ${cargo.repo_base_url}/${OUTPUT_DIR}\
+</%def>
+
+<%def name="library_name()">\
+${util.library_name(name, version)}\
 </%def>

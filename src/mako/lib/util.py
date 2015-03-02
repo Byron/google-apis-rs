@@ -20,6 +20,10 @@ def put_and(l):
         return l[0]
     return ', '.join(l[:-1]) + ' and ' + l[-1]
 
+# escape each string in l with "s" and return the new list
+def estr(l):
+    return ["%s" % i for i in l]
+
 # build a full library name (non-canonical)
 def library_name(name, version):
     return name + to_api_version(version)
