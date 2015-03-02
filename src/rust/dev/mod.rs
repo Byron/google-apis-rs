@@ -11,13 +11,12 @@
 //! # // TODO - generate !
 //! # }
 //! ```
-extern crate hyper;
-extern crate "rustc-serialize" as rustc_serialize;
-extern crate "yup-oauth2" as oauth2;
-
 use std::marker::PhantomData;
 use std::borrow::BorrowMut;
 use std::cell::RefCell;
+
+use hyper;
+use oauth2;
 
 mod common;
 pub mod videos;

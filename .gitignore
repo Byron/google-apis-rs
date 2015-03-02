@@ -1,6 +1,6 @@
 .pyenv
-target
+*.pyc
+**target/
 .api.deps
-Cargo.lock
+**Cargo.lock
 *.sublime-workspace
-*.xml
