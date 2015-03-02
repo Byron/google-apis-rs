@@ -308,13 +308,14 @@ def cmdline(argv=None):
         try:
             result = template.render(**data_converted)
             if output_file:
-                if not os.path.isdir(dirname(output_file)):
-                    os.makedirs(dirname(output_file))
+                dir = dirname(output_file)
+                if dir and not os.path.isdir(dir):
+                    os.makedirs(dir)
                 fh = open(output_file, "wb")
-                fh.write(result)
+                fh.write(result.encode('utf-8'))
                 fh.close()
             else:
-                print(result)
+                print(result.encode('utf-8'))
         except:
             _exit()
     # end for each input file

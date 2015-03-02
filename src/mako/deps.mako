@@ -1,15 +1,13 @@
 # DO NOT EDIT !
 # This file was generated automatically by '${self.uri}'
 # DO NOT EDIT !
-## ${util.to_api_version('v3')}
-## here <%util:to_api_version v="v3"/>
+
 <%api_info=[]%>\
 % for a in api.list:
 <%
 	import util
-	version = util.to_api_version(a.version)
-	gen_root = directories.output + '/' + a.name + version
-	api_name = a.name + version
+	gen_root = directories.output + '/' + a.name + util.to_api_version(a.version)
+	api_name = util.library_name(a.name, a.version)
 	api_clean = api_name + '-clean'
 	# source, destination of individual output files
 	sds = [(directories.mako_src + '/' + i.source + '.mako', gen_root + i.get('output_dir', '') + '/' + i.source) 

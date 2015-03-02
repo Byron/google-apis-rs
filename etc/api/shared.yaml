@@ -16,6 +16,7 @@ api:
   templates:
   # all output directories are relative to the one set for the respective API
     - source: README.md
+    - source: LICENSE.md
     - source: cargo.toml
       # output_dir:  optional - not there if unset
 cargo:
@@ -23,7 +24,14 @@ cargo:
   repo_base_url: https://github.com/Byron/google-apis-rs
   doc_base_url: http://byron.github.io/google-apis-rs
   authors:
+    # don't forget to possibly add them to copyright authors
     - Sebastian Thiel <byronimo@gmail>
   keywords: [google, protocol, web, api]
   # All APIs should live in the same repository
   repository_url: https://github.com/Byron/google-apis-rs
+
+copyright:
+  # should at some point be 2015-2016 ... 
+  years: '2015'
+  authors:
+    - 'Sebastian Thiel'
