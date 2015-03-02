@@ -1,4 +1,4 @@
-.PHONY:  json-to-xml clean help api-deps
+.PHONY:  json-to-xml clean help api-deps rebuild-apis
 .SUFFIXES:
 
 include Makefile.helpers
@@ -24,6 +24,7 @@ help:
 	$(info Targets)
 	$(info help         -   print this help)
 	$(info api-deps     -   generate a file to tell make what API file dependencies will be)
+	$(info rebuild-apis -   clear out all generated apis, and regenerate them)
 	$(info help-api     -   show all api targets to build individually)
 
 $(PYTHON):
@@ -38,6 +39,8 @@ $(API_DEPS): $(API_SHARED_INFO) $(API_DEPS_TPL) $(MAKO_LIB_FILES) $(MAKO_RENDER)
 api-deps: $(API_DEPS)
 
 include $(API_DEPS)
+
+rebuild-apis: clean-apis apis
 
 clean: clean-apis
 	-rm -Rf $(VENV_DIR)

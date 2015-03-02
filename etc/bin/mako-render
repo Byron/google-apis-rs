@@ -5,6 +5,7 @@
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 from argparse import ArgumentParser
 from os.path import isfile, dirname
+import os
 import sys
 from mako.template import Template
 from mako.lookup import TemplateLookup
@@ -307,6 +308,8 @@ def cmdline(argv=None):
         try:
             result = template.render(**data_converted)
             if output_file:
+                if not os.path.isdir(dirname(output_file)):
+                    os.makedirs(dirname(output_file))
                 fh = open(output_file, "wb")
                 fh.write(result)
                 fh.close()

@@ -19,7 +19,6 @@
 	api_info.append((api_name, api_clean, gen_root))
 %>\
 ${gen_root}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_LIB_FILES) $(MAKO_RENDER)
-	@mkdir -p $@
 	PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.' --var OUTPUT_DIR=$@ -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
 
 ${api_name}: ${gen_root}
@@ -28,7 +27,7 @@ ${api_clean}:
 	-rm -Rf ${gen_root}
 % endfor
 
-.PHONY += $(.PHONY) ${' '.join(a[0] for a in api_info)} ${' '.join(a[1] for a in api_info)}
+.PHONY += $(.PHONY) help-api clean-apis apis ${' '.join(a[0] for a in api_info)} ${' '.join(a[1] for a in api_info)}
 
 help-api:
 	$(info apis       -    make all APIs)

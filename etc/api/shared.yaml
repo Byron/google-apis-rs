@@ -1,7 +1,7 @@
 # Contains values shared among all API implementations
 directories:
   # directory under which all generated sources should reside
-  output: generated
+  output: lib
   # how to get from `output` back to common library
   common: ../
   # where are all the API meta files
@@ -15,6 +15,7 @@ api:
   base_path: "etc/api"
   templates:
   # all output directories are relative to the one set for the respective API
+    - source: README.md
     - source: cargo.toml
       # output_dir:  optional - not there if unset
 cargo:
