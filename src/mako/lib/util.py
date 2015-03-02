@@ -76,13 +76,18 @@ def to_rust_type(sn, pn, t, allow_optionals=True):
             return "Option<%s>" % tn
         return tn
     try:
+        is_pod = True
         rust_type = TYPE_MAP[t.type]
         if t.type == 'array':
             rust_type = "%s<%s>" % (rust_type, nested_type(t))
+            is_pod = False
         elif t.type == 'object':
             rust_type = "%s<String, %s>" % (rust_type, nested_type(t))
+            is_pod = False
         elif rust_type == USE_FORMAT:
             rust_type = TYPE_MAP[t.format]
+        if is_pod and allow_optionals:
+            return "Option<%s>" % rust_type
         return rust_type
     except KeyError as err:
         raise AssertionError("%s: Property type '%s' unknown - add new type mapping: %s" % (str(err), t.type, str(t)))
