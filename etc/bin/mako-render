@@ -288,7 +288,7 @@ def cmdline(argv=None):
         if input_file == '-':
             assert not seen_stdin, "STDIN (-) can only be named once"
             seen_stdin = True
-            lookup_dirs = options.template_dir or ["."]
+            lookup_dirs = options.template_dir or ['.']
             lookup = TemplateLookup(lookup_dirs)
             try:
                 template = Template(sys.stdin.read(), lookup=lookup)

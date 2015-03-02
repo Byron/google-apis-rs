@@ -1,4 +1,5 @@
 .pyenv
+*.pyc
 generated/
 target
 .api.deps

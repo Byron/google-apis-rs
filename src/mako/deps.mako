@@ -1,23 +1,26 @@
 # DO NOT EDIT !
 # This file was generated automatically by '${self.uri}'
 # DO NOT EDIT !
-
+## ${util.to_api_version('v3')}
+## here <%util:to_api_version v="v3"/>
 <%api_info=[]%>\
 % for a in api.list:
 <%
-	gen_root = directories.output + '/' + a.name + a.version[1:]
-	api_name = a.name + a.version
+	import util
+	version = util.to_api_version(a.version)
+	gen_root = directories.output + '/' + a.name + version
+	api_name = a.name + version
 	api_clean = api_name + '-clean'
-	# source, destination
+	# source, destination of individual output files
 	sds = [(directories.mako_src + '/' + i.source + '.mako', gen_root + i.get('output_dir', '') + '/' + i.source) 
 																								for i in api.templates]
 	api_json = directories.api_base + '/' + a.name + '/' + a.version + '/' + a.name + '-api.json'
 	api_json_inputs = api_json + " $(API_SHARED_INFO)"
 	api_info.append((api_name, api_clean, gen_root))
 %>\
-${gen_root}: ${' '.join(i[0] for i in sds)} ${api_json_inputs}
+${gen_root}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_LIB_FILES) $(MAKO_RENDER)
 	@mkdir -p $@
-	$(TPL) --var OUTPUT_DIR=$@ -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
+	PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.' --var OUTPUT_DIR=$@ -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
 
 ${api_name}: ${gen_root}
 	

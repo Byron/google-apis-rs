@@ -1,3 +1,6 @@
+# DO NOT EDIT !
+# This file was generated automatically by '${self.uri}'
+# DO NOT EDIT !
 [package]
 
 name = "${name}${version[1:]}"
