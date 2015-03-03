@@ -18,8 +18,10 @@
 	api_json_inputs = api_json + " $(API_SHARED_INFO)"
 	api_info.append((api_name, api_clean, gen_root))
 %>\
-${api_common}: $(RUST_SRC)/cmn.rs
-	@cp $< $@
+${api_common}: $(RUST_SRC)/cmn.rs $(lastword $(MAKEFILE_LIST))
+	@ echo "// COPY OF '$<'"  > $@
+	@ echo "// DO NOT EDIT"  >> $@
+	@cat $< >> $@
 
 ${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_LIB_FILES) $(MAKO_RENDER)
 	PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.' --var OUTPUT_DIR=$@ -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}

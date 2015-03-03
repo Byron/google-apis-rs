@@ -35,6 +35,21 @@ def rust_module_doc_comment(s):
 def rust_doc_comment(s):
     return re_linestart.sub('/// ', s)
 
+# rust comment filter
+def rust_comment(s):
+    return re_linestart.sub('// ', s)
+
+# hash-based comment filter
+def hash_comment(s):
+    return re_linestart.sub('# ', s)
+
+# markdown comments
+def markdown_comment(s):
+    nl = ''
+    if not s.endswith('\n'):
+        nl = '\n'
+    return "<!---\n%s%s-->" % (s, nl)
+
 # escape each string in l with "s" and return the new list
 def estr(l):
     return ['"%s"' % i for i in l]

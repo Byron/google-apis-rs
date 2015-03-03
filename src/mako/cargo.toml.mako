@@ -1,8 +1,8 @@
 <%! import util %>\
 <%namespace name="mutil" file="lib/util.mako"/>\
-# DO NOT EDIT !
-# This file was generated automatically by '${self.uri}'
-# DO NOT EDIT !
+<%block filter="util.hash_comment">\
+<%mutil:gen_info source="${self.uri}" />\
+</%block>
 [package]
 
 name = "${mutil.library_name()}"

@@ -8,6 +8,10 @@
 <%namespace name="lib" file="lib/lib.mako"/>\
 <%namespace name="mutil" file="lib/util.mako"/>\
 <%namespace name="schema" file="lib/schema.mako"/>\
+<%block filter="util.rust_comment">\
+<%mutil:gen_info source="${self.uri}" />\
+</%block>
+
 <%block filter="util.rust_module_doc_comment">\
 <%lib:docs />\
 </%block>

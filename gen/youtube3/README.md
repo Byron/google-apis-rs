@@ -1,3 +1,8 @@
+<!---
+DO NOT EDIT !
+This file was generated automatically from 'src/mako/README.md.mako'
+DO NOT EDIT !
+-->
 The `youtube3` library allows access to all features of *YouTube*.
 
 TODO: Library level fully fledged documentation, incuding **summary** and **usage**.

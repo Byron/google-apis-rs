@@ -1,5 +1,12 @@
 <%! import util %>\
 
+## source should be ${self.uri}
+## you need to escape the output, using a filter for example
+<%def name="gen_info(source)">\
+DO NOT EDIT !
+This file was generated automatically from '${source}'
+DO NOT EDIT !\
+</%def>
 
 ## This will only work within a substitution, not within python code
 <%def name="to_api_version(v)">\

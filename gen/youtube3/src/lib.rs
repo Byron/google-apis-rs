@@ -1,3 +1,7 @@
+// DO NOT EDIT !
+// This file was generated automatically from 'src/mako/lib.rs.mako'
+// DO NOT EDIT !
+
 //! TODO: Library level fully fledged documentation, incuding **summary** and **usage**.
 //! And another line, for testing
 //! 
