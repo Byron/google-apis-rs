@@ -149,7 +149,7 @@ def schema_markers(s, c):
     else:
         # it should have at least one activity that matches it's type to qualify for the Resource trait
         for fqan, iot in activities.iteritems():
-            if activity_name_to_type_name(activity_split(fqan)[0]) == s.id:
+            if activity_name_to_type_name(activity_split(fqan)[0]).lower() == s.id.lower():
                 res.add('Resource')
             if IO_RESPONSE in iot:
                 res.add('ResponseResult')
