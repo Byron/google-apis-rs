@@ -14,6 +14,8 @@ TYPE_MAP = {'boolean' : 'bool',
             'string'  : 'String',
             'object'  : 'HashMap'}
 TREF = '$ref'
+INS_METHOD = 'insert'
+DEL_METHOD = 'delete'
 
 # ==============================================================================
 ## @name Filters
@@ -58,7 +60,7 @@ def put_and(l):
 
 
 def nested_type_name(sn, pn):
-    return sn + pn[:1].upper() + pn[1:]
+    return sn + pn.capitalize()
 
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
@@ -150,15 +152,33 @@ def build_activity_mappings(activities):
                 t = m.get(in_out_type_name, None)
                 if t is None:
                     continue
-
                 tn = to_rust_type(None, None, t, allow_optionals=False)
                 info = res.setdefault(tn, dict())
                 io_info = info.setdefault(m.id, [])
                 io_info.append(in_out_type_name)
             # end for each io type
+
+            # handle delete/getrating/(possibly others)
+            # delete: has no response or request
+            # getrating: response is a 'SomethingResult', which is still related to activities name
+            #            the latter is used to deduce the resource name
+            an, _ = activity_split(m.id)
+            # videos -> Video
+            an = an.capitalize()[:-1]
+            info = res.setdefault(an, dict())
+            if m.id not in info:
+                io_info = info.setdefault(m.id, [])
+                io_info.append([])
+            # end handle other cases
         # end for each method
     # end for each activity
     return res, fqan
+
+# return (name, method)
+def activity_split(fqan):
+    t = fqan.split('.')
+    assert len(t) == 3
+    return t[1:]
 
 ## -- End Activity Utilities -- @}
 

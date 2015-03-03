@@ -147,6 +147,8 @@ pub struct PlaylistLocalization {
 /// # Activities
 /// 
 /// * youtube.playlists.insert
+/// * youtube.playlists.delete
+/// * youtube.playlists.list
 /// * youtube.playlists.update
 /// 
 /// 
@@ -754,7 +756,7 @@ pub struct ChannelSectionSnippet {
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentDetails {
 	/// no description provided
-	pub relatedPlaylists: HashMap<String, ChannelContentDetailsRelatedPlaylists>,
+	pub relatedPlaylists: HashMap<String, ChannelContentDetailsRelatedplaylists>,
 	/// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.
 	pub googlePlusUserId: Option<String>,
 }
@@ -974,8 +976,12 @@ pub struct SubscriptionContentDetails {
 /// 
 /// # Activities
 /// 
+/// * youtube.videos.rate
+/// * youtube.videos.getRating
+/// * youtube.videos.list
 /// * youtube.videos.insert
 /// * youtube.videos.update
+/// * youtube.videos.delete
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1149,6 +1155,8 @@ pub struct PromotedItemId {
 /// # Activities
 /// 
 /// * youtube.subscriptions.insert
+/// * youtube.subscriptions.list
+/// * youtube.subscriptions.delete
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1483,7 +1491,10 @@ pub struct VideoFileDetailsVideoStream {
 
 /// A thumbnail is an image representing a YouTube resource.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// * youtube.thumbnails.set
+/// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct Thumbnail {
@@ -1499,6 +1510,7 @@ pub struct Thumbnail {
 /// 
 /// # Activities
 /// 
+/// * youtube.channels.list
 /// * youtube.channels.update
 /// 
 /// 
@@ -2488,7 +2500,7 @@ pub struct PageInfo {
 /// This schema type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
-pub struct ChannelContentDetailsRelatedPlaylists {
+pub struct ChannelContentDetailsRelatedplaylists {
 	/// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.
 	pub uploads: Option<String>,
 	/// The ID of the playlist that contains the channel"s watch history. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
