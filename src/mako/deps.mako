@@ -7,6 +7,7 @@
 <%
 	import util
 	gen_root = directories.output + '/' + a.name + util.to_api_version(a.version)
+	gen_root_stamp = gen_root + '/.timestamp'
 	api_name = util.library_name(a.name, a.version)
 	api_clean = api_name + '-clean'
 	# source, destination of individual output files
@@ -16,10 +17,11 @@
 	api_json_inputs = api_json + " $(API_SHARED_INFO)"
 	api_info.append((api_name, api_clean, gen_root))
 %>\
-${gen_root}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_LIB_FILES) $(MAKO_RENDER)
+${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_LIB_FILES) $(MAKO_RENDER)
 	PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.' --var OUTPUT_DIR=$@ -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
+	@touch $@
 
-${api_name}: ${gen_root}
+${api_name}: ${gen_root_stamp}
 	
 ${api_clean}:
 	-rm -Rf ${gen_root}

@@ -7,7 +7,6 @@ extern crate cmn;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate "yup-oauth2" as oauth2;
 
-use std::default::Default;
 use std::collections::HashMap;
 
 /// There is no detailed description.
@@ -292,15 +291,15 @@ pub struct ChannelSettings {
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoStatistics {
 	/// The number of comments for the video.
-	pub commentCount: Option<String>,
+	pub commentCount: Option<i64>,
 	/// The number of times the video has been viewed.
-	pub viewCount: Option<String>,
+	pub viewCount: Option<i64>,
 	/// The number of users who currently have the video marked as a favorite video.
-	pub favoriteCount: Option<String>,
+	pub favoriteCount: Option<i64>,
 	/// The number of users who have indicated that they disliked the video by giving it a negative rating.
-	pub dislikeCount: Option<String>,
+	pub dislikeCount: Option<i64>,
 	/// The number of users who have indicated that they liked the video by giving it a positive rating.
-	pub likeCount: Option<String>,
+	pub likeCount: Option<i64>,
 }
 
 /// Brief description of the live stream cdn settings.
@@ -1225,15 +1224,15 @@ pub struct Channel {
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelStatistics {
 	/// The number of comments for the channel.
-	pub commentCount: Option<String>,
+	pub commentCount: Option<i64>,
 	/// The number of subscribers that the channel has.
-	pub subscriberCount: Option<String>,
+	pub subscriberCount: Option<i64>,
 	/// The number of videos uploaded to the channel.
-	pub videoCount: Option<String>,
+	pub videoCount: Option<i64>,
 	/// Whether or not the number of subscribers is shown for this user.
 	pub hiddenSubscriberCount: Option<bool>,
 	/// The number of times the channel has been viewed.
-	pub viewCount: Option<String>,
+	pub viewCount: Option<i64>,
 }
 
 /// Details about a social network post.

@@ -84,6 +84,8 @@ def to_rust_type(sn, pn, t, allow_optionals=True):
         elif t.type == 'object':
             rust_type = "%s<String, %s>" % (rust_type, nested_type(t))
             is_pod = False
+        elif t.type == 'string' and 'Count' in pn:
+            rust_type = 'i64'
         elif rust_type == USE_FORMAT:
             rust_type = TYPE_MAP[t.format]
         if is_pod and allow_optionals:
