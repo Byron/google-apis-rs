@@ -2,10 +2,76 @@
 // This file was generated automatically from 'src/mako/lib.rs.mako'
 // DO NOT EDIT !
 
-//! TODO: Library level fully fledged documentation, incuding **summary** and **usage**.
-//! And another line, for testing
+//! # Features
 //! 
-//! # Activities
+//! Handle the following *Resources* with ease ... 
+//! 
+//! * activities (*insert* and *list*)
+//! * channel banners (*insert*)
+//! * channel sections (*delete*, *insert*, *list* and *update*)
+//! * channels (*list* and *update*)
+//! * guide categories (*list*)
+//! * i18n languages (*list*)
+//! * i18n regions (*list*)
+//! * live broadcasts (*bind*, *control*, *delete*, *insert*, *list*, *transition* and *update*)
+//! * live streams (*delete*, *insert*, *list* and *update*)
+//! * playlist items (*delete*, *insert*, *list* and *update*)
+//! * playlists (*delete*, *insert*, *list* and *update*)
+//! * search (*list*)
+//! * subscriptions (*delete*, *insert* and *list*)
+//! * thumbnails (*set*)
+//! * video categories (*list*)
+//! * videos (*delete*, *getRating*, *insert*, *list*, *rate* and *update*)
+//! * watermarks (*set* and *unset*)
+//! 
+//! # Structure of this Library
+//! 
+//! The API is structured into the following primary items:
+//! 
+//! * **Hub**
+//!     * a central object to maintain state and allow accessing all *Activities*
+//! * **Resources**
+//!     * primary types that you can apply *Activities* to
+//!     * a collection of properties and *Parts*
+//!     * **Parts**
+//!         * a collection of properties
+//!         * never directly used in *Activities*
+//! * **Activities**
+//!     * operations to apply to *Resources*
+//! 
+//! Generally speaking, you can invoke *Activities* like this:
+//! 
+//! ```Rust,ignore
+//! let r = hub.resource().activity(...).do()
+//! ```
+//! 
+//! Or specifically ...
+//! 
+//! ```ignore
+//! let r = hub.videos().rate(...).do()
+//! let r = hub.videos().getRating(...).do()
+//! let r = hub.videos().list(...).do()
+//! let r = hub.videos().insert(...).do()
+//! let r = hub.videos().update(...).do()
+//! let r = hub.videos().delete(...).do()
+//! ```
+//! 
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
+//! supports various methods to configure the impending operation. It is made such that all required arguments have to be 
+//! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
+//! The `do()` method performs the actual communication with the server and returns the respective result.
+//! 
+//! # Usage (*TODO*)
+//! 
+//! ## Instantiating the Hub
+//! 
+//! ## About error handling
+//! 
+//! ## About costumization
+//! 
+//! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
+//! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
 //! 
 //! 
 #![feature(core)]

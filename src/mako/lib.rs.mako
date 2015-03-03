@@ -1,19 +1,18 @@
 <% 
-	import util 
-	nested_schemas = list(util.iter_nested_types(schemas))
+	from util import (iter_nested_types, new_context, rust_comment, rust_module_doc_comment, )
+	nested_schemas = list(iter_nested_types(schemas))
 
-	sta_map, fqan_map = util.build_activity_mappings(resources)
-	c = util.Context(sta_map, fqan_map)
+	c = new_context(resources)
 %>\
 <%namespace name="lib" file="lib/lib.mako"/>\
 <%namespace name="mutil" file="lib/util.mako"/>\
 <%namespace name="schema" file="lib/schema.mako"/>\
-<%block filter="util.rust_comment">\
+<%block filter="rust_comment">\
 <%mutil:gen_info source="${self.uri}" />\
 </%block>
 
-<%block filter="util.rust_module_doc_comment">\
-<%lib:docs />\
+<%block filter="rust_module_doc_comment">\
+${lib.docs(c)}
 </%block>
 #![feature(core)]
 #![allow(non_snake_case)]

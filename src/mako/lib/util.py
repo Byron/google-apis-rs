@@ -69,6 +69,13 @@ def put_and(l):
         return l[0]
     return ', '.join(l[:-1]) + ' and ' + l[-1]
 
+def md_italic(l):
+    return ['*%s*' % s for s in l]
+
+def split_camelcase_s(s):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', s)
+    return re.sub('([a-z0-9])([A-Z])', r'\1 \2', s1).lower()
+
 ## -- End Natural Language Utilities -- @}
 
 
@@ -236,6 +243,11 @@ def activity_name_to_type_name(an):
 
 
 Context = collections.namedtuple('Context', ['sta_map', 'fqan_map'])
+
+# return a newly build context from the given data
+def new_context(resources):
+    sta_map, fqan_map = build_activity_mappings(resources)
+    return Context(sta_map, fqan_map)
 
 # Expects v to be 'v\d+', throws otherwise
 def to_api_version(v):

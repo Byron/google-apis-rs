@@ -36,7 +36,7 @@ $(PYTHON):
 $(MAKO_RENDER): $(PYTHON)
 
 $(API_DEPS): $(API_SHARED_INFO) $(API_DEPS_TPL) $(MAKO_LIB_FILES) $(MAKO_RENDER)
-	PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.' -io $(API_DEPS_TPL) --data-files $(API_SHARED_INFO) > $@
+	PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.' -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO)
 
 api-deps: $(API_DEPS)
 
