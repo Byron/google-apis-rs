@@ -2,7 +2,10 @@
 ## Create new schema with everything.
 ## 's' contains the schema structure from json to build
 <%def name="new(s, c)">\
-<% assert s.type == "object" %>\
+<% 
+	assert s.type == "object" 
+	markers = util.schema_markers(s, c)
+%>\
 <%block filter="util.rust_doc_comment">\
 ${doc(s, c)}\
 </%block>
@@ -18,6 +21,10 @@ pub struct ${s.id}\
 % else:
 ;
 % endif
+
+% for marker_trait in markers:
+impl ${marker_trait} for ${s.id} {}
+% endfor
 </%def>
 
 <%def name="doc(s, c)">\
@@ -26,7 +33,11 @@ ${s.get('description', 'There is no detailed description.')}
 
 # Activities
 
-${''.join("* %s\n" % a for a in c.sta_map[s.id].keys())}
+This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+The list links the activity name, along with information about where it is used (one of ${util.put_and(util.IO_TYPES)}.
+
+${''.join("* %s (%s)\n" % (util.activity_split(a)[1], iot and '|'.join(iot) or 'none') 
+													for a, iot in c.sta_map[s.id].iteritems())}
 % else:
 
 This schema type is not used in any activity, and only used as *part* of another schema.

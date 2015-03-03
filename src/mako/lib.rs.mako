@@ -19,6 +19,8 @@ extern crate "yup-oauth2" as oauth2;
 
 use std::collections::HashMap;
 
+use cmn::{Resource, Part, ResponseResult, RequestResult, NestedType};
+
 // ############
 // SCHEMAS ###
 // ##########

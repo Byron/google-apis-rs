@@ -14,8 +14,13 @@ TYPE_MAP = {'boolean' : 'bool',
             'string'  : 'String',
             'object'  : 'HashMap'}
 TREF = '$ref'
+IO_RESPONSE = 'response'
+IO_REQUEST = 'request'
+IO_TYPES = (IO_REQUEST, IO_RESPONSE)
 INS_METHOD = 'insert'
 DEL_METHOD = 'delete'
+
+NESTED_TYPE_MARKER = 'is_nested'
 
 # ==============================================================================
 ## @name Filters
@@ -79,7 +84,7 @@ def to_rust_type(sn, pn, t, allow_optionals=True):
         elif nt.get('additionalProperties'):
             nt = nt.additionalProperties
         else:
-            assert(is_nested_type(nt))
+            assert(is_nested_type_property(nt))
             # It's a nested type - we take it literally like $ref, but generate a name for the type ourselves
             # This of course assumes
             return nested_type_name(sn, pn)
@@ -112,8 +117,13 @@ def to_rust_type(sn, pn, t, allow_optionals=True):
     except AttributeError as err:
         raise AssertionError("%s: unknown dict layout: %s" % (str(err), t))
 
-def is_nested_type(t):
-    return 'type' in t and t.type == 'object' and 'additionalProperties' not in t
+# return True if this property is actually a nested type
+def is_nested_type_property(t):
+    return 'type' in t and t.type == 'object' and 'properties' in t
+
+# Return True if the schema is nested
+def is_nested_type(s):
+    return NESTED_TYPE_MARKER in s
 
 # return an iterator yielding fake-schemas that identify a nested type
 def iter_nested_types(schemas):
@@ -121,12 +131,37 @@ def iter_nested_types(schemas):
         if 'properties' not in s:
             continue
         for pn, p in s.properties.iteritems():
-            if is_nested_type(p):
+            if is_nested_type_property(p):
                 ns = p.copy()
                 ns.id = nested_type_name(s.id, pn)
+                ns[NESTED_TYPE_MARKER] = True
                 yield ns
         # end for ach property
     # end for aech schma
+
+# Return sorted type names of all markers applicable to the given schema
+def schema_markers(s, c):
+    res = set()
+
+    activities = c.sta_map.get(s.id, dict())
+    if len(activities) == 0:
+        res.add('Part')
+    else:
+        # it should have at least one activity that matches it's type to qualify for the Resource trait
+        for fqan, iot in activities.iteritems():
+            if activity_name_to_type_name(activity_split(fqan)[0]) == s.id:
+                res.add('Resource')
+            if IO_RESPONSE in iot:
+                res.add('ResponseResult')
+            if IO_REQUEST in iot:
+                res.add('RequestResult')
+        # end for each activity
+    # end handle activites
+
+    if is_nested_type(s):
+        res.add('NestedType')
+
+    return sorted(res)
 
 ## -- End Rust TypeSystem -- @}
 
@@ -148,7 +183,7 @@ def build_activity_mappings(activities):
         for mn, m in a.methods.iteritems():
             assert m.id not in fqan
             fqan[m.id] = m
-            for in_out_type_name in ('request', 'response'):
+            for in_out_type_name in IO_TYPES:
                 t = m.get(in_out_type_name, None)
                 if t is None:
                     continue
@@ -163,12 +198,10 @@ def build_activity_mappings(activities):
             # getrating: response is a 'SomethingResult', which is still related to activities name
             #            the latter is used to deduce the resource name
             an, _ = activity_split(m.id)
-            # videos -> Video
-            an = an.capitalize()[:-1]
-            info = res.setdefault(an, dict())
+            tn = activity_name_to_type_name(an)
+            info = res.setdefault(tn, dict())
             if m.id not in info:
-                io_info = info.setdefault(m.id, [])
-                io_info.append([])
+                info.setdefault(m.id, [])
             # end handle other cases
         # end for each method
     # end for each activity
@@ -179,6 +212,10 @@ def activity_split(fqan):
     t = fqan.split('.')
     assert len(t) == 3
     return t[1:]
+
+# videos -> Video
+def activity_name_to_type_name(an):
+    return an.capitalize()[:-1]
 
 ## -- End Activity Utilities -- @}
 

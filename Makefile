@@ -16,7 +16,7 @@ API_DEPS = .api.deps
 API_SHARED_INFO = etc/api/shared.yaml
 API_JSON_FILES = $(shell find etc -type f -name '*-api.json')
 MAKO_LIB_DIR = $(MAKO_SRC)/lib
-MAKO_LIB_FILES = $(shell find $(MAKO_LIB_DIR) -type f -name '*.mako' -or -name '*.py')
+MAKO_LIB_FILES = $(shell find $(MAKO_LIB_DIR) -type f -name '*.*')
 
 help:
 	$(info using template engine: '$(TPL)')
