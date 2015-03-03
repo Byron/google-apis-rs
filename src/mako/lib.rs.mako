@@ -11,15 +11,17 @@
 <%block filter="util.rust_module_doc_comment">\
 <%lib:docs />\
 </%block>
+#![feature(core)]
 #![allow(non_snake_case)]
 
-extern crate cmn;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate "yup-oauth2" as oauth2;
 
+mod cmn;
+
 use std::collections::HashMap;
 
-use cmn::{Resource, Part, ResponseResult, RequestResult, NestedType};
+pub use cmn::{Resource, Part, ResponseResult, RequestResult, NestedType};
 
 // ############
 // SCHEMAS ###

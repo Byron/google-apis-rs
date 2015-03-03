@@ -4,20 +4,24 @@
 //! # Activities
 //! 
 //! 
+#![feature(core)]
 #![allow(non_snake_case)]
 
-extern crate cmn;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate "yup-oauth2" as oauth2;
 
+mod cmn;
+
 use std::collections::HashMap;
+
+pub use cmn::{Resource, Part, ResponseResult, RequestResult, NestedType};
 
 // ############
 // SCHEMAS ###
 // ##########
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoConversionPings {
@@ -25,11 +29,16 @@ pub struct VideoConversionPings {
 	pub pings: Vec<VideoConversionPing>,
 }
 
+impl Part for VideoConversionPings {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.subscriptions.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -54,9 +63,11 @@ pub struct SubscriptionListResponse {
 	pub pageInfo: Option<PageInfo>,
 }
 
+impl ResponseResult for SubscriptionListResponse {}
+
 /// Information about a resource that received a positive (like) rating.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsLike {
@@ -64,9 +75,11 @@ pub struct ActivityContentDetailsLike {
 	pub resourceId: Option<ResourceId>,
 }
 
+impl Part for ActivityContentDetailsLike {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastSnippet {
@@ -90,9 +103,11 @@ pub struct LiveBroadcastSnippet {
 	pub thumbnails: Option<ThumbnailDetails>,
 }
 
+impl Part for LiveBroadcastSnippet {}
+
 /// Describes original video file properties, including technical details about audio and video streams, but also metadata information like content length, digitization time, or geotagging information.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetails {
@@ -121,9 +136,11 @@ pub struct VideoFileDetails {
 	pub audioStreams: Vec<VideoFileDetailsAudioStream>,
 }
 
+impl Part for VideoFileDetails {}
+
 /// Playlist localization setting
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistLocalization {
@@ -132,6 +149,8 @@ pub struct PlaylistLocalization {
 	/// The localized strings for playlist's title.
 	pub title: Option<String>,
 }
+
+impl Part for PlaylistLocalization {}
 
 /// A playlist resource represents a YouTube playlist. A playlist is a collection of videos that can be viewed sequentially and shared with other users. A playlist can contain up to 200 videos, and YouTube does not limit the number of playlists that each user creates. By default, playlists are publicly visible to other users, but playlists can be public or private.
 /// 
@@ -146,10 +165,13 @@ pub struct PlaylistLocalization {
 /// 
 /// # Activities
 /// 
-/// * youtube.playlists.insert
-/// * youtube.playlists.delete
-/// * youtube.playlists.list
-/// * youtube.playlists.update
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * insert (request|response)
+/// * delete (none)
+/// * list (none)
+/// * update (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -172,11 +194,18 @@ pub struct Playlist {
 	pub localizations: HashMap<String, PlaylistLocalization>,
 }
 
+impl RequestResult for Playlist {}
+impl Resource for Playlist {}
+impl ResponseResult for Playlist {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.playlistItems.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -201,9 +230,11 @@ pub struct PlaylistItemListResponse {
 	pub pageInfo: Option<PageInfo>,
 }
 
+impl ResponseResult for PlaylistItemListResponse {}
+
 /// A pair Property / Value.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PropertyValue {
@@ -213,9 +244,11 @@ pub struct PropertyValue {
 	pub value: Option<String>,
 }
 
+impl Part for PropertyValue {}
+
 /// Describes a temporal position of a visual widget inside a video.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoTiming {
@@ -227,9 +260,11 @@ pub struct InvideoTiming {
 	pub durationMs: Option<String>,
 }
 
+impl Part for InvideoTiming {}
+
 /// Basic details about a playlist, including title, description and thumbnails.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistSnippet {
@@ -253,9 +288,11 @@ pub struct PlaylistSnippet {
 	pub thumbnails: Option<ThumbnailDetails>,
 }
 
+impl Part for PlaylistSnippet {}
+
 /// The auditDetails object encapsulates channel data that is relevant for YouTube Partners during the audit process.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelAuditDetails {
@@ -269,12 +306,17 @@ pub struct ChannelAuditDetails {
 	pub overallGoodStanding: Option<bool>,
 }
 
+impl Part for ChannelAuditDetails {}
+
 /// A live stream describes a live ingestion point.
 /// 
 /// # Activities
 /// 
-/// * youtube.liveStreams.update
-/// * youtube.liveStreams.insert
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * update (request|response)
+/// * insert (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -295,11 +337,18 @@ pub struct LiveStream {
 	pub id: Option<String>,
 }
 
+impl RequestResult for LiveStream {}
+impl Resource for LiveStream {}
+impl ResponseResult for LiveStream {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.thumbnails.set
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * set (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -316,9 +365,11 @@ pub struct ThumbnailSetResponse {
 	pub visitorId: Option<String>,
 }
 
+impl ResponseResult for ThumbnailSetResponse {}
+
 /// Information about the uploaded video.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsUpload {
@@ -326,9 +377,11 @@ pub struct ActivityContentDetailsUpload {
 	pub videoId: Option<String>,
 }
 
+impl Part for ActivityContentDetailsUpload {}
+
 /// Branding properties for the channel view.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSettings {
@@ -360,9 +413,11 @@ pub struct ChannelSettings {
 	pub trackingAnalyticsAccountId: Option<String>,
 }
 
+impl Part for ChannelSettings {}
+
 /// Statistics about the video, such as the number of times the video was viewed or liked.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoStatistics {
@@ -378,9 +433,11 @@ pub struct VideoStatistics {
 	pub likeCount: Option<i64>,
 }
 
+impl Part for VideoStatistics {}
+
 /// Brief description of the live stream cdn settings.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct CdnSettings {
@@ -392,11 +449,16 @@ pub struct CdnSettings {
 	pub ingestionType: Option<String>,
 }
 
+impl Part for CdnSettings {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.videos.getRating
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * getRating (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -413,9 +475,11 @@ pub struct VideoGetRatingResponse {
 	pub visitorId: Option<String>,
 }
 
+impl ResponseResult for VideoGetRatingResponse {}
+
 /// Basic details about a video category, such as its localized title.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoCategorySnippet {
@@ -427,9 +491,11 @@ pub struct VideoCategorySnippet {
 	pub title: Option<String>,
 }
 
+impl Part for VideoCategorySnippet {}
+
 /// Details about a resource which was added to a channel.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsChannelItem {
@@ -437,9 +503,11 @@ pub struct ActivityContentDetailsChannelItem {
 	pub resourceId: Option<ResourceId>,
 }
 
+impl Part for ActivityContentDetailsChannelItem {}
+
 /// Basic details about an i18n language, such as language code and human-readable name.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nLanguageSnippet {
@@ -449,9 +517,11 @@ pub struct I18nLanguageSnippet {
 	pub hl: Option<String>,
 }
 
+impl Part for I18nLanguageSnippet {}
+
 /// Basic details about a subscription, including title, description and thumbnails of the subscribed item.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SubscriptionSnippet {
@@ -471,9 +541,11 @@ pub struct SubscriptionSnippet {
 	pub channelTitle: Option<String>,
 }
 
+impl Part for SubscriptionSnippet {}
+
 /// Details about a channelsection, including playlists and channels.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSectionContentDetails {
@@ -483,11 +555,16 @@ pub struct ChannelSectionContentDetails {
 	pub playlists: Vec<String>,
 }
 
+impl Part for ChannelSectionContentDetails {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.i18nRegions.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -504,11 +581,16 @@ pub struct I18nRegionListResponse {
 	pub visitorId: Option<String>,
 }
 
+impl ResponseResult for I18nRegionListResponse {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.liveStreams.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -533,9 +615,11 @@ pub struct LiveStreamListResponse {
 	pub pageInfo: Option<PageInfo>,
 }
 
+impl ResponseResult for LiveStreamListResponse {}
+
 /// Describes a single promoted item.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PromotedItem {
@@ -549,9 +633,11 @@ pub struct PromotedItem {
 	pub id: Option<PromotedItemId>,
 }
 
+impl Part for PromotedItem {}
+
 /// Branding properties of a YouTube channel.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelBrandingSettings {
@@ -565,11 +651,16 @@ pub struct ChannelBrandingSettings {
 	pub hints: Vec<PropertyValue>,
 }
 
+impl Part for ChannelBrandingSettings {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.playlists.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -594,11 +685,16 @@ pub struct PlaylistListResponse {
 	pub pageInfo: Option<PageInfo>,
 }
 
+impl ResponseResult for PlaylistListResponse {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.watermarks.set
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * set (request)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -615,9 +711,11 @@ pub struct InvideoBranding {
 	pub imageBytes: Option<String>,
 }
 
+impl RequestResult for InvideoBranding {}
+
 /// Information about the playlist item's privacy status.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItemStatus {
@@ -625,9 +723,11 @@ pub struct PlaylistItemStatus {
 	pub privacyStatus: Option<String>,
 }
 
+impl Part for PlaylistItemStatus {}
+
 /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelConversionPing {
@@ -637,9 +737,11 @@ pub struct ChannelConversionPing {
 	pub conversionUrl: Option<String>,
 }
 
+impl Part for ChannelConversionPing {}
+
 /// Describes an invideo promotion campaign consisting of multiple promoted items. A campaign belongs to a single channel_id.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoPromotion {
@@ -652,6 +754,8 @@ pub struct InvideoPromotion {
 	/// The spatial position within the video where the promoted item will be displayed.
 	pub position: Option<InvideoPosition>,
 }
+
+impl Part for InvideoPromotion {}
 
 /// A playlistItem resource identifies another resource, such as a video, that is included in a playlist. In addition, the playlistItem  resource contains details about the included resource that pertain specifically to how that resource is used in that playlist.
 /// 
@@ -666,8 +770,11 @@ pub struct InvideoPromotion {
 /// 
 /// # Activities
 /// 
-/// * youtube.playlistItems.insert
-/// * youtube.playlistItems.update
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * insert (request|response)
+/// * update (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -686,11 +793,18 @@ pub struct PlaylistItem {
 	pub id: Option<String>,
 }
 
+impl RequestResult for PlaylistItem {}
+impl Resource for PlaylistItem {}
+impl ResponseResult for PlaylistItem {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.guideCategories.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -715,9 +829,11 @@ pub struct GuideCategoryListResponse {
 	pub pageInfo: Option<PageInfo>,
 }
 
+impl ResponseResult for GuideCategoryListResponse {}
+
 /// Localized versions of certain video properties (e.g. title).
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoLocalization {
@@ -727,9 +843,11 @@ pub struct VideoLocalization {
 	pub title: Option<String>,
 }
 
+impl Part for VideoLocalization {}
+
 /// Basic details about a channel section, including title, style and position.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSectionSnippet {
@@ -749,9 +867,11 @@ pub struct ChannelSectionSnippet {
 	pub defaultLanguage: Option<String>,
 }
 
+impl Part for ChannelSectionSnippet {}
+
 /// Details about the content of a channel.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentDetails {
@@ -761,16 +881,20 @@ pub struct ChannelContentDetails {
 	pub googlePlusUserId: Option<String>,
 }
 
+impl Part for ChannelContentDetails {}
+
 /// Stub token pagination template to suppress results.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct TokenPagination;
 
+impl Part for TokenPagination {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItemContentDetails {
@@ -784,9 +908,11 @@ pub struct PlaylistItemContentDetails {
 	pub videoId: Option<String>,
 }
 
+impl Part for PlaylistItemContentDetails {}
+
 /// Internal representation of thumbnails for a YouTube resource.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ThumbnailDetails {
@@ -802,9 +928,11 @@ pub struct ThumbnailDetails {
 	pub standard: Option<Thumbnail>,
 }
 
+impl Part for ThumbnailDetails {}
+
 /// Details about monetization of a YouTube Video.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoMonetizationDetails {
@@ -812,9 +940,11 @@ pub struct VideoMonetizationDetails {
 	pub access: Option<AccessPolicy>,
 }
 
+impl Part for VideoMonetizationDetails {}
+
 /// Information that identifies the recommended resource.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsRecommendation {
@@ -826,9 +956,11 @@ pub struct ActivityContentDetailsRecommendation {
 	pub seedResourceId: Option<ResourceId>,
 }
 
+impl Part for ActivityContentDetailsRecommendation {}
+
 /// Recording information associated with the video.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoRecordingDetails {
@@ -840,9 +972,11 @@ pub struct VideoRecordingDetails {
 	pub location: Option<GeoPoint>,
 }
 
+impl Part for VideoRecordingDetails {}
+
 /// Information about a channel that a user subscribed to.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsSubscription {
@@ -850,9 +984,11 @@ pub struct ActivityContentDetailsSubscription {
 	pub resourceId: Option<ResourceId>,
 }
 
+impl Part for ActivityContentDetailsSubscription {}
+
 /// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelConversionPings {
@@ -860,9 +996,11 @@ pub struct ChannelConversionPings {
 	pub pings: Vec<ChannelConversionPing>,
 }
 
+impl Part for ChannelConversionPings {}
+
 /// Details about the content of an activity: the video that was shared, the channel that was subscribed to, etc.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetails {
@@ -890,9 +1028,11 @@ pub struct ActivityContentDetails {
 	pub subscription: Option<ActivityContentDetailsSubscription>,
 }
 
+impl Part for ActivityContentDetails {}
+
 /// A i18nRegion resource identifies a region where YouTube is available.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nRegion {
@@ -906,9 +1046,11 @@ pub struct I18nRegion {
 	pub id: Option<String>,
 }
 
+impl Part for I18nRegion {}
+
 /// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentOwnerDetails {
@@ -918,9 +1060,11 @@ pub struct ChannelContentOwnerDetails {
 	pub timeLinked: Option<String>,
 }
 
+impl Part for ChannelContentOwnerDetails {}
+
 /// Describes processing status and progress and availability of some other Video resource parts.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoProcessingDetails {
@@ -942,9 +1086,11 @@ pub struct VideoProcessingDetails {
 	pub tagSuggestionsAvailability: Option<String>,
 }
 
+impl Part for VideoProcessingDetails {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastStatus {
@@ -958,9 +1104,11 @@ pub struct LiveBroadcastStatus {
 	pub liveBroadcastPriority: Option<String>,
 }
 
+impl Part for LiveBroadcastStatus {}
+
 /// Details about the content to witch a subscription refers.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SubscriptionContentDetails {
@@ -972,16 +1120,21 @@ pub struct SubscriptionContentDetails {
 	pub totalItemCount: Option<u32>,
 }
 
+impl Part for SubscriptionContentDetails {}
+
 /// A video resource represents a YouTube video.
 /// 
 /// # Activities
 /// 
-/// * youtube.videos.rate
-/// * youtube.videos.getRating
-/// * youtube.videos.list
-/// * youtube.videos.insert
-/// * youtube.videos.update
-/// * youtube.videos.delete
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * rate (none)
+/// * getRating (none)
+/// * list (none)
+/// * insert (request|response)
+/// * update (request|response)
+/// * delete (none)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1028,9 +1181,13 @@ pub struct Video {
 	pub recordingDetails: Option<VideoRecordingDetails>,
 }
 
+impl RequestResult for Video {}
+impl Resource for Video {}
+impl ResponseResult for Video {}
+
 /// Geographical coordinates of a point, in WGS84.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct GeoPoint {
@@ -1042,9 +1199,11 @@ pub struct GeoPoint {
 	pub longitude: Option<f64>,
 }
 
+impl Part for GeoPoint {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoAgeGating {
@@ -1056,9 +1215,11 @@ pub struct VideoAgeGating {
 	pub videoGameRating: Option<String>,
 }
 
+impl Part for VideoAgeGating {}
+
 /// Player to be used for a video playback.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoPlayer {
@@ -1066,9 +1227,11 @@ pub struct VideoPlayer {
 	pub embedHtml: Option<String>,
 }
 
+impl Part for VideoPlayer {}
+
 /// Basic details about a channel, including title, description and thumbnails.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSnippet {
@@ -1086,9 +1249,11 @@ pub struct ChannelSnippet {
 	pub description: Option<String>,
 }
 
+impl Part for ChannelSnippet {}
+
 /// Branding properties for the watch.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct WatchSettings {
@@ -1100,9 +1265,11 @@ pub struct WatchSettings {
 	pub backgroundColor: Option<String>,
 }
 
+impl Part for WatchSettings {}
+
 /// ChannelSection localization setting
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSectionLocalization {
@@ -1110,9 +1277,11 @@ pub struct ChannelSectionLocalization {
 	pub title: Option<String>,
 }
 
+impl Part for ChannelSectionLocalization {}
+
 /// DEPRECATED Region restriction of the video.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoContentDetailsRegionRestriction {
@@ -1122,9 +1291,11 @@ pub struct VideoContentDetailsRegionRestriction {
 	pub blocked: Vec<String>,
 }
 
+impl Part for VideoContentDetailsRegionRestriction {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoRating {
@@ -1134,9 +1305,11 @@ pub struct VideoRating {
 	pub videoId: Option<String>,
 }
 
+impl Part for VideoRating {}
+
 /// Describes a single promoted item id. It is a union of various possible types.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PromotedItemId {
@@ -1150,13 +1323,18 @@ pub struct PromotedItemId {
 	pub videoId: Option<String>,
 }
 
+impl Part for PromotedItemId {}
+
 /// A subscription resource contains information about a YouTube user subscription. A subscription notifies a user when new videos are added to a channel or when another user takes one of several actions on YouTube, such as uploading a video, rating a video, or commenting on a video.
 /// 
 /// # Activities
 /// 
-/// * youtube.subscriptions.insert
-/// * youtube.subscriptions.list
-/// * youtube.subscriptions.delete
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * insert (request|response)
+/// * list (none)
+/// * delete (none)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1175,9 +1353,13 @@ pub struct Subscription {
 	pub id: Option<String>,
 }
 
+impl RequestResult for Subscription {}
+impl Resource for Subscription {}
+impl ResponseResult for Subscription {}
+
 /// Basic details about an i18n region, such as region code and human-readable name.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nRegionSnippet {
@@ -1187,9 +1369,11 @@ pub struct I18nRegionSnippet {
 	pub name: Option<String>,
 }
 
+impl Part for I18nRegionSnippet {}
+
 /// Information about a new playlist item.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsPlaylistItem {
@@ -1201,9 +1385,11 @@ pub struct ActivityContentDetailsPlaylistItem {
 	pub playlistItemId: Option<String>,
 }
 
+impl Part for ActivityContentDetailsPlaylistItem {}
+
 /// Describes the spatial position of a visual widget inside a video. It is a union of various position types, out of which only will be set one.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoPosition {
@@ -1213,9 +1399,11 @@ pub struct InvideoPosition {
 	pub type_: Option<String>,
 }
 
+impl Part for InvideoPosition {}
+
 /// Information about a resource that received a comment.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsComment {
@@ -1223,9 +1411,11 @@ pub struct ActivityContentDetailsComment {
 	pub resourceId: Option<ResourceId>,
 }
 
+impl Part for ActivityContentDetailsComment {}
+
 /// Basic details about a guide category.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct GuideCategorySnippet {
@@ -1235,9 +1425,11 @@ pub struct GuideCategorySnippet {
 	pub title: Option<String>,
 }
 
+impl Part for GuideCategorySnippet {}
+
 /// Basic details about a video, including title, description, uploader, thumbnails and category.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoSnippet {
@@ -1265,9 +1457,11 @@ pub struct VideoSnippet {
 	pub channelTitle: Option<String>,
 }
 
+impl Part for VideoSnippet {}
+
 /// Project specific details about the content of a YouTube Video.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoProjectDetails {
@@ -1275,9 +1469,11 @@ pub struct VideoProjectDetails {
 	pub tags: Vec<String>,
 }
 
+impl Part for VideoProjectDetails {}
+
 /// Detailed settings of a stream.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStreamContentDetails {
@@ -1292,9 +1488,11 @@ pub struct LiveStreamContentDetails {
 	pub closedCaptionsIngestionUrl: Option<String>,
 }
 
+impl Part for LiveStreamContentDetails {}
+
 /// Detailed settings of a broadcast.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastContentDetails {
@@ -1324,9 +1522,11 @@ pub struct LiveBroadcastContentDetails {
 	pub monitorStream: Option<MonitorStreamInfo>,
 }
 
+impl Part for LiveBroadcastContentDetails {}
+
 /// Basic details about a video category, such as its localized title.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoStatus {
@@ -1348,9 +1548,11 @@ pub struct VideoStatus {
 	pub failureReason: Option<String>,
 }
 
+impl Part for VideoStatus {}
+
 /// A guideCategory resource identifies a category that YouTube algorithmically assigns based on a channel's content or other indicators, such as the channel's popularity. The list is similar to video categories, with the difference being that a video's uploader can assign a video category but only YouTube can assign a channel category.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct GuideCategory {
@@ -1364,11 +1566,16 @@ pub struct GuideCategory {
 	pub id: Option<String>,
 }
 
+impl Part for GuideCategory {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.channelSections.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1385,9 +1592,11 @@ pub struct ChannelSectionListResponse {
 	pub visitorId: Option<String>,
 }
 
+impl ResponseResult for ChannelSectionListResponse {}
+
 /// Settings and Info of the monitor stream
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct MonitorStreamInfo {
@@ -1403,11 +1612,16 @@ pub struct MonitorStreamInfo {
 	pub enableMonitorStream: Option<bool>,
 }
 
+impl Part for MonitorStreamInfo {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.i18nLanguages.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1424,9 +1638,11 @@ pub struct I18nLanguageListResponse {
 	pub visitorId: Option<String>,
 }
 
+impl ResponseResult for I18nLanguageListResponse {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LocalizedProperty {
@@ -1438,15 +1654,20 @@ pub struct LocalizedProperty {
 	pub localized: Vec<LocalizedString>,
 }
 
+impl Part for LocalizedProperty {}
+
 /// A liveBroadcast resource represents an event that will be streamed, via live video, on YouTube.
 /// 
 /// # Activities
 /// 
-/// * youtube.liveBroadcasts.control
-/// * youtube.liveBroadcasts.insert
-/// * youtube.liveBroadcasts.update
-/// * youtube.liveBroadcasts.transition
-/// * youtube.liveBroadcasts.bind
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * control (response)
+/// * insert (request|response)
+/// * update (request|response)
+/// * transition (response)
+/// * bind (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1465,9 +1686,13 @@ pub struct LiveBroadcast {
 	pub id: Option<String>,
 }
 
+impl RequestResult for LiveBroadcast {}
+impl Resource for LiveBroadcast {}
+impl ResponseResult for LiveBroadcast {}
+
 /// Information about a video stream.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetailsVideoStream {
@@ -1489,11 +1714,16 @@ pub struct VideoFileDetailsVideoStream {
 	pub frameRateFps: Option<f64>,
 }
 
+impl Part for VideoFileDetailsVideoStream {}
+
 /// A thumbnail is an image representing a YouTube resource.
 /// 
 /// # Activities
 /// 
-/// * youtube.thumbnails.set
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * set (none)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1506,12 +1736,17 @@ pub struct Thumbnail {
 	pub height: Option<u32>,
 }
 
+impl Resource for Thumbnail {}
+
 /// A channel resource contains information about a YouTube channel.
 /// 
 /// # Activities
 /// 
-/// * youtube.channels.list
-/// * youtube.channels.update
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (none)
+/// * update (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1546,9 +1781,13 @@ pub struct Channel {
 	pub localizations: HashMap<String, ChannelLocalization>,
 }
 
+impl RequestResult for Channel {}
+impl Resource for Channel {}
+impl ResponseResult for Channel {}
+
 /// Statistics about a channel: number of subscribers, number of videos in the channel, etc.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelStatistics {
@@ -1564,9 +1803,11 @@ pub struct ChannelStatistics {
 	pub viewCount: Option<i64>,
 }
 
+impl Part for ChannelStatistics {}
+
 /// Details about a social network post.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsSocial {
@@ -1582,9 +1823,11 @@ pub struct ActivityContentDetailsSocial {
 	pub author: Option<String>,
 }
 
+impl Part for ActivityContentDetailsSocial {}
+
 /// Channel localization setting
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelLocalization {
@@ -1594,9 +1837,11 @@ pub struct ChannelLocalization {
 	pub title: Option<String>,
 }
 
+impl Part for ChannelLocalization {}
+
 /// A resource id is a generic reference that points to another YouTube resource.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ResourceId {
@@ -1610,9 +1855,11 @@ pub struct ResourceId {
 	pub videoId: Option<String>,
 }
 
+impl Part for ResourceId {}
+
 /// A search result contains information about a YouTube video, channel, or playlist that matches the search parameters specified in an API request. While a search result points to a uniquely identifiable resource, like a video, it does not have its own persistent data.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SearchResult {
@@ -1626,11 +1873,16 @@ pub struct SearchResult {
 	pub id: Option<ResourceId>,
 }
 
+impl Part for SearchResult {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.videoCategories.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1655,9 +1907,11 @@ pub struct VideoCategoryListResponse {
 	pub pageInfo: Option<PageInfo>,
 }
 
+impl ResponseResult for VideoCategoryListResponse {}
+
 /// Basic details about an activity, including title, description, thumbnails, activity type and group.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivitySnippet {
@@ -1679,9 +1933,11 @@ pub struct ActivitySnippet {
 	pub description: Option<String>,
 }
 
+impl Part for ActivitySnippet {}
+
 /// Video processing progress and completion time estimate.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoProcessingDetailsProcessingProgress {
@@ -1696,11 +1952,16 @@ pub struct VideoProcessingDetailsProcessingProgress {
 	pub partsTotal: Option<String>,
 }
 
+impl Part for VideoProcessingDetailsProcessingProgress {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.search.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1725,9 +1986,11 @@ pub struct SearchListResponse {
 	pub pageInfo: Option<PageInfo>,
 }
 
+impl ResponseResult for SearchListResponse {}
+
 /// Freebase topic information related to the channel.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelTopicDetails {
@@ -1735,11 +1998,16 @@ pub struct ChannelTopicDetails {
 	pub topicIds: Vec<String>,
 }
 
+impl Part for ChannelTopicDetails {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.videos.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1764,9 +2032,11 @@ pub struct VideoListResponse {
 	pub pageInfo: Option<PageInfo>,
 }
 
+impl ResponseResult for VideoListResponse {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LanguageTag {
@@ -1774,9 +2044,11 @@ pub struct LanguageTag {
 	pub value: Option<String>,
 }
 
+impl Part for LanguageTag {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistStatus {
@@ -1784,9 +2056,11 @@ pub struct PlaylistStatus {
 	pub privacyStatus: Option<String>,
 }
 
+impl Part for PlaylistStatus {}
+
 /// Details about the content of a YouTube Video.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoContentDetails {
@@ -1808,9 +2082,11 @@ pub struct VideoContentDetails {
 	pub dimension: Option<String>,
 }
 
+impl Part for VideoContentDetails {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStreamSnippet {
@@ -1824,9 +2100,11 @@ pub struct LiveStreamSnippet {
 	pub title: Option<String>,
 }
 
+impl Part for LiveStreamSnippet {}
+
 /// JSON template for the status part of a channel.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelStatus {
@@ -1838,11 +2116,16 @@ pub struct ChannelStatus {
 	pub longUploadsStatus: Option<String>,
 }
 
+impl Part for ChannelStatus {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.channels.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1867,12 +2150,17 @@ pub struct ChannelListResponse {
 	pub pageInfo: Option<PageInfo>,
 }
 
+impl ResponseResult for ChannelListResponse {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.channelSections.update
-/// * youtube.channelSections.insert
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * update (request|response)
+/// * insert (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1891,11 +2179,18 @@ pub struct ChannelSection {
 	pub localizations: HashMap<String, ChannelSectionLocalization>,
 }
 
+impl RequestResult for ChannelSection {}
+impl Resource for ChannelSection {}
+impl ResponseResult for ChannelSection {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.liveBroadcasts.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1920,9 +2215,11 @@ pub struct LiveBroadcastListResponse {
 	pub pageInfo: Option<PageInfo>,
 }
 
+impl ResponseResult for LiveBroadcastListResponse {}
+
 /// Brief description of the live stream status.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStreamStatus {
@@ -1930,9 +2227,11 @@ pub struct LiveStreamStatus {
 	pub streamStatus: Option<String>,
 }
 
+impl Part for LiveStreamStatus {}
+
 /// Details about the live streaming metadata.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoLiveStreamingDetails {
@@ -1948,9 +2247,11 @@ pub struct VideoLiveStreamingDetails {
 	pub actualEndTime: Option<String>,
 }
 
+impl Part for VideoLiveStreamingDetails {}
+
 /// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 65
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ContentRating {
@@ -2084,11 +2385,16 @@ pub struct ContentRating {
 	pub mekuRating: Option<String>,
 }
 
+impl Part for ContentRating {}
+
 /// There is no detailed description.
 /// 
 /// # Activities
 /// 
-/// * youtube.activities.list
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2113,11 +2419,16 @@ pub struct ActivityListResponse {
 	pub pageInfo: Option<PageInfo>,
 }
 
+impl ResponseResult for ActivityListResponse {}
+
 /// An activity resource contains information about an action that a particular channel, or user, has taken on YouTube.The actions reported in activity feeds include rating a video, sharing a video, marking a video as a favorite, commenting on a video, uploading a video, and so forth. Each activity resource identifies the type of action, the channel associated with the action, and the resource(s) associated with the action, such as the video that was rated or uploaded.
 /// 
 /// # Activities
 /// 
-/// * youtube.activities.insert
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * insert (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2134,9 +2445,12 @@ pub struct Activity {
 	pub id: Option<String>,
 }
 
+impl RequestResult for Activity {}
+impl ResponseResult for Activity {}
+
 /// Basic details about a subscription's subscriber including title, description, channel ID and thumbnails.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SubscriptionSubscriberSnippet {
@@ -2150,9 +2464,11 @@ pub struct SubscriptionSubscriberSnippet {
 	pub title: Option<String>,
 }
 
+impl Part for SubscriptionSubscriberSnippet {}
+
 /// Branding properties for images associated with the channel.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ImageSettings {
@@ -2202,9 +2518,11 @@ pub struct ImageSettings {
 	pub watchIconImageUrl: Option<String>,
 }
 
+impl Part for ImageSettings {}
+
 /// Details about a resource which is being promoted.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsPromotedItem {
@@ -2230,9 +2548,11 @@ pub struct ActivityContentDetailsPromotedItem {
 	pub clickTrackingUrl: Option<String>,
 }
 
+impl Part for ActivityContentDetailsPromotedItem {}
+
 /// Rights management policy for YouTube resources.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct AccessPolicy {
@@ -2242,9 +2562,11 @@ pub struct AccessPolicy {
 	pub allowed: Option<bool>,
 }
 
+impl Part for AccessPolicy {}
+
 /// Details about a channel bulletin post.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsBulletin {
@@ -2252,9 +2574,11 @@ pub struct ActivityContentDetailsBulletin {
 	pub resourceId: Option<ResourceId>,
 }
 
+impl Part for ActivityContentDetailsBulletin {}
+
 /// An i18nLanguage resource identifies a UI language currently supported by YouTube.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nLanguage {
@@ -2268,9 +2592,11 @@ pub struct I18nLanguage {
 	pub id: Option<String>,
 }
 
+impl Part for I18nLanguage {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LocalizedString {
@@ -2280,9 +2606,11 @@ pub struct LocalizedString {
 	pub value: Option<String>,
 }
 
+impl Part for LocalizedString {}
+
 /// Information about an audio stream.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetailsAudioStream {
@@ -2296,9 +2624,11 @@ pub struct VideoFileDetailsAudioStream {
 	pub channelCount: Option<u32>,
 }
 
+impl Part for VideoFileDetailsAudioStream {}
+
 /// Freebase topic information related to the video.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoTopicDetails {
@@ -2308,9 +2638,11 @@ pub struct VideoTopicDetails {
 	pub relevantTopicIds: Vec<String>,
 }
 
+impl Part for VideoTopicDetails {}
+
 /// Describes information necessary for ingesting an RTMP or an HTTP stream.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct IngestionInfo {
@@ -2326,9 +2658,11 @@ pub struct IngestionInfo {
 	pub ingestionAddress: Option<String>,
 }
 
+impl Part for IngestionInfo {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoConversionPing {
@@ -2338,9 +2672,11 @@ pub struct VideoConversionPing {
 	pub conversionUrl: Option<String>,
 }
 
+impl Part for VideoConversionPing {}
+
 /// A videoCategory resource identifies a category that has been or could be associated with uploaded videos.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoCategory {
@@ -2354,9 +2690,11 @@ pub struct VideoCategory {
 	pub id: Option<String>,
 }
 
+impl Part for VideoCategory {}
+
 /// Basic details about a playlist, including title, description and thumbnails.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItemSnippet {
@@ -2380,9 +2718,11 @@ pub struct PlaylistItemSnippet {
 	pub thumbnails: Option<ThumbnailDetails>,
 }
 
+impl Part for PlaylistItemSnippet {}
+
 /// Information about a video that was marked as a favorite video.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsFavorite {
@@ -2390,9 +2730,11 @@ pub struct ActivityContentDetailsFavorite {
 	pub resourceId: Option<ResourceId>,
 }
 
+impl Part for ActivityContentDetailsFavorite {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistPlayer {
@@ -2400,9 +2742,11 @@ pub struct PlaylistPlayer {
 	pub embedHtml: Option<String>,
 }
 
+impl Part for PlaylistPlayer {}
+
 /// A single tag suggestion with it's relevance information.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoSuggestionsTagSuggestion {
@@ -2412,9 +2756,11 @@ pub struct VideoSuggestionsTagSuggestion {
 	pub tag: Option<String>,
 }
 
+impl Part for VideoSuggestionsTagSuggestion {}
+
 /// Specifies suggestions on how to improve video content, including encoding hints, tag suggestions, and editor suggestions.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoSuggestions {
@@ -2430,9 +2776,11 @@ pub struct VideoSuggestions {
 	pub processingHints: Vec<String>,
 }
 
+impl Part for VideoSuggestions {}
+
 /// Basic details about a search result, including title, description and thumbnails of the item referenced by the search result.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SearchResultSnippet {
@@ -2452,11 +2800,16 @@ pub struct SearchResultSnippet {
 	pub channelTitle: Option<String>,
 }
 
+impl Part for SearchResultSnippet {}
+
 /// A channel banner returned as the response to a channel_banner.insert call.
 /// 
 /// # Activities
 /// 
-/// * youtube.channelBanners.insert
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * insert (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2469,9 +2822,12 @@ pub struct ChannelBannerResource {
 	pub etag: Option<String>,
 }
 
+impl RequestResult for ChannelBannerResource {}
+impl ResponseResult for ChannelBannerResource {}
+
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistContentDetails {
@@ -2479,9 +2835,11 @@ pub struct PlaylistContentDetails {
 	pub itemCount: Option<u32>,
 }
 
+impl Part for PlaylistContentDetails {}
+
 /// Paging details for lists of resources, including total number of items available and number of resources returned in a single page.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PageInfo {
@@ -2491,13 +2849,15 @@ pub struct PageInfo {
 	pub totalResults: Option<i32>,
 }
 
+impl Part for PageInfo {}
+
 
 // ###################
 // NESTED SCHEMAS ###
 // #################
 /// There is no detailed description.
 /// 
-/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentDetailsRelatedplaylists {
@@ -2512,4 +2872,7 @@ pub struct ChannelContentDetailsRelatedplaylists {
 	/// The ID of the playlist that contains the channel"s watch later playlist. Use the playlistItems.insert and  playlistItems.delete to add or remove items from that list.
 	pub watchLater: Option<String>,
 }
+
+impl NestedType for ChannelContentDetailsRelatedplaylists {}
+impl Part for ChannelContentDetailsRelatedplaylists {}
 

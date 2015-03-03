@@ -1,4 +1,4 @@
-.PHONY:  json-to-xml clean help api-deps rebuild-apis license
+.PHONY:  json-to-xml clean help api-deps regen-apis license
 .SUFFIXES:
 
 include Makefile.helpers
@@ -11,6 +11,7 @@ MAKO_RENDER := etc/bin/mako-render
 TPL := $(PYTHON) $(MAKO_RENDER)
 
 MAKO_SRC = src/mako
+RUST_SRC = src/rust
 API_DEPS_TPL = $(MAKO_SRC)/deps.mako
 API_DEPS = .api.deps
 API_SHARED_INFO = etc/api/shared.yaml
@@ -24,7 +25,7 @@ help:
 	$(info Targets)
 	$(info help         -   print this help)
 	$(info api-deps     -   generate a file to tell make what API file dependencies will be)
-	$(info rebuild-apis -   clear out all generated apis, and regenerate them)
+	$(info regen-apis   -   clear out all generated apis, and regenerate them)
 	$(info help-api     -   show all api targets to build individually)
 	$(info license      -   regenerate the main license file)
 
@@ -42,11 +43,11 @@ api-deps: $(API_DEPS)
 include $(API_DEPS)
 
 LICENSE.md: $(MAKO_SRC)/LICENSE.md.mako $(API_SHARED_INFO)
-	$(TPL) -io $<=$@ --data-files $(API_SHARED_INFO)
+	PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) -io $<=$@ --data-files $(API_SHARED_INFO)
 
 license: LICENSE.md
 
-rebuild-apis: clean-apis apis license
+regen-apis: clean-apis apis license
 
 clean: clean-apis
 	-rm -Rf $(VENV_DIR)
