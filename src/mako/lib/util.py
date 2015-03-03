@@ -1,4 +1,6 @@
 import re
+import collections
+
 re_linestart = re.compile('^', flags=re.MULTILINE)
 
 USE_FORMAT = 'use_format_field'
@@ -13,6 +15,11 @@ TYPE_MAP = {'boolean' : 'bool',
             'object'  : 'HashMap'}
 TREF = '$ref'
 
+# ==============================================================================
+## @name Filters
+# ------------------------------------------------------------------------------
+## @{
+
 # rust module doc comment filter
 def rust_module_doc_comment(s):
     return re_linestart.sub('//! ', s)
@@ -21,10 +28,16 @@ def rust_module_doc_comment(s):
 def rust_doc_comment(s):
     return re_linestart.sub('/// ', s)
 
-# Expects v to be 'v\d+', throws otherwise
-def to_api_version(v):
-	assert len(v) >= 2 and v[0] == 'v'
-	return v[1:]
+# escape each string in l with "s" and return the new list
+def estr(l):
+    return ['"%s"' % i for i in l]
+
+## -- End Filters -- @}
+
+# ==============================================================================
+## @name Natural Language Utilities
+# ------------------------------------------------------------------------------
+## @{
 
 # l must be a list, if it is more than one, 'and' will before last item
 # l will also be coma-separtated
@@ -34,13 +47,14 @@ def put_and(l):
         return l[0]
     return ', '.join(l[:-1]) + ' and ' + l[-1]
 
-# escape each string in l with "s" and return the new list
-def estr(l):
-    return ['"%s"' % i for i in l]
+## -- End Natural Language Utilities -- @}
 
-# build a full library name (non-canonical)
-def library_name(name, version):
-    return name + to_api_version(version)
+
+# ==============================================================================
+## @name Rust TypeSystem
+# ------------------------------------------------------------------------------
+## @{
+
 
 
 def nested_type_name(sn, pn):
@@ -112,3 +126,50 @@ def iter_nested_types(schemas):
         # end for ach property
     # end for aech schma
 
+## -- End Rust TypeSystem -- @}
+
+
+# -------------------------
+## @name Activity Utilities
+# @{
+
+# Returns (A, B) where
+# A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
+# B: { fqan -> activity_method }
+# fqan = fully qualified activity name
+def build_activity_mappings(activities):
+    res = dict()
+    fqan = dict()
+    for an, a in activities.iteritems():
+        if 'methods' not in a:
+            continue
+        for mn, m in a.methods.iteritems():
+            assert m.id not in fqan
+            fqan[m.id] = m
+            for in_out_type_name in ('request', 'response'):
+                t = m.get(in_out_type_name, None)
+                if t is None:
+                    continue
+
+                tn = to_rust_type(None, None, t, allow_optionals=False)
+                info = res.setdefault(tn, dict())
+                io_info = info.setdefault(m.id, [])
+                io_info.append(in_out_type_name)
+            # end for each io type
+        # end for each method
+    # end for each activity
+    return res, fqan
+
+## -- End Activity Utilities -- @}
+
+
+Context = collections.namedtuple('Context', ['sta_map', 'fqan_map'])
+
+# Expects v to be 'v\d+', throws otherwise
+def to_api_version(v):
+    assert len(v) >= 2 and v[0] == 'v'
+    return v[1:]
+
+# build a full library name (non-canonical)
+def library_name(name, version):
+    return name + to_api_version(version)

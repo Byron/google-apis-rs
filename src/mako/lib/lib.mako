@@ -4,6 +4,9 @@
 <%def name="docs()">\
 TODO: Library level fully fledged documentation, incuding **summary** and **usage**.
 And another line, for testing
+
+# Activities
+
 </%def>
 
 <%def name="license()">\

@@ -1,6 +1,9 @@
 //! TODO: Library level fully fledged documentation, incuding **summary** and **usage**.
 //! And another line, for testing
 //! 
+//! # Activities
+//! 
+//! 
 #![allow(non_snake_case)]
 
 extern crate cmn;
@@ -9,7 +12,13 @@ extern crate "yup-oauth2" as oauth2;
 
 use std::collections::HashMap;
 
+// ############
+// SCHEMAS ###
+// ##########
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoConversionPings {
 	/// Pings that the app shall fire for a video (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
@@ -17,6 +26,12 @@ pub struct VideoConversionPings {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.subscriptions.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SubscriptionListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -40,6 +55,9 @@ pub struct SubscriptionListResponse {
 }
 
 /// Information about a resource that received a positive (like) rating.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsLike {
 	/// The resourceId object contains information that identifies the rated resource.
@@ -47,6 +65,9 @@ pub struct ActivityContentDetailsLike {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastSnippet {
 	/// The date and time that the broadcast actually ended. This information is only available once the broadcast's state is complete. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
@@ -70,6 +91,9 @@ pub struct LiveBroadcastSnippet {
 }
 
 /// Describes original video file properties, including technical details about audio and video streams, but also metadata information like content length, digitization time, or geotagging information.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetails {
 	/// The uploaded video file's combined (video and audio) bitrate in bits per second.
@@ -98,6 +122,9 @@ pub struct VideoFileDetails {
 }
 
 /// Playlist localization setting
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistLocalization {
 	/// The localized strings for playlist's description.
@@ -116,6 +143,13 @@ pub struct PlaylistLocalization {
 /// - watch later  To be more specific, these lists are associated with a channel, which is a collection of a person, group, or company's videos, playlists, and other YouTube information. You can retrieve the playlist IDs for each of these lists from the  channel resource for a given channel.
 /// 
 /// You can then use the   playlistItems.list method to retrieve any of those lists. You can also add or remove items from those lists by calling the   playlistItems.insert and   playlistItems.delete methods.
+/// 
+/// # Activities
+/// 
+/// * youtube.playlists.insert
+/// * youtube.playlists.update
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct Playlist {
 	/// The status object contains status information for the playlist.
@@ -137,6 +171,12 @@ pub struct Playlist {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.playlistItems.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItemListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -160,6 +200,9 @@ pub struct PlaylistItemListResponse {
 }
 
 /// A pair Property / Value.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PropertyValue {
 	/// A property.
@@ -169,6 +212,9 @@ pub struct PropertyValue {
 }
 
 /// Describes a temporal position of a visual widget inside a video.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoTiming {
 	/// Defines the time at which the promotion will appear. Depending on the value of type the value of the offsetMs field will represent a time offset from the start or from the end of the video, expressed in milliseconds.
@@ -180,6 +226,9 @@ pub struct InvideoTiming {
 }
 
 /// Basic details about a playlist, including title, description and thumbnails.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistSnippet {
 	/// The playlist's description.
@@ -203,6 +252,9 @@ pub struct PlaylistSnippet {
 }
 
 /// The auditDetails object encapsulates channel data that is relevant for YouTube Partners during the audit process.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelAuditDetails {
 	/// Whether or not the channel has any copyright strikes.
@@ -216,6 +268,13 @@ pub struct ChannelAuditDetails {
 }
 
 /// A live stream describes a live ingestion point.
+/// 
+/// # Activities
+/// 
+/// * youtube.liveStreams.update
+/// * youtube.liveStreams.insert
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStream {
 	/// The status object contains information about live stream's status.
@@ -235,6 +294,12 @@ pub struct LiveStream {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.thumbnails.set
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ThumbnailSetResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -250,6 +315,9 @@ pub struct ThumbnailSetResponse {
 }
 
 /// Information about the uploaded video.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsUpload {
 	/// The ID that YouTube uses to uniquely identify the uploaded video.
@@ -257,6 +325,9 @@ pub struct ActivityContentDetailsUpload {
 }
 
 /// Branding properties for the channel view.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSettings {
 	/// Specifies the channel description.
@@ -288,6 +359,9 @@ pub struct ChannelSettings {
 }
 
 /// Statistics about the video, such as the number of times the video was viewed or liked.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoStatistics {
 	/// The number of comments for the video.
@@ -303,6 +377,9 @@ pub struct VideoStatistics {
 }
 
 /// Brief description of the live stream cdn settings.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct CdnSettings {
 	/// The format of the video stream that you are sending to Youtube.
@@ -314,6 +391,12 @@ pub struct CdnSettings {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.videos.getRating
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoGetRatingResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -329,6 +412,9 @@ pub struct VideoGetRatingResponse {
 }
 
 /// Basic details about a video category, such as its localized title.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoCategorySnippet {
 	/// no description provided
@@ -340,6 +426,9 @@ pub struct VideoCategorySnippet {
 }
 
 /// Details about a resource which was added to a channel.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsChannelItem {
 	/// The resourceId object contains information that identifies the resource that was added to the channel.
@@ -347,6 +436,9 @@ pub struct ActivityContentDetailsChannelItem {
 }
 
 /// Basic details about an i18n language, such as language code and human-readable name.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nLanguageSnippet {
 	/// The human-readable name of the language in the language itself.
@@ -356,6 +448,9 @@ pub struct I18nLanguageSnippet {
 }
 
 /// Basic details about a subscription, including title, description and thumbnails of the subscribed item.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SubscriptionSnippet {
 	/// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
@@ -375,6 +470,9 @@ pub struct SubscriptionSnippet {
 }
 
 /// Details about a channelsection, including playlists and channels.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSectionContentDetails {
 	/// The channel ids for type multiple_channels.
@@ -384,6 +482,12 @@ pub struct ChannelSectionContentDetails {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.i18nRegions.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nRegionListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -399,6 +503,12 @@ pub struct I18nRegionListResponse {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.liveStreams.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStreamListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -422,6 +532,9 @@ pub struct LiveStreamListResponse {
 }
 
 /// Describes a single promoted item.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PromotedItem {
 	/// The temporal position within the video where the promoted item will be displayed. If present, it overrides the default timing.
@@ -435,6 +548,9 @@ pub struct PromotedItem {
 }
 
 /// Branding properties of a YouTube channel.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelBrandingSettings {
 	/// Branding properties for branding images.
@@ -448,6 +564,12 @@ pub struct ChannelBrandingSettings {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.playlists.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -471,6 +593,12 @@ pub struct PlaylistListResponse {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.watermarks.set
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoBranding {
 	/// no description provided
@@ -486,6 +614,9 @@ pub struct InvideoBranding {
 }
 
 /// Information about the playlist item's privacy status.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItemStatus {
 	/// This resource's privacy status.
@@ -493,6 +624,9 @@ pub struct PlaylistItemStatus {
 }
 
 /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelConversionPing {
 	/// Defines the context of the ping.
@@ -502,6 +636,9 @@ pub struct ChannelConversionPing {
 }
 
 /// Describes an invideo promotion campaign consisting of multiple promoted items. A campaign belongs to a single channel_id.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoPromotion {
 	/// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.
@@ -524,6 +661,13 @@ pub struct InvideoPromotion {
 /// - watch later  To be more specific, these lists are associated with a channel, which is a collection of a person, group, or company's videos, playlists, and other YouTube information.
 /// 
 /// You can retrieve the playlist IDs for each of these lists from the  channel resource  for a given channel. You can then use the   playlistItems.list method to retrieve any of those lists. You can also add or remove items from those lists by calling the   playlistItems.insert and   playlistItems.delete methods. For example, if a user gives a positive rating to a video, you would insert that video into the liked videos playlist for that user's channel.
+/// 
+/// # Activities
+/// 
+/// * youtube.playlistItems.insert
+/// * youtube.playlistItems.update
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItem {
 	/// The status object contains information about the playlist item's privacy status.
@@ -541,6 +685,12 @@ pub struct PlaylistItem {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.guideCategories.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct GuideCategoryListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -564,6 +714,9 @@ pub struct GuideCategoryListResponse {
 }
 
 /// Localized versions of certain video properties (e.g. title).
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoLocalization {
 	/// Localized version of the video's description.
@@ -573,6 +726,9 @@ pub struct VideoLocalization {
 }
 
 /// Basic details about a channel section, including title, style and position.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSectionSnippet {
 	/// The style of the channel section.
@@ -592,6 +748,9 @@ pub struct ChannelSectionSnippet {
 }
 
 /// Details about the content of a channel.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentDetails {
 	/// no description provided
@@ -601,10 +760,16 @@ pub struct ChannelContentDetails {
 }
 
 /// Stub token pagination template to suppress results.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct TokenPagination;
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItemContentDetails {
 	/// A user-generated note for this item.
@@ -618,6 +783,9 @@ pub struct PlaylistItemContentDetails {
 }
 
 /// Internal representation of thumbnails for a YouTube resource.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ThumbnailDetails {
 	/// The default image for this resource.
@@ -633,6 +801,9 @@ pub struct ThumbnailDetails {
 }
 
 /// Details about monetization of a YouTube Video.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoMonetizationDetails {
 	/// The value of access indicates whether the video can be monetized or not.
@@ -640,6 +811,9 @@ pub struct VideoMonetizationDetails {
 }
 
 /// Information that identifies the recommended resource.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsRecommendation {
 	/// The resourceId object contains information that identifies the recommended resource.
@@ -651,6 +825,9 @@ pub struct ActivityContentDetailsRecommendation {
 }
 
 /// Recording information associated with the video.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoRecordingDetails {
 	/// The date and time when the video was recorded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.
@@ -662,6 +839,9 @@ pub struct VideoRecordingDetails {
 }
 
 /// Information about a channel that a user subscribed to.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsSubscription {
 	/// The resourceId object contains information that identifies the resource that the user subscribed to.
@@ -669,6 +849,9 @@ pub struct ActivityContentDetailsSubscription {
 }
 
 /// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelConversionPings {
 	/// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
@@ -676,6 +859,9 @@ pub struct ChannelConversionPings {
 }
 
 /// Details about the content of an activity: the video that was shared, the channel that was subscribed to, etc.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetails {
 	/// The comment object contains information about a resource that received a comment. This property is only present if the snippet.type is comment.
@@ -703,6 +889,9 @@ pub struct ActivityContentDetails {
 }
 
 /// A i18nRegion resource identifies a region where YouTube is available.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nRegion {
 	/// The snippet object contains basic details about the i18n region, such as region code and human-readable name.
@@ -716,6 +905,9 @@ pub struct I18nRegion {
 }
 
 /// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentOwnerDetails {
 	/// The ID of the content owner linked to the channel.
@@ -725,6 +917,9 @@ pub struct ChannelContentOwnerDetails {
 }
 
 /// Describes processing status and progress and availability of some other Video resource parts.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoProcessingDetails {
 	/// This value indicates whether file details are available for the uploaded video. You can retrieve a video's file details by requesting the fileDetails part in your videos.list() request.
@@ -746,6 +941,9 @@ pub struct VideoProcessingDetails {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastStatus {
 	/// The broadcast's recording status.
@@ -759,6 +957,9 @@ pub struct LiveBroadcastStatus {
 }
 
 /// Details about the content to witch a subscription refers.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SubscriptionContentDetails {
 	/// The number of new items in the subscription since its content was last read.
@@ -770,6 +971,13 @@ pub struct SubscriptionContentDetails {
 }
 
 /// A video resource represents a YouTube video.
+/// 
+/// # Activities
+/// 
+/// * youtube.videos.insert
+/// * youtube.videos.update
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct Video {
 	/// The status object contains information about the video's uploading, processing, and privacy statuses.
@@ -815,6 +1023,9 @@ pub struct Video {
 }
 
 /// Geographical coordinates of a point, in WGS84.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct GeoPoint {
 	/// Latitude in degrees.
@@ -826,6 +1037,9 @@ pub struct GeoPoint {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoAgeGating {
 	/// Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won't be present.
@@ -837,6 +1051,9 @@ pub struct VideoAgeGating {
 }
 
 /// Player to be used for a video playback.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoPlayer {
 	/// An <iframe> tag that embeds a player that will play the video.
@@ -844,6 +1061,9 @@ pub struct VideoPlayer {
 }
 
 /// Basic details about a channel, including title, description and thumbnails.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSnippet {
 	/// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
@@ -861,6 +1081,9 @@ pub struct ChannelSnippet {
 }
 
 /// Branding properties for the watch.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct WatchSettings {
 	/// The background color for the video watch page's branded area.
@@ -872,6 +1095,9 @@ pub struct WatchSettings {
 }
 
 /// ChannelSection localization setting
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSectionLocalization {
 	/// The localized strings for channel section's title.
@@ -879,6 +1105,9 @@ pub struct ChannelSectionLocalization {
 }
 
 /// DEPRECATED Region restriction of the video.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoContentDetailsRegionRestriction {
 	/// A list of region codes that identify countries where the video is viewable. If this property is present and a country is not listed in its value, then the video is blocked from appearing in that country. If this property is present and contains an empty list, the video is blocked in all countries.
@@ -888,6 +1117,9 @@ pub struct VideoContentDetailsRegionRestriction {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoRating {
 	/// no description provided
@@ -897,6 +1129,9 @@ pub struct VideoRating {
 }
 
 /// Describes a single promoted item id. It is a union of various possible types.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PromotedItemId {
 	/// If the promoted item represents a website, this field represents the url pointing to the website. This field will be present only if type has the value website.
@@ -910,6 +1145,12 @@ pub struct PromotedItemId {
 }
 
 /// A subscription resource contains information about a YouTube user subscription. A subscription notifies a user when new videos are added to a channel or when another user takes one of several actions on YouTube, such as uploading a video, rating a video, or commenting on a video.
+/// 
+/// # Activities
+/// 
+/// * youtube.subscriptions.insert
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct Subscription {
 	/// The snippet object contains basic details about the subscription, including its title and the channel that the user subscribed to.
@@ -927,6 +1168,9 @@ pub struct Subscription {
 }
 
 /// Basic details about an i18n region, such as region code and human-readable name.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nRegionSnippet {
 	/// The region code as a 2-letter ISO country code.
@@ -936,6 +1180,9 @@ pub struct I18nRegionSnippet {
 }
 
 /// Information about a new playlist item.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsPlaylistItem {
 	/// The resourceId object contains information about the resource that was added to the playlist.
@@ -947,6 +1194,9 @@ pub struct ActivityContentDetailsPlaylistItem {
 }
 
 /// Describes the spatial position of a visual widget inside a video. It is a union of various position types, out of which only will be set one.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoPosition {
 	/// Describes in which corner of the video the visual widget will appear.
@@ -956,6 +1206,9 @@ pub struct InvideoPosition {
 }
 
 /// Information about a resource that received a comment.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsComment {
 	/// The resourceId object contains information that identifies the resource associated with the comment.
@@ -963,6 +1216,9 @@ pub struct ActivityContentDetailsComment {
 }
 
 /// Basic details about a guide category.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct GuideCategorySnippet {
 	/// no description provided
@@ -972,6 +1228,9 @@ pub struct GuideCategorySnippet {
 }
 
 /// Basic details about a video, including title, description, uploader, thumbnails and category.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoSnippet {
 	/// The video's description.
@@ -999,6 +1258,9 @@ pub struct VideoSnippet {
 }
 
 /// Project specific details about the content of a YouTube Video.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoProjectDetails {
 	/// A list of project tags associated with the video during the upload.
@@ -1006,6 +1268,9 @@ pub struct VideoProjectDetails {
 }
 
 /// Detailed settings of a stream.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStreamContentDetails {
 	/// Indicates whether the stream is reusable, which means that it can be bound to multiple broadcasts. It is common for broadcasters to reuse the same stream for many different broadcasts if those broadcasts occur at different times.
@@ -1020,6 +1285,9 @@ pub struct LiveStreamContentDetails {
 }
 
 /// Detailed settings of a broadcast.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastContentDetails {
 	/// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.
@@ -1049,6 +1317,9 @@ pub struct LiveBroadcastContentDetails {
 }
 
 /// Basic details about a video category, such as its localized title.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoStatus {
 	/// The video's license.
@@ -1070,6 +1341,9 @@ pub struct VideoStatus {
 }
 
 /// A guideCategory resource identifies a category that YouTube algorithmically assigns based on a channel's content or other indicators, such as the channel's popularity. The list is similar to video categories, with the difference being that a video's uploader can assign a video category but only YouTube can assign a channel category.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct GuideCategory {
 	/// The snippet object contains basic details about the category, such as its title.
@@ -1083,6 +1357,12 @@ pub struct GuideCategory {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.channelSections.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSectionListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -1098,6 +1378,9 @@ pub struct ChannelSectionListResponse {
 }
 
 /// Settings and Info of the monitor stream
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct MonitorStreamInfo {
 	/// If you have set the enableMonitorStream property to true, then this property determines the length of the live broadcast delay.
@@ -1113,6 +1396,12 @@ pub struct MonitorStreamInfo {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.i18nLanguages.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nLanguageListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -1128,6 +1417,9 @@ pub struct I18nLanguageListResponse {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LocalizedProperty {
 	/// no description provided
@@ -1139,6 +1431,16 @@ pub struct LocalizedProperty {
 }
 
 /// A liveBroadcast resource represents an event that will be streamed, via live video, on YouTube.
+/// 
+/// # Activities
+/// 
+/// * youtube.liveBroadcasts.control
+/// * youtube.liveBroadcasts.insert
+/// * youtube.liveBroadcasts.update
+/// * youtube.liveBroadcasts.transition
+/// * youtube.liveBroadcasts.bind
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcast {
 	/// The status object contains information about the event's status.
@@ -1156,6 +1458,9 @@ pub struct LiveBroadcast {
 }
 
 /// Information about a video stream.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetailsVideoStream {
 	/// The video stream's bitrate, in bits per second.
@@ -1177,6 +1482,9 @@ pub struct VideoFileDetailsVideoStream {
 }
 
 /// A thumbnail is an image representing a YouTube resource.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct Thumbnail {
 	/// The thumbnail image's URL.
@@ -1188,6 +1496,12 @@ pub struct Thumbnail {
 }
 
 /// A channel resource contains information about a YouTube channel.
+/// 
+/// # Activities
+/// 
+/// * youtube.channels.update
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct Channel {
 	/// The status object encapsulates information about the privacy status of the channel.
@@ -1221,6 +1535,9 @@ pub struct Channel {
 }
 
 /// Statistics about a channel: number of subscribers, number of videos in the channel, etc.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelStatistics {
 	/// The number of comments for the channel.
@@ -1236,6 +1553,9 @@ pub struct ChannelStatistics {
 }
 
 /// Details about a social network post.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsSocial {
 	/// The resourceId object encapsulates information that identifies the resource associated with a social network post.
@@ -1251,6 +1571,9 @@ pub struct ActivityContentDetailsSocial {
 }
 
 /// Channel localization setting
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelLocalization {
 	/// The localized strings for channel's description.
@@ -1260,6 +1583,9 @@ pub struct ChannelLocalization {
 }
 
 /// A resource id is a generic reference that points to another YouTube resource.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ResourceId {
 	/// The type of the API resource.
@@ -1273,6 +1599,9 @@ pub struct ResourceId {
 }
 
 /// A search result contains information about a YouTube video, channel, or playlist that matches the search parameters specified in an API request. While a search result points to a uniquely identifiable resource, like a video, it does not have its own persistent data.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SearchResult {
 	/// The snippet object contains basic details about a search result, such as its title or description. For example, if the search result is a video, then the title will be the video's title and the description will be the video's description.
@@ -1286,6 +1615,12 @@ pub struct SearchResult {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.videoCategories.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoCategoryListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -1309,6 +1644,9 @@ pub struct VideoCategoryListResponse {
 }
 
 /// Basic details about an activity, including title, description, thumbnails, activity type and group.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivitySnippet {
 	/// A map of thumbnail images associated with the resource that is primarily associated with the activity. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
@@ -1330,6 +1668,9 @@ pub struct ActivitySnippet {
 }
 
 /// Video processing progress and completion time estimate.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoProcessingDetailsProcessingProgress {
 	/// An estimate of the amount of time, in millseconds, that YouTube needs to finish processing the video.
@@ -1344,6 +1685,12 @@ pub struct VideoProcessingDetailsProcessingProgress {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.search.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SearchListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -1367,6 +1714,9 @@ pub struct SearchListResponse {
 }
 
 /// Freebase topic information related to the channel.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelTopicDetails {
 	/// A list of Freebase topic IDs associated with the channel. You can retrieve information about each topic using the Freebase Topic API.
@@ -1374,6 +1724,12 @@ pub struct ChannelTopicDetails {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.videos.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -1397,6 +1753,9 @@ pub struct VideoListResponse {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LanguageTag {
 	/// no description provided
@@ -1404,6 +1763,9 @@ pub struct LanguageTag {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistStatus {
 	/// The playlist's privacy status.
@@ -1411,6 +1773,9 @@ pub struct PlaylistStatus {
 }
 
 /// Details about the content of a YouTube Video.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoContentDetails {
 	/// The value of definition indicates whether the video is available in high definition or only in standard definition.
@@ -1432,6 +1797,9 @@ pub struct VideoContentDetails {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStreamSnippet {
 	/// The ID that YouTube uses to uniquely identify the channel that is transmitting the stream.
@@ -1445,6 +1813,9 @@ pub struct LiveStreamSnippet {
 }
 
 /// JSON template for the status part of a channel.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelStatus {
 	/// Privacy status of the channel.
@@ -1456,6 +1827,12 @@ pub struct ChannelStatus {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.channels.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -1479,6 +1856,13 @@ pub struct ChannelListResponse {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.channelSections.update
+/// * youtube.channelSections.insert
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSection {
 	/// The snippet object contains basic details about the channel section, such as its type, style and title.
@@ -1496,6 +1880,12 @@ pub struct ChannelSection {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.liveBroadcasts.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -1519,6 +1909,9 @@ pub struct LiveBroadcastListResponse {
 }
 
 /// Brief description of the live stream status.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStreamStatus {
 	/// no description provided
@@ -1526,6 +1919,9 @@ pub struct LiveStreamStatus {
 }
 
 /// Details about the live streaming metadata.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoLiveStreamingDetails {
 	/// The time that the broadcast is scheduled to begin. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
@@ -1541,6 +1937,9 @@ pub struct VideoLiveStreamingDetails {
 }
 
 /// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 65
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ContentRating {
 	/// Internal YouTube rating.
@@ -1674,6 +2073,12 @@ pub struct ContentRating {
 }
 
 /// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// * youtube.activities.list
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityListResponse {
 	/// Serialized EventId of the request which produced this response.
@@ -1697,6 +2102,12 @@ pub struct ActivityListResponse {
 }
 
 /// An activity resource contains information about an action that a particular channel, or user, has taken on YouTube.The actions reported in activity feeds include rating a video, sharing a video, marking a video as a favorite, commenting on a video, uploading a video, and so forth. Each activity resource identifies the type of action, the channel associated with the action, and the resource(s) associated with the action, such as the video that was rated or uploaded.
+/// 
+/// # Activities
+/// 
+/// * youtube.activities.insert
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct Activity {
 	/// The snippet object contains basic details about the activity, including the activity's type and group ID.
@@ -1712,6 +2123,9 @@ pub struct Activity {
 }
 
 /// Basic details about a subscription's subscriber including title, description, channel ID and thumbnails.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SubscriptionSubscriberSnippet {
 	/// The channel ID of the subscriber.
@@ -1725,6 +2139,9 @@ pub struct SubscriptionSubscriberSnippet {
 }
 
 /// Branding properties for images associated with the channel.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ImageSettings {
 	/// Banner image. TV size medium resolution (1280x720).
@@ -1774,6 +2191,9 @@ pub struct ImageSettings {
 }
 
 /// Details about a resource which is being promoted.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsPromotedItem {
 	/// The type of call-to-action, a message to the user indicating action that can be taken.
@@ -1799,6 +2219,9 @@ pub struct ActivityContentDetailsPromotedItem {
 }
 
 /// Rights management policy for YouTube resources.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct AccessPolicy {
 	/// A list of region codes that identify countries where the default policy do not apply.
@@ -1808,6 +2231,9 @@ pub struct AccessPolicy {
 }
 
 /// Details about a channel bulletin post.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsBulletin {
 	/// The resourceId object contains information that identifies the resource associated with a bulletin post.
@@ -1815,6 +2241,9 @@ pub struct ActivityContentDetailsBulletin {
 }
 
 /// An i18nLanguage resource identifies a UI language currently supported by YouTube.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nLanguage {
 	/// The snippet object contains basic details about the i18n language, such as language code and human-readable name.
@@ -1828,6 +2257,9 @@ pub struct I18nLanguage {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LocalizedString {
 	/// no description provided
@@ -1837,6 +2269,9 @@ pub struct LocalizedString {
 }
 
 /// Information about an audio stream.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetailsAudioStream {
 	/// The audio stream's bitrate, in bits per second.
@@ -1850,6 +2285,9 @@ pub struct VideoFileDetailsAudioStream {
 }
 
 /// Freebase topic information related to the video.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoTopicDetails {
 	/// A list of Freebase topic IDs that are centrally associated with the video. These are topics that are centrally featured in the video, and it can be said that the video is mainly about each of these. You can retrieve information about each topic using the Freebase Topic API.
@@ -1859,6 +2297,9 @@ pub struct VideoTopicDetails {
 }
 
 /// Describes information necessary for ingesting an RTMP or an HTTP stream.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct IngestionInfo {
 	/// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.
@@ -1874,6 +2315,9 @@ pub struct IngestionInfo {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoConversionPing {
 	/// Defines the context of the ping.
@@ -1883,6 +2327,9 @@ pub struct VideoConversionPing {
 }
 
 /// A videoCategory resource identifies a category that has been or could be associated with uploaded videos.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoCategory {
 	/// The snippet object contains basic details about the video category, including its title.
@@ -1896,6 +2343,9 @@ pub struct VideoCategory {
 }
 
 /// Basic details about a playlist, including title, description and thumbnails.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItemSnippet {
 	/// The ID that YouTube uses to uniquely identify the user that added the item to the playlist.
@@ -1919,6 +2369,9 @@ pub struct PlaylistItemSnippet {
 }
 
 /// Information about a video that was marked as a favorite video.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsFavorite {
 	/// The resourceId object contains information that identifies the resource that was marked as a favorite.
@@ -1926,6 +2379,9 @@ pub struct ActivityContentDetailsFavorite {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistPlayer {
 	/// An <iframe> tag that embeds a player that will play the playlist.
@@ -1933,6 +2389,9 @@ pub struct PlaylistPlayer {
 }
 
 /// A single tag suggestion with it's relevance information.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoSuggestionsTagSuggestion {
 	/// A set of video categories for which the tag is relevant. You can use this information to display appropriate tag suggestions based on the video category that the video uploader associates with the video. By default, tag suggestions are relevant for all categories if there are no restricts defined for the keyword.
@@ -1942,6 +2401,9 @@ pub struct VideoSuggestionsTagSuggestion {
 }
 
 /// Specifies suggestions on how to improve video content, including encoding hints, tag suggestions, and editor suggestions.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoSuggestions {
 	/// A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video's current processing status, eventually, that status will almost certainly be failed.
@@ -1957,6 +2419,9 @@ pub struct VideoSuggestions {
 }
 
 /// Basic details about a search result, including title, description and thumbnails of the item referenced by the search result.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SearchResultSnippet {
 	/// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.
@@ -1976,6 +2441,12 @@ pub struct SearchResultSnippet {
 }
 
 /// A channel banner returned as the response to a channel_banner.insert call.
+/// 
+/// # Activities
+/// 
+/// * youtube.channelBanners.insert
+/// 
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelBannerResource {
 	/// The URL of this banner image.
@@ -1987,6 +2458,9 @@ pub struct ChannelBannerResource {
 }
 
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistContentDetails {
 	/// The number of videos in the playlist.
@@ -1994,6 +2468,9 @@ pub struct PlaylistContentDetails {
 }
 
 /// Paging details for lists of resources, including total number of items available and number of resources returned in a single page.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PageInfo {
 	/// The number of results included in the API response.
@@ -2003,7 +2480,13 @@ pub struct PageInfo {
 }
 
 
+// ###################
+// NESTED SCHEMAS ###
+// #################
 /// There is no detailed description.
+/// 
+/// This schema type is not used in any activity, and only used as *part* of another schema.
+/// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentDetailsRelatedPlaylists {
 	/// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.

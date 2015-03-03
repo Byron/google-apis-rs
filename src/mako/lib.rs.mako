@@ -1,4 +1,10 @@
-<% import util %>\
+<% 
+	import util 
+	nested_schemas = list(util.iter_nested_types(schemas))
+
+	sta_map, fqan_map = util.build_activity_mappings(resources)
+	c = util.Context(sta_map, fqan_map)
+%>\
 <%namespace name="lib" file="lib/lib.mako"/>\
 <%namespace name="mutil" file="lib/util.mako"/>\
 <%namespace name="schema" file="lib/schema.mako"/>\
@@ -13,14 +19,18 @@ extern crate "yup-oauth2" as oauth2;
 
 use std::collections::HashMap;
 
-## SCHEMAS - normal ones
+// ############
+// SCHEMAS ###
+// ##########
 % for s in schemas.values():
-${schema.new(s)}
+${schema.new(s, c)}
 % endfor
 
-## SCHEMAS - nested
+// ###################
+// NESTED SCHEMAS ###
+// #################
 ## some schemas are only used once and basically internal types.
 ## We have to find them and process them as normal types
-% for s in util.iter_nested_types(schemas):
-${schema.new(s)}
+% for s in nested_schemas:
+${schema.new(s, c)}
 % endfor
