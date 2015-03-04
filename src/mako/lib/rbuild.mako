@@ -1,6 +1,7 @@
 <%!
 	from util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
-                      rb_type, singular, hub_type, mangle_ident)
+                      rb_type, singular, hub_type, mangle_ident, mb_type, method_params, property,
+                      to_fqan, indent_all_but_first_by)
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -41,4 +42,28 @@ pub struct ${ThisType}
 }
 
 impl<'a, C, NC, A> ResourceMethodsBuilder for ${ThisType} {}
+
+## Builder Creators Methods ####################
+impl<'a, C, NC, A> ${ThisType} {
+	% for a in c.rta_map[resource]:
+<%
+	m = c.fqan_map[to_fqan(name, resource, a)]
+	RType = mb_type(resource, a)
+%>\
+	
+	% if 'description' in m:
+	/// Create a builder to help you perform the following task:
+	///
+	${m.description | rust_doc_comment, indent_all_but_first_by(1)}
+	% endif
+	fn ${mangle_ident(a)}(&self) -> ${RType}<'a, C, NC, A> {
+		${RType} {
+			hub: self.hub,
+			% for p in method_params(m):
+			${property(p.name)}: Default::default(),
+			% endfor
+		}
+	}
+	% endfor ## for each activity
+}
 </%def>

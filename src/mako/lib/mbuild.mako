@@ -60,16 +60,14 @@ impl<'a, C, NC, A> MethodBuilder for ${ThisType} {}
 
 impl<'a, C, NC, A> ${ThisType} {
 
-	% if 'description' in m:
-	${m.description | rust_doc_comment, indent_all_but_first_by(1)}
-	///
-	% endif
+	/// Perform the operation you have build so far.
+	/// Can only be called once !
 	/// TODO: Build actual call
 	pub fn ${api.terms.action}(self) {
 
 	}
 
-## PROPERTIES ###############
+## SETTERS ###############
 % for p in method_params(m):
 ${self._setter(resource, method, m, p, ThisType, c)}\
 % endfor

@@ -32,6 +32,7 @@ use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::borrow::BorrowMut;
 use std::cell::RefCell;
+use std::default::Default;
 
 pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestResult, NestedType};
 
