@@ -3093,6 +3093,7 @@ impl Part for ChannelContentDetailsRelatedplaylists {}
 // MethodBuilders ###
 // #################
 
+
 /// A builder providing access to all methods supported on *i18nLanguage* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3137,6 +3138,10 @@ pub struct I18nLanguagesMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nLanguagesMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *channelBanner* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3181,6 +3186,10 @@ pub struct ChannelBannersMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelBannersMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *channelSection* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3225,6 +3234,10 @@ pub struct ChannelSectionsMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionsMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *guideCategorie* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3269,6 +3282,10 @@ pub struct GuideCategoriesMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for GuideCategoriesMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *playlist* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3313,6 +3330,10 @@ pub struct PlaylistsMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistsMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *thumbnail* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3357,6 +3378,10 @@ pub struct ThumbnailsMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ThumbnailsMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *video* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3401,6 +3426,10 @@ pub struct VideosMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideosMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *subscription* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3445,6 +3474,10 @@ pub struct SubscriptionsMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionsMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *search* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3489,6 +3522,10 @@ pub struct SearchMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for SearchMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *i18nRegion* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3533,6 +3570,10 @@ pub struct I18nRegionsMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nRegionsMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *liveStream* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3577,6 +3618,10 @@ pub struct LiveStreamsMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamsMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *channel* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3621,6 +3666,10 @@ pub struct ChannelsMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelsMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *playlistItem* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3665,6 +3714,10 @@ pub struct PlaylistItemsMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemsMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *watermark* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3709,6 +3762,10 @@ pub struct WatermarksMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for WatermarksMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *liveBroadcast* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3753,6 +3810,10 @@ pub struct LiveBroadcastsMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastsMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *videoCategorie* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3797,6 +3858,10 @@ pub struct VideoCategoriesMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoCategoriesMethodBuilder<'a, C, NC, A> {}
+
+
+
+
 /// A builder providing access to all methods supported on *activitie* resources.
 /// It is usually not used directly, but through the `YouTube` hub.
 ///
@@ -3841,4 +3906,29 @@ pub struct ActivitiesMethodBuilder<'a, C, NC, A>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ActivitiesMethodBuilder<'a, C, NC, A> {}
+
+
+
+
+
+// ###################
+// CallBuilders   ###
+// #################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -1,19 +1,19 @@
 <% 
 	from util import (iter_nested_types, new_context, rust_comment, rust_doc_comment,
-                      rust_module_doc_comment, rust_doc_test_norun, canonical_type_name,
-                      mb_type, singular, rust_test_fn_invisible, put_and)
+                      rust_module_doc_comment, mb_type, hub_type)
 	nested_schemas = list(iter_nested_types(schemas))
 
  	c = new_context(resources)
 
-	hub_type = canonical_type_name(canonicalName)
+	hub_type = hub_type(canonicalName)
     
 %>\
 <%namespace name="lib" file="lib/lib.mako"/>\
-<%namespace name="mutil" file="lib/util.mako"/>\
+<%namespace name="util" file="lib/util.mako"/>\
+<%namespace name="rbuild" file="lib/rbuild.mako"/>\
 <%namespace name="schema" file="lib/schema.mako"/>\
 <%block filter="rust_comment">\
-<%mutil:gen_info source="${self.uri}" />\
+<%util:gen_info source="${self.uri}" />\
 </%block>
 
 <%block filter="rust_module_doc_comment">\
@@ -97,33 +97,17 @@ ${schema.new(s, c)}
 // MethodBuilders ###
 // #################
 
-% for resource, methods in c.rta_map.iteritems():
-/// A builder providing access to all methods supported on *${singular(resource)}* resources.
-/// It is usually not used directly, but through the `${hub_type}` hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-<%block filter="rust_doc_test_norun, rust_doc_comment">\
-${mutil.test_prelude()}\
+% for resource in c.rta_map:
+${rbuild.new(resource, c)}
 
-<%block filter="rust_test_fn_invisible">\
-${lib.test_hub(canonical_type_name(canonicalName))}\
 
-// Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
-// like ${put_and(sorted('`%s(...)`' % f for f in methods))}
-let rb = hub.${resource}();
-</%block>
-</%block>
-pub struct ${mb_type(resource)}<'a, C, NC, A>
-    where NC: 'a,
-           C: 'a,
-           A: 'a, {
-
-    hub: &'a ${hub_type}<C, NC, A>
-}
-
-impl<'a, C, NC, A> MethodBuilder for ${mb_type(resource)}<'a, C, NC, A> {}
 % endfor
 
+
+// ###################
+// CallBuilders   ###
+// #################
+
+% for resource in c.rta_map:
+
+% endfor

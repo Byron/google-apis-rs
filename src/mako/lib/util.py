@@ -313,3 +313,6 @@ def library_name(name, version):
 # return type name of a resource builder, from a resource name
 def mb_type(r):
     return "%sMethodBuilder" % canonical_type_name(r)
+
+def hub_type(canonicalName):
+    return canonical_type_name(canonicalName)
