@@ -9,5 +9,5 @@
 </%block>
 The `${util.library_name()}` library allows access to all features of *${canonicalName}*.
 
-${lib.docs(c)}
+${lib.docs(c, rust_doc=False)}
 <%lib:license />

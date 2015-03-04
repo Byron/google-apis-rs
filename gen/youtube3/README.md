@@ -60,7 +60,7 @@ let r = hub.videos().delete(...).do()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation. It is made such that all required arguments have to be 
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `do()` method performs the actual communication with the server and returns the respective result.
 
@@ -68,9 +68,34 @@ The `do()` method performs the actual communication with the server and returns 
 
 ## Instantiating the Hub
 
+```Rust
+extern crate hyper;
+extern crate "yup-oauth2" as oauth2;
+extern crate "rustc-serialize" as rustc_serialize;
+extern crate youtube3;
+
+use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+use std::default::Default;
+
+use youtube3::YouTube;
+
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
+// among other things.
+let secret: ApplicationSecret = Default::default();
+// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// unless you replace  `None` with the desired Flow
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
+// You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
+let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+                              hyper::Client::new(),
+                              <MemoryStorage as Default>::default(), None);
+let mut hub = YouTube::new(hyper::Client::new(), auth);
+```
+
+**TODO** Example calls - there should soon be a generator able to do that with proper inputs
 ## About error handling
 
-## About costumization
+## About Customization/Callbacks
 
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client

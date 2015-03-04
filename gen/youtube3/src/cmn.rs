@@ -2,6 +2,11 @@
 // DO NOT EDIT
 use std::marker::MarkerTrait;
 
+/// Identifies the Hub. There is only one per library, this trait is supposed
+/// to make intended use more explicit.
+/// The hub allows to access all resource methods more easily.
+pub trait Hub: MarkerTrait {}
+
 /// Identifies types which can be inserted and deleted.
 /// Types with this trait are most commonly used by clients of this API.
 pub trait Resource: MarkerTrait {}

@@ -43,12 +43,27 @@ def rust_comment(s):
 def hash_comment(s):
     return re_linestart.sub('# ', s)
 
+# return s, with trailing newline
+def trailing_newline(s):
+    if not s.endswith('\n'):
+        return s + '\n'
+    return s
+
+# a rust test that doesn't run though
+def rust_doc_test_norun(s):
+    return "```test_harness,no_run\n%s```" % trailing_newline(s)
+
+# a rust code block in (github) markdown
+def markdown_rust_block(s):
+    return "```Rust\n%s```" % trailing_newline(s)    
+
+# wraps s into an invisible doc test function.
+def rust_test_fn_invisible(s):
+    return "# #[test] fn egal() {\n%s# }" % trailing_newline(s)
+
 # markdown comments
 def markdown_comment(s):
-    nl = ''
-    if not s.endswith('\n'):
-        nl = '\n'
-    return "<!---\n%s%s-->" % (s, nl)
+    return "<!---\n%s-->" % trailing_newline(s)
 
 # escape each string in l with "s" and return the new list
 def estr(l):
@@ -84,7 +99,10 @@ def split_camelcase_s(s):
 # ------------------------------------------------------------------------------
 ## @{
 
-
+# Return transformed string that could make a good type name
+def canonical_type_name(s):
+    # can't use s.capitalize() as it will lower-case the remainder of the string
+    return s[:1].upper() + s[1:]
 
 def nested_type_name(sn, pn):
     return sn + pn.capitalize()
@@ -194,7 +212,7 @@ def schema_markers(s, c):
 
 # Returns (A, B) where
 # A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
-# B: { fqan -> activity_method }
+# B: { fqan -> activity_method_data }
 # fqan = fully qualified activity name
 def build_activity_mappings(activities):
     res = dict()
@@ -238,6 +256,10 @@ def activity_split(fqan):
 # videos -> Video
 def activity_name_to_type_name(an):
     return an.capitalize()[:-1]
+
+# yields (resource, activity, activity_data)
+def iter_acitivities(c):
+    return ((activity_split(an) + [a]) for an, a in c.fqan_map.iteritems())
 
 ## -- End Activity Utilities -- @}
 
