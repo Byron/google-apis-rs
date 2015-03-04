@@ -1,6 +1,6 @@
 <% 
 	from util import (iter_nested_types, new_context, rust_comment, rust_doc_comment,
-                      rust_module_doc_comment, mb_type, hub_type)
+                      rust_module_doc_comment, rb_type, hub_type)
 	nested_schemas = list(iter_nested_types(schemas))
 
  	c = new_context(resources)
@@ -11,6 +11,7 @@
 <%namespace name="lib" file="lib/lib.mako"/>\
 <%namespace name="util" file="lib/util.mako"/>\
 <%namespace name="rbuild" file="lib/rbuild.mako"/>\
+<%namespace name="mbuild" file="lib/mbuild.mako"/>\
 <%namespace name="schema" file="lib/schema.mako"/>\
 <%block filter="rust_comment">\
 <%util:gen_info source="${self.uri}" />\
@@ -33,7 +34,7 @@ use std::marker::PhantomData;
 use std::borrow::BorrowMut;
 use std::cell::RefCell;
 
-pub use cmn::{Hub, MethodBuilder, Resource, Part, ResponseResult, RequestResult, NestedType};
+pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestResult, NestedType};
 
 // ########
 // HUB ###
@@ -70,8 +71,8 @@ impl<'a, C, NC, A> ${hub_type}<C, NC, A>
     }
 
     % for resource in sorted(c.rta_map.keys()):
-    pub fn ${resource}(&'a self) -> ${mb_type(resource)}<'a, C, NC, A> {
-        ${mb_type(resource)} { hub: &self }
+    pub fn ${resource}(&'a self) -> ${rb_type(resource)}<'a, C, NC, A> {
+        ${rb_type(resource)} { hub: &self }
     }
     % endfor
 }
@@ -108,6 +109,9 @@ ${rbuild.new(resource, c)}
 // CallBuilders   ###
 // #################
 
-% for resource in c.rta_map:
+% for resource, methods in c.rta_map.iteritems():
+% for method in methods:
+${mbuild.new(resource, method, c)}
 
-% endfor
+% endfor ## method in methods
+% endfor ## resource, methods

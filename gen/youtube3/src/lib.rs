@@ -72,10 +72,9 @@
 //! extern crate youtube3;
 //! 
 //! # #[test] fn egal() {
-//! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 //! use std::default::Default;
-//! 
-//! use youtube3::YouTube;
+//! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+//! # use youtube3::YouTube;
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
 //! // among other things.
@@ -115,7 +114,7 @@ use std::marker::PhantomData;
 use std::borrow::BorrowMut;
 use std::cell::RefCell;
 
-pub use cmn::{Hub, MethodBuilder, Resource, Part, ResponseResult, RequestResult, NestedType};
+pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestResult, NestedType};
 
 // ########
 // HUB ###
@@ -134,10 +133,9 @@ pub use cmn::{Hub, MethodBuilder, Resource, Part, ResponseResult, RequestResult,
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
-/// 
-/// use youtube3::YouTube;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
 /// // among other things.
@@ -174,56 +172,56 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
         }
     }
 
-    pub fn activities(&'a self) -> ActivitiesMethodBuilder<'a, C, NC, A> {
-        ActivitiesMethodBuilder { hub: &self }
+    pub fn activities(&'a self) -> ActivityMethodsBuilder<'a, C, NC, A> {
+        ActivityMethodsBuilder { hub: &self }
     }
-    pub fn channelBanners(&'a self) -> ChannelBannersMethodBuilder<'a, C, NC, A> {
-        ChannelBannersMethodBuilder { hub: &self }
+    pub fn channelBanners(&'a self) -> ChannelBannerMethodsBuilder<'a, C, NC, A> {
+        ChannelBannerMethodsBuilder { hub: &self }
     }
-    pub fn channelSections(&'a self) -> ChannelSectionsMethodBuilder<'a, C, NC, A> {
-        ChannelSectionsMethodBuilder { hub: &self }
+    pub fn channelSections(&'a self) -> ChannelSectionMethodsBuilder<'a, C, NC, A> {
+        ChannelSectionMethodsBuilder { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelsMethodBuilder<'a, C, NC, A> {
-        ChannelsMethodBuilder { hub: &self }
+    pub fn channels(&'a self) -> ChannelMethodsBuilder<'a, C, NC, A> {
+        ChannelMethodsBuilder { hub: &self }
     }
-    pub fn guideCategories(&'a self) -> GuideCategoriesMethodBuilder<'a, C, NC, A> {
-        GuideCategoriesMethodBuilder { hub: &self }
+    pub fn guideCategories(&'a self) -> GuideCategoryMethodsBuilder<'a, C, NC, A> {
+        GuideCategoryMethodsBuilder { hub: &self }
     }
-    pub fn i18nLanguages(&'a self) -> I18nLanguagesMethodBuilder<'a, C, NC, A> {
-        I18nLanguagesMethodBuilder { hub: &self }
+    pub fn i18nLanguages(&'a self) -> I18nLanguageMethodsBuilder<'a, C, NC, A> {
+        I18nLanguageMethodsBuilder { hub: &self }
     }
-    pub fn i18nRegions(&'a self) -> I18nRegionsMethodBuilder<'a, C, NC, A> {
-        I18nRegionsMethodBuilder { hub: &self }
+    pub fn i18nRegions(&'a self) -> I18nRegionMethodsBuilder<'a, C, NC, A> {
+        I18nRegionMethodsBuilder { hub: &self }
     }
-    pub fn liveBroadcasts(&'a self) -> LiveBroadcastsMethodBuilder<'a, C, NC, A> {
-        LiveBroadcastsMethodBuilder { hub: &self }
+    pub fn liveBroadcasts(&'a self) -> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
+        LiveBroadcastMethodsBuilder { hub: &self }
     }
-    pub fn liveStreams(&'a self) -> LiveStreamsMethodBuilder<'a, C, NC, A> {
-        LiveStreamsMethodBuilder { hub: &self }
+    pub fn liveStreams(&'a self) -> LiveStreamMethodsBuilder<'a, C, NC, A> {
+        LiveStreamMethodsBuilder { hub: &self }
     }
-    pub fn playlistItems(&'a self) -> PlaylistItemsMethodBuilder<'a, C, NC, A> {
-        PlaylistItemsMethodBuilder { hub: &self }
+    pub fn playlistItems(&'a self) -> PlaylistItemMethodsBuilder<'a, C, NC, A> {
+        PlaylistItemMethodsBuilder { hub: &self }
     }
-    pub fn playlists(&'a self) -> PlaylistsMethodBuilder<'a, C, NC, A> {
-        PlaylistsMethodBuilder { hub: &self }
+    pub fn playlists(&'a self) -> PlaylistMethodsBuilder<'a, C, NC, A> {
+        PlaylistMethodsBuilder { hub: &self }
     }
-    pub fn search(&'a self) -> SearchMethodBuilder<'a, C, NC, A> {
-        SearchMethodBuilder { hub: &self }
+    pub fn search(&'a self) -> SearchMethodsBuilder<'a, C, NC, A> {
+        SearchMethodsBuilder { hub: &self }
     }
-    pub fn subscriptions(&'a self) -> SubscriptionsMethodBuilder<'a, C, NC, A> {
-        SubscriptionsMethodBuilder { hub: &self }
+    pub fn subscriptions(&'a self) -> SubscriptionMethodsBuilder<'a, C, NC, A> {
+        SubscriptionMethodsBuilder { hub: &self }
     }
-    pub fn thumbnails(&'a self) -> ThumbnailsMethodBuilder<'a, C, NC, A> {
-        ThumbnailsMethodBuilder { hub: &self }
+    pub fn thumbnails(&'a self) -> ThumbnailMethodsBuilder<'a, C, NC, A> {
+        ThumbnailMethodsBuilder { hub: &self }
     }
-    pub fn videoCategories(&'a self) -> VideoCategoriesMethodBuilder<'a, C, NC, A> {
-        VideoCategoriesMethodBuilder { hub: &self }
+    pub fn videoCategories(&'a self) -> VideoCategoryMethodsBuilder<'a, C, NC, A> {
+        VideoCategoryMethodsBuilder { hub: &self }
     }
-    pub fn videos(&'a self) -> VideosMethodBuilder<'a, C, NC, A> {
-        VideosMethodBuilder { hub: &self }
+    pub fn videos(&'a self) -> VideoMethodsBuilder<'a, C, NC, A> {
+        VideoMethodsBuilder { hub: &self }
     }
-    pub fn watermarks(&'a self) -> WatermarksMethodBuilder<'a, C, NC, A> {
-        WatermarksMethodBuilder { hub: &self }
+    pub fn watermarks(&'a self) -> WatermarkMethodsBuilder<'a, C, NC, A> {
+        WatermarkMethodsBuilder { hub: &self }
     }
 }
 
@@ -3093,9 +3091,8 @@ impl Part for ChannelContentDetailsRelatedplaylists {}
 // MethodBuilders ###
 // #################
 
-
 /// A builder providing access to all methods supported on *i18nLanguage* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3108,28 +3105,22 @@ impl Part for ChannelContentDetailsRelatedplaylists {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
+/// // to build up your call.
 /// let rb = hub.i18nLanguages();
 /// # }
 /// ```
-pub struct I18nLanguagesMethodBuilder<'a, C, NC, A>
+pub struct I18nLanguageMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3137,13 +3128,12 @@ pub struct I18nLanguagesMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for I18nLanguagesMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for I18nLanguageMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *channelBanner* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3156,28 +3146,22 @@ impl<'a, C, NC, A> MethodBuilder for I18nLanguagesMethodBuilder<'a, C, NC, A> {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `insert(...)`
+/// // to build up your call.
 /// let rb = hub.channelBanners();
 /// # }
 /// ```
-pub struct ChannelBannersMethodBuilder<'a, C, NC, A>
+pub struct ChannelBannerMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3185,13 +3169,12 @@ pub struct ChannelBannersMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for ChannelBannersMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelBannerMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *channelSection* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3204,28 +3187,22 @@ impl<'a, C, NC, A> MethodBuilder for ChannelBannersMethodBuilder<'a, C, NC, A> {
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
+/// // to build up your call.
 /// let rb = hub.channelSections();
 /// # }
 /// ```
-pub struct ChannelSectionsMethodBuilder<'a, C, NC, A>
+pub struct ChannelSectionMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3233,13 +3210,12 @@ pub struct ChannelSectionsMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for ChannelSectionsMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelSectionMethodsBuilder<'a, C, NC, A> {}
 
 
 
-
-/// A builder providing access to all methods supported on *guideCategorie* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// A builder providing access to all methods supported on *guideCategory* resources.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3252,28 +3228,22 @@ impl<'a, C, NC, A> MethodBuilder for ChannelSectionsMethodBuilder<'a, C, NC, A> 
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
+/// // to build up your call.
 /// let rb = hub.guideCategories();
 /// # }
 /// ```
-pub struct GuideCategoriesMethodBuilder<'a, C, NC, A>
+pub struct GuideCategoryMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3281,13 +3251,12 @@ pub struct GuideCategoriesMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for GuideCategoriesMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for GuideCategoryMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *playlist* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3300,28 +3269,22 @@ impl<'a, C, NC, A> MethodBuilder for GuideCategoriesMethodBuilder<'a, C, NC, A> 
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
+/// // to build up your call.
 /// let rb = hub.playlists();
 /// # }
 /// ```
-pub struct PlaylistsMethodBuilder<'a, C, NC, A>
+pub struct PlaylistMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3329,13 +3292,12 @@ pub struct PlaylistsMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for PlaylistsMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for PlaylistMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *thumbnail* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3348,28 +3310,22 @@ impl<'a, C, NC, A> MethodBuilder for PlaylistsMethodBuilder<'a, C, NC, A> {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `set(...)`
+/// // to build up your call.
 /// let rb = hub.thumbnails();
 /// # }
 /// ```
-pub struct ThumbnailsMethodBuilder<'a, C, NC, A>
+pub struct ThumbnailMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3377,13 +3333,12 @@ pub struct ThumbnailsMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for ThumbnailsMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for ThumbnailMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *video* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3396,28 +3351,22 @@ impl<'a, C, NC, A> MethodBuilder for ThumbnailsMethodBuilder<'a, C, NC, A> {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `getRating(...)`, `insert(...)`, `list(...)`, `rate(...)` and `update(...)`
+/// // to build up your call.
 /// let rb = hub.videos();
 /// # }
 /// ```
-pub struct VideosMethodBuilder<'a, C, NC, A>
+pub struct VideoMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3425,13 +3374,12 @@ pub struct VideosMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for VideosMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for VideoMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *subscription* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3444,28 +3392,22 @@ impl<'a, C, NC, A> MethodBuilder for VideosMethodBuilder<'a, C, NC, A> {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)` and `list(...)`
+/// // to build up your call.
 /// let rb = hub.subscriptions();
 /// # }
 /// ```
-pub struct SubscriptionsMethodBuilder<'a, C, NC, A>
+pub struct SubscriptionMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3473,13 +3415,12 @@ pub struct SubscriptionsMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for SubscriptionsMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for SubscriptionMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *search* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3492,28 +3433,22 @@ impl<'a, C, NC, A> MethodBuilder for SubscriptionsMethodBuilder<'a, C, NC, A> {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
+/// // to build up your call.
 /// let rb = hub.search();
 /// # }
 /// ```
-pub struct SearchMethodBuilder<'a, C, NC, A>
+pub struct SearchMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3521,13 +3456,12 @@ pub struct SearchMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for SearchMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for SearchMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *i18nRegion* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3540,28 +3474,22 @@ impl<'a, C, NC, A> MethodBuilder for SearchMethodBuilder<'a, C, NC, A> {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
+/// // to build up your call.
 /// let rb = hub.i18nRegions();
 /// # }
 /// ```
-pub struct I18nRegionsMethodBuilder<'a, C, NC, A>
+pub struct I18nRegionMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3569,13 +3497,12 @@ pub struct I18nRegionsMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for I18nRegionsMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for I18nRegionMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *liveStream* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3588,28 +3515,22 @@ impl<'a, C, NC, A> MethodBuilder for I18nRegionsMethodBuilder<'a, C, NC, A> {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
+/// // to build up your call.
 /// let rb = hub.liveStreams();
 /// # }
 /// ```
-pub struct LiveStreamsMethodBuilder<'a, C, NC, A>
+pub struct LiveStreamMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3617,13 +3538,12 @@ pub struct LiveStreamsMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for LiveStreamsMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for LiveStreamMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *channel* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3636,28 +3556,22 @@ impl<'a, C, NC, A> MethodBuilder for LiveStreamsMethodBuilder<'a, C, NC, A> {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)` and `update(...)`
+/// // to build up your call.
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelsMethodBuilder<'a, C, NC, A>
+pub struct ChannelMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3665,13 +3579,12 @@ pub struct ChannelsMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for ChannelsMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *playlistItem* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3684,28 +3597,22 @@ impl<'a, C, NC, A> MethodBuilder for ChannelsMethodBuilder<'a, C, NC, A> {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
+/// // to build up your call.
 /// let rb = hub.playlistItems();
 /// # }
 /// ```
-pub struct PlaylistItemsMethodBuilder<'a, C, NC, A>
+pub struct PlaylistItemMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3713,13 +3620,12 @@ pub struct PlaylistItemsMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for PlaylistItemsMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for PlaylistItemMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *watermark* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3732,28 +3638,22 @@ impl<'a, C, NC, A> MethodBuilder for PlaylistItemsMethodBuilder<'a, C, NC, A> {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `set(...)` and `unset(...)`
+/// // to build up your call.
 /// let rb = hub.watermarks();
 /// # }
 /// ```
-pub struct WatermarksMethodBuilder<'a, C, NC, A>
+pub struct WatermarkMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3761,13 +3661,12 @@ pub struct WatermarksMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for WatermarksMethodBuilder<'a, C, NC, A> {}
-
+impl<'a, C, NC, A> ResourceMethodsBuilder for WatermarkMethodsBuilder<'a, C, NC, A> {}
 
 
 
 /// A builder providing access to all methods supported on *liveBroadcast* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3780,28 +3679,22 @@ impl<'a, C, NC, A> MethodBuilder for WatermarksMethodBuilder<'a, C, NC, A> {}
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `bind(...)`, `control(...)`, `delete(...)`, `insert(...)`, `list(...)`, `transition(...)` and `update(...)`
+/// // to build up your call.
 /// let rb = hub.liveBroadcasts();
 /// # }
 /// ```
-pub struct LiveBroadcastsMethodBuilder<'a, C, NC, A>
+pub struct LiveBroadcastMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3809,13 +3702,12 @@ pub struct LiveBroadcastsMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for LiveBroadcastsMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for LiveBroadcastMethodsBuilder<'a, C, NC, A> {}
 
 
 
-
-/// A builder providing access to all methods supported on *videoCategorie* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// A builder providing access to all methods supported on *videoCategory* resources.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3828,28 +3720,22 @@ impl<'a, C, NC, A> MethodBuilder for LiveBroadcastsMethodBuilder<'a, C, NC, A> {
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
+/// // to build up your call.
 /// let rb = hub.videoCategories();
 /// # }
 /// ```
-pub struct VideoCategoriesMethodBuilder<'a, C, NC, A>
+pub struct VideoCategoryMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3857,13 +3743,12 @@ pub struct VideoCategoriesMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for VideoCategoriesMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for VideoCategoryMethodsBuilder<'a, C, NC, A> {}
 
 
 
-
-/// A builder providing access to all methods supported on *activitie* resources.
-/// It is usually not used directly, but through the `YouTube` hub.
+/// A builder providing access to all methods supported on *activity* resources.
+/// It is not used directly, but through the `YouTube` hub.
 ///
 /// # Example
 ///
@@ -3876,28 +3761,22 @@ impl<'a, C, NC, A> MethodBuilder for VideoCategoriesMethodBuilder<'a, C, NC, A> 
 /// extern crate youtube3;
 /// 
 /// # #[test] fn egal() {
-/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
 /// 
-/// use youtube3::YouTube;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+/// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `insert(...)` and `list(...)`
+/// // to build up your call.
 /// let rb = hub.activities();
 /// # }
 /// ```
-pub struct ActivitiesMethodBuilder<'a, C, NC, A>
+pub struct ActivityMethodsBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -3905,7 +3784,7 @@ pub struct ActivitiesMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>
 }
 
-impl<'a, C, NC, A> MethodBuilder for ActivitiesMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for ActivityMethodsBuilder<'a, C, NC, A> {}
 
 
 
@@ -3915,20 +3794,1983 @@ impl<'a, C, NC, A> MethodBuilder for ActivitiesMethodBuilder<'a, C, NC, A> {}
 // CallBuilders   ###
 // #################
 
+/// A builder for the *list* method supported by a *i18nLanguage* resource.
+/// It is not used directly, but through a `I18nLanguageMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.i18nLanguages().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for I18nLanguageListMethodBuilder<'a, C, NC, A> {}
 
 
+/// A builder for the *insert* method supported by a *channelBanner* resource.
+/// It is not used directly, but through a `ChannelBannerMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.channelBanners().insert(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for ChannelBannerInsertMethodBuilder<'a, C, NC, A> {}
 
 
+/// A builder for the *list* method supported by a *channelSection* resource.
+/// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.channelSections().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for ChannelSectionListMethodBuilder<'a, C, NC, A> {}
 
 
+/// A builder for the *insert* method supported by a *channelSection* resource.
+/// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.channelSections().insert(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for ChannelSectionInsertMethodBuilder<'a, C, NC, A> {}
 
 
+/// A builder for the *delete* method supported by a *channelSection* resource.
+/// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.channelSections().delete(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {}
 
 
+/// A builder for the *update* method supported by a *channelSection* resource.
+/// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.channelSections().update(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {}
 
 
+/// A builder for the *list* method supported by a *guideCategory* resource.
+/// It is not used directly, but through a `GuideCategoryMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.guideCategories().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for GuideCategoryListMethodBuilder<'a, C, NC, A> {}
 
 
+/// A builder for the *insert* method supported by a *playlist* resource.
+/// It is not used directly, but through a `PlaylistMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.playlists().insert(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
 
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for PlaylistInsertMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *list* method supported by a *playlist* resource.
+/// It is not used directly, but through a `PlaylistMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.playlists().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct PlaylistListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for PlaylistListMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *delete* method supported by a *playlist* resource.
+/// It is not used directly, but through a `PlaylistMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.playlists().delete(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for PlaylistDeleteMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *update* method supported by a *playlist* resource.
+/// It is not used directly, but through a `PlaylistMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.playlists().update(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for PlaylistUpdateMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *set* method supported by a *thumbnail* resource.
+/// It is not used directly, but through a `ThumbnailMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.thumbnails().set(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for ThumbnailSetMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *list* method supported by a *video* resource.
+/// It is not used directly, but through a `VideoMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.videos().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct VideoListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for VideoListMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *rate* method supported by a *video* resource.
+/// It is not used directly, but through a `VideoMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.videos().rate(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct VideoRateMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for VideoRateMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *getRating* method supported by a *video* resource.
+/// It is not used directly, but through a `VideoMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.videos().getRating(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct VideoGetratingMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for VideoGetratingMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *delete* method supported by a *video* resource.
+/// It is not used directly, but through a `VideoMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.videos().delete(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for VideoDeleteMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *update* method supported by a *video* resource.
+/// It is not used directly, but through a `VideoMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.videos().update(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for VideoUpdateMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *insert* method supported by a *video* resource.
+/// It is not used directly, but through a `VideoMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.videos().insert(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct VideoInsertMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for VideoInsertMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *insert* method supported by a *subscription* resource.
+/// It is not used directly, but through a `SubscriptionMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.subscriptions().insert(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for SubscriptionInsertMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *list* method supported by a *subscription* resource.
+/// It is not used directly, but through a `SubscriptionMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.subscriptions().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for SubscriptionListMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *delete* method supported by a *subscription* resource.
+/// It is not used directly, but through a `SubscriptionMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.subscriptions().delete(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for SubscriptionDeleteMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *list* method supported by a *search* resource.
+/// It is not used directly, but through a `SearchMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.search().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct SearchListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for SearchListMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *list* method supported by a *i18nRegion* resource.
+/// It is not used directly, but through a `I18nRegionMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.i18nRegions().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for I18nRegionListMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *update* method supported by a *liveStream* resource.
+/// It is not used directly, but through a `LiveStreamMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.liveStreams().update(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for LiveStreamUpdateMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *delete* method supported by a *liveStream* resource.
+/// It is not used directly, but through a `LiveStreamMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.liveStreams().delete(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for LiveStreamDeleteMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *list* method supported by a *liveStream* resource.
+/// It is not used directly, but through a `LiveStreamMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.liveStreams().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for LiveStreamListMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *insert* method supported by a *liveStream* resource.
+/// It is not used directly, but through a `LiveStreamMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.liveStreams().insert(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for LiveStreamInsertMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *update* method supported by a *channel* resource.
+/// It is not used directly, but through a `ChannelMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.channels().update(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for ChannelUpdateMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *list* method supported by a *channel* resource.
+/// It is not used directly, but through a `ChannelMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.channels().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct ChannelListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for ChannelListMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *delete* method supported by a *playlistItem* resource.
+/// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.playlistItems().delete(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *list* method supported by a *playlistItem* resource.
+/// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.playlistItems().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for PlaylistItemListMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *insert* method supported by a *playlistItem* resource.
+/// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.playlistItems().insert(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for PlaylistItemInsertMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *update* method supported by a *playlistItem* resource.
+/// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.playlistItems().update(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *set* method supported by a *watermark* resource.
+/// It is not used directly, but through a `WatermarkMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.watermarks().set(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for WatermarkSetMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *unset* method supported by a *watermark* resource.
+/// It is not used directly, but through a `WatermarkMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.watermarks().unset(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for WatermarkUnsetMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *control* method supported by a *liveBroadcast* resource.
+/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.liveBroadcasts().control(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastControlMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *update* method supported by a *liveBroadcast* resource.
+/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.liveBroadcasts().update(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *insert* method supported by a *liveBroadcast* resource.
+/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.liveBroadcasts().insert(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *bind* method supported by a *liveBroadcast* resource.
+/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.liveBroadcasts().bind(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastBindMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *list* method supported by a *liveBroadcast* resource.
+/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.liveBroadcasts().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastListMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *delete* method supported by a *liveBroadcast* resource.
+/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.liveBroadcasts().delete(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *transition* method supported by a *liveBroadcast* resource.
+/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.liveBroadcasts().transition(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *list* method supported by a *videoCategory* resource.
+/// It is not used directly, but through a `VideoCategoryMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.videoCategories().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for VideoCategoryListMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *list* method supported by a *activity* resource.
+/// It is not used directly, but through a `ActivityMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.activities().list(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct ActivityListMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for ActivityListMethodBuilder<'a, C, NC, A> {}
+
+
+/// A builder for the *insert* method supported by a *activity* resource.
+/// It is not used directly, but through a `ActivityMethodsBuilder`.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate "yup-oauth2" as oauth2;
+/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate youtube3;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use youtube3::YouTube;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = YouTube::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling methods
+/// // to setup your call.
+/// // TODO: figoure out actual arguments ... 
+/// // let mb = hub.activities().insert(...);
+/// 
+/// // Finally, execute your call and process the result
+/// // TODO: comment in once args are properly setup !
+/// // mb.do()
+/// # }
+/// ```
+pub struct ActivityInsertMethodBuilder<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a YouTube<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for ActivityInsertMethodBuilder<'a, C, NC, A> {}
 
 

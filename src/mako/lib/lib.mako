@@ -76,19 +76,22 @@ ${'##'} About Customization/Callbacks
 ## Needs test_prelude.
 ###############################################################################################
 ###############################################################################################
-<%def name="test_hub(hub_type)">\
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+<%def name="test_hub(hub_type, comments=True)">\
 use std::default::Default;
+use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+# use ${util.library_name()}::${hub_type};
 
-use ${util.library_name()}::${hub_type};
-
+% if comments:
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
 // among other things.
+% endif
 let secret: ApplicationSecret = Default::default();
+% if comments:
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
 // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
+% endif
 let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);

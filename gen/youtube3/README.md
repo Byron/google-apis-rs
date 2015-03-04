@@ -74,10 +74,9 @@ extern crate "yup-oauth2" as oauth2;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate youtube3;
 
-use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 use std::default::Default;
-
-use youtube3::YouTube;
+use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+# use youtube3::YouTube;
 
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
 // among other things.

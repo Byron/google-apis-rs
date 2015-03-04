@@ -109,6 +109,8 @@ def md_italic(l):
     return enclose_in('*', l)
 
 def singular(s):
+    if s.endswith('ies'):
+        return s[:-3]+'y'
     if s[-1] == 's':
         return s[:-1]
     return s
@@ -310,9 +312,13 @@ def to_api_version(v):
 def library_name(name, version):
     return name + to_api_version(version)
 
-# return type name of a resource builder, from a resource name
-def mb_type(r):
-    return "%sMethodBuilder" % canonical_type_name(r)
+# return type name of a resource method builder, from a resource name
+def rb_type(r):
+    return "%sMethodsBuilder" % singular(canonical_type_name(r))
+
+# return type name for a method on the given resource
+def mb_type(r, m):
+    return "%s%sMethodBuilder" % (singular(canonical_type_name(r)), m.capitalize())
 
 def hub_type(canonicalName):
     return canonical_type_name(canonicalName)

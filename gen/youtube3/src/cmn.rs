@@ -7,7 +7,10 @@ use std::marker::MarkerTrait;
 /// The hub allows to access all resource methods more easily.
 pub trait Hub: MarkerTrait {}
 
-/// Identifies types for building methods of a particular type
+/// Identifies types for building methods of a particular resource type
+pub trait ResourceMethodsBuilder: MarkerTrait {}
+
+/// Identifies types which represent builders for a particular resource method
 pub trait MethodBuilder: MarkerTrait {}
 
 /// Identifies types which can be inserted and deleted.
