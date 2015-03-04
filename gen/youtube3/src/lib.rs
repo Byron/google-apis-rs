@@ -92,6 +92,7 @@
 //! ```
 //! 
 //! **TODO** Example calls - there should soon be a generator able to do that with proper inputs
+//! 
 //! ## About error handling
 //! 
 //! ## About Customization/Callbacks
@@ -146,8 +147,8 @@ pub use cmn::{Hub, Resource, Part, ResponseResult, RequestResult, NestedType};
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
 /// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                                   hyper::Client::new(),
-///                                   <MemoryStorage as Default>::default(), None);
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// # }
 /// ```

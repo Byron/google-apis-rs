@@ -2,7 +2,7 @@ import re
 import collections
 
 re_linestart = re.compile('^', flags=re.MULTILINE)
-re_first_4_spaces = re.compile('^    ', flags=re.MULTILINE)
+re_first_4_spaces = re.compile('^ {1,4}', flags=re.MULTILINE)
 
 USE_FORMAT = 'use_format_field'
 TYPE_MAP = {'boolean' : 'bool',
@@ -47,6 +47,12 @@ def hash_comment(s):
 # remove the first indentation (must be spaces !)
 def unindent(s):
     return re_first_4_spaces.sub('', s)
+
+# tabs: 1 tabs is 4 spaces
+def unindent_first_by(tabs):
+    def unindent_inner(s):
+        return re.sub("^ {1,%i}" % (tabs*4), '', s)
+    return unindent_inner
 
 # add 4 spaces to the beginning of a line.
 # useful if you have defs embedded in an unindent block - they need to counteract. 

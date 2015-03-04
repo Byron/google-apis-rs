@@ -93,6 +93,7 @@ let mut hub = YouTube::new(hyper::Client::new(), auth);
 ```
 
 **TODO** Example calls - there should soon be a generator able to do that with proper inputs
+
 ## About error handling
 
 ## About Customization/Callbacks
