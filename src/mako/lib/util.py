@@ -22,6 +22,7 @@ INS_METHOD = 'insert'
 DEL_METHOD = 'delete'
 
 NESTED_TYPE_MARKER = 'is_nested'
+SPACES_PER_TAB = 4
 
 # ==============================================================================
 ## @name Filters
@@ -51,8 +52,22 @@ def unindent(s):
 # tabs: 1 tabs is 4 spaces
 def unindent_first_by(tabs):
     def unindent_inner(s):
-        return re.sub("^ {1,%i}" % (tabs*4), '', s)
+        return re_linestart.sub(' ' * tabs * SPACES_PER_TAB, s)
     return unindent_inner
+
+# tabs: 1 tabs is 4 spaces
+def indent_all_but_first_by(tabs):
+    def indent_inner(s):
+        try:
+            i = s.index('\n')
+        except ValueError:
+            f = s
+            p = ''
+        else:
+            f = s[:i+1]
+            p = s[i+1:]
+        return f + re_linestart.sub(' ' * (tabs * SPACES_PER_TAB), p)
+    return indent_inner
 
 # add 4 spaces to the beginning of a line.
 # useful if you have defs embedded in an unindent block - they need to counteract. 
@@ -119,6 +134,10 @@ def split_camelcase_s(s):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', s)
     return re.sub('([a-z0-9])([A-Z])', r'\1 \2', s1).lower()
 
+def camel_to_under(s):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', s)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
 ## -- End Natural Language Utilities -- @}
 
 
@@ -137,6 +156,7 @@ def nested_type_name(sn, pn):
 
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
+    n = camel_to_under(n)
     if n == 'type':
         return n + '_'
     return n
@@ -193,6 +213,14 @@ def is_nested_type_property(t):
 def is_nested_type(s):
     return NESTED_TYPE_MARKER in s
 
+# convert a rust-type to something that would be taken as input of a function
+# even though our storage type is different
+def activity_input_type(p):
+    n = activity_rust_type(p, allow_optionals=False)
+    if n == 'String':
+        n = 'str'
+    return '&%s' % n
+
 # return an iterator yielding fake-schemas that identify a nested type
 def iter_nested_types(schemas):
     for s in schemas.values():
@@ -243,6 +271,14 @@ def activity_split(fqan):
     assert len(t) == 3
     return t[1:]
 
+# Shorthand to get a type from parameters of activities
+def activity_rust_type(p, allow_optionals=True):
+    return to_rust_type(None, p.name, p, allow_optionals=allow_optionals)
+
+# the inverse of activity-split, but needs to know the 'name' of the API
+def to_fqan(name, resource, method):
+    return '%s.%s.%s' % (name, resource, method)
+
 # videos -> Video
 def activity_name_to_type_name(an):
     return an.capitalize()[:-1]
@@ -250,6 +286,33 @@ def activity_name_to_type_name(an):
 # yields (resource, activity, activity_data)
 def iter_acitivities(c):
     return ((activity_split(an) + [a]) for an, a in c.fqan_map.iteritems())
+
+# return a list of parameter structures of all params of the given method dict
+# apply a prune filter to restrict the set of returned parameters.
+# The order will always be: partOrder + alpha
+def method_params(m, required=None, location=None):
+    res = list()
+    po = m.get('parameterOrder', [])
+    for pn, p in m.parameters.iteritems():
+        if required is not None and p.get('required', False) != required:
+            continue
+        if location is not None and p.get('location', '') != location:
+            continue
+        np = p.copy()
+        np['name'] = pn
+        try:
+            # po = ['part', 'foo']
+            # part_prio = 2 - 0 = 2
+            # foo_prio = 2 - 1 = 1
+            # default = 0
+            prio = len(po) - po.index(pn)
+        except ValueError:
+            prio = 0
+        np['priority'] = prio
+        res.append(np)
+    # end for each parameter
+    return sorted(res, key=lambda p: (p.priority, p.name), reverse=True)
+
 
 ## -- End Activity Utilities -- @}
 
@@ -322,3 +385,14 @@ def mb_type(r, m):
 
 def hub_type(canonicalName):
     return canonical_type_name(canonicalName)
+
+# return e + d[n] + e + ' ' or ''
+def get_word(d, n, e = ''):
+    if n in d:
+        v = e + d[n] + e
+        if not v.endswith(' '):
+            v += ' '
+        return v
+    else:
+        return ''
+

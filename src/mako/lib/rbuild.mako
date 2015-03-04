@@ -1,6 +1,6 @@
 <%!
 	from util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
-                      rb_type, singular, hub_type)
+                      rb_type, singular, hub_type, mangle_ident)
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -9,7 +9,10 @@
 ###############################################################################################
 ###############################################################################################
 <%def name="new(resource, c)">\
-<% hub_type_name = hub_type(canonicalName) %>\
+<% 
+	hub_type_name = hub_type(canonicalName) 
+	ThisType = rb_type(resource) + "<'a, C, NC, A>"
+%>\
 /// A builder providing access to all methods supported on *${singular(resource)}* resources.
 /// It is not used directly, but through the `${hub_type_name}` hub.
 ///
@@ -26,10 +29,10 @@ ${lib.test_hub(hub_type_name, comments=False)}\
 // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 // like ${put_and(sorted('`%s(...)`' % f for f in c.rta_map[resource]))}
 // to build up your call.
-let rb = hub.${resource}();
+let rb = hub.${mangle_ident(resource)}();
 </%block>
 </%block>
-pub struct ${rb_type(resource)}<'a, C, NC, A>
+pub struct ${ThisType}
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -37,5 +40,5 @@ pub struct ${rb_type(resource)}<'a, C, NC, A>
     hub: &'a ${hub_type_name}<C, NC, A>
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ${rb_type(resource)}<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for ${ThisType} {}
 </%def>

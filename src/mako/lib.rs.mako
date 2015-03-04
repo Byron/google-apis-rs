@@ -1,6 +1,6 @@
 <% 
 	from util import (iter_nested_types, new_context, rust_comment, rust_doc_comment,
-                      rust_module_doc_comment, rb_type, hub_type)
+                      rust_module_doc_comment, rb_type, hub_type, mangle_ident)
 	nested_schemas = list(iter_nested_types(schemas))
 
  	c = new_context(resources)
@@ -21,7 +21,6 @@
 ${lib.docs(c)}
 </%block>
 #![feature(core)]
-#![allow(non_snake_case)]
 
 extern crate hyper;
 extern crate "rustc-serialize" as rustc_serialize;
@@ -71,7 +70,7 @@ impl<'a, C, NC, A> ${hub_type}<C, NC, A>
     }
 
     % for resource in sorted(c.rta_map.keys()):
-    pub fn ${resource}(&'a self) -> ${rb_type(resource)}<'a, C, NC, A> {
+    pub fn ${mangle_ident(resource)}(&'a self) -> ${rb_type(resource)}<'a, C, NC, A> {
         ${rb_type(resource)} { hub: &self }
     }
     % endfor

@@ -45,24 +45,24 @@ The API is structured into the following primary items:
 Generally speaking, you can invoke *Activities* like this:
 
 ```Rust,ignore
-let r = hub.resource().activity(...).do()
+let r = hub.resource().activity(...).doit()
 ```
 
 Or specifically ...
 
 ```ignore
-let r = hub.videos().rate(...).do()
-let r = hub.videos().getRating(...).do()
-let r = hub.videos().list(...).do()
-let r = hub.videos().insert(...).do()
-let r = hub.videos().update(...).do()
-let r = hub.videos().delete(...).do()
+let r = hub.videos().rate(...).doit()
+let r = hub.videos().getRating(...).doit()
+let r = hub.videos().list(...).doit()
+let r = hub.videos().insert(...).doit()
+let r = hub.videos().update(...).doit()
+let r = hub.videos().delete(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
 supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
-The `do()` method performs the actual communication with the server and returns the respective result.
+The `doit()` method performs the actual communication with the server and returns the respective result.
 
 # Usage (*TODO*)
 

@@ -42,24 +42,24 @@
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
 //! ```Rust,ignore
-//! let r = hub.resource().activity(...).do()
+//! let r = hub.resource().activity(...).doit()
 //! ```
 //! 
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.videos().rate(...).do()
-//! let r = hub.videos().getRating(...).do()
-//! let r = hub.videos().list(...).do()
-//! let r = hub.videos().insert(...).do()
-//! let r = hub.videos().update(...).do()
-//! let r = hub.videos().delete(...).do()
+//! let r = hub.videos().rate(...).doit()
+//! let r = hub.videos().getRating(...).doit()
+//! let r = hub.videos().list(...).doit()
+//! let r = hub.videos().insert(...).doit()
+//! let r = hub.videos().update(...).doit()
+//! let r = hub.videos().delete(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
 //! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
-//! The `do()` method performs the actual communication with the server and returns the respective result.
+//! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
 //! # Usage (*TODO*)
 //! 
@@ -101,7 +101,6 @@
 //! 
 //! 
 #![feature(core)]
-#![allow(non_snake_case)]
 
 extern crate hyper;
 extern crate "rustc-serialize" as rustc_serialize;
@@ -175,31 +174,31 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
     pub fn activities(&'a self) -> ActivityMethodsBuilder<'a, C, NC, A> {
         ActivityMethodsBuilder { hub: &self }
     }
-    pub fn channelBanners(&'a self) -> ChannelBannerMethodsBuilder<'a, C, NC, A> {
+    pub fn channel_banners(&'a self) -> ChannelBannerMethodsBuilder<'a, C, NC, A> {
         ChannelBannerMethodsBuilder { hub: &self }
     }
-    pub fn channelSections(&'a self) -> ChannelSectionMethodsBuilder<'a, C, NC, A> {
+    pub fn channel_sections(&'a self) -> ChannelSectionMethodsBuilder<'a, C, NC, A> {
         ChannelSectionMethodsBuilder { hub: &self }
     }
     pub fn channels(&'a self) -> ChannelMethodsBuilder<'a, C, NC, A> {
         ChannelMethodsBuilder { hub: &self }
     }
-    pub fn guideCategories(&'a self) -> GuideCategoryMethodsBuilder<'a, C, NC, A> {
+    pub fn guide_categories(&'a self) -> GuideCategoryMethodsBuilder<'a, C, NC, A> {
         GuideCategoryMethodsBuilder { hub: &self }
     }
-    pub fn i18nLanguages(&'a self) -> I18nLanguageMethodsBuilder<'a, C, NC, A> {
+    pub fn i18n_languages(&'a self) -> I18nLanguageMethodsBuilder<'a, C, NC, A> {
         I18nLanguageMethodsBuilder { hub: &self }
     }
-    pub fn i18nRegions(&'a self) -> I18nRegionMethodsBuilder<'a, C, NC, A> {
+    pub fn i18n_regions(&'a self) -> I18nRegionMethodsBuilder<'a, C, NC, A> {
         I18nRegionMethodsBuilder { hub: &self }
     }
-    pub fn liveBroadcasts(&'a self) -> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
+    pub fn live_broadcasts(&'a self) -> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
         LiveBroadcastMethodsBuilder { hub: &self }
     }
-    pub fn liveStreams(&'a self) -> LiveStreamMethodsBuilder<'a, C, NC, A> {
+    pub fn live_streams(&'a self) -> LiveStreamMethodsBuilder<'a, C, NC, A> {
         LiveStreamMethodsBuilder { hub: &self }
     }
-    pub fn playlistItems(&'a self) -> PlaylistItemMethodsBuilder<'a, C, NC, A> {
+    pub fn playlist_items(&'a self) -> PlaylistItemMethodsBuilder<'a, C, NC, A> {
         PlaylistItemMethodsBuilder { hub: &self }
     }
     pub fn playlists(&'a self) -> PlaylistMethodsBuilder<'a, C, NC, A> {
@@ -214,7 +213,7 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
     pub fn thumbnails(&'a self) -> ThumbnailMethodsBuilder<'a, C, NC, A> {
         ThumbnailMethodsBuilder { hub: &self }
     }
-    pub fn videoCategories(&'a self) -> VideoCategoryMethodsBuilder<'a, C, NC, A> {
+    pub fn video_categories(&'a self) -> VideoCategoryMethodsBuilder<'a, C, NC, A> {
         VideoCategoryMethodsBuilder { hub: &self }
     }
     pub fn videos(&'a self) -> VideoMethodsBuilder<'a, C, NC, A> {
@@ -254,23 +253,23 @@ impl Part for VideoConversionPings {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SubscriptionListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-	pub nextPageToken: Option<String>,
+	pub next_page_token: Option<String>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#subscriptionListResponse".
 	pub kind: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 	/// A list of subscriptions that match the request criteria.
 	pub items: Vec<Subscription>,
 	/// no description provided
-	pub tokenPagination: Option<TokenPagination>,
+	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-	pub prevPageToken: Option<String>,
+	pub prev_page_token: Option<String>,
 	/// no description provided
-	pub pageInfo: Option<PageInfo>,
+	pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for SubscriptionListResponse {}
@@ -282,7 +281,7 @@ impl ResponseResult for SubscriptionListResponse {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsLike {
 	/// The resourceId object contains information that identifies the rated resource.
-	pub resourceId: Option<ResourceId>,
+	pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsLike {}
@@ -294,21 +293,21 @@ impl Part for ActivityContentDetailsLike {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastSnippet {
 	/// The date and time that the broadcast actually ended. This information is only available once the broadcast's state is complete. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub actualEndTime: Option<String>,
+	pub actual_end_time: Option<String>,
 	/// The broadcast's description. As with the title, you can set this field by modifying the broadcast resource or by setting the description field of the corresponding video resource.
 	pub description: Option<String>,
 	/// The broadcast's title. Note that the broadcast represents exactly one YouTube video. You can set this field by modifying the broadcast resource or by setting the title field of the corresponding video resource.
 	pub title: Option<String>,
 	/// The ID that YouTube uses to uniquely identify the channel that is publishing the broadcast.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The date and time that the broadcast was added to YouTube's live broadcast schedule. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub publishedAt: Option<String>,
+	pub published_at: Option<String>,
 	/// The date and time that the broadcast is scheduled to start. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub scheduledStartTime: Option<String>,
+	pub scheduled_start_time: Option<String>,
 	/// The date and time that the broadcast actually started. This information is only available once the broadcast's state is live. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub actualStartTime: Option<String>,
+	pub actual_start_time: Option<String>,
 	/// The date and time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub scheduledEndTime: Option<String>,
+	pub scheduled_end_time: Option<String>,
 	/// A map of thumbnail images associated with the broadcast. For each nested object in this object, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
 	pub thumbnails: Option<ThumbnailDetails>,
 }
@@ -322,28 +321,28 @@ impl Part for LiveBroadcastSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetails {
 	/// The uploaded video file's combined (video and audio) bitrate in bits per second.
-	pub bitrateBps: Option<String>,
+	pub bitrate_bps: Option<String>,
 	/// The uploaded video file's container format.
 	pub container: Option<String>,
 	/// Geographic coordinates that identify the place where the uploaded video was recorded. Coordinates are defined using WGS 84.
-	pub recordingLocation: Option<GeoPoint>,
+	pub recording_location: Option<GeoPoint>,
 	/// The uploaded file's type as detected by YouTube's video processing engine. Currently, YouTube only processes video files, but this field is present whether a video file or another type of file was uploaded.
-	pub fileType: Option<String>,
+	pub file_type: Option<String>,
 	/// The date and time when the uploaded video file was created. The value is specified in ISO 8601 format. Currently, the following ISO 8601 formats are supported:  
 /// - Date only: YYYY-MM-DD 
 /// - Naive time: YYYY-MM-DDTHH:MM:SS 
 /// - Time with timezone: YYYY-MM-DDTHH:MM:SS+HH:MM
-	pub creationTime: Option<String>,
+	pub creation_time: Option<String>,
 	/// The length of the uploaded video in milliseconds.
-	pub durationMs: Option<String>,
+	pub duration_ms: Option<String>,
 	/// The uploaded file's name. This field is present whether a video file or another type of file was uploaded.
-	pub fileName: Option<String>,
+	pub file_name: Option<String>,
 	/// The uploaded file's size in bytes. This field is present whether a video file or another type of file was uploaded.
-	pub fileSize: Option<String>,
+	pub file_size: Option<String>,
 	/// A list of video streams contained in the uploaded video file. Each item in the list contains detailed metadata about a video stream.
-	pub videoStreams: Vec<VideoFileDetailsVideoStream>,
+	pub video_streams: Vec<VideoFileDetailsVideoStream>,
 	/// A list of audio streams contained in the uploaded video file. Each item in the list contains detailed metadata about an audio stream.
-	pub audioStreams: Vec<VideoFileDetailsAudioStream>,
+	pub audio_streams: Vec<VideoFileDetailsAudioStream>,
 }
 
 impl Part for VideoFileDetails {}
@@ -391,7 +390,7 @@ pub struct Playlist {
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#playlist".
 	pub kind: Option<String>,
 	/// The contentDetails object contains information like video count.
-	pub contentDetails: Option<PlaylistContentDetails>,
+	pub content_details: Option<PlaylistContentDetails>,
 	/// The snippet object contains basic details about the playlist, such as its title and description.
 	pub snippet: Option<PlaylistSnippet>,
 	/// The player object contains information that you would use to play the playlist in an embedded player.
@@ -421,23 +420,23 @@ impl ResponseResult for Playlist {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItemListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-	pub nextPageToken: Option<String>,
+	pub next_page_token: Option<String>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistItemListResponse".
 	pub kind: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 	/// A list of playlist items that match the request criteria.
 	pub items: Vec<PlaylistItem>,
 	/// no description provided
-	pub tokenPagination: Option<TokenPagination>,
+	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-	pub prevPageToken: Option<String>,
+	pub prev_page_token: Option<String>,
 	/// no description provided
-	pub pageInfo: Option<PageInfo>,
+	pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for PlaylistItemListResponse {}
@@ -463,11 +462,11 @@ impl Part for PropertyValue {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoTiming {
 	/// Defines the time at which the promotion will appear. Depending on the value of type the value of the offsetMs field will represent a time offset from the start or from the end of the video, expressed in milliseconds.
-	pub offsetMs: Option<String>,
+	pub offset_ms: Option<String>,
 	/// Describes a timing type. If the value is offsetFromStart, then the offsetMs field represents an offset from the start of the video. If the value is offsetFromEnd, then the offsetMs field represents an offset from the end of the video.
 	pub type_: Option<String>,
 	/// Defines the duration in milliseconds for which the promotion should be displayed. If missing, the client should use the default.
-	pub durationMs: Option<String>,
+	pub duration_ms: Option<String>,
 }
 
 impl Part for InvideoTiming {}
@@ -483,15 +482,15 @@ pub struct PlaylistSnippet {
 	/// Keyword tags associated with the playlist.
 	pub tags: Vec<String>,
 	/// The ID that YouTube uses to uniquely identify the channel that published the playlist.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The date and time that the playlist was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub publishedAt: Option<String>,
+	pub published_at: Option<String>,
 	/// The channel title of the channel that the video belongs to.
-	pub channelTitle: Option<String>,
+	pub channel_title: Option<String>,
 	/// The playlist's title.
 	pub title: Option<String>,
 	/// The language of the playlist's default title and description.
-	pub defaultLanguage: Option<String>,
+	pub default_language: Option<String>,
 	/// Localized title and description, read-only.
 	pub localized: Option<PlaylistLocalization>,
 	/// A map of thumbnail images associated with the playlist. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
@@ -507,13 +506,13 @@ impl Part for PlaylistSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelAuditDetails {
 	/// Whether or not the channel has any copyright strikes.
-	pub copyrightStrikesGoodStanding: Option<bool>,
+	pub copyright_strikes_good_standing: Option<bool>,
 	/// Whether or not the channel respects the community guidelines.
-	pub communityGuidelinesGoodStanding: Option<bool>,
+	pub community_guidelines_good_standing: Option<bool>,
 	/// Whether or not the channel has any unresolved claims.
-	pub contentIdClaimsGoodStanding: Option<bool>,
+	pub content_id_claims_good_standing: Option<bool>,
 	/// Describes the general state of the channel. This field will always show if there are any issues whatsoever with the channel. Currently this field represents the result of the logical and operation over the community guidelines good standing, the copyright strikes good standing and the content ID claims good standing, but this may change in the future.
-	pub overallGoodStanding: Option<bool>,
+	pub overall_good_standing: Option<bool>,
 }
 
 impl Part for ChannelAuditDetails {}
@@ -540,7 +539,7 @@ pub struct LiveStream {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The content_details object contains information about the stream, including the closed captions ingestion URL.
-	pub contentDetails: Option<LiveStreamContentDetails>,
+	pub content_details: Option<LiveStreamContentDetails>,
 	/// The cdn object defines the live stream's content delivery network (CDN) settings. These settings provide details about the manner in which you stream your content to YouTube.
 	pub cdn: Option<CdnSettings>,
 	/// The ID that YouTube assigns to uniquely identify the stream.
@@ -564,7 +563,7 @@ impl ResponseResult for LiveStream {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ThumbnailSetResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// A list of thumbnails.
 	pub items: Vec<ThumbnailDetails>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#thumbnailSetResponse".
@@ -572,7 +571,7 @@ pub struct ThumbnailSetResponse {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 }
 
 impl ResponseResult for ThumbnailSetResponse {}
@@ -584,7 +583,7 @@ impl ResponseResult for ThumbnailSetResponse {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsUpload {
 	/// The ID that YouTube uses to uniquely identify the uploaded video.
-	pub videoId: Option<String>,
+	pub video_id: Option<String>,
 }
 
 impl Part for ActivityContentDetailsUpload {}
@@ -600,27 +599,27 @@ pub struct ChannelSettings {
 	/// Specifies the channel title.
 	pub title: Option<String>,
 	/// Whether user-submitted comments left on the channel page need to be approved by the channel owner to be publicly visible.
-	pub moderateComments: Option<bool>,
+	pub moderate_comments: Option<bool>,
 	/// Whether the tab to browse the videos should be displayed.
-	pub showBrowseView: Option<bool>,
+	pub show_browse_view: Option<bool>,
 	/// Title for the featured channels tab.
-	pub featuredChannelsTitle: Option<String>,
+	pub featured_channels_title: Option<String>,
 	/// no description provided
-	pub defaultLanguage: Option<String>,
+	pub default_language: Option<String>,
 	/// The trailer of the channel, for users that are not subscribers.
-	pub unsubscribedTrailer: Option<String>,
+	pub unsubscribed_trailer: Option<String>,
 	/// The list of featured channels.
-	pub featuredChannelsUrls: Vec<String>,
+	pub featured_channels_urls: Vec<String>,
 	/// A prominent color that can be rendered on this channel page.
-	pub profileColor: Option<String>,
+	pub profile_color: Option<String>,
 	/// Which content tab users should see when viewing the channel.
-	pub defaultTab: Option<String>,
+	pub default_tab: Option<String>,
 	/// Lists keywords associated with the channel, comma-separated.
 	pub keywords: Option<String>,
 	/// Whether related channels should be proposed.
-	pub showRelatedChannels: Option<bool>,
+	pub show_related_channels: Option<bool>,
 	/// The ID for a Google Analytics account to track and measure traffic to the channels.
-	pub trackingAnalyticsAccountId: Option<String>,
+	pub tracking_analytics_account_id: Option<String>,
 }
 
 impl Part for ChannelSettings {}
@@ -632,15 +631,15 @@ impl Part for ChannelSettings {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoStatistics {
 	/// The number of comments for the video.
-	pub commentCount: Option<i64>,
+	pub comment_count: Option<i64>,
 	/// The number of times the video has been viewed.
-	pub viewCount: Option<i64>,
+	pub view_count: Option<i64>,
 	/// The number of users who currently have the video marked as a favorite video.
-	pub favoriteCount: Option<i64>,
+	pub favorite_count: Option<i64>,
 	/// The number of users who have indicated that they disliked the video by giving it a negative rating.
-	pub dislikeCount: Option<i64>,
+	pub dislike_count: Option<i64>,
 	/// The number of users who have indicated that they liked the video by giving it a positive rating.
-	pub likeCount: Option<i64>,
+	pub like_count: Option<i64>,
 }
 
 impl Part for VideoStatistics {}
@@ -654,9 +653,9 @@ pub struct CdnSettings {
 	/// The format of the video stream that you are sending to Youtube.
 	pub format: Option<String>,
 	/// The ingestionInfo object contains information that YouTube provides that you need to transmit your RTMP or HTTP stream to YouTube.
-	pub ingestionInfo: Option<IngestionInfo>,
+	pub ingestion_info: Option<IngestionInfo>,
 	/// The method or protocol used to transmit the video stream.
-	pub ingestionType: Option<String>,
+	pub ingestion_type: Option<String>,
 }
 
 impl Part for CdnSettings {}
@@ -674,7 +673,7 @@ impl Part for CdnSettings {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoGetRatingResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// A list of ratings that match the request criteria.
 	pub items: Vec<VideoRating>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#videoGetRatingResponse".
@@ -682,7 +681,7 @@ pub struct VideoGetRatingResponse {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 }
 
 impl ResponseResult for VideoGetRatingResponse {}
@@ -696,7 +695,7 @@ pub struct VideoCategorySnippet {
 	/// no description provided
 	pub assignable: Option<bool>,
 	/// The YouTube channel that created the video category.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The video category's title.
 	pub title: Option<String>,
 }
@@ -710,7 +709,7 @@ impl Part for VideoCategorySnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsChannelItem {
 	/// The resourceId object contains information that identifies the resource that was added to the channel.
-	pub resourceId: Option<ResourceId>,
+	pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsChannelItem {}
@@ -740,15 +739,15 @@ pub struct SubscriptionSnippet {
 	/// The subscription's title.
 	pub title: Option<String>,
 	/// The id object contains information about the channel that the user subscribed to.
-	pub resourceId: Option<ResourceId>,
+	pub resource_id: Option<ResourceId>,
 	/// The subscription's details.
 	pub description: Option<String>,
 	/// The ID that YouTube uses to uniquely identify the subscriber's channel.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The date and time that the subscription was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub publishedAt: Option<String>,
+	pub published_at: Option<String>,
 	/// Channel title for the channel that the subscription belongs to.
-	pub channelTitle: Option<String>,
+	pub channel_title: Option<String>,
 }
 
 impl Part for SubscriptionSnippet {}
@@ -780,7 +779,7 @@ impl Part for ChannelSectionContentDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nRegionListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// A list of regions where YouTube is available. In this map, the i18n region ID is the map key, and its value is the corresponding i18nRegion resource.
 	pub items: Vec<I18nRegion>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nRegionListResponse".
@@ -788,7 +787,7 @@ pub struct I18nRegionListResponse {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 }
 
 impl ResponseResult for I18nRegionListResponse {}
@@ -806,23 +805,23 @@ impl ResponseResult for I18nRegionListResponse {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStreamListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-	pub nextPageToken: Option<String>,
+	pub next_page_token: Option<String>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#liveStreamListResponse".
 	pub kind: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 	/// A list of live streams that match the request criteria.
 	pub items: Vec<LiveStream>,
 	/// no description provided
-	pub tokenPagination: Option<TokenPagination>,
+	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-	pub prevPageToken: Option<String>,
+	pub prev_page_token: Option<String>,
 	/// no description provided
-	pub pageInfo: Option<PageInfo>,
+	pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for LiveStreamListResponse {}
@@ -836,9 +835,9 @@ pub struct PromotedItem {
 	/// The temporal position within the video where the promoted item will be displayed. If present, it overrides the default timing.
 	pub timing: Option<InvideoTiming>,
 	/// If true, the content owner's name will be used when displaying the promotion. This field can only be set when the update is made on behalf of the content owner.
-	pub promotedByContentOwner: Option<bool>,
+	pub promoted_by_content_owner: Option<bool>,
 	/// A custom message to display for this promotion. This field is currently ignored unless the promoted item is a website.
-	pub customMessage: Option<String>,
+	pub custom_message: Option<String>,
 	/// Identifies the promoted item.
 	pub id: Option<PromotedItemId>,
 }
@@ -876,23 +875,23 @@ impl Part for ChannelBrandingSettings {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-	pub nextPageToken: Option<String>,
+	pub next_page_token: Option<String>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistListResponse".
 	pub kind: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 	/// A list of playlists that match the request criteria.
 	pub items: Vec<Playlist>,
 	/// no description provided
-	pub tokenPagination: Option<TokenPagination>,
+	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-	pub prevPageToken: Option<String>,
+	pub prev_page_token: Option<String>,
 	/// no description provided
-	pub pageInfo: Option<PageInfo>,
+	pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for PlaylistListResponse {}
@@ -910,15 +909,15 @@ impl ResponseResult for PlaylistListResponse {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoBranding {
 	/// no description provided
-	pub targetChannelId: Option<String>,
+	pub target_channel_id: Option<String>,
 	/// no description provided
 	pub position: Option<InvideoPosition>,
 	/// no description provided
-	pub imageUrl: Option<String>,
+	pub image_url: Option<String>,
 	/// no description provided
 	pub timing: Option<InvideoTiming>,
 	/// no description provided
-	pub imageBytes: Option<String>,
+	pub image_bytes: Option<String>,
 }
 
 impl RequestResult for InvideoBranding {}
@@ -930,7 +929,7 @@ impl RequestResult for InvideoBranding {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItemStatus {
 	/// This resource's privacy status.
-	pub privacyStatus: Option<String>,
+	pub privacy_status: Option<String>,
 }
 
 impl Part for PlaylistItemStatus {}
@@ -944,7 +943,7 @@ pub struct ChannelConversionPing {
 	/// Defines the context of the ping.
 	pub context: Option<String>,
 	/// The url (without the schema) that the player shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D cview%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.
-	pub conversionUrl: Option<String>,
+	pub conversion_url: Option<String>,
 }
 
 impl Part for ChannelConversionPing {}
@@ -956,11 +955,11 @@ impl Part for ChannelConversionPing {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoPromotion {
 	/// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.
-	pub defaultTiming: Option<InvideoTiming>,
+	pub default_timing: Option<InvideoTiming>,
 	/// List of promoted items in decreasing priority.
 	pub items: Vec<PromotedItem>,
 	/// Indicates whether the channel's promotional campaign uses "smart timing." This feature attempts to show promotions at a point in the video when they are more likely to be clicked and less likely to disrupt the viewing experience. This feature also picks up a single promotion to show on each video.
-	pub useSmartTiming: Option<bool>,
+	pub use_smart_timing: Option<bool>,
 	/// The spatial position within the video where the promoted item will be displayed.
 	pub position: Option<InvideoPosition>,
 }
@@ -998,7 +997,7 @@ pub struct PlaylistItem {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The contentDetails object is included in the resource if the included item is a YouTube video. The object contains additional information about the video.
-	pub contentDetails: Option<PlaylistItemContentDetails>,
+	pub content_details: Option<PlaylistItemContentDetails>,
 	/// The ID that YouTube uses to uniquely identify the playlist item.
 	pub id: Option<String>,
 }
@@ -1020,23 +1019,23 @@ impl ResponseResult for PlaylistItem {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct GuideCategoryListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-	pub nextPageToken: Option<String>,
+	pub next_page_token: Option<String>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#guideCategoryListResponse".
 	pub kind: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 	/// A list of categories that can be associated with YouTube channels. In this map, the category ID is the map key, and its value is the corresponding guideCategory resource.
 	pub items: Vec<GuideCategory>,
 	/// no description provided
-	pub tokenPagination: Option<TokenPagination>,
+	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-	pub prevPageToken: Option<String>,
+	pub prev_page_token: Option<String>,
 	/// no description provided
-	pub pageInfo: Option<PageInfo>,
+	pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for GuideCategoryListResponse {}
@@ -1070,11 +1069,11 @@ pub struct ChannelSectionSnippet {
 	/// The position of the channel section in the channel.
 	pub position: Option<u32>,
 	/// The ID that YouTube uses to uniquely identify the channel that published the channel section.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The type of the channel section.
 	pub type_: Option<String>,
 	/// The language of the channel section's default title and description.
-	pub defaultLanguage: Option<String>,
+	pub default_language: Option<String>,
 }
 
 impl Part for ChannelSectionSnippet {}
@@ -1086,9 +1085,9 @@ impl Part for ChannelSectionSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentDetails {
 	/// no description provided
-	pub relatedPlaylists: HashMap<String, ChannelContentDetailsRelatedplaylists>,
+	pub related_playlists: HashMap<String, ChannelContentDetailsRelatedplaylists>,
 	/// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.
-	pub googlePlusUserId: Option<String>,
+	pub google_plus_user_id: Option<String>,
 }
 
 impl Part for ChannelContentDetails {}
@@ -1111,11 +1110,11 @@ pub struct PlaylistItemContentDetails {
 	/// A user-generated note for this item.
 	pub note: Option<String>,
 	/// The time, measured in seconds from the start of the video, when the video should start playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) The default value is 0.
-	pub startAt: Option<String>,
+	pub start_at: Option<String>,
 	/// The time, measured in seconds from the start of the video, when the video should stop playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) By default, assume that the video.endTime is the end of the video.
-	pub endAt: Option<String>,
+	pub end_at: Option<String>,
 	/// The ID that YouTube uses to uniquely identify a video. To retrieve the video resource, set the id query parameter to this value in your API request.
-	pub videoId: Option<String>,
+	pub video_id: Option<String>,
 }
 
 impl Part for PlaylistItemContentDetails {}
@@ -1159,11 +1158,11 @@ impl Part for VideoMonetizationDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsRecommendation {
 	/// The resourceId object contains information that identifies the recommended resource.
-	pub resourceId: Option<ResourceId>,
+	pub resource_id: Option<ResourceId>,
 	/// The reason that the resource is recommended to the user.
 	pub reason: Option<String>,
 	/// The seedResourceId object contains information about the resource that caused the recommendation.
-	pub seedResourceId: Option<ResourceId>,
+	pub seed_resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsRecommendation {}
@@ -1175,9 +1174,9 @@ impl Part for ActivityContentDetailsRecommendation {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoRecordingDetails {
 	/// The date and time when the video was recorded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.
-	pub recordingDate: Option<String>,
+	pub recording_date: Option<String>,
 	/// The text description of the location where the video was recorded.
-	pub locationDescription: Option<String>,
+	pub location_description: Option<String>,
 	/// The geolocation information associated with the video.
 	pub location: Option<GeoPoint>,
 }
@@ -1191,7 +1190,7 @@ impl Part for VideoRecordingDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsSubscription {
 	/// The resourceId object contains information that identifies the resource that the user subscribed to.
-	pub resourceId: Option<ResourceId>,
+	pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsSubscription {}
@@ -1217,11 +1216,11 @@ pub struct ActivityContentDetails {
 	/// The comment object contains information about a resource that received a comment. This property is only present if the snippet.type is comment.
 	pub comment: Option<ActivityContentDetailsComment>,
 	/// The playlistItem object contains information about a new playlist item. This property is only present if the snippet.type is playlistItem.
-	pub playlistItem: Option<ActivityContentDetailsPlaylistItem>,
+	pub playlist_item: Option<ActivityContentDetailsPlaylistItem>,
 	/// The like object contains information about a resource that received a positive (like) rating. This property is only present if the snippet.type is like.
 	pub like: Option<ActivityContentDetailsLike>,
 	/// The promotedItem object contains details about a resource which is being promoted. This property is only present if the snippet.type is promotedItem.
-	pub promotedItem: Option<ActivityContentDetailsPromotedItem>,
+	pub promoted_item: Option<ActivityContentDetailsPromotedItem>,
 	/// The recommendation object contains information about a recommended resource. This property is only present if the snippet.type is recommendation.
 	pub recommendation: Option<ActivityContentDetailsRecommendation>,
 	/// The favorite object contains information about a video that was marked as a favorite video. This property is only present if the snippet.type is favorite.
@@ -1231,7 +1230,7 @@ pub struct ActivityContentDetails {
 	/// The social object contains details about a social network post. This property is only present if the snippet.type is social.
 	pub social: Option<ActivityContentDetailsSocial>,
 	/// The channelItem object contains details about a resource which was added to a channel. This property is only present if the snippet.type is channelItem.
-	pub channelItem: Option<ActivityContentDetailsChannelItem>,
+	pub channel_item: Option<ActivityContentDetailsChannelItem>,
 	/// The bulletin object contains details about a channel bulletin post. This object is only present if the snippet.type is bulletin.
 	pub bulletin: Option<ActivityContentDetailsBulletin>,
 	/// The subscription object contains information about a channel that a user subscribed to. This property is only present if the snippet.type is subscription.
@@ -1265,9 +1264,9 @@ impl Part for I18nRegion {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentOwnerDetails {
 	/// The ID of the content owner linked to the channel.
-	pub contentOwner: Option<String>,
+	pub content_owner: Option<String>,
 	/// The date and time of when the channel was linked to the content owner. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub timeLinked: Option<String>,
+	pub time_linked: Option<String>,
 }
 
 impl Part for ChannelContentOwnerDetails {}
@@ -1279,21 +1278,21 @@ impl Part for ChannelContentOwnerDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoProcessingDetails {
 	/// This value indicates whether file details are available for the uploaded video. You can retrieve a video's file details by requesting the fileDetails part in your videos.list() request.
-	pub fileDetailsAvailability: Option<String>,
+	pub file_details_availability: Option<String>,
 	/// This value indicates whether video editing suggestions, which might improve video quality or the playback experience, are available for the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
-	pub editorSuggestionsAvailability: Option<String>,
+	pub editor_suggestions_availability: Option<String>,
 	/// The video's processing status. This value indicates whether YouTube was able to process the video or if the video is still being processed.
-	pub processingStatus: Option<String>,
+	pub processing_status: Option<String>,
 	/// This value indicates whether the video processing engine has generated suggestions that might improve YouTube's ability to process the the video, warnings that explain video processing problems, or errors that cause video processing problems. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
-	pub processingIssuesAvailability: Option<String>,
+	pub processing_issues_availability: Option<String>,
 	/// The reason that YouTube failed to process the video. This property will only have a value if the processingStatus property's value is failed.
-	pub processingFailureReason: Option<String>,
+	pub processing_failure_reason: Option<String>,
 	/// This value indicates whether thumbnail images have been generated for the video.
-	pub thumbnailsAvailability: Option<String>,
+	pub thumbnails_availability: Option<String>,
 	/// The processingProgress object contains information about the progress YouTube has made in processing the video. The values are really only relevant if the video's processing status is processing.
-	pub processingProgress: Option<VideoProcessingDetailsProcessingProgress>,
+	pub processing_progress: Option<VideoProcessingDetailsProcessingProgress>,
 	/// This value indicates whether keyword (tag) suggestions are available for the video. Tags can be added to a video's metadata to make it easier for other users to find the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
-	pub tagSuggestionsAvailability: Option<String>,
+	pub tag_suggestions_availability: Option<String>,
 }
 
 impl Part for VideoProcessingDetails {}
@@ -1305,13 +1304,13 @@ impl Part for VideoProcessingDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastStatus {
 	/// The broadcast's recording status.
-	pub recordingStatus: Option<String>,
+	pub recording_status: Option<String>,
 	/// The broadcast's privacy status. Note that the broadcast represents exactly one YouTube video, so the privacy settings are identical to those supported for videos. In addition, you can set this field by modifying the broadcast resource or by setting the privacyStatus field of the corresponding video resource.
-	pub privacyStatus: Option<String>,
+	pub privacy_status: Option<String>,
 	/// The broadcast's status. The status can be updated using the API's liveBroadcasts.transition method.
-	pub lifeCycleStatus: Option<String>,
+	pub life_cycle_status: Option<String>,
 	/// Priority of the live broadcast event (internal state).
-	pub liveBroadcastPriority: Option<String>,
+	pub live_broadcast_priority: Option<String>,
 }
 
 impl Part for LiveBroadcastStatus {}
@@ -1323,11 +1322,11 @@ impl Part for LiveBroadcastStatus {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SubscriptionContentDetails {
 	/// The number of new items in the subscription since its content was last read.
-	pub newItemCount: Option<u32>,
+	pub new_item_count: Option<u32>,
 	/// The type of activity this subscription is for (only uploads, everything).
-	pub activityType: Option<String>,
+	pub activity_type: Option<String>,
 	/// The approximate number of items that the subscription points to.
-	pub totalItemCount: Option<u32>,
+	pub total_item_count: Option<u32>,
 }
 
 impl Part for SubscriptionContentDetails {}
@@ -1352,15 +1351,15 @@ pub struct Video {
 	/// The status object contains information about the video's uploading, processing, and privacy statuses.
 	pub status: Option<VideoStatus>,
 	/// The topicDetails object encapsulates information about Freebase topics associated with the video.
-	pub topicDetails: Option<VideoTopicDetails>,
+	pub topic_details: Option<VideoTopicDetails>,
 	/// The monetizationDetails object encapsulates information about the monetization status of the video.
-	pub monetizationDetails: Option<VideoMonetizationDetails>,
+	pub monetization_details: Option<VideoMonetizationDetails>,
 	/// The suggestions object encapsulates suggestions that identify opportunities to improve the video quality or the metadata for the uploaded video. This data can only be retrieved by the video owner.
 	pub suggestions: Option<VideoSuggestions>,
 	/// Age restriction details related to a video.
-	pub ageGating: Option<VideoAgeGating>,
+	pub age_gating: Option<VideoAgeGating>,
 	/// The fileDetails object encapsulates information about the video file that was uploaded to YouTube, including the file's resolution, duration, audio and video codecs, stream bitrates, and more. This data can only be retrieved by the video owner.
-	pub fileDetails: Option<VideoFileDetails>,
+	pub file_details: Option<VideoFileDetails>,
 	/// The player object contains information that you would use to play the video in an embedded player.
 	pub player: Option<VideoPlayer>,
 	/// The ID that YouTube uses to uniquely identify the video.
@@ -1368,27 +1367,27 @@ pub struct Video {
 	/// List with all localizations.
 	pub localizations: HashMap<String, VideoLocalization>,
 	/// The liveStreamingDetails object contains metadata about a live video broadcast. The object will only be present in a video resource if the video is an upcoming, live, or completed live broadcast.
-	pub liveStreamingDetails: Option<VideoLiveStreamingDetails>,
+	pub live_streaming_details: Option<VideoLiveStreamingDetails>,
 	/// The processingProgress object encapsulates information about YouTube's progress in processing the uploaded video file. The properties in the object identify the current processing status and an estimate of the time remaining until YouTube finishes processing the video. This part also indicates whether different types of data or content, such as file details or thumbnail images, are available for the video.
 /// 
 /// The processingProgress object is designed to be polled so that the video uploaded can track the progress that YouTube has made in processing the uploaded video file. This data can only be retrieved by the video owner.
-	pub processingDetails: Option<VideoProcessingDetails>,
+	pub processing_details: Option<VideoProcessingDetails>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#video".
 	pub kind: Option<String>,
 	/// The statistics object contains statistics about the video.
 	pub statistics: Option<VideoStatistics>,
 	/// The contentDetails object contains information about the video content, including the length of the video and its aspect ratio.
-	pub contentDetails: Option<VideoContentDetails>,
+	pub content_details: Option<VideoContentDetails>,
 	/// The conversionPings object encapsulates information about url pings that need to be respected by the App in different video contexts.
-	pub conversionPings: Option<VideoConversionPings>,
+	pub conversion_pings: Option<VideoConversionPings>,
 	/// The snippet object contains basic details about the video, such as its title, description, and category.
 	pub snippet: Option<VideoSnippet>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The projectDetails object contains information about the project specific video metadata.
-	pub projectDetails: Option<VideoProjectDetails>,
+	pub project_details: Option<VideoProjectDetails>,
 	/// The recordingDetails object encapsulates information about the location, date and address where the video was recorded.
-	pub recordingDetails: Option<VideoRecordingDetails>,
+	pub recording_details: Option<VideoRecordingDetails>,
 }
 
 impl RequestResult for Video {}
@@ -1420,9 +1419,9 @@ pub struct VideoAgeGating {
 	/// Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won't be present.
 	pub restricted: Option<bool>,
 	/// Indicates whether or not the video has alcoholic beverage content. Only users of legal purchasing age in a particular country, as identified by ICAP, can view the content.
-	pub alcoholContent: Option<bool>,
+	pub alcohol_content: Option<bool>,
 	/// Video game rating, if any.
-	pub videoGameRating: Option<String>,
+	pub video_game_rating: Option<String>,
 }
 
 impl Part for VideoAgeGating {}
@@ -1434,7 +1433,7 @@ impl Part for VideoAgeGating {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoPlayer {
 	/// An <iframe> tag that embeds a player that will play the video.
-	pub embedHtml: Option<String>,
+	pub embed_html: Option<String>,
 }
 
 impl Part for VideoPlayer {}
@@ -1446,7 +1445,7 @@ impl Part for VideoPlayer {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSnippet {
 	/// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub publishedAt: Option<String>,
+	pub published_at: Option<String>,
 	/// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
 	pub thumbnails: Option<ThumbnailDetails>,
 	/// The channel's title.
@@ -1454,7 +1453,7 @@ pub struct ChannelSnippet {
 	/// Localized title and description, read-only.
 	pub localized: Option<ChannelLocalization>,
 	/// The language of the channel's default title and description.
-	pub defaultLanguage: Option<String>,
+	pub default_language: Option<String>,
 	/// The description of the channel.
 	pub description: Option<String>,
 }
@@ -1468,11 +1467,11 @@ impl Part for ChannelSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct WatchSettings {
 	/// The background color for the video watch page's branded area.
-	pub textColor: Option<String>,
+	pub text_color: Option<String>,
 	/// An ID that uniquely identifies a playlist that displays next to the video player.
-	pub featuredPlaylistId: Option<String>,
+	pub featured_playlist_id: Option<String>,
 	/// The text color for the video watch page's branded area.
-	pub backgroundColor: Option<String>,
+	pub background_color: Option<String>,
 }
 
 impl Part for WatchSettings {}
@@ -1512,7 +1511,7 @@ pub struct VideoRating {
 	/// no description provided
 	pub rating: Option<String>,
 	/// no description provided
-	pub videoId: Option<String>,
+	pub video_id: Option<String>,
 }
 
 impl Part for VideoRating {}
@@ -1524,13 +1523,13 @@ impl Part for VideoRating {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PromotedItemId {
 	/// If the promoted item represents a website, this field represents the url pointing to the website. This field will be present only if type has the value website.
-	pub websiteUrl: Option<String>,
+	pub website_url: Option<String>,
 	/// If type is recentUpload, this field identifies the channel from which to take the recent upload. If missing, the channel is assumed to be the same channel for which the invideoPromotion is set.
-	pub recentlyUploadedBy: Option<String>,
+	pub recently_uploaded_by: Option<String>,
 	/// Describes the type of the promoted item.
 	pub type_: Option<String>,
 	/// If the promoted item represents a video, this field represents the unique YouTube ID identifying it. This field will be present only if type has the value video.
-	pub videoId: Option<String>,
+	pub video_id: Option<String>,
 }
 
 impl Part for PromotedItemId {}
@@ -1556,9 +1555,9 @@ pub struct Subscription {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The contentDetails object contains basic statistics about the subscription.
-	pub contentDetails: Option<SubscriptionContentDetails>,
+	pub content_details: Option<SubscriptionContentDetails>,
 	/// The subscriberSnippet object contains basic details about the sbuscriber.
-	pub subscriberSnippet: Option<SubscriptionSubscriberSnippet>,
+	pub subscriber_snippet: Option<SubscriptionSubscriberSnippet>,
 	/// The ID that YouTube uses to uniquely identify the subscription.
 	pub id: Option<String>,
 }
@@ -1588,11 +1587,11 @@ impl Part for I18nRegionSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsPlaylistItem {
 	/// The resourceId object contains information about the resource that was added to the playlist.
-	pub resourceId: Option<ResourceId>,
+	pub resource_id: Option<ResourceId>,
 	/// The value that YouTube uses to uniquely identify the playlist.
-	pub playlistId: Option<String>,
+	pub playlist_id: Option<String>,
 	/// ID of the item within the playlist.
-	pub playlistItemId: Option<String>,
+	pub playlist_item_id: Option<String>,
 }
 
 impl Part for ActivityContentDetailsPlaylistItem {}
@@ -1604,7 +1603,7 @@ impl Part for ActivityContentDetailsPlaylistItem {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoPosition {
 	/// Describes in which corner of the video the visual widget will appear.
-	pub cornerPosition: Option<String>,
+	pub corner_position: Option<String>,
 	/// Defines the position type.
 	pub type_: Option<String>,
 }
@@ -1618,7 +1617,7 @@ impl Part for InvideoPosition {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsComment {
 	/// The resourceId object contains information that identifies the resource associated with the comment.
-	pub resourceId: Option<ResourceId>,
+	pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsComment {}
@@ -1630,7 +1629,7 @@ impl Part for ActivityContentDetailsComment {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct GuideCategorySnippet {
 	/// no description provided
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// Description of the guide category.
 	pub title: Option<String>,
 }
@@ -1648,23 +1647,23 @@ pub struct VideoSnippet {
 	/// A list of keyword tags associated with the video. Tags may contain spaces. This field is only visible to the video's uploader.
 	pub tags: Vec<String>,
 	/// The ID that YouTube uses to uniquely identify the channel that the video was uploaded to.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub publishedAt: Option<String>,
+	pub published_at: Option<String>,
 	/// Indicates if the video is an upcoming/active live broadcast. Or it's "none" if the video is not an upcoming/active live broadcast.
-	pub liveBroadcastContent: Option<String>,
+	pub live_broadcast_content: Option<String>,
 	/// The language of the videos's default snippet.
-	pub defaultLanguage: Option<String>,
+	pub default_language: Option<String>,
 	/// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
 	pub thumbnails: Option<ThumbnailDetails>,
 	/// The video's title.
 	pub title: Option<String>,
 	/// The YouTube video category associated with the video.
-	pub categoryId: Option<String>,
+	pub category_id: Option<String>,
 	/// Localized snippet selected with the hl parameter. If no such localization exists, this field is populated with the default snippet. (Read-only)
 	pub localized: Option<VideoLocalization>,
 	/// Channel title for the channel that the video belongs to.
-	pub channelTitle: Option<String>,
+	pub channel_title: Option<String>,
 }
 
 impl Part for VideoSnippet {}
@@ -1693,9 +1692,9 @@ pub struct LiveStreamContentDetails {
 /// - A non-reusable stream can only be bound to one broadcast. 
 /// - A non-reusable stream might be deleted by an automated process after the broadcast ends. 
 /// - The  liveStreams.list method does not list non-reusable streams if you call the method and set the mine parameter to true. The only way to use that method to retrieve the resource for a non-reusable stream is to use the id parameter to identify the stream.
-	pub isReusable: Option<bool>,
+	pub is_reusable: Option<bool>,
 	/// The ingestion URL where the closed captions of this stream are sent.
-	pub closedCaptionsIngestionUrl: Option<String>,
+	pub closed_captions_ingestion_url: Option<String>,
 }
 
 impl Part for LiveStreamContentDetails {}
@@ -1707,29 +1706,29 @@ impl Part for LiveStreamContentDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastContentDetails {
 	/// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.
-	pub startWithSlate: Option<bool>,
+	pub start_with_slate: Option<bool>,
 	/// This value uniquely identifies the live stream bound to the broadcast.
-	pub boundStreamId: Option<String>,
+	pub bound_stream_id: Option<String>,
 	/// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.
-	pub enableEmbed: Option<bool>,
+	pub enable_embed: Option<bool>,
 	/// This setting indicates whether closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API.
-	pub enableClosedCaptions: Option<bool>,
+	pub enable_closed_captions: Option<bool>,
 	/// This setting indicates whether YouTube should enable content encryption for the broadcast.
-	pub enableContentEncryption: Option<bool>,
+	pub enable_content_encryption: Option<bool>,
 	/// Automatically start recording after the event goes live. The default value for this property is true.
 /// 
 /// 
 /// 
 /// Important: You must also set the enableDvr property's value to true if you want the playback to be available immediately after the broadcast ends. If you set this property's value to true but do not also set the enableDvr property to true, there may be a delay of around one day before the archived video will be available for playback.
-	pub recordFromStart: Option<bool>,
+	pub record_from_start: Option<bool>,
 	/// This setting determines whether viewers can access DVR controls while watching the video. DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content. The default value for this property is true.
 /// 
 /// 
 /// 
 /// Important: You must set the value to true and also set the enableArchive property's value to true if you want to make playback available immediately after the broadcast ends.
-	pub enableDvr: Option<bool>,
+	pub enable_dvr: Option<bool>,
 	/// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.
-	pub monitorStream: Option<MonitorStreamInfo>,
+	pub monitor_stream: Option<MonitorStreamInfo>,
 }
 
 impl Part for LiveBroadcastContentDetails {}
@@ -1745,17 +1744,17 @@ pub struct VideoStatus {
 	/// This value indicates if the video can be embedded on another website.
 	pub embeddable: Option<bool>,
 	/// The video's privacy status.
-	pub privacyStatus: Option<String>,
+	pub privacy_status: Option<String>,
 	/// The date and time when the video is scheduled to publish. It can be set only if the privacy status of the video is private. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub publishAt: Option<String>,
+	pub publish_at: Option<String>,
 	/// This value indicates if the extended video statistics on the watch page can be viewed by everyone. Note that the view count, likes, etc will still be visible if this is disabled.
-	pub publicStatsViewable: Option<bool>,
+	pub public_stats_viewable: Option<bool>,
 	/// The status of the uploaded video.
-	pub uploadStatus: Option<String>,
+	pub upload_status: Option<String>,
 	/// This value explains why YouTube rejected an uploaded video. This property is only present if the uploadStatus property indicates that the upload was rejected.
-	pub rejectionReason: Option<String>,
+	pub rejection_reason: Option<String>,
 	/// This value explains why a video failed to upload. This property is only present if the uploadStatus property indicates that the upload failed.
-	pub failureReason: Option<String>,
+	pub failure_reason: Option<String>,
 }
 
 impl Part for VideoStatus {}
@@ -1791,7 +1790,7 @@ impl Part for GuideCategory {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSectionListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// A list of ChannelSections that match the request criteria.
 	pub items: Vec<ChannelSection>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#channelSectionListResponse".
@@ -1799,7 +1798,7 @@ pub struct ChannelSectionListResponse {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 }
 
 impl ResponseResult for ChannelSectionListResponse {}
@@ -1811,15 +1810,15 @@ impl ResponseResult for ChannelSectionListResponse {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct MonitorStreamInfo {
 	/// If you have set the enableMonitorStream property to true, then this property determines the length of the live broadcast delay.
-	pub broadcastStreamDelayMs: Option<u32>,
+	pub broadcast_stream_delay_ms: Option<u32>,
 	/// HTML code that embeds a player that plays the monitor stream.
-	pub embedHtml: Option<String>,
+	pub embed_html: Option<String>,
 	/// This value determines whether the monitor stream is enabled for the broadcast. If the monitor stream is enabled, then YouTube will broadcast the event content on a special stream intended only for the broadcaster's consumption. The broadcaster can use the stream to review the event content and also to identify the optimal times to insert cuepoints.
 /// 
 /// You need to set this value to true if you intend to have a broadcast delay for your event.
 /// 
 /// Note: This property cannot be updated once the broadcast is in the testing or live state.
-	pub enableMonitorStream: Option<bool>,
+	pub enable_monitor_stream: Option<bool>,
 }
 
 impl Part for MonitorStreamInfo {}
@@ -1837,7 +1836,7 @@ impl Part for MonitorStreamInfo {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nLanguageListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// A list of supported i18n languages. In this map, the i18n language ID is the map key, and its value is the corresponding i18nLanguage resource.
 	pub items: Vec<I18nLanguage>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nLanguageListResponse".
@@ -1845,7 +1844,7 @@ pub struct I18nLanguageListResponse {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 }
 
 impl ResponseResult for I18nLanguageListResponse {}
@@ -1859,7 +1858,7 @@ pub struct LocalizedProperty {
 	/// no description provided
 	pub default: Option<String>,
 	/// The language of the default property.
-	pub defaultLanguage: Option<LanguageTag>,
+	pub default_language: Option<LanguageTag>,
 	/// no description provided
 	pub localized: Vec<LocalizedString>,
 }
@@ -1891,7 +1890,7 @@ pub struct LiveBroadcast {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The contentDetails object contains information about the event's video content, such as whether the content can be shown in an embedded video player or if it will be archived and therefore available for viewing after the event has concluded.
-	pub contentDetails: Option<LiveBroadcastContentDetails>,
+	pub content_details: Option<LiveBroadcastContentDetails>,
 	/// The ID that YouTube assigns to uniquely identify the broadcast.
 	pub id: Option<String>,
 }
@@ -1907,21 +1906,21 @@ impl ResponseResult for LiveBroadcast {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetailsVideoStream {
 	/// The video stream's bitrate, in bits per second.
-	pub bitrateBps: Option<String>,
+	pub bitrate_bps: Option<String>,
 	/// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.
 	pub vendor: Option<String>,
 	/// The video codec that the stream uses.
 	pub codec: Option<String>,
 	/// The encoded video content's width in pixels. You can calculate the video's encoding aspect ratio as width_pixels / height_pixels.
-	pub widthPixels: Option<u32>,
+	pub width_pixels: Option<u32>,
 	/// The encoded video content's height in pixels.
-	pub heightPixels: Option<u32>,
+	pub height_pixels: Option<u32>,
 	/// The video content's display aspect ratio, which specifies the aspect ratio in which the video should be displayed.
-	pub aspectRatio: Option<f64>,
+	pub aspect_ratio: Option<f64>,
 	/// The amount that YouTube needs to rotate the original source content to properly display the video.
 	pub rotation: Option<String>,
 	/// The video stream's frame rate, in frames per second.
-	pub frameRateFps: Option<f64>,
+	pub frame_rate_fps: Option<f64>,
 }
 
 impl Part for VideoFileDetailsVideoStream {}
@@ -1964,25 +1963,25 @@ pub struct Channel {
 	/// The status object encapsulates information about the privacy status of the channel.
 	pub status: Option<ChannelStatus>,
 	/// The invideoPromotion object encapsulates information about promotion campaign associated with the channel.
-	pub invideoPromotion: Option<InvideoPromotion>,
+	pub invideo_promotion: Option<InvideoPromotion>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#channel".
 	pub kind: Option<String>,
 	/// The statistics object encapsulates statistics for the channel.
 	pub statistics: Option<ChannelStatistics>,
 	/// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.
-	pub contentOwnerDetails: Option<ChannelContentOwnerDetails>,
+	pub content_owner_details: Option<ChannelContentOwnerDetails>,
 	/// The topicDetails object encapsulates information about Freebase topics associated with the channel.
-	pub topicDetails: Option<ChannelTopicDetails>,
+	pub topic_details: Option<ChannelTopicDetails>,
 	/// The contentDetails object encapsulates information about the channel's content.
-	pub contentDetails: Option<ChannelContentDetails>,
+	pub content_details: Option<ChannelContentDetails>,
 	/// The brandingSettings object encapsulates information about the branding of the channel.
-	pub brandingSettings: Option<ChannelBrandingSettings>,
+	pub branding_settings: Option<ChannelBrandingSettings>,
 	/// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.
-	pub conversionPings: Option<ChannelConversionPings>,
+	pub conversion_pings: Option<ChannelConversionPings>,
 	/// The snippet object contains basic details about the channel, such as its title, description, and thumbnail images.
 	pub snippet: Option<ChannelSnippet>,
 	/// The auditionDetails object encapsulates channel data that is relevant for YouTube Partners during the audition process.
-	pub auditDetails: Option<ChannelAuditDetails>,
+	pub audit_details: Option<ChannelAuditDetails>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The ID that YouTube uses to uniquely identify the channel.
@@ -2002,15 +2001,15 @@ impl ResponseResult for Channel {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelStatistics {
 	/// The number of comments for the channel.
-	pub commentCount: Option<i64>,
+	pub comment_count: Option<i64>,
 	/// The number of subscribers that the channel has.
-	pub subscriberCount: Option<i64>,
+	pub subscriber_count: Option<i64>,
 	/// The number of videos uploaded to the channel.
-	pub videoCount: Option<i64>,
+	pub video_count: Option<i64>,
 	/// Whether or not the number of subscribers is shown for this user.
-	pub hiddenSubscriberCount: Option<bool>,
+	pub hidden_subscriber_count: Option<bool>,
 	/// The number of times the channel has been viewed.
-	pub viewCount: Option<i64>,
+	pub view_count: Option<i64>,
 }
 
 impl Part for ChannelStatistics {}
@@ -2022,13 +2021,13 @@ impl Part for ChannelStatistics {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsSocial {
 	/// The resourceId object encapsulates information that identifies the resource associated with a social network post.
-	pub resourceId: Option<ResourceId>,
+	pub resource_id: Option<ResourceId>,
 	/// An image of the post's author.
-	pub imageUrl: Option<String>,
+	pub image_url: Option<String>,
 	/// The name of the social network.
 	pub type_: Option<String>,
 	/// The URL of the social network post.
-	pub referenceUrl: Option<String>,
+	pub reference_url: Option<String>,
 	/// The author of the social network post.
 	pub author: Option<String>,
 }
@@ -2058,11 +2057,11 @@ pub struct ResourceId {
 	/// The type of the API resource.
 	pub kind: Option<String>,
 	/// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a channel. This property is only present if the resourceId.kind value is youtube#channel.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a playlist. This property is only present if the resourceId.kind value is youtube#playlist.
-	pub playlistId: Option<String>,
+	pub playlist_id: Option<String>,
 	/// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a video. This property is only present if the resourceId.kind value is youtube#video.
-	pub videoId: Option<String>,
+	pub video_id: Option<String>,
 }
 
 impl Part for ResourceId {}
@@ -2098,23 +2097,23 @@ impl Part for SearchResult {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoCategoryListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-	pub nextPageToken: Option<String>,
+	pub next_page_token: Option<String>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#videoCategoryListResponse".
 	pub kind: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 	/// A list of video categories that can be associated with YouTube videos. In this map, the video category ID is the map key, and its value is the corresponding videoCategory resource.
 	pub items: Vec<VideoCategory>,
 	/// no description provided
-	pub tokenPagination: Option<TokenPagination>,
+	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-	pub prevPageToken: Option<String>,
+	pub prev_page_token: Option<String>,
 	/// no description provided
-	pub pageInfo: Option<PageInfo>,
+	pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for VideoCategoryListResponse {}
@@ -2130,15 +2129,15 @@ pub struct ActivitySnippet {
 	/// The title of the resource primarily associated with the activity.
 	pub title: Option<String>,
 	/// The ID that YouTube uses to uniquely identify the channel associated with the activity.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub publishedAt: Option<String>,
+	pub published_at: Option<String>,
 	/// Channel title for the channel responsible for this activity
-	pub channelTitle: Option<String>,
+	pub channel_title: Option<String>,
 	/// The type of activity that the resource describes.
 	pub type_: Option<String>,
 	/// The group ID associated with the activity. A group ID identifies user events that are associated with the same user and resource. For example, if a user rates a video and marks the same video as a favorite, the entries for those events would have the same group ID in the user's activity feed. In your user interface, you can avoid repetition by grouping events with the same groupId value.
-	pub groupId: Option<String>,
+	pub group_id: Option<String>,
 	/// The description of the resource primarily associated with the activity.
 	pub description: Option<String>,
 }
@@ -2152,14 +2151,14 @@ impl Part for ActivitySnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoProcessingDetailsProcessingProgress {
 	/// An estimate of the amount of time, in millseconds, that YouTube needs to finish processing the video.
-	pub timeLeftMs: Option<String>,
+	pub time_left_ms: Option<String>,
 	/// The number of parts of the video that YouTube has already processed. You can estimate the percentage of the video that YouTube has already processed by calculating:
 /// 100 * parts_processed / parts_total
 /// 
 /// Note that since the estimated number of parts could increase without a corresponding increase in the number of parts that have already been processed, it is possible that the calculated progress could periodically decrease while YouTube processes a video.
-	pub partsProcessed: Option<String>,
+	pub parts_processed: Option<String>,
 	/// An estimate of the total number of parts that need to be processed for the video. The number may be updated with more precise estimates while YouTube processes the video.
-	pub partsTotal: Option<String>,
+	pub parts_total: Option<String>,
 }
 
 impl Part for VideoProcessingDetailsProcessingProgress {}
@@ -2177,23 +2176,23 @@ impl Part for VideoProcessingDetailsProcessingProgress {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SearchListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-	pub nextPageToken: Option<String>,
+	pub next_page_token: Option<String>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#searchListResponse".
 	pub kind: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 	/// A list of results that match the search criteria.
 	pub items: Vec<SearchResult>,
 	/// no description provided
-	pub tokenPagination: Option<TokenPagination>,
+	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-	pub prevPageToken: Option<String>,
+	pub prev_page_token: Option<String>,
 	/// no description provided
-	pub pageInfo: Option<PageInfo>,
+	pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for SearchListResponse {}
@@ -2205,7 +2204,7 @@ impl ResponseResult for SearchListResponse {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelTopicDetails {
 	/// A list of Freebase topic IDs associated with the channel. You can retrieve information about each topic using the Freebase Topic API.
-	pub topicIds: Vec<String>,
+	pub topic_ids: Vec<String>,
 }
 
 impl Part for ChannelTopicDetails {}
@@ -2223,23 +2222,23 @@ impl Part for ChannelTopicDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-	pub nextPageToken: Option<String>,
+	pub next_page_token: Option<String>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#videoListResponse".
 	pub kind: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 	/// A list of videos that match the request criteria.
 	pub items: Vec<Video>,
 	/// no description provided
-	pub tokenPagination: Option<TokenPagination>,
+	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-	pub prevPageToken: Option<String>,
+	pub prev_page_token: Option<String>,
 	/// no description provided
-	pub pageInfo: Option<PageInfo>,
+	pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for VideoListResponse {}
@@ -2263,7 +2262,7 @@ impl Part for LanguageTag {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistStatus {
 	/// The playlist's privacy status.
-	pub privacyStatus: Option<String>,
+	pub privacy_status: Option<String>,
 }
 
 impl Part for PlaylistStatus {}
@@ -2277,17 +2276,17 @@ pub struct VideoContentDetails {
 	/// The value of definition indicates whether the video is available in high definition or only in standard definition.
 	pub definition: Option<String>,
 	/// The countryRestriction object contains information about the countries where a video is (or is not) viewable.
-	pub countryRestriction: Option<AccessPolicy>,
+	pub country_restriction: Option<AccessPolicy>,
 	/// Specifies the ratings that the video received under various rating schemes.
-	pub contentRating: Option<ContentRating>,
+	pub content_rating: Option<ContentRating>,
 	/// The value of captions indicates whether the video has captions or not.
 	pub caption: Option<String>,
 	/// The regionRestriction object contains information about the countries where a video is (or is not) viewable. The object will contain either the contentDetails.regionRestriction.allowed property or the contentDetails.regionRestriction.blocked property.
-	pub regionRestriction: Option<VideoContentDetailsRegionRestriction>,
+	pub region_restriction: Option<VideoContentDetailsRegionRestriction>,
 	/// The length of the video. The tag value is an ISO 8601 duration in the format PT#M#S, in which the letters PT indicate that the value specifies a period of time, and the letters M and S refer to length in minutes and seconds, respectively. The # characters preceding the M and S letters are both integers that specify the number of minutes (or seconds) of the video. For example, a value of PT15M51S indicates that the video is 15 minutes and 51 seconds long.
 	pub duration: Option<String>,
 	/// The value of is_license_content indicates whether the video is licensed content.
-	pub licensedContent: Option<bool>,
+	pub licensed_content: Option<bool>,
 	/// The value of dimension indicates whether the video is available in 3D or in 2D.
 	pub dimension: Option<String>,
 }
@@ -2301,11 +2300,11 @@ impl Part for VideoContentDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStreamSnippet {
 	/// The ID that YouTube uses to uniquely identify the channel that is transmitting the stream.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The stream's description. The value cannot be longer than 10000 characters.
 	pub description: Option<String>,
 	/// The date and time that the stream was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub publishedAt: Option<String>,
+	pub published_at: Option<String>,
 	/// The stream's title. The value must be between 1 and 128 characters long.
 	pub title: Option<String>,
 }
@@ -2319,11 +2318,11 @@ impl Part for LiveStreamSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelStatus {
 	/// Privacy status of the channel.
-	pub privacyStatus: Option<String>,
+	pub privacy_status: Option<String>,
 	/// If true, then the user is linked to either a YouTube username or G+ account. Otherwise, the user doesn't have a public YouTube identity.
-	pub isLinked: Option<bool>,
+	pub is_linked: Option<bool>,
 	/// The long uploads status of this channel. See
-	pub longUploadsStatus: Option<String>,
+	pub long_uploads_status: Option<String>,
 }
 
 impl Part for ChannelStatus {}
@@ -2341,23 +2340,23 @@ impl Part for ChannelStatus {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-	pub nextPageToken: Option<String>,
+	pub next_page_token: Option<String>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#channelListResponse".
 	pub kind: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 	/// A list of channels that match the request criteria.
 	pub items: Vec<Channel>,
 	/// no description provided
-	pub tokenPagination: Option<TokenPagination>,
+	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-	pub prevPageToken: Option<String>,
+	pub prev_page_token: Option<String>,
 	/// no description provided
-	pub pageInfo: Option<PageInfo>,
+	pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for ChannelListResponse {}
@@ -2382,7 +2381,7 @@ pub struct ChannelSection {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The contentDetails object contains details about the channel section content, such as a list of playlists or channels featured in the section.
-	pub contentDetails: Option<ChannelSectionContentDetails>,
+	pub content_details: Option<ChannelSectionContentDetails>,
 	/// The ID that YouTube uses to uniquely identify the channel section.
 	pub id: Option<String>,
 	/// Localizations for different languages
@@ -2406,23 +2405,23 @@ impl ResponseResult for ChannelSection {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-	pub nextPageToken: Option<String>,
+	pub next_page_token: Option<String>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#liveBroadcastListResponse".
 	pub kind: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 	/// A list of broadcasts that match the request criteria.
 	pub items: Vec<LiveBroadcast>,
 	/// no description provided
-	pub tokenPagination: Option<TokenPagination>,
+	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-	pub prevPageToken: Option<String>,
+	pub prev_page_token: Option<String>,
 	/// no description provided
-	pub pageInfo: Option<PageInfo>,
+	pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for LiveBroadcastListResponse {}
@@ -2434,7 +2433,7 @@ impl ResponseResult for LiveBroadcastListResponse {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStreamStatus {
 	/// no description provided
-	pub streamStatus: Option<String>,
+	pub stream_status: Option<String>,
 }
 
 impl Part for LiveStreamStatus {}
@@ -2446,15 +2445,15 @@ impl Part for LiveStreamStatus {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoLiveStreamingDetails {
 	/// The time that the broadcast is scheduled to begin. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub scheduledStartTime: Option<String>,
+	pub scheduled_start_time: Option<String>,
 	/// The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.
-	pub concurrentViewers: Option<String>,
+	pub concurrent_viewers: Option<String>,
 	/// The time that the broadcast actually started. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast begins.
-	pub actualStartTime: Option<String>,
+	pub actual_start_time: Option<String>,
 	/// The time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. If the value is empty or the property is not present, then the broadcast is scheduled to continue indefinitely.
-	pub scheduledEndTime: Option<String>,
+	pub scheduled_end_time: Option<String>,
 	/// The time that the broadcast actually ended. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast is over.
-	pub actualEndTime: Option<String>,
+	pub actual_end_time: Option<String>,
 }
 
 impl Part for VideoLiveStreamingDetails {}
@@ -2466,133 +2465,133 @@ impl Part for VideoLiveStreamingDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ContentRating {
 	/// Internal YouTube rating.
-	pub ytRating: Option<String>,
+	pub yt_rating: Option<String>,
 	/// Rating system for French Canadian TV - Regie du cinema
-	pub catvfrRating: Option<String>,
+	pub catvfr_rating: Option<String>,
 	/// Rating system in India - Central Board of Film Certification
-	pub cbfcRating: Option<String>,
+	pub cbfc_rating: Option<String>,
 	/// Rating system for Thailand - Board of Filmand Video Censors
-	pub bfvcRating: Option<String>,
+	pub bfvc_rating: Option<String>,
 	/// Rating system for Austria - Bundesministeriums f�r Unterricht, Kunst und Kultur!
-	pub bmukkRating: Option<String>,
+	pub bmukk_rating: Option<String>,
 	/// Rating system for Switzerland - Switzerland Rating System
-	pub chfilmRating: Option<String>,
+	pub chfilm_rating: Option<String>,
 	/// Rating system for Taiwan - Ministry of Culture - Tawan
-	pub moctwRating: Option<String>,
+	pub moctw_rating: Option<String>,
 	/// Rating system for Canadian TV - Canadian TV Classification System
-	pub catvRating: Option<String>,
+	pub catv_rating: Option<String>,
 	/// Rating system for Peru - Peru Rating System
-	pub pefilmRating: Option<String>,
+	pub pefilm_rating: Option<String>,
 	/// no description provided
-	pub djctqRatingReasons: Vec<String>,
+	pub djctq_rating_reasons: Vec<String>,
 	/// Rating system for Argentina - Instituto Nacional de Cine y Artes Audiovisuales
-	pub incaaRating: Option<String>,
+	pub incaa_rating: Option<String>,
 	/// Rating system for Israel - Israel Rating System
-	pub ilfilmRating: Option<String>,
+	pub ilfilm_rating: Option<String>,
 	/// Rating system for Luxembourg - Commission de surveillance de la classification des films
-	pub cscfRating: Option<String>,
+	pub cscf_rating: Option<String>,
 	/// Rating system in Germany - Voluntary Self Regulation of the Movie Industry
-	pub fskRating: Option<String>,
+	pub fsk_rating: Option<String>,
 	/// Rating system in South Korea - Korea Media Rating Board
-	pub kmrbRating: Option<String>,
+	pub kmrb_rating: Option<String>,
 	/// Rating system in Brazil - Department of Justice, Rating, Titles and Qualification
-	pub djctqRating: Option<String>,
+	pub djctq_rating: Option<String>,
 	/// Rating system for Indonesia - Lembaga Sensor Film
-	pub lsfRating: Option<String>,
+	pub lsf_rating: Option<String>,
 	/// Rating system for Hong kong - Office for Film, Newspaper and Article Administration
-	pub fcoRating: Option<String>,
+	pub fco_rating: Option<String>,
 	/// Rating system for Norway - Medietilsynet
-	pub medietilsynetRating: Option<String>,
+	pub medietilsynet_rating: Option<String>,
 	/// Rating system for Greece - Greece Rating System
-	pub grfilmRating: Option<String>,
+	pub grfilm_rating: Option<String>,
 	/// Rating system for Chile - Consejo de Calificaci�n Cinematogr�fica
-	pub cccRating: Option<String>,
+	pub ccc_rating: Option<String>,
 	/// Rating system for Ireland - Raidi� Teilif�s �ireann
-	pub rteRating: Option<String>,
+	pub rte_rating: Option<String>,
 	/// Rating system in France - French Minister of Culture
-	pub fmocRating: Option<String>,
+	pub fmoc_rating: Option<String>,
 	/// Rating system for Sweden - Statens medier�d (National Media Council)
-	pub smsaRating: Option<String>,
+	pub smsa_rating: Option<String>,
 	/// Rating system for Portugal - Comiss�o de Classifica��o de Espect�culos
-	pub cceRating: Option<String>,
+	pub cce_rating: Option<String>,
 	/// Rating system for Latvia - National Film Center of Latvia
-	pub nkclvRating: Option<String>,
+	pub nkclv_rating: Option<String>,
 	/// Rating system for South africa - Film & Publication Board
-	pub fpbRating: Option<String>,
+	pub fpb_rating: Option<String>,
 	/// Rating system for Iceland - SMAIS
-	pub smaisRating: Option<String>,
+	pub smais_rating: Option<String>,
 	/// Canadian Home Video Rating System
-	pub chvrsRating: Option<String>,
+	pub chvrs_rating: Option<String>,
 	/// Rating system for Italy - Autorit� per le Garanzie nelle Comunicazioni
-	pub agcomRating: Option<String>,
+	pub agcom_rating: Option<String>,
 	/// Rating system for Colombia - MoC
-	pub mocRating: Option<String>,
+	pub moc_rating: Option<String>,
 	/// Rating system for Hungary - Rating Committee of the National Office of Film
-	pub rcnofRating: Option<String>,
+	pub rcnof_rating: Option<String>,
 	/// Rating system for Malaysia - Film Censorship Board of Malaysia
-	pub fcbmRating: Option<String>,
+	pub fcbm_rating: Option<String>,
 	/// Rating system for Netherlands - Nederlands Instituut voor de Classificatie van Audiovisuele Media
-	pub kijkwijzerRating: Option<String>,
+	pub kijkwijzer_rating: Option<String>,
 	/// Rating system for Singapore - Media Development Authority
-	pub mdaRating: Option<String>,
+	pub mda_rating: Option<String>,
 	/// Rating system for Nigeria - National Film and Video Censors Board
-	pub nfvcbRating: Option<String>,
+	pub nfvcb_rating: Option<String>,
 	/// Rating system for Venezuela - SiBCI
-	pub resorteviolenciaRating: Option<String>,
+	pub resorteviolencia_rating: Option<String>,
 	/// Rating system for France - Conseil sup�rieur de l?audiovisuel
-	pub csaRating: Option<String>,
+	pub csa_rating: Option<String>,
 	/// Rating system in New Zealand - Office of Film and Literature Classification
-	pub oflcRating: Option<String>,
+	pub oflc_rating: Option<String>,
 	/// TV Parental Guidelines rating of the content.
-	pub tvpgRating: Option<String>,
+	pub tvpg_rating: Option<String>,
 	/// Rating system for Bulgaria - National Film Centre
-	pub nfrcRating: Option<String>,
+	pub nfrc_rating: Option<String>,
 	/// Rating system for Malta - Film Age-Classification Board
-	pub mccaaRating: Option<String>,
+	pub mccaa_rating: Option<String>,
 	/// Rating system in Mexico - General Directorate of Radio, Television and Cinematography
-	pub rtcRating: Option<String>,
+	pub rtc_rating: Option<String>,
 	/// Rating system in Italy - Ministero dei Beni e delle Attivita Culturali e del Turismo
-	pub mibacRating: Option<String>,
+	pub mibac_rating: Option<String>,
 	/// British Board of Film Classification
-	pub bbfcRating: Option<String>,
+	pub bbfc_rating: Option<String>,
 	/// Rating system for Egypt - Egypt Rating System
-	pub egfilmRating: Option<String>,
+	pub egfilm_rating: Option<String>,
 	/// Rating system for Belgium - Belgium Rating System
-	pub cicfRating: Option<String>,
+	pub cicf_rating: Option<String>,
 	/// Rating system for Poland - National Broadcasting Council
-	pub nbcplRating: Option<String>,
+	pub nbcpl_rating: Option<String>,
 	/// Rating system for Maldives - National Bureau of Classification
-	pub nbcRating: Option<String>,
+	pub nbc_rating: Option<String>,
 	/// Motion Picture Association of America rating for the content.
-	pub mpaaRating: Option<String>,
+	pub mpaa_rating: Option<String>,
 	/// Rating system in Ireland - Irish Film Classification Office
-	pub ifcoRating: Option<String>,
+	pub ifco_rating: Option<String>,
 	/// Rating system in Australia - Australian Classification Board
-	pub acbRating: Option<String>,
+	pub acb_rating: Option<String>,
 	/// Rating system for Estonia - Estonia Rating System
-	pub eefilmRating: Option<String>,
+	pub eefilm_rating: Option<String>,
 	/// Rating system for Czech republic - Czech republic Rating System
-	pub czfilmRating: Option<String>,
+	pub czfilm_rating: Option<String>,
 	/// Rating system for Kenya - Kenya Film Classification Board
-	pub kfcbRating: Option<String>,
+	pub kfcb_rating: Option<String>,
 	/// Rating system in Russia
-	pub russiaRating: Option<String>,
+	pub russia_rating: Option<String>,
 	/// Rating system for Philippines - MOVIE AND TELEVISION REVIEW AND CLASSIFICATION BOARD
-	pub mtrcbRating: Option<String>,
+	pub mtrcb_rating: Option<String>,
 	/// Rating system for Chile - Asociaci�n Nacional de Televisi�n
-	pub anatelRating: Option<String>,
+	pub anatel_rating: Option<String>,
 	/// Rating system in Japan - Eiga Rinri Kanri Iinkai
-	pub eirinRating: Option<String>,
+	pub eirin_rating: Option<String>,
 	/// Rating system for Romania - CONSILIUL NATIONAL AL AUDIOVIZUALULUI - CNA
-	pub cnaRating: Option<String>,
+	pub cna_rating: Option<String>,
 	/// Rating system in Spain - Instituto de Cinematografia y de las Artes Audiovisuales
-	pub icaaRating: Option<String>,
+	pub icaa_rating: Option<String>,
 	/// Rating system for Denmark - The Media Council for Children and Young People
-	pub mccypRating: Option<String>,
+	pub mccyp_rating: Option<String>,
 	/// Rating system for Slovakia - Slovakia Rating System
-	pub skfilmRating: Option<String>,
+	pub skfilm_rating: Option<String>,
 	/// Rating system for Finland - Finnish Centre for Media Education and Audiovisual Media
-	pub mekuRating: Option<String>,
+	pub meku_rating: Option<String>,
 }
 
 impl Part for ContentRating {}
@@ -2610,23 +2609,23 @@ impl Part for ContentRating {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityListResponse {
 	/// Serialized EventId of the request which produced this response.
-	pub eventId: Option<String>,
+	pub event_id: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
-	pub nextPageToken: Option<String>,
+	pub next_page_token: Option<String>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#activityListResponse".
 	pub kind: Option<String>,
 	/// The visitorId identifies the visitor.
-	pub visitorId: Option<String>,
+	pub visitor_id: Option<String>,
 	/// A list of activities, or events, that match the request criteria.
 	pub items: Vec<Activity>,
 	/// no description provided
-	pub tokenPagination: Option<TokenPagination>,
+	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
-	pub prevPageToken: Option<String>,
+	pub prev_page_token: Option<String>,
 	/// no description provided
-	pub pageInfo: Option<PageInfo>,
+	pub page_info: Option<PageInfo>,
 }
 
 impl ResponseResult for ActivityListResponse {}
@@ -2646,7 +2645,7 @@ pub struct Activity {
 	/// The snippet object contains basic details about the activity, including the activity's type and group ID.
 	pub snippet: Option<ActivitySnippet>,
 	/// The contentDetails object contains information about the content associated with the activity. For example, if the snippet.type value is videoRated, then the contentDetails object's content identifies the rated video.
-	pub contentDetails: Option<ActivityContentDetails>,
+	pub content_details: Option<ActivityContentDetails>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#activity".
 	pub kind: Option<String>,
 	/// Etag of this resource.
@@ -2665,7 +2664,7 @@ impl ResponseResult for Activity {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SubscriptionSubscriberSnippet {
 	/// The channel ID of the subscriber.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The description of the subscriber.
 	pub description: Option<String>,
 	/// Thumbnails for this subscriber.
@@ -2683,49 +2682,49 @@ impl Part for SubscriptionSubscriberSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ImageSettings {
 	/// Banner image. TV size medium resolution (1280x720).
-	pub bannerTvMediumImageUrl: Option<String>,
+	pub banner_tv_medium_image_url: Option<String>,
 	/// Banner image. Tablet size low resolution (1138x188).
-	pub bannerTabletLowImageUrl: Option<String>,
+	pub banner_tablet_low_image_url: Option<String>,
 	/// The image map script for the large banner image.
-	pub largeBrandedBannerImageImapScript: Option<LocalizedProperty>,
+	pub large_branded_banner_image_imap_script: Option<LocalizedProperty>,
 	/// Banner image. Mobile size (640x175).
-	pub bannerMobileImageUrl: Option<String>,
+	pub banner_mobile_image_url: Option<String>,
 	/// The URL for the 640px by 70px banner image that appears below the video player in the default view of the video watch page.
-	pub smallBrandedBannerImageUrl: Option<LocalizedProperty>,
+	pub small_branded_banner_image_url: Option<LocalizedProperty>,
 	/// Banner image. Tablet size high resolution (2276x377).
-	pub bannerTabletHdImageUrl: Option<String>,
+	pub banner_tablet_hd_image_url: Option<String>,
 	/// Banner image. TV size high resolution (1920x1080).
-	pub bannerTvHighImageUrl: Option<String>,
+	pub banner_tv_high_image_url: Option<String>,
 	/// Banner image. Mobile size medium/high resolution (960x263).
-	pub bannerMobileMediumHdImageUrl: Option<String>,
+	pub banner_mobile_medium_hd_image_url: Option<String>,
 	/// The URL for a 1px by 1px tracking pixel that can be used to collect statistics for views of the channel or video pages.
-	pub trackingImageUrl: Option<String>,
+	pub tracking_image_url: Option<String>,
 	/// Banner image. Mobile size high resolution (1440x395).
-	pub bannerMobileExtraHdImageUrl: Option<String>,
+	pub banner_mobile_extra_hd_image_url: Option<String>,
 	/// Banner image. Tablet size (1707x283).
-	pub bannerTabletImageUrl: Option<String>,
+	pub banner_tablet_image_url: Option<String>,
 	/// Banner image. Mobile size low resolution (320x88).
-	pub bannerMobileLowImageUrl: Option<String>,
+	pub banner_mobile_low_image_url: Option<String>,
 	/// Banner image. TV size extra high resolution (2120x1192).
-	pub bannerTvImageUrl: Option<String>,
+	pub banner_tv_image_url: Option<String>,
 	/// Banner image. TV size low resolution (854x480).
-	pub bannerTvLowImageUrl: Option<String>,
+	pub banner_tv_low_image_url: Option<String>,
 	/// Banner image. Tablet size extra high resolution (2560x424).
-	pub bannerTabletExtraHdImageUrl: Option<String>,
+	pub banner_tablet_extra_hd_image_url: Option<String>,
 	/// The URL for the 854px by 70px image that appears below the video player in the expanded video view of the video watch page.
-	pub largeBrandedBannerImageUrl: Option<LocalizedProperty>,
+	pub large_branded_banner_image_url: Option<LocalizedProperty>,
 	/// Banner image. Desktop size (1060x175).
-	pub bannerImageUrl: Option<String>,
+	pub banner_image_url: Option<String>,
 	/// The URL for the background image shown on the video watch page. The image should be 1200px by 615px, with a maximum file size of 128k.
-	pub backgroundImageUrl: Option<LocalizedProperty>,
+	pub background_image_url: Option<LocalizedProperty>,
 	/// The image map script for the small banner image.
-	pub smallBrandedBannerImageImapScript: Option<LocalizedProperty>,
+	pub small_branded_banner_image_imap_script: Option<LocalizedProperty>,
 	/// Banner image. Mobile size high resolution (1280x360).
-	pub bannerMobileHdImageUrl: Option<String>,
+	pub banner_mobile_hd_image_url: Option<String>,
 	/// This is used only in update requests; if it's set, we use this URL to generate all of the above banner URLs.
-	pub bannerExternalUrl: Option<String>,
+	pub banner_external_url: Option<String>,
 	/// The URL for the image that appears above the top-left corner of the video player. This is a 25-pixel-high image with a flexible width that cannot exceed 170 pixels.
-	pub watchIconImageUrl: Option<String>,
+	pub watch_icon_image_url: Option<String>,
 }
 
 impl Part for ImageSettings {}
@@ -2737,25 +2736,25 @@ impl Part for ImageSettings {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsPromotedItem {
 	/// The type of call-to-action, a message to the user indicating action that can be taken.
-	pub ctaType: Option<String>,
+	pub cta_type: Option<String>,
 	/// The URL the client should fetch to request a promoted item.
-	pub adTag: Option<String>,
+	pub ad_tag: Option<String>,
 	/// The URL the client should direct the user to, if the user chooses to visit the advertiser's website.
-	pub destinationUrl: Option<String>,
+	pub destination_url: Option<String>,
 	/// The list of forecasting URLs. The client should ping all of these URLs when a promoted item is not available, to indicate that a promoted item could have been shown.
-	pub forecastingUrl: Vec<String>,
+	pub forecasting_url: Vec<String>,
 	/// The list of impression URLs. The client should ping all of these URLs to indicate that the user was shown this promoted item.
-	pub impressionUrl: Vec<String>,
+	pub impression_url: Vec<String>,
 	/// The URL the client should ping to indicate that the user was shown this promoted item.
-	pub creativeViewUrl: Option<String>,
+	pub creative_view_url: Option<String>,
 	/// The ID that YouTube uses to uniquely identify the promoted video.
-	pub videoId: Option<String>,
+	pub video_id: Option<String>,
 	/// The text description to accompany the promoted item.
-	pub descriptionText: Option<String>,
+	pub description_text: Option<String>,
 	/// The custom call-to-action button text. If specified, it will override the default button text for the cta_type.
-	pub customCtaButtonText: Option<String>,
+	pub custom_cta_button_text: Option<String>,
 	/// The URL the client should ping to indicate that the user clicked through on this promoted item.
-	pub clickTrackingUrl: Option<String>,
+	pub click_tracking_url: Option<String>,
 }
 
 impl Part for ActivityContentDetailsPromotedItem {}
@@ -2781,7 +2780,7 @@ impl Part for AccessPolicy {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsBulletin {
 	/// The resourceId object contains information that identifies the resource associated with a bulletin post.
-	pub resourceId: Option<ResourceId>,
+	pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsBulletin {}
@@ -2825,13 +2824,13 @@ impl Part for LocalizedString {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetailsAudioStream {
 	/// The audio stream's bitrate, in bits per second.
-	pub bitrateBps: Option<String>,
+	pub bitrate_bps: Option<String>,
 	/// The audio codec that the stream uses.
 	pub codec: Option<String>,
 	/// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.
 	pub vendor: Option<String>,
 	/// The number of audio channels that the stream contains.
-	pub channelCount: Option<u32>,
+	pub channel_count: Option<u32>,
 }
 
 impl Part for VideoFileDetailsAudioStream {}
@@ -2843,9 +2842,9 @@ impl Part for VideoFileDetailsAudioStream {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoTopicDetails {
 	/// A list of Freebase topic IDs that are centrally associated with the video. These are topics that are centrally featured in the video, and it can be said that the video is mainly about each of these. You can retrieve information about each topic using the Freebase Topic API.
-	pub topicIds: Vec<String>,
+	pub topic_ids: Vec<String>,
 	/// Similar to topic_id, except that these topics are merely relevant to the video. These are topics that may be mentioned in, or appear in the video. You can retrieve information about each topic using Freebase Topic API.
-	pub relevantTopicIds: Vec<String>,
+	pub relevant_topic_ids: Vec<String>,
 }
 
 impl Part for VideoTopicDetails {}
@@ -2857,15 +2856,15 @@ impl Part for VideoTopicDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct IngestionInfo {
 	/// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.
-	pub backupIngestionAddress: Option<String>,
+	pub backup_ingestion_address: Option<String>,
 	/// The HTTP or RTMP stream name that YouTube assigns to the video stream.
-	pub streamName: Option<String>,
+	pub stream_name: Option<String>,
 	/// The primary ingestion URL that you should use to stream video to YouTube. You must stream video to this URL.
 /// 
 /// Depending on which application or tool you use to encode your video stream, you may need to enter the stream URL and stream name separately or you may need to concatenate them in the following format:
 /// 
 /// STREAM_URL/STREAM_NAME
-	pub ingestionAddress: Option<String>,
+	pub ingestion_address: Option<String>,
 }
 
 impl Part for IngestionInfo {}
@@ -2879,7 +2878,7 @@ pub struct VideoConversionPing {
 	/// Defines the context of the ping.
 	pub context: Option<String>,
 	/// The url (without the schema) that the app shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D like%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA%3Bytvid%3DUrIaJUvIQDg&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.
-	pub conversionUrl: Option<String>,
+	pub conversion_url: Option<String>,
 }
 
 impl Part for VideoConversionPing {}
@@ -2909,19 +2908,19 @@ impl Part for VideoCategory {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItemSnippet {
 	/// The ID that YouTube uses to uniquely identify the user that added the item to the playlist.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The item's description.
 	pub description: Option<String>,
 	/// The item's title.
 	pub title: Option<String>,
 	/// The id object contains information that can be used to uniquely identify the resource that is included in the playlist as the playlist item.
-	pub resourceId: Option<ResourceId>,
+	pub resource_id: Option<ResourceId>,
 	/// The ID that YouTube uses to uniquely identify the playlist that the playlist item is in.
-	pub playlistId: Option<String>,
+	pub playlist_id: Option<String>,
 	/// The date and time that the item was added to the playlist. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub publishedAt: Option<String>,
+	pub published_at: Option<String>,
 	/// Channel title for the channel that the playlist item belongs to.
-	pub channelTitle: Option<String>,
+	pub channel_title: Option<String>,
 	/// The order in which the item appears in the playlist. The value uses a zero-based index, so the first item has a position of 0, the second item has a position of 1, and so forth.
 	pub position: Option<u32>,
 	/// A map of thumbnail images associated with the playlist item. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
@@ -2937,7 +2936,7 @@ impl Part for PlaylistItemSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivityContentDetailsFavorite {
 	/// The resourceId object contains information that identifies the resource that was marked as a favorite.
-	pub resourceId: Option<ResourceId>,
+	pub resource_id: Option<ResourceId>,
 }
 
 impl Part for ActivityContentDetailsFavorite {}
@@ -2949,7 +2948,7 @@ impl Part for ActivityContentDetailsFavorite {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistPlayer {
 	/// An <iframe> tag that embeds a player that will play the playlist.
-	pub embedHtml: Option<String>,
+	pub embed_html: Option<String>,
 }
 
 impl Part for PlaylistPlayer {}
@@ -2961,7 +2960,7 @@ impl Part for PlaylistPlayer {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoSuggestionsTagSuggestion {
 	/// A set of video categories for which the tag is relevant. You can use this information to display appropriate tag suggestions based on the video category that the video uploader associates with the video. By default, tag suggestions are relevant for all categories if there are no restricts defined for the keyword.
-	pub categoryRestricts: Vec<String>,
+	pub category_restricts: Vec<String>,
 	/// The keyword tag suggested for the video.
 	pub tag: Option<String>,
 }
@@ -2975,15 +2974,15 @@ impl Part for VideoSuggestionsTagSuggestion {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoSuggestions {
 	/// A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video's current processing status, eventually, that status will almost certainly be failed.
-	pub processingErrors: Vec<String>,
+	pub processing_errors: Vec<String>,
 	/// A list of keyword tags that could be added to the video's metadata to increase the likelihood that users will locate your video when searching or browsing on YouTube.
-	pub tagSuggestions: Vec<VideoSuggestionsTagSuggestion>,
+	pub tag_suggestions: Vec<VideoSuggestionsTagSuggestion>,
 	/// A list of video editing operations that might improve the video quality or playback experience of the uploaded video.
-	pub editorSuggestions: Vec<String>,
+	pub editor_suggestions: Vec<String>,
 	/// A list of reasons why YouTube may have difficulty transcoding the uploaded video or that might result in an erroneous transcoding. These warnings are generated before YouTube actually processes the uploaded video file. In addition, they identify issues that are unlikely to cause the video processing to fail but that might cause problems such as sync issues, video artifacts, or a missing audio track.
-	pub processingWarnings: Vec<String>,
+	pub processing_warnings: Vec<String>,
 	/// A list of suggestions that may improve YouTube's ability to process the video.
-	pub processingHints: Vec<String>,
+	pub processing_hints: Vec<String>,
 }
 
 impl Part for VideoSuggestions {}
@@ -2995,7 +2994,7 @@ impl Part for VideoSuggestions {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SearchResultSnippet {
 	/// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.
-	pub liveBroadcastContent: Option<String>,
+	pub live_broadcast_content: Option<String>,
 	/// A map of thumbnail images associated with the search result. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
 	pub thumbnails: Option<ThumbnailDetails>,
 	/// The title of the search result.
@@ -3003,11 +3002,11 @@ pub struct SearchResultSnippet {
 	/// A description of the search result.
 	pub description: Option<String>,
 	/// The value that YouTube uses to uniquely identify the channel that published the resource that the search result identifies.
-	pub channelId: Option<String>,
+	pub channel_id: Option<String>,
 	/// The creation date and time of the resource that the search result identifies. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
-	pub publishedAt: Option<String>,
+	pub published_at: Option<String>,
 	/// The title of the channel that published the resource that the search result identifies.
-	pub channelTitle: Option<String>,
+	pub channel_title: Option<String>,
 }
 
 impl Part for SearchResultSnippet {}
@@ -3042,7 +3041,7 @@ impl ResponseResult for ChannelBannerResource {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistContentDetails {
 	/// The number of videos in the playlist.
-	pub itemCount: Option<u32>,
+	pub item_count: Option<u32>,
 }
 
 impl Part for PlaylistContentDetails {}
@@ -3054,9 +3053,9 @@ impl Part for PlaylistContentDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PageInfo {
 	/// The number of results included in the API response.
-	pub resultsPerPage: Option<i32>,
+	pub results_per_page: Option<i32>,
 	/// The total number of results in the result set.
-	pub totalResults: Option<i32>,
+	pub total_results: Option<i32>,
 }
 
 impl Part for PageInfo {}
@@ -3074,13 +3073,13 @@ pub struct ChannelContentDetailsRelatedplaylists {
 	/// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.
 	pub uploads: Option<String>,
 	/// The ID of the playlist that contains the channel"s watch history. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
-	pub watchHistory: Option<String>,
+	pub watch_history: Option<String>,
 	/// The ID of the playlist that contains the channel"s liked videos. Use the   playlistItems.insert and  playlistItems.delete to add or remove items from that list.
 	pub likes: Option<String>,
 	/// The ID of the playlist that contains the channel"s favorite videos. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
 	pub favorites: Option<String>,
 	/// The ID of the playlist that contains the channel"s watch later playlist. Use the playlistItems.insert and  playlistItems.delete to add or remove items from that list.
-	pub watchLater: Option<String>,
+	pub watch_later: Option<String>,
 }
 
 impl NestedType for ChannelContentDetailsRelatedplaylists {}
@@ -3117,7 +3116,7 @@ impl Part for ChannelContentDetailsRelatedplaylists {}
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
 /// // to build up your call.
-/// let rb = hub.i18nLanguages();
+/// let rb = hub.i18n_languages();
 /// # }
 /// ```
 pub struct I18nLanguageMethodsBuilder<'a, C, NC, A>
@@ -3158,7 +3157,7 @@ impl<'a, C, NC, A> ResourceMethodsBuilder for I18nLanguageMethodsBuilder<'a, C, 
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `insert(...)`
 /// // to build up your call.
-/// let rb = hub.channelBanners();
+/// let rb = hub.channel_banners();
 /// # }
 /// ```
 pub struct ChannelBannerMethodsBuilder<'a, C, NC, A>
@@ -3199,7 +3198,7 @@ impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelBannerMethodsBuilder<'a, C,
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.channelSections();
+/// let rb = hub.channel_sections();
 /// # }
 /// ```
 pub struct ChannelSectionMethodsBuilder<'a, C, NC, A>
@@ -3240,7 +3239,7 @@ impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelSectionMethodsBuilder<'a, C
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
 /// // to build up your call.
-/// let rb = hub.guideCategories();
+/// let rb = hub.guide_categories();
 /// # }
 /// ```
 pub struct GuideCategoryMethodsBuilder<'a, C, NC, A>
@@ -3486,7 +3485,7 @@ impl<'a, C, NC, A> ResourceMethodsBuilder for SearchMethodsBuilder<'a, C, NC, A>
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
 /// // to build up your call.
-/// let rb = hub.i18nRegions();
+/// let rb = hub.i18n_regions();
 /// # }
 /// ```
 pub struct I18nRegionMethodsBuilder<'a, C, NC, A>
@@ -3527,7 +3526,7 @@ impl<'a, C, NC, A> ResourceMethodsBuilder for I18nRegionMethodsBuilder<'a, C, NC
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.liveStreams();
+/// let rb = hub.live_streams();
 /// # }
 /// ```
 pub struct LiveStreamMethodsBuilder<'a, C, NC, A>
@@ -3609,7 +3608,7 @@ impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelMethodsBuilder<'a, C, NC, A
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.playlistItems();
+/// let rb = hub.playlist_items();
 /// # }
 /// ```
 pub struct PlaylistItemMethodsBuilder<'a, C, NC, A>
@@ -3691,7 +3690,7 @@ impl<'a, C, NC, A> ResourceMethodsBuilder for WatermarkMethodsBuilder<'a, C, NC,
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `bind(...)`, `control(...)`, `delete(...)`, `insert(...)`, `list(...)`, `transition(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.liveBroadcasts();
+/// let rb = hub.live_broadcasts();
 /// # }
 /// ```
 pub struct LiveBroadcastMethodsBuilder<'a, C, NC, A>
@@ -3732,7 +3731,7 @@ impl<'a, C, NC, A> ResourceMethodsBuilder for LiveBroadcastMethodsBuilder<'a, C,
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
 /// // to build up your call.
-/// let rb = hub.videoCategories();
+/// let rb = hub.video_categories();
 /// # }
 /// ```
 pub struct VideoCategoryMethodsBuilder<'a, C, NC, A>
@@ -3794,6 +3793,8 @@ impl<'a, C, NC, A> ResourceMethodsBuilder for ActivityMethodsBuilder<'a, C, NC, 
 // CallBuilders   ###
 // #################
 
+/// Returns a list of supported languages.
+///
 /// A builder for the *list* method supported by a *i18nLanguage* resource.
 /// It is not used directly, but through a `I18nLanguageMethodsBuilder`.
 ///
@@ -3832,12 +3833,49 @@ pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nLanguageListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a list of supported languages.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
+	pub fn part(&mut self, new_value: &str) -> &mut I18nLanguageListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *hl* query property to the given value.
+	/// 
+    /// The hl parameter specifies the language that should be used for text values in the API response.    
+	pub fn hl(&mut self, new_value: &str) -> &mut I18nLanguageListMethodBuilder<'a, C, NC, A> {
+		self._hl = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Uploads a channel banner image to YouTube. This method represents the first two steps in a three-step process to update the banner image for a channel:
+/// 
+/// - Call the channelBanners.insert method to upload the binary image data to YouTube. The image must have a 16:9 aspect ratio and be at least 2120x1192 pixels.
+/// - Extract the url property's value from the response that the API returns for step 1.
+/// - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2.
+///
 /// A builder for the *insert* method supported by a *channelBanner* resource.
 /// It is not used directly, but through a `ChannelBannerMethodsBuilder`.
 ///
@@ -3876,12 +3914,40 @@ pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelBannerInsertMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 
+	/// Uploads a channel banner image to YouTube. This method represents the first two steps in a three-step process to update the banner image for a channel:
+    /// 
+    /// - Call the channelBanners.insert method to upload the binary image data to YouTube. The image must have a 16:9 aspect ratio and be at least 2120x1192 pixels.
+    /// - Extract the url property's value from the response that the API returns for step 1.
+    /// - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2.
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns channelSection resources that match the API request criteria.
+///
 /// A builder for the *list* method supported by a *channelSection* resource.
 /// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
 ///
@@ -3920,12 +3986,76 @@ pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _mine: Option<bool>,
+    _id: Option<String>,
+    _channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns channelSection resources that match the API request criteria.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set part=snippet, the API response will also contain all of those nested properties.
+	pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *mine* query property to the given value.
+	/// 
+    /// Set this parameter's value to true to retrieve a feed of the authenticated user's channelSections.    
+	pub fn mine(&mut self, new_value: &bool) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// 
+    /// The id parameter specifies a comma-separated list of the YouTube channelSection ID(s) for the resource(s) that are being retrieved. In a channelSection resource, the id property specifies the YouTube channelSection ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *channel id* query property to the given value.
+	/// 
+    /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's channelSections.    
+	pub fn channel_id(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
+		self._channel_id = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Adds a channelSection for the authenticated user's channel.
+///
 /// A builder for the *insert* method supported by a *channelSection* resource.
 /// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
 ///
@@ -3964,12 +4094,62 @@ pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionInsertMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 
+	/// Adds a channelSection for the authenticated user's channel.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and contentDetails.
+	pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Deletes a channelSection.
+///
 /// A builder for the *delete* method supported by a *channelSection* resource.
 /// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
 ///
@@ -4008,12 +4188,47 @@ pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _id: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 
+	/// Deletes a channelSection.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Update a channelSection.
+///
 /// A builder for the *update* method supported by a *channelSection* resource.
 /// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
 ///
@@ -4052,12 +4267,49 @@ pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 
+	/// Update a channelSection.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and contentDetails.
+	pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns a list of categories that can be associated with YouTube channels.
+///
 /// A builder for the *list* method supported by a *guideCategory* resource.
 /// It is not used directly, but through a `GuideCategoryMethodsBuilder`.
 ///
@@ -4096,12 +4348,65 @@ pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _region_code: Option<String>,
+    _id: Option<String>,
+    _hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for GuideCategoryListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a list of categories that can be associated with YouTube channels.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more guideCategory resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a guideCategory resource, the snippet property contains other properties, such as the category's title. If you set part=snippet, the API response will also contain all of those nested properties.
+	pub fn part(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *region code* query property to the given value.
+	/// 
+    /// The regionCode parameter instructs the API to return the list of guide categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
+	pub fn region_code(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
+		self._region_code = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// 
+    /// The id parameter specifies a comma-separated list of the YouTube channel category ID(s) for the resource(s) that are being retrieved. In a guideCategory resource, the id property specifies the YouTube channel category ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *hl* query property to the given value.
+	/// 
+    /// The hl parameter specifies the language that will be used for text values in the API response.    
+	pub fn hl(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
+		self._hl = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Creates a playlist.
+///
 /// A builder for the *insert* method supported by a *playlist* resource.
 /// It is not used directly, but through a `PlaylistMethodsBuilder`.
 ///
@@ -4140,12 +4445,62 @@ pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistInsertMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 
+	/// Creates a playlist.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and status.
+	pub fn part(&mut self, new_value: &str) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.
+///
 /// A builder for the *list* method supported by a *playlist* resource.
 /// It is not used directly, but through a `PlaylistMethodsBuilder`.
 ///
@@ -4184,12 +4539,107 @@ pub struct PlaylistListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
+    _channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, status, and contentDetails.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set part=snippet, the API response will contain all of those properties.
+	pub fn part(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *page token* query property to the given value.
+	/// 
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+	pub fn page_token(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+		self._page_token = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *mine* query property to the given value.
+	/// 
+    /// Set this parameter's value to true to instruct the API to only return playlists owned by the authenticated user.    
+	pub fn mine(&mut self, new_value: &bool) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *max results* query property to the given value.
+	/// 
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+	pub fn max_results(&mut self, new_value: &u32) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// 
+    /// The id parameter specifies a comma-separated list of the YouTube playlist ID(s) for the resource(s) that are being retrieved. In a playlist resource, the id property specifies the playlist's YouTube playlist ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *channel id* query property to the given value.
+	/// 
+    /// This value indicates that the API should only return the specified channel's playlists.    
+	pub fn channel_id(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+		self._channel_id = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Deletes a playlist.
+///
 /// A builder for the *delete* method supported by a *playlist* resource.
 /// It is not used directly, but through a `PlaylistMethodsBuilder`.
 ///
@@ -4228,12 +4678,47 @@ pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _id: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistDeleteMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 
+	/// Deletes a playlist.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut PlaylistDeleteMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistDeleteMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.
+///
 /// A builder for the *update* method supported by a *playlist* resource.
 /// It is not used directly, but through a `PlaylistMethodsBuilder`.
 ///
@@ -4272,12 +4757,51 @@ pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistUpdateMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 
+	/// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and status.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist's privacy setting is contained in the status part. As such, if your request is updating a private playlist, and the request's part parameter value includes the status part, the playlist's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the playlist will revert to the default privacy setting.
+	pub fn part(&mut self, new_value: &str) -> &mut PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Uploads a custom video thumbnail to YouTube and sets it for a video.
+///
 /// A builder for the *set* method supported by a *thumbnail* resource.
 /// It is not used directly, but through a `ThumbnailMethodsBuilder`.
 ///
@@ -4316,12 +4840,45 @@ pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _video_id: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ThumbnailSetMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 
+	/// Uploads a custom video thumbnail to YouTube and sets it for a video.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *video id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided.    
+	pub fn video_id(&mut self, new_value: &str) -> &mut ThumbnailSetMethodBuilder<'a, C, NC, A> {
+		self._video_id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ThumbnailSetMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns a list of videos that match the API request parameters.
+///
 /// A builder for the *list* method supported by a *video* resource.
 /// It is not used directly, but through a `VideoMethodsBuilder`.
 ///
@@ -4360,12 +4917,134 @@ pub struct VideoListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _video_category_id: Option<String>,
+    _region_code: Option<String>,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _my_rating: Option<String>,
+    _max_results: Option<u32>,
+    _locale: Option<String>,
+    _id: Option<String>,
+    _hl: Option<String>,
+    _chart: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a list of videos that match the API request parameters.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set part=snippet, the API response will contain all of those properties.
+	pub fn part(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *video category id* query property to the given value.
+	/// 
+    /// The videoCategoryId parameter identifies the video category for which the chart should be retrieved. This parameter can only be used in conjunction with the chart parameter. By default, charts are not restricted to a particular category.    
+	pub fn video_category_id(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._video_category_id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *region code* query property to the given value.
+	/// 
+    /// The regionCode parameter instructs the API to select a video chart available in the specified region. This parameter can only be used in conjunction with the chart parameter. The parameter value is an ISO 3166-1 alpha-2 country code.    
+	pub fn region_code(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._region_code = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *page token* query property to the given value.
+	/// 
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
+    /// 
+    /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
+	pub fn page_token(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._page_token = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *my rating* query property to the given value.
+	/// 
+    /// Set this parameter's value to like or dislike to instruct the API to only return videos liked or disliked by the authenticated user.    
+	pub fn my_rating(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._my_rating = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *max results* query property to the given value.
+	/// 
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
+    /// 
+    /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
+	pub fn max_results(&mut self, new_value: &u32) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *locale* query property to the given value.
+	/// 
+    /// DEPRECATED    
+	pub fn locale(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._locale = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// 
+    /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) that are being retrieved. In a video resource, the id property specifies the video's ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *hl* query property to the given value.
+	/// 
+    /// The hl parameter instructs the API to return a localized version of the video details. If localized text is nor available for the requested language, the localizations object in the API response will contain the requested information in the default language instead. The parameter value is a BCP-47 language code. Your application can determine whether the requested localization was returned by checking the value of the snippet.localized.language property in the API response.    
+	pub fn hl(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._hl = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *chart* query property to the given value.
+	/// 
+    /// The chart parameter identifies the chart that you want to retrieve.    
+	pub fn chart(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._chart = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Add a like or dislike rating to a video or remove a rating from a video.
+///
 /// A builder for the *rate* method supported by a *video* resource.
 /// It is not used directly, but through a `VideoMethodsBuilder`.
 ///
@@ -4404,12 +5083,58 @@ pub struct VideoRateMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _id: Option<String>,
+    _rating: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoRateMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 
+	/// Add a like or dislike rating to a video or remove a rating from a video.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed.    
+	pub fn id(&mut self, new_value: &str) -> &mut VideoRateMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *rating* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// Specifies the rating to record.    
+	pub fn rating(&mut self, new_value: &str) -> &mut VideoRateMethodBuilder<'a, C, NC, A> {
+		self._rating = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoRateMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Retrieves the ratings that the authorized user gave to a list of specified videos.
+///
 /// A builder for the *getRating* method supported by a *video* resource.
 /// It is not used directly, but through a `VideoMethodsBuilder`.
 ///
@@ -4448,12 +5173,47 @@ pub struct VideoGetratingMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _id: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoGetratingMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 
+	/// Retrieves the ratings that the authorized user gave to a list of specified videos.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut VideoGetratingMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoGetratingMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Deletes a YouTube video.
+///
 /// A builder for the *delete* method supported by a *video* resource.
 /// It is not used directly, but through a `VideoMethodsBuilder`.
 ///
@@ -4492,12 +5252,47 @@ pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _id: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoDeleteMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 
+	/// Deletes a YouTube video.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut VideoDeleteMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoDeleteMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Updates a video's metadata.
+///
 /// A builder for the *update* method supported by a *video* resource.
 /// It is not used directly, but through a `VideoMethodsBuilder`.
 ///
@@ -4536,12 +5331,53 @@ pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoUpdateMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 
+	/// Updates a video's metadata.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a video's privacy setting is contained in the status part. As such, if your request is updating a private video, and the request's part parameter value includes the status part, the video's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the video will revert to the default privacy setting.
+    /// 
+    /// In addition, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
+	pub fn part(&mut self, new_value: &str) -> &mut VideoUpdateMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoUpdateMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Uploads a video to YouTube and optionally sets the video's metadata.
+///
 /// A builder for the *insert* method supported by a *video* resource.
 /// It is not used directly, but through a `VideoMethodsBuilder`.
 ///
@@ -4580,12 +5416,89 @@ pub struct VideoInsertMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _stabilize: Option<bool>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _notify_subscribers: Option<bool>,
+    _auto_levels: Option<bool>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoInsertMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 
+	/// Uploads a video to YouTube and optionally sets the video's metadata.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails. However, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
+	pub fn part(&mut self, new_value: &str) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *stabilize* query property to the given value.
+	/// 
+    /// The stabilize parameter indicates whether YouTube should adjust the video to remove shaky camera motions.    
+	pub fn stabilize(&mut self, new_value: &bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+		self._stabilize = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *notify subscribers* query property to the given value.
+	/// 
+    /// The notifySubscribers parameter indicates whether YouTube should send notification to subscribers about the inserted video.    
+	pub fn notify_subscribers(&mut self, new_value: &bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+		self._notify_subscribers = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *auto levels* query property to the given value.
+	/// 
+    /// The autoLevels parameter indicates whether YouTube should automatically enhance the video's lighting and color.    
+	pub fn auto_levels(&mut self, new_value: &bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+		self._auto_levels = Some(new_value.clone());
+		return self;
+	}
+
+}
+
+
+/// Adds a subscription for the authenticated user's channel.
+///
 /// A builder for the *insert* method supported by a *subscription* resource.
 /// It is not used directly, but through a `SubscriptionMethodsBuilder`.
 ///
@@ -4624,12 +5537,38 @@ pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionInsertMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 
+	/// Adds a subscription for the authenticated user's channel.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and contentDetails.
+	pub fn part(&mut self, new_value: &str) -> &mut SubscriptionInsertMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns subscription resources that match the API request criteria.
+///
 /// A builder for the *list* method supported by a *subscription* resource.
 /// It is not used directly, but through a `SubscriptionMethodsBuilder`.
 ///
@@ -4668,12 +5607,134 @@ pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _page_token: Option<String>,
+    _order: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _my_subscribers: Option<bool>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
+    _for_channel_id: Option<String>,
+    _channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns subscription resources that match the API request criteria.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set part=snippet, the API response will also contain all of those nested properties.
+	pub fn part(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *page token* query property to the given value.
+	/// 
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+	pub fn page_token(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._page_token = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *order* query property to the given value.
+	/// 
+    /// The order parameter specifies the method that will be used to sort resources in the API response.    
+	pub fn order(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._order = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *my subscribers* query property to the given value.
+	/// 
+    /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user.    
+	pub fn my_subscribers(&mut self, new_value: &bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._my_subscribers = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *mine* query property to the given value.
+	/// 
+    /// Set this parameter's value to true to retrieve a feed of the authenticated user's subscriptions.    
+	pub fn mine(&mut self, new_value: &bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *max results* query property to the given value.
+	/// 
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+	pub fn max_results(&mut self, new_value: &u32) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// 
+    /// The id parameter specifies a comma-separated list of the YouTube subscription ID(s) for the resource(s) that are being retrieved. In a subscription resource, the id property specifies the YouTube subscription ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *for channel id* query property to the given value.
+	/// 
+    /// The forChannelId parameter specifies a comma-separated list of channel IDs. The API response will then only contain subscriptions matching those channels.    
+	pub fn for_channel_id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._for_channel_id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *channel id* query property to the given value.
+	/// 
+    /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's subscriptions.    
+	pub fn channel_id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._channel_id = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Deletes a subscription.
+///
 /// A builder for the *delete* method supported by a *subscription* resource.
 /// It is not used directly, but through a `SubscriptionMethodsBuilder`.
 ///
@@ -4712,12 +5773,36 @@ pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionDeleteMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 
+	/// Deletes a subscription.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.
+///
 /// A builder for the *list* method supported by a *search* resource.
 /// It is not used directly, but through a `SearchMethodsBuilder`.
 ///
@@ -4756,12 +5841,303 @@ pub struct SearchListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _video_type: Option<String>,
+    _video_syndicated: Option<String>,
+    _video_license: Option<String>,
+    _video_embeddable: Option<String>,
+    _video_duration: Option<String>,
+    _video_dimension: Option<String>,
+    _video_definition: Option<String>,
+    _video_category_id: Option<String>,
+    _video_caption: Option<String>,
+    _type_: Option<String>,
+    _topic_id: Option<String>,
+    _safe_search: Option<String>,
+    _relevance_language: Option<String>,
+    _related_to_video_id: Option<String>,
+    _region_code: Option<String>,
+    _q: Option<String>,
+    _published_before: Option<String>,
+    _published_after: Option<String>,
+    _page_token: Option<String>,
+    _order: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _max_results: Option<u32>,
+    _location_radius: Option<String>,
+    _location: Option<String>,
+    _for_mine: Option<bool>,
+    _for_content_owner: Option<bool>,
+    _event_type: Option<String>,
+    _channel_type: Option<String>,
+    _channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SearchListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a search result, the snippet property contains other properties that identify the result's title, description, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
+	pub fn part(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *video type* query property to the given value.
+	/// 
+    /// The videoType parameter lets you restrict a search to a particular type of videos.    
+	pub fn video_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._video_type = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *video syndicated* query property to the given value.
+	/// 
+    /// The videoSyndicated parameter lets you to restrict a search to only videos that can be played outside youtube.com.    
+	pub fn video_syndicated(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._video_syndicated = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *video license* query property to the given value.
+	/// 
+    /// The videoLicense parameter filters search results to only include videos with a particular license. YouTube lets video uploaders choose to attach either the Creative Commons license or the standard YouTube license to each of their videos.    
+	pub fn video_license(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._video_license = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *video embeddable* query property to the given value.
+	/// 
+    /// The videoEmbeddable parameter lets you to restrict a search to only videos that can be embedded into a webpage.    
+	pub fn video_embeddable(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._video_embeddable = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *video duration* query property to the given value.
+	/// 
+    /// The videoDuration parameter filters video search results based on their duration.    
+	pub fn video_duration(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._video_duration = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *video dimension* query property to the given value.
+	/// 
+    /// The videoDimension parameter lets you restrict a search to only retrieve 2D or 3D videos.    
+	pub fn video_dimension(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._video_dimension = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *video definition* query property to the given value.
+	/// 
+    /// The videoDefinition parameter lets you restrict a search to only include either high definition (HD) or standard definition (SD) videos. HD videos are available for playback in at least 720p, though higher resolutions, like 1080p, might also be available.    
+	pub fn video_definition(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._video_definition = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *video category id* query property to the given value.
+	/// 
+    /// The videoCategoryId parameter filters video search results based on their category.    
+	pub fn video_category_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._video_category_id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *video caption* query property to the given value.
+	/// 
+    /// The videoCaption parameter indicates whether the API should filter video search results based on whether they have captions.    
+	pub fn video_caption(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._video_caption = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *type* query property to the given value.
+	/// 
+    /// The type parameter restricts a search query to only retrieve a particular type of resource. The value is a comma-separated list of resource types.    
+	pub fn type_(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._type_ = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *topic id* query property to the given value.
+	/// 
+    /// The topicId parameter indicates that the API response should only contain resources associated with the specified topic. The value identifies a Freebase topic ID.    
+	pub fn topic_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._topic_id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *safe search* query property to the given value.
+	/// 
+    /// The safeSearch parameter indicates whether the search results should include restricted content as well as standard content.    
+	pub fn safe_search(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._safe_search = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *relevance language* query property to the given value.
+	/// 
+    /// The relevanceLanguage parameter instructs the API to return search results that are most relevant to the specified language. The parameter value is typically an ISO 639-1 two-letter language code. However, you should use the values zh-Hans for simplified Chinese and zh-Hant for traditional Chinese. Please note that results in other languages will still be returned if they are highly relevant to the search query term.    
+	pub fn relevance_language(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._relevance_language = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *related to video id* query property to the given value.
+	/// 
+    /// The relatedToVideoId parameter retrieves a list of videos that are related to the video that the parameter value identifies. The parameter value must be set to a YouTube video ID and, if you are using this parameter, the type parameter must be set to video.    
+	pub fn related_to_video_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._related_to_video_id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *region code* query property to the given value.
+	/// 
+    /// The regionCode parameter instructs the API to return search results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
+	pub fn region_code(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._region_code = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *q* query property to the given value.
+	/// 
+    /// The q parameter specifies the query term to search for.    
+	pub fn q(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._q = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *published before* query property to the given value.
+	/// 
+    /// The publishedBefore parameter indicates that the API response should only contain resources created before the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
+	pub fn published_before(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._published_before = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *published after* query property to the given value.
+	/// 
+    /// The publishedAfter parameter indicates that the API response should only contain resources created after the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
+	pub fn published_after(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._published_after = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *page token* query property to the given value.
+	/// 
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+	pub fn page_token(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._page_token = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *order* query property to the given value.
+	/// 
+    /// The order parameter specifies the method that will be used to order resources in the API response.    
+	pub fn order(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._order = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *max results* query property to the given value.
+	/// 
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+	pub fn max_results(&mut self, new_value: &u32) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *location radius* query property to the given value.
+	/// 
+    /// The locationRadius, in conjunction with the location parameter, defines a geographic area. If the geographic coordinates associated with a video fall within that area, then the video may be included in search results. This parameter value must be a floating point number followed by a measurement unit. Valid measurement units are m, km, ft, and mi. For example, valid parameter values include 1500m, 5km, 10000ft, and 0.75mi. The API does not support locationRadius parameter values larger than 1000 kilometers.    
+	pub fn location_radius(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._location_radius = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *location* query property to the given value.
+	/// 
+    /// The location parameter restricts a search to videos that have a geographical location specified in their metadata. The value is a string that specifies geographic latitude/longitude coordinates e.g. (37.42307,-122.08427)    
+	pub fn location(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._location = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *for mine* query property to the given value.
+	/// 
+    /// The forMine parameter restricts the search to only retrieve videos owned by the authenticated user. If you set this parameter to true, then the type parameter's value must also be set to video.    
+	pub fn for_mine(&mut self, new_value: &bool) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._for_mine = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *for content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The forContentOwner parameter restricts the search to only retrieve resources owned by the content owner specified by the onBehalfOfContentOwner parameter. The user must be authenticated using a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.
+	pub fn for_content_owner(&mut self, new_value: &bool) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._for_content_owner = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *event type* query property to the given value.
+	/// 
+    /// The eventType parameter restricts a search to broadcast events.    
+	pub fn event_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._event_type = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *channel type* query property to the given value.
+	/// 
+    /// The channelType parameter lets you restrict a search to a particular type of channel.    
+	pub fn channel_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._channel_type = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *channel id* query property to the given value.
+	/// 
+    /// The channelId parameter indicates that the API response should only contain resources created by the channel    
+	pub fn channel_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._channel_id = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns a list of supported regions.
+///
 /// A builder for the *list* method supported by a *i18nRegion* resource.
 /// It is not used directly, but through a `I18nRegionMethodsBuilder`.
 ///
@@ -4800,12 +6176,45 @@ pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nRegionListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a list of supported regions.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
+	pub fn part(&mut self, new_value: &str) -> &mut I18nRegionListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *hl* query property to the given value.
+	/// 
+    /// The hl parameter specifies the language that should be used for text values in the API response.    
+	pub fn hl(&mut self, new_value: &str) -> &mut I18nRegionListMethodBuilder<'a, C, NC, A> {
+		self._hl = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.
+///
 /// A builder for the *update* method supported by a *liveStream* resource.
 /// It is not used directly, but through a `LiveStreamMethodsBuilder`.
 ///
@@ -4844,12 +6253,64 @@ pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamUpdateMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 
+	/// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part properties that you can include in the parameter value are id, snippet, cdn, and status.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. If the request body does not specify a value for a mutable property, the existing value for that property will be removed.
+	pub fn part(&mut self, new_value: &str) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Deletes a video stream.
+///
 /// A builder for the *delete* method supported by a *liveStream* resource.
 /// It is not used directly, but through a `LiveStreamMethodsBuilder`.
 ///
@@ -4888,12 +6349,60 @@ pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _id: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamDeleteMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 
+	/// Deletes a video stream.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies the YouTube live stream ID for the resource that is being deleted.    
+	pub fn id(&mut self, new_value: &str) -> &mut LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns a list of video streams that match the API request parameters.
+///
 /// A builder for the *list* method supported by a *liveStream* resource.
 /// It is not used directly, but through a `LiveStreamMethodsBuilder`.
 ///
@@ -4932,12 +6441,96 @@ pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a list of video streams that match the API request parameters.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.    
+	pub fn part(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *page token* query property to the given value.
+	/// 
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+	pub fn page_token(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+		self._page_token = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *mine* query property to the given value.
+	/// 
+    /// The mine parameter can be used to instruct the API to only return streams owned by the authenticated user. Set the parameter value to true to only retrieve your own streams.    
+	pub fn mine(&mut self, new_value: &bool) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *max results* query property to the given value.
+	/// 
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set. Acceptable values are 0 to 50, inclusive. The default value is 5.    
+	pub fn max_results(&mut self, new_value: &u32) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// 
+    /// The id parameter specifies a comma-separated list of YouTube stream IDs that identify the streams being retrieved. In a liveStream resource, the id property specifies the stream's ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.
+///
 /// A builder for the *insert* method supported by a *liveStream* resource.
 /// It is not used directly, but through a `LiveStreamMethodsBuilder`.
 ///
@@ -4976,12 +6569,62 @@ pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamInsertMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 
+	/// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part properties that you can include in the parameter value are id, snippet, cdn, and status.
+	pub fn part(&mut self, new_value: &str) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Updates a channel's metadata.
+///
 /// A builder for the *update* method supported by a *channel* resource.
 /// It is not used directly, but through a `ChannelMethodsBuilder`.
 ///
@@ -5020,12 +6663,49 @@ pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelUpdateMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 
+	/// Updates a channel's metadata.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are id and invideoPromotion.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies.
+	pub fn part(&mut self, new_value: &str) -> &mut ChannelUpdateMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelUpdateMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns a collection of zero or more channel resources that match the request criteria.
+///
 /// A builder for the *list* method supported by a *channel* resource.
 /// It is not used directly, but through a `ChannelMethodsBuilder`.
 ///
@@ -5064,12 +6744,119 @@ pub struct ChannelListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _my_subscribers: Option<bool>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _managed_by_me: Option<bool>,
+    _id: Option<String>,
+    _for_username: Option<String>,
+    _category_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a collection of zero or more channel resources that match the request criteria.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, statistics, topicDetails, and invideoPromotion.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set part=contentDetails, the API response will also contain all of those nested properties.
+	pub fn part(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *page token* query property to the given value.
+	/// 
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+	pub fn page_token(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._page_token = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *my subscribers* query property to the given value.
+	/// 
+    /// Set this parameter's value to true to retrieve a list of channels that subscribed to the authenticated user's channel.    
+	pub fn my_subscribers(&mut self, new_value: &bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._my_subscribers = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *mine* query property to the given value.
+	/// 
+    /// Set this parameter's value to true to instruct the API to only return channels owned by the authenticated user.    
+	pub fn mine(&mut self, new_value: &bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *max results* query property to the given value.
+	/// 
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+	pub fn max_results(&mut self, new_value: &u32) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *managed by me* query property to the given value.
+	/// 
+    /// Set this parameter's value to true to instruct the API to only return channels managed by the content owner that the onBehalfOfContentOwner parameter specifies. The user must be authenticated as a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.    
+	pub fn managed_by_me(&mut self, new_value: &bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._managed_by_me = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// 
+    /// The id parameter specifies a comma-separated list of the YouTube channel ID(s) for the resource(s) that are being retrieved. In a channel resource, the id property specifies the channel's YouTube channel ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *for username* query property to the given value.
+	/// 
+    /// The forUsername parameter specifies a YouTube username, thereby requesting the channel associated with that username.    
+	pub fn for_username(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._for_username = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *category id* query property to the given value.
+	/// 
+    /// The categoryId parameter specifies a YouTube guide category, thereby requesting YouTube channels associated with that category.    
+	pub fn category_id(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._category_id = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Deletes a playlist item.
+///
 /// A builder for the *delete* method supported by a *playlistItem* resource.
 /// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
 ///
@@ -5108,12 +6895,36 @@ pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 
+	/// Deletes a playlist item.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.
+///
 /// A builder for the *list* method supported by a *playlistItem* resource.
 /// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
 ///
@@ -5152,12 +6963,94 @@ pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _video_id: Option<String>,
+    _playlist_id: Option<String>,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set part=snippet, the API response will contain all of those properties.
+	pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *video id* query property to the given value.
+	/// 
+    /// The videoId parameter specifies that the request should return only the playlist items that contain the specified video.    
+	pub fn video_id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+		self._video_id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *playlist id* query property to the given value.
+	/// 
+    /// The playlistId parameter specifies the unique ID of the playlist for which you want to retrieve playlist items. Note that even though this is an optional parameter, every request to retrieve playlist items must specify a value for either the id parameter or the playlistId parameter.    
+	pub fn playlist_id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+		self._playlist_id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *page token* query property to the given value.
+	/// 
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+	pub fn page_token(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+		self._page_token = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *max results* query property to the given value.
+	/// 
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+	pub fn max_results(&mut self, new_value: &u32) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// 
+    /// The id parameter specifies a comma-separated list of one or more unique playlist item IDs.    
+	pub fn id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Adds a resource to a playlist.
+///
 /// A builder for the *insert* method supported by a *playlistItem* resource.
 /// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
 ///
@@ -5196,12 +7089,49 @@ pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemInsertMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 
+	/// Adds a resource to a playlist.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet, contentDetails, and status.
+	pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Modifies a playlist item. For example, you could update the item's position in the playlist.
+///
 /// A builder for the *update* method supported by a *playlistItem* resource.
 /// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
 ///
@@ -5240,12 +7170,40 @@ pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 
+	/// Modifies a playlist item. For example, you could update the item's position in the playlist.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet, contentDetails, and status.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist item can specify a start time and end time, which identify the times portion of the video that should play when users watch the video in the playlist. If your request is updating a playlist item that sets these values, and the request's part parameter value includes the contentDetails part, the playlist item's start and end times will be updated to whatever value the request body specifies. If the request body does not specify values, the existing start and end times will be removed and replaced with the default settings.
+	pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Uploads a watermark image to YouTube and sets it for a channel.
+///
 /// A builder for the *set* method supported by a *watermark* resource.
 /// It is not used directly, but through a `WatermarkMethodsBuilder`.
 ///
@@ -5284,12 +7242,45 @@ pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _channel_id: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for WatermarkSetMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 
+	/// Uploads a watermark image to YouTube and sets it for a channel.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *channel id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The channelId parameter specifies a YouTube channel ID for which the watermark is being provided.    
+	pub fn channel_id(&mut self, new_value: &str) -> &mut WatermarkSetMethodBuilder<'a, C, NC, A> {
+		self._channel_id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut WatermarkSetMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Deletes a watermark.
+///
 /// A builder for the *unset* method supported by a *watermark* resource.
 /// It is not used directly, but through a `WatermarkMethodsBuilder`.
 ///
@@ -5328,12 +7319,45 @@ pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _channel_id: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for WatermarkUnsetMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 
+	/// Deletes a watermark.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *channel id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The channelId parameter specifies a YouTube channel ID for which the watermark is being unset.    
+	pub fn channel_id(&mut self, new_value: &str) -> &mut WatermarkUnsetMethodBuilder<'a, C, NC, A> {
+		self._channel_id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut WatermarkUnsetMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Controls the settings for a slate that can be displayed in the broadcast stream.
+///
 /// A builder for the *control* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
@@ -5372,12 +7396,102 @@ pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _id: Option<String>,
+    _part: Option<String>,
+    _walltime: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _offset_time_ms: Option<String>,
+    _display_slate: Option<bool>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastControlMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 
+	/// Controls the settings for a slate that can be displayed in the broadcast stream.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated.    
+	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
+	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *walltime* query property to the given value.
+	/// 
+    /// The walltime parameter specifies the wall clock time at which the specified slate change will occur. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.    
+	pub fn walltime(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+		self._walltime = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *offset time ms* query property to the given value.
+	/// 
+    /// The offsetTimeMs parameter specifies a positive time offset when the specified slate change will occur. The value is measured in milliseconds from the beginning of the broadcast's monitor stream, which is the time that the testing phase for the broadcast began. Even though it is specified in milliseconds, the value is actually an approximation, and YouTube completes the requested action as closely as possible to that time.
+    /// 
+    /// If you do not specify a value for this parameter, then YouTube performs the action as soon as possible. See the Getting started guide for more details.
+    /// 
+    /// Important: You should only specify a value for this parameter if your broadcast stream is delayed.
+	pub fn offset_time_ms(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+		self._offset_time_ms = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *display slate* query property to the given value.
+	/// 
+    /// The displaySlate parameter specifies whether the slate is being enabled or disabled.    
+	pub fn display_slate(&mut self, new_value: &bool) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+		self._display_slate = Some(new_value.clone());
+		return self;
+	}
+
+}
+
+
+/// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.
+///
 /// A builder for the *update* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
@@ -5416,12 +7530,64 @@ pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 
+	/// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part properties that you can include in the parameter value are id, snippet, contentDetails, and status.
+    /// 
+    /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a broadcast's privacy status is defined in the status part. As such, if your request is updating a private or unlisted broadcast, and the request's part parameter value includes the status part, the broadcast's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the broadcast will revert to the default privacy setting.
+	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Creates a broadcast.
+///
 /// A builder for the *insert* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
@@ -5460,12 +7626,62 @@ pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 
+	/// Creates a broadcast.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part properties that you can include in the parameter value are id, snippet, contentDetails, and status.
+	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.
+///
 /// A builder for the *bind* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
@@ -5504,12 +7720,80 @@ pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _id: Option<String>,
+    _part: Option<String>,
+    _stream_id: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastBindMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 
+	/// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.    
+	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
+	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *stream id* query property to the given value.
+	/// 
+    /// The streamId parameter specifies the unique ID of the video stream that is being bound to a broadcast. If this parameter is omitted, the API will remove any existing binding between the broadcast and a video stream.    
+	pub fn stream_id(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+		self._stream_id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns a list of YouTube broadcasts that match the API request parameters.
+///
 /// A builder for the *list* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
@@ -5548,12 +7832,105 @@ pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
+    _broadcast_status: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a list of YouTube broadcasts that match the API request parameters.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
+	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *page token* query property to the given value.
+	/// 
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+	pub fn page_token(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+		self._page_token = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *mine* query property to the given value.
+	/// 
+    /// The mine parameter can be used to instruct the API to only return broadcasts owned by the authenticated user. Set the parameter value to true to only retrieve your own broadcasts.    
+	pub fn mine(&mut self, new_value: &bool) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *max results* query property to the given value.
+	/// 
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+	pub fn max_results(&mut self, new_value: &u32) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// 
+    /// The id parameter specifies a comma-separated list of YouTube broadcast IDs that identify the broadcasts being retrieved. In a liveBroadcast resource, the id property specifies the broadcast's ID.    
+	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *broadcast status* query property to the given value.
+	/// 
+    /// The broadcastStatus parameter filters the API response to only include broadcasts with the specified status.    
+	pub fn broadcast_status(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+		self._broadcast_status = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Deletes a broadcast.
+///
 /// A builder for the *delete* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
@@ -5592,12 +7969,60 @@ pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _id: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 
+	/// Deletes a broadcast.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted.    
+	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.
+///
 /// A builder for the *transition* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
@@ -5636,12 +8061,82 @@ pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _broadcast_status: Option<String>,
+    _id: Option<String>,
+    _part: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 
+	/// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *broadcast status* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to.    
+	pub fn broadcast_status(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+		self._broadcast_status = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The id parameter specifies the unique ID of the broadcast that is transitioning to another status.    
+	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
+	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner channel* query property to the given value.
+	/// 
+    /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
+    /// 
+    /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
+	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *on behalf of content owner* query property to the given value.
+	/// 
+    /// Note: This parameter is intended exclusively for YouTube content partners.
+    /// 
+    /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
+	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+		self._on_behalf_of_content_owner = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns a list of categories that can be associated with YouTube videos.
+///
 /// A builder for the *list* method supported by a *videoCategory* resource.
 /// It is not used directly, but through a `VideoCategoryMethodsBuilder`.
 ///
@@ -5680,12 +8175,63 @@ pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _region_code: Option<String>,
+    _id: Option<String>,
+    _hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoCategoryListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a list of categories that can be associated with YouTube videos.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.    
+	pub fn part(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *region code* query property to the given value.
+	/// 
+    /// The regionCode parameter instructs the API to return the list of video categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
+	pub fn region_code(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
+		self._region_code = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *id* query property to the given value.
+	/// 
+    /// The id parameter specifies a comma-separated list of video category IDs for the resources that you are retrieving.    
+	pub fn id(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
+		self._id = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *hl* query property to the given value.
+	/// 
+    /// The hl parameter specifies the language that should be used for text values in the API response.    
+	pub fn hl(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
+		self._hl = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.
+///
 /// A builder for the *list* method supported by a *activity* resource.
 /// It is not used directly, but through a `ActivityMethodsBuilder`.
 ///
@@ -5724,12 +8270,112 @@ pub struct ActivityListMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
+    _region_code: Option<String>,
+    _published_before: Option<String>,
+    _published_after: Option<String>,
+    _page_token: Option<String>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _home: Option<bool>,
+    _channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ActivityListMethodBuilder<'a, C, NC, A> {}
 
+impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 
+	/// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.    
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+    /// 
+    /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
+	pub fn part(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *region code* query property to the given value.
+	/// 
+    /// The regionCode parameter instructs the API to return results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code. YouTube uses this value when the authorized user's previous activity on YouTube does not provide enough information to generate the activity feed.    
+	pub fn region_code(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._region_code = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *published before* query property to the given value.
+	/// 
+    /// The publishedBefore parameter specifies the date and time before which an activity must have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be excluded from the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+	pub fn published_before(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._published_before = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *published after* query property to the given value.
+	/// 
+    /// The publishedAfter parameter specifies the earliest date and time that an activity could have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be included in the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+	pub fn published_after(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._published_after = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *page token* query property to the given value.
+	/// 
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+	pub fn page_token(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._page_token = Some(new_value.to_string());
+		return self;
+	}
+
+	/// Sets the *mine* query property to the given value.
+	/// 
+    /// Set this parameter's value to true to retrieve a feed of the authenticated user's activities.    
+	pub fn mine(&mut self, new_value: &bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *max results* query property to the given value.
+	/// 
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+	pub fn max_results(&mut self, new_value: &u32) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *home* query property to the given value.
+	/// 
+    /// Set this parameter's value to true to retrieve the activity feed that displays on the YouTube home page for the currently authenticated user.    
+	pub fn home(&mut self, new_value: &bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._home = Some(new_value.clone());
+		return self;
+	}
+
+	/// Sets the *channel id* query property to the given value.
+	/// 
+    /// The channelId parameter specifies a unique YouTube channel ID. The API will then return a list of that channel's activities.    
+	pub fn channel_id(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._channel_id = Some(new_value.to_string());
+		return self;
+	}
+
+}
+
+
+/// Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
+/// 
+/// Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite.
+///
 /// A builder for the *insert* method supported by a *activity* resource.
 /// It is not used directly, but through a `ActivityMethodsBuilder`.
 ///
@@ -5768,9 +8414,35 @@ pub struct ActivityInsertMethodBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    hub: &'a YouTube<C, NC, A>
+    hub: &'a YouTube<C, NC, A>,
+    _part: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ActivityInsertMethodBuilder<'a, C, NC, A> {}
+
+impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
+
+	/// Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
+    /// 
+    /// Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite.
+	///
+	/// TODO: Build actual call
+	pub fn doit(self) {
+
+	}
+
+	/// Sets the *part* query property to the given value.
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+    /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
+    /// 
+    /// The part names that you can include in the parameter value are snippet and contentDetails.
+	pub fn part(&mut self, new_value: &str) -> &mut ActivityInsertMethodBuilder<'a, C, NC, A> {
+		self._part = Some(new_value.to_string());
+		return self;
+	}
+
+}
 
 

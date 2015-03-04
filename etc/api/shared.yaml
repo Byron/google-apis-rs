@@ -15,7 +15,7 @@ api:
   base_path: "etc/api"
   terms:
     # how to actually do something with the API
-    action: do
+    action: doit
   templates:
   # all output directories are relative to the one set for the respective API
     - source: README.md

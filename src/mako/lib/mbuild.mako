@@ -1,6 +1,8 @@
 <%!
 	from util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
-                      rb_type, mb_type, singular, hub_type)
+                      rb_type, mb_type, singular, hub_type, to_fqan, indent_all_but_first_by,
+                      method_params, activity_rust_type, mangle_ident, activity_input_type, get_word,
+                      split_camelcase_s)
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -9,7 +11,17 @@
 ###############################################################################################
 ###############################################################################################
 <%def name="new(resource, method, c)">\
-<% hub_type_name = hub_type(canonicalName) %>\
+<% 
+	hub_type_name = hub_type(canonicalName)
+	m = c.fqan_map[to_fqan(name, resource, method)]
+	# an identifier for a property. We prefix them to prevent clashes with the setters
+	property = lambda x: '_' + mangle_ident(x)
+	ThisType = mb_type(resource, method) + "<'a, C, NC, A>"
+%>\
+% if 'description' in m:
+${m.description | rust_doc_comment}
+///
+% endif
 /// A builder for the *${method}* method supported by a *${singular(resource)}* resource.
 /// It is not used directly, but through a `${rb_type(resource)}`.
 ///
@@ -33,13 +45,52 @@ ${lib.test_hub(hub_type_name, comments=False)}\
 // mb.do()
 </%block>
 </%block>
-pub struct ${mb_type(resource, method)}<'a, C, NC, A>
+pub struct ${ThisType}
     where NC: 'a,
            C: 'a,
            A: 'a, {
 
-    hub: &'a ${hub_type_name}<C, NC, A>
+    hub: &'a ${hub_type_name}<C, NC, A>,
+% for p in method_params(m):
+    ${property(p.name)}: ${activity_rust_type(p)},
+% endfor
 }
 
-impl<'a, C, NC, A> MethodBuilder for ${mb_type(resource, method)}<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for ${ThisType} {}
+
+impl<'a, C, NC, A> ${ThisType} {
+
+	% if 'description' in m:
+	${m.description | rust_doc_comment, indent_all_but_first_by(1)}
+	///
+	% endif
+	/// TODO: Build actual call
+	pub fn ${api.terms.action}(self) {
+
+	}
+
+% for p in method_params(m):
+<%
+	InType = activity_input_type(p)
+%>\
+	/// Sets the *${split_camelcase_s(p.name)}* ${get_word(p, 'location')}property to the given value.
+	% if p.get('required', False):
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	%endif
+	/// 
+	% if 'description' in p:
+    ${p.description | rust_doc_comment, indent_all_but_first_by(1)}
+	% endif
+	pub fn ${mangle_ident(p.name)}(&mut self, new_value: ${InType}) -> &mut ${ThisType} {
+		% if InType == '&str':
+		self.${property(p.name)} = Some(new_value.to_string());
+		% else:
+		self.${property(p.name)} = Some(new_value.clone());
+		% endif
+		return self;
+	}
+
+% endfor
+}
 </%def>
