@@ -100,7 +100,6 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-//! 
 #![feature(core)]
 #![allow(non_snake_case)]
 
@@ -147,8 +146,8 @@ pub use cmn::{Hub, Resource, Part, ResponseResult, RequestResult, NestedType};
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
 /// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::new(),
-///                               <MemoryStorage as Default>::default(), None);
+///                                   hyper::Client::new(),
+///                                   <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// # }
 /// ```

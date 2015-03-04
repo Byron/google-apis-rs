@@ -2,6 +2,7 @@ import re
 import collections
 
 re_linestart = re.compile('^', flags=re.MULTILINE)
+re_first_4_spaces = re.compile('^    ', flags=re.MULTILINE)
 
 USE_FORMAT = 'use_format_field'
 TYPE_MAP = {'boolean' : 'bool',
@@ -42,6 +43,16 @@ def rust_comment(s):
 # hash-based comment filter
 def hash_comment(s):
     return re_linestart.sub('# ', s)
+
+# remove the first indentation (must be spaces !)
+def unindent(s):
+    return re_first_4_spaces.sub('', s)
+
+# add 4 spaces to the beginning of a line.
+# useful if you have defs embedded in an unindent block - they need to counteract. 
+# It's a bit itchy, but logical
+def indent(s):
+    return re_linestart.sub('    ', s)
 
 # return s, with trailing newline
 def trailing_newline(s):
