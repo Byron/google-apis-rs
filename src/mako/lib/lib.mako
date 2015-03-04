@@ -12,19 +12,13 @@
     # fr == fattest resource, the fatter, the more important, right ?
     fr = None
     fr = sorted(schemas.values(), key=lambda s: (len(c.sta_map.get(s.id, [])), len(s.get('properties', []))), reverse=True)[0]
-
-    # resouce -> [activity, ...]
-    amap = dict()
-    for an in c.fqan_map:
-        resource, activity = activity_split(an)
-        amap.setdefault(resource, list()).append(activity)
 %>\
 # Features
 
 Handle the following *Resources* with ease ... 
 
-% for r in sorted(amap.keys()):
-* ${split_camelcase_s(r)} (${put_and(md_italic(sorted(amap[r])))})
+% for r in sorted(c.rta_map.keys()):
+* ${split_camelcase_s(r)} (${put_and(md_italic(sorted(c.rta_map[r])))})
 % endfor
 
 # Structure of this Library

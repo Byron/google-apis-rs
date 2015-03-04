@@ -1,12 +1,13 @@
 <% 
 	from util import (iter_nested_types, new_context, rust_comment, rust_doc_comment,
                       rust_module_doc_comment, rust_doc_test_norun, canonical_type_name,
-                      rust_test_fn_invisible)
+                      mb_type, singular, rust_test_fn_invisible, put_and)
 	nested_schemas = list(iter_nested_types(schemas))
 
  	c = new_context(resources)
 
 	hub_type = canonical_type_name(canonicalName)
+    
 %>\
 <%namespace name="lib" file="lib/lib.mako"/>\
 <%namespace name="mutil" file="lib/util.mako"/>\
@@ -32,7 +33,7 @@ use std::marker::PhantomData;
 use std::borrow::BorrowMut;
 use std::cell::RefCell;
 
-pub use cmn::{Hub, Resource, Part, ResponseResult, RequestResult, NestedType};
+pub use cmn::{Hub, MethodBuilder, Resource, Part, ResponseResult, RequestResult, NestedType};
 
 // ########
 // HUB ###
@@ -45,7 +46,7 @@ pub use cmn::{Hub, Resource, Part, ResponseResult, RequestResult, NestedType};
 /// Instantiate a new hub
 ///
 <%block filter="rust_doc_comment">\
-${lib.hub_usage_example()}\
+<%lib:hub_usage_example/>\
 </%block>
 pub struct ${hub_type}<C, NC, A> {
     client: RefCell<C>,
@@ -67,6 +68,12 @@ impl<'a, C, NC, A> ${hub_type}<C, NC, A>
             _m: PhantomData,
         }
     }
+
+    % for resource in sorted(c.rta_map.keys()):
+    pub fn ${resource}(&'a self) -> ${mb_type(resource)}<'a, C, NC, A> {
+        ${mb_type(resource)} { hub: &self }
+    }
+    % endfor
 }
 
 
@@ -85,3 +92,38 @@ ${schema.new(s, c)}
 % for s in nested_schemas:
 ${schema.new(s, c)}
 % endfor
+
+// ###################
+// MethodBuilders ###
+// #################
+
+% for resource, methods in c.rta_map.iteritems():
+/// A builder providing access to all methods supported on *${singular(resource)}* resources.
+/// It is usually not used directly, but through the `${hub_type}` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+<%block filter="rust_doc_test_norun, rust_doc_comment">\
+${mutil.test_prelude()}\
+
+<%block filter="rust_test_fn_invisible">\
+${lib.test_hub(canonical_type_name(canonicalName))}\
+
+// Usually you wouldn't stick this into a variable, but keep calling `MethodBuilders`
+// like ${put_and(sorted('`%s(...)`' % f for f in methods))}
+let rb = hub.${resource}();
+</%block>
+</%block>
+pub struct ${mb_type(resource)}<'a, C, NC, A>
+    where NC: 'a,
+           C: 'a,
+           A: 'a, {
+
+    hub: &'a ${hub_type}<C, NC, A>
+}
+
+impl<'a, C, NC, A> MethodBuilder for ${mb_type(resource)}<'a, C, NC, A> {}
+% endfor
+

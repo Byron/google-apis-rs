@@ -7,6 +7,8 @@ use rustc_serialize;
 use hyper;
 use oauth2;
 
+use super::super::YouTube;
+
 /// Reresents all aspects of a youtube video resource. May only be partially 
 /// available
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -75,10 +77,7 @@ pub struct Service<'a, C, NC, A>
            C: 'a,
            A: 'a, {
 
-    client: &'a RefCell<C>,
-    auth:  &'a RefCell<A>,
-
-    _m: PhantomData<NC>
+    hub: &'a YouTube<C, NC, A>
 }
 
 impl<'a, C, NC, A> Service<'a, C, NC, A>
@@ -86,21 +85,15 @@ impl<'a, C, NC, A> Service<'a, C, NC, A>
             C: BorrowMut<hyper::Client<NC>> + 'a,
             A: oauth2::GetToken + 'a {
 
-    pub fn new(client: &'a RefCell<C>, authenticator: &'a RefCell<A>) -> Service<'a, C, NC, A> {
-        Service {
-            client: client,
-            auth: authenticator,
-            _m: PhantomData,
-        }
+    pub fn new(hub: &'a YouTube<C, NC, A>) -> Service<'a, C, NC, A> {
+        Service { hub: hub }
     }
 
     pub fn insert(&self, parts: &str, video: &Video) -> VideosInsertBuilder<'a, C, NC, A> {
         VideosInsertBuilder {
-            client: self.client,
-            auth: self.auth,
+            hub: self.hub,
             video: video.clone(),
             parts: parts.to_string(),
-            _m: PhantomData,
         }
     }
 }
@@ -110,12 +103,9 @@ pub struct VideosInsertBuilder<'a, C, NC, A>
            C: 'a,
            A: 'a {
 
-    client: &'a RefCell<C>,
-    auth: &'a RefCell<A>,
+    hub: &'a YouTube<C, NC, A>,
     video: Video,
     parts: String,
-
-    _m: PhantomData<NC>
 }
 
 

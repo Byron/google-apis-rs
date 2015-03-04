@@ -43,7 +43,7 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
     }
 
     pub fn videos(&'a self) -> videos::Service<'a, C, NC, A> {
-        videos::Service::new(&self.client, &self.auth)
+        videos::Service::new(&self)
     }
 }
 

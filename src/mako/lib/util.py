@@ -101,8 +101,17 @@ def put_and(l):
         return l[0]
     return ', '.join(l[:-1]) + ' and ' + l[-1]
 
+# ['foo', ...] with e == '*' -> ['*foo*', ...]
+def enclose_in(e, l):
+    return ['%s%s%s' % (e, s, e) for s in l]
+
 def md_italic(l):
-    return ['*%s*' % s for s in l]
+    return enclose_in('*', l)
+
+def singular(s):
+    if s[-1] == 's':
+        return s[:-1]
+    return s
 
 def split_camelcase_s(s):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', s)
@@ -226,44 +235,6 @@ def schema_markers(s, c):
 # -------------------------
 ## @name Activity Utilities
 # @{
-
-# Returns (A, B) where
-# A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
-# B: { fqan -> activity_method_data }
-# fqan = fully qualified activity name
-def build_activity_mappings(activities):
-    res = dict()
-    fqan = dict()
-    for an, a in activities.iteritems():
-        if 'methods' not in a:
-            continue
-        for mn, m in a.methods.iteritems():
-            assert m.id not in fqan
-            fqan[m.id] = m
-            for in_out_type_name in IO_TYPES:
-                t = m.get(in_out_type_name, None)
-                if t is None:
-                    continue
-                tn = to_rust_type(None, None, t, allow_optionals=False)
-                info = res.setdefault(tn, dict())
-                io_info = info.setdefault(m.id, [])
-                io_info.append(in_out_type_name)
-            # end for each io type
-
-            # handle delete/getrating/(possibly others)
-            # delete: has no response or request
-            # getrating: response is a 'SomethingResult', which is still related to activities name
-            #            the latter is used to deduce the resource name
-            an, _ = activity_split(m.id)
-            tn = activity_name_to_type_name(an)
-            info = res.setdefault(tn, dict())
-            if m.id not in info:
-                info.setdefault(m.id, [])
-            # end handle other cases
-        # end for each method
-    # end for each activity
-    return res, fqan
-
 # return (name, method)
 def activity_split(fqan):
     t = fqan.split('.')
@@ -281,12 +252,54 @@ def iter_acitivities(c):
 ## -- End Activity Utilities -- @}
 
 
-Context = collections.namedtuple('Context', ['sta_map', 'fqan_map'])
+Context = collections.namedtuple('Context', ['sta_map', 'fqan_map', 'rta_map'])
 
 # return a newly build context from the given data
 def new_context(resources):
+    # Returns (A, B) where
+    # A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
+    # B: { fqan -> activity_method_data }
+    # fqan = fully qualified activity name
+    def build_activity_mappings(activities):
+        res = dict()
+        fqan = dict()
+        for an, a in activities.iteritems():
+            if 'methods' not in a:
+                continue
+            for mn, m in a.methods.iteritems():
+                assert m.id not in fqan
+                fqan[m.id] = m
+                for in_out_type_name in IO_TYPES:
+                    t = m.get(in_out_type_name, None)
+                    if t is None:
+                        continue
+                    tn = to_rust_type(None, None, t, allow_optionals=False)
+                    info = res.setdefault(tn, dict())
+                    io_info = info.setdefault(m.id, [])
+                    io_info.append(in_out_type_name)
+                # end for each io type
+
+                # handle delete/getrating/(possibly others)
+                # delete: has no response or request
+                # getrating: response is a 'SomethingResult', which is still related to activities name
+                #            the latter is used to deduce the resource name
+                an, _ = activity_split(m.id)
+                tn = activity_name_to_type_name(an)
+                info = res.setdefault(tn, dict())
+                if m.id not in info:
+                    info.setdefault(m.id, [])
+                # end handle other cases
+            # end for each method
+        # end for each activity
+        return res, fqan
+    # end utility
+
     sta_map, fqan_map = build_activity_mappings(resources)
-    return Context(sta_map, fqan_map)
+    rta_map = dict()
+    for an in fqan_map:
+        resource, activity = activity_split(an)
+        rta_map.setdefault(resource, list()).append(activity)
+    return Context(sta_map, fqan_map, rta_map)
 
 # Expects v to be 'v\d+', throws otherwise
 def to_api_version(v):
@@ -296,3 +309,7 @@ def to_api_version(v):
 # build a full library name (non-canonical)
 def library_name(name, version):
     return name + to_api_version(version)
+
+# return type name of a resource builder, from a resource name
+def mb_type(r):
+    return "%sMethodBuilder" % canonical_type_name(r)
