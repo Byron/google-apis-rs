@@ -3135,7 +3135,7 @@ impl<'a, C, NC, A> I18nLanguageMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of supported languages.    
-	fn list(&self) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 		I18nLanguageListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3194,7 +3194,7 @@ impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
     /// - Call the channelBanners.insert method to upload the binary image data to YouTube. The image must have a 16:9 aspect ratio and be at least 2120x1192 pixels.
     /// - Extract the url property's value from the response that the API returns for step 1.
     /// - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2.
-	fn insert(&self) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 		ChannelBannerInsertMethodBuilder {
 			hub: self.hub,
 			_on_behalf_of_content_owner: Default::default(),
@@ -3248,7 +3248,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns channelSection resources that match the API request criteria.    
-	fn list(&self) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 		ChannelSectionListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3262,7 +3262,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Adds a channelSection for the authenticated user's channel.    
-	fn insert(&self) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 		ChannelSectionInsertMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3274,7 +3274,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a channelSection.    
-	fn delete(&self) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 		ChannelSectionDeleteMethodBuilder {
 			hub: self.hub,
 			_id: Default::default(),
@@ -3285,7 +3285,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Update a channelSection.    
-	fn update(&self) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 		ChannelSectionUpdateMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3340,7 +3340,7 @@ impl<'a, C, NC, A> GuideCategoryMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of categories that can be associated with YouTube channels.    
-	fn list(&self) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 		GuideCategoryListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3397,7 +3397,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Creates a playlist.    
-	fn insert(&self) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 		PlaylistInsertMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3409,7 +3409,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.    
-	fn list(&self) -> PlaylistListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> PlaylistListMethodBuilder<'a, C, NC, A> {
 		PlaylistListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3426,7 +3426,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a playlist.    
-	fn delete(&self) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 		PlaylistDeleteMethodBuilder {
 			hub: self.hub,
 			_id: Default::default(),
@@ -3437,7 +3437,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.    
-	fn update(&self) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 		PlaylistUpdateMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3492,7 +3492,7 @@ impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Uploads a custom video thumbnail to YouTube and sets it for a video.    
-	fn set(&self) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
+	pub fn set(&self) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 		ThumbnailSetMethodBuilder {
 			hub: self.hub,
 			_video_id: Default::default(),
@@ -3527,7 +3527,7 @@ impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
-/// // like `delete(...)`, `getRating(...)`, `insert(...)`, `list(...)`, `rate(...)` and `update(...)`
+/// // like `delete(...)`, `get_rating(...)`, `insert(...)`, `list(...)`, `rate(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.videos();
 /// # }
@@ -3547,7 +3547,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of videos that match the API request parameters.    
-	fn list(&self) -> VideoListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> VideoListMethodBuilder<'a, C, NC, A> {
 		VideoListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3567,7 +3567,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Add a like or dislike rating to a video or remove a rating from a video.    
-	fn rate(&self) -> VideoRateMethodBuilder<'a, C, NC, A> {
+	pub fn rate(&self) -> VideoRateMethodBuilder<'a, C, NC, A> {
 		VideoRateMethodBuilder {
 			hub: self.hub,
 			_id: Default::default(),
@@ -3579,7 +3579,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Retrieves the ratings that the authorized user gave to a list of specified videos.    
-	fn get_rating(&self) -> VideoGetratingMethodBuilder<'a, C, NC, A> {
+	pub fn get_rating(&self) -> VideoGetratingMethodBuilder<'a, C, NC, A> {
 		VideoGetratingMethodBuilder {
 			hub: self.hub,
 			_id: Default::default(),
@@ -3590,7 +3590,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a YouTube video.    
-	fn delete(&self) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
 		VideoDeleteMethodBuilder {
 			hub: self.hub,
 			_id: Default::default(),
@@ -3601,7 +3601,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Updates a video's metadata.    
-	fn update(&self) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
 		VideoUpdateMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3612,7 +3612,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Uploads a video to YouTube and optionally sets the video's metadata.    
-	fn insert(&self) -> VideoInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self) -> VideoInsertMethodBuilder<'a, C, NC, A> {
 		VideoInsertMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3671,7 +3671,7 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Adds a subscription for the authenticated user's channel.    
-	fn insert(&self) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 		SubscriptionInsertMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3681,7 +3681,7 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns subscription resources that match the API request criteria.    
-	fn list(&self) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
 		SubscriptionListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3701,7 +3701,7 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a subscription.    
-	fn delete(&self) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 		SubscriptionDeleteMethodBuilder {
 			hub: self.hub,
 			_id: Default::default(),
@@ -3755,7 +3755,7 @@ impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.    
-	fn list(&self) -> SearchListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> SearchListMethodBuilder<'a, C, NC, A> {
 		SearchListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3838,7 +3838,7 @@ impl<'a, C, NC, A> I18nRegionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of supported regions.    
-	fn list(&self) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
 		I18nRegionListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3893,7 +3893,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.    
-	fn update(&self) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 		LiveStreamUpdateMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3905,7 +3905,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a video stream.    
-	fn delete(&self) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 		LiveStreamDeleteMethodBuilder {
 			hub: self.hub,
 			_id: Default::default(),
@@ -3917,7 +3917,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of video streams that match the API request parameters.    
-	fn list(&self) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
 		LiveStreamListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3933,7 +3933,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.    
-	fn insert(&self) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 		LiveStreamInsertMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -3989,7 +3989,7 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Updates a channel's metadata.    
-	fn update(&self) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 		ChannelUpdateMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -4000,7 +4000,7 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a collection of zero or more channel resources that match the request criteria.    
-	fn list(&self) -> ChannelListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> ChannelListMethodBuilder<'a, C, NC, A> {
 		ChannelListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -4063,7 +4063,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a playlist item.    
-	fn delete(&self) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 		PlaylistItemDeleteMethodBuilder {
 			hub: self.hub,
 			_id: Default::default(),
@@ -4073,7 +4073,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.    
-	fn list(&self) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 		PlaylistItemListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -4089,7 +4089,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Adds a resource to a playlist.    
-	fn insert(&self) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 		PlaylistItemInsertMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -4100,7 +4100,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Modifies a playlist item. For example, you could update the item's position in the playlist.    
-	fn update(&self) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 		PlaylistItemUpdateMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -4154,7 +4154,7 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Uploads a watermark image to YouTube and sets it for a channel.    
-	fn set(&self) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
+	pub fn set(&self) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
 		WatermarkSetMethodBuilder {
 			hub: self.hub,
 			_channel_id: Default::default(),
@@ -4165,7 +4165,7 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a watermark.    
-	fn unset(&self) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
+	pub fn unset(&self) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 		WatermarkUnsetMethodBuilder {
 			hub: self.hub,
 			_channel_id: Default::default(),
@@ -4220,7 +4220,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Controls the settings for a slate that can be displayed in the broadcast stream.    
-	fn control(&self) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+	pub fn control(&self) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastControlMethodBuilder {
 			hub: self.hub,
 			_id: Default::default(),
@@ -4236,7 +4236,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.    
-	fn update(&self) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastUpdateMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -4248,7 +4248,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Creates a broadcast.    
-	fn insert(&self) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastInsertMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -4260,7 +4260,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.    
-	fn bind(&self) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+	pub fn bind(&self) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastBindMethodBuilder {
 			hub: self.hub,
 			_id: Default::default(),
@@ -4274,7 +4274,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of YouTube broadcasts that match the API request parameters.    
-	fn list(&self) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -4291,7 +4291,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a broadcast.    
-	fn delete(&self) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastDeleteMethodBuilder {
 			hub: self.hub,
 			_id: Default::default(),
@@ -4303,7 +4303,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.    
-	fn transition(&self) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+	pub fn transition(&self) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastTransitionMethodBuilder {
 			hub: self.hub,
 			_broadcast_status: Default::default(),
@@ -4361,7 +4361,7 @@ impl<'a, C, NC, A> VideoCategoryMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of categories that can be associated with YouTube videos.    
-	fn list(&self) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 		VideoCategoryListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -4418,7 +4418,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.    
-	fn list(&self) -> ActivityListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self) -> ActivityListMethodBuilder<'a, C, NC, A> {
 		ActivityListMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -4438,7 +4438,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 	/// Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
     /// 
     /// Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite.
-	fn insert(&self) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
 		ActivityInsertMethodBuilder {
 			hub: self.hub,
 			_part: Default::default(),
@@ -4688,8 +4688,8 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's channelSections.    
-	pub fn mine(&mut self, new_value: &bool) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value.clone());
+	pub fn mine(&mut self, new_value: bool) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value);
 		return self;
 	}
 	/// Sets the *id* query property to the given value.
@@ -5273,16 +5273,16 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// Set this parameter's value to true to instruct the API to only return playlists owned by the authenticated user.    
-	pub fn mine(&mut self, new_value: &bool) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value.clone());
+	pub fn mine(&mut self, new_value: bool) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value);
 		return self;
 	}
 	/// Sets the *max results* query property to the given value.
 	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: &u32) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value.clone());
+	pub fn max_results(&mut self, new_value: u32) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value);
 		return self;
 	}
 	/// Sets the *id* query property to the given value.
@@ -5673,8 +5673,8 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     /// 
     /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
-	pub fn max_results(&mut self, new_value: &u32) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value.clone());
+	pub fn max_results(&mut self, new_value: u32) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value);
 		return self;
 	}
 	/// Sets the *locale* query property to the given value.
@@ -5830,7 +5830,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling methods
 /// // to setup your call.
 /// // TODO: figoure out actual arguments ... 
-/// // let mb = hub.videos().getRating(...);
+/// // let mb = hub.videos().get_rating(...);
 /// 
 /// // Finally, execute your call and process the result
 /// // TODO: comment in once args are properly setup !
@@ -6127,8 +6127,8 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// The stabilize parameter indicates whether YouTube should adjust the video to remove shaky camera motions.    
-	pub fn stabilize(&mut self, new_value: &bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
-		self._stabilize = Some(new_value.clone());
+	pub fn stabilize(&mut self, new_value: bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+		self._stabilize = Some(new_value);
 		return self;
 	}
 	/// Sets the *on behalf of content owner channel* query property to the given value.
@@ -6157,16 +6157,16 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// The notifySubscribers parameter indicates whether YouTube should send notification to subscribers about the inserted video.    
-	pub fn notify_subscribers(&mut self, new_value: &bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
-		self._notify_subscribers = Some(new_value.clone());
+	pub fn notify_subscribers(&mut self, new_value: bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+		self._notify_subscribers = Some(new_value);
 		return self;
 	}
 	/// Sets the *auto levels* query property to the given value.
 	///
 	/// 
     /// The autoLevels parameter indicates whether YouTube should automatically enhance the video's lighting and color.    
-	pub fn auto_levels(&mut self, new_value: &bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
-		self._auto_levels = Some(new_value.clone());
+	pub fn auto_levels(&mut self, new_value: bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+		self._auto_levels = Some(new_value);
 		return self;
 	}
 }
@@ -6364,24 +6364,24 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user.    
-	pub fn my_subscribers(&mut self, new_value: &bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._my_subscribers = Some(new_value.clone());
+	pub fn my_subscribers(&mut self, new_value: bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._my_subscribers = Some(new_value);
 		return self;
 	}
 	/// Sets the *mine* query property to the given value.
 	///
 	/// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's subscriptions.    
-	pub fn mine(&mut self, new_value: &bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value.clone());
+	pub fn mine(&mut self, new_value: bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value);
 		return self;
 	}
 	/// Sets the *max results* query property to the given value.
 	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: &u32) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value.clone());
+	pub fn max_results(&mut self, new_value: u32) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value);
 		return self;
 	}
 	/// Sets the *id* query property to the given value.
@@ -6749,8 +6749,8 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: &u32) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value.clone());
+	pub fn max_results(&mut self, new_value: u32) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value);
 		return self;
 	}
 	/// Sets the *location radius* query property to the given value.
@@ -6773,8 +6773,8 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// The forMine parameter restricts the search to only retrieve videos owned by the authenticated user. If you set this parameter to true, then the type parameter's value must also be set to video.    
-	pub fn for_mine(&mut self, new_value: &bool) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._for_mine = Some(new_value.clone());
+	pub fn for_mine(&mut self, new_value: bool) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._for_mine = Some(new_value);
 		return self;
 	}
 	/// Sets the *for content owner* query property to the given value.
@@ -6783,8 +6783,8 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The forContentOwner parameter restricts the search to only retrieve resources owned by the content owner specified by the onBehalfOfContentOwner parameter. The user must be authenticated using a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.
-	pub fn for_content_owner(&mut self, new_value: &bool) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._for_content_owner = Some(new_value.clone());
+	pub fn for_content_owner(&mut self, new_value: bool) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+		self._for_content_owner = Some(new_value);
 		return self;
 	}
 	/// Sets the *event type* query property to the given value.
@@ -7187,16 +7187,16 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// The mine parameter can be used to instruct the API to only return streams owned by the authenticated user. Set the parameter value to true to only retrieve your own streams.    
-	pub fn mine(&mut self, new_value: &bool) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value.clone());
+	pub fn mine(&mut self, new_value: bool) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value);
 		return self;
 	}
 	/// Sets the *max results* query property to the given value.
 	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set. Acceptable values are 0 to 50, inclusive. The default value is 5.    
-	pub fn max_results(&mut self, new_value: &u32) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value.clone());
+	pub fn max_results(&mut self, new_value: u32) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value);
 		return self;
 	}
 	/// Sets the *id* query property to the given value.
@@ -7487,32 +7487,32 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// Set this parameter's value to true to retrieve a list of channels that subscribed to the authenticated user's channel.    
-	pub fn my_subscribers(&mut self, new_value: &bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._my_subscribers = Some(new_value.clone());
+	pub fn my_subscribers(&mut self, new_value: bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._my_subscribers = Some(new_value);
 		return self;
 	}
 	/// Sets the *mine* query property to the given value.
 	///
 	/// 
     /// Set this parameter's value to true to instruct the API to only return channels owned by the authenticated user.    
-	pub fn mine(&mut self, new_value: &bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value.clone());
+	pub fn mine(&mut self, new_value: bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value);
 		return self;
 	}
 	/// Sets the *max results* query property to the given value.
 	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: &u32) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value.clone());
+	pub fn max_results(&mut self, new_value: u32) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value);
 		return self;
 	}
 	/// Sets the *managed by me* query property to the given value.
 	///
 	/// 
     /// Set this parameter's value to true to instruct the API to only return channels managed by the content owner that the onBehalfOfContentOwner parameter specifies. The user must be authenticated as a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.    
-	pub fn managed_by_me(&mut self, new_value: &bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._managed_by_me = Some(new_value.clone());
+	pub fn managed_by_me(&mut self, new_value: bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+		self._managed_by_me = Some(new_value);
 		return self;
 	}
 	/// Sets the *id* query property to the given value.
@@ -7721,8 +7721,8 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: &u32) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value.clone());
+	pub fn max_results(&mut self, new_value: u32) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value);
 		return self;
 	}
 	/// Sets the *id* query property to the given value.
@@ -8176,8 +8176,8 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// The displaySlate parameter specifies whether the slate is being enabled or disabled.    
-	pub fn display_slate(&mut self, new_value: &bool) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-		self._display_slate = Some(new_value.clone());
+	pub fn display_slate(&mut self, new_value: bool) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+		self._display_slate = Some(new_value);
 		return self;
 	}
 }
@@ -8597,16 +8597,16 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// The mine parameter can be used to instruct the API to only return broadcasts owned by the authenticated user. Set the parameter value to true to only retrieve your own broadcasts.    
-	pub fn mine(&mut self, new_value: &bool) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value.clone());
+	pub fn mine(&mut self, new_value: bool) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value);
 		return self;
 	}
 	/// Sets the *max results* query property to the given value.
 	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: &u32) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value.clone());
+	pub fn max_results(&mut self, new_value: u32) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value);
 		return self;
 	}
 	/// Sets the *id* query property to the given value.
@@ -9040,24 +9040,24 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 	///
 	/// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's activities.    
-	pub fn mine(&mut self, new_value: &bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value.clone());
+	pub fn mine(&mut self, new_value: bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._mine = Some(new_value);
 		return self;
 	}
 	/// Sets the *max results* query property to the given value.
 	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: &u32) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value.clone());
+	pub fn max_results(&mut self, new_value: u32) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._max_results = Some(new_value);
 		return self;
 	}
 	/// Sets the *home* query property to the given value.
 	///
 	/// 
     /// Set this parameter's value to true to retrieve the activity feed that displays on the YouTube home page for the currently authenticated user.    
-	pub fn home(&mut self, new_value: &bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._home = Some(new_value.clone());
+	pub fn home(&mut self, new_value: bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+		self._home = Some(new_value);
 		return self;
 	}
 	/// Sets the *channel id* query property to the given value.

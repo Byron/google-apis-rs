@@ -219,7 +219,13 @@ def activity_input_type(p):
     n = activity_rust_type(p, allow_optionals=False)
     if n == 'String':
         n = 'str'
+    # pods are copied anyway
+    elif is_pod_property(p):
+        return n
     return '&%s' % n
+
+def is_pod_property(p):
+    return 'format' in p or p.type == 'boolean'
 
 # return an iterator yielding fake-schemas that identify a nested type
 def iter_nested_types(schemas):

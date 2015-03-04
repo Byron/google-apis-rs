@@ -28,7 +28,7 @@ ${util.test_prelude()}\
 ${lib.test_hub(hub_type_name, comments=False)}\
 
 // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
-// like ${put_and(sorted('`%s(...)`' % f for f in c.rta_map[resource]))}
+// like ${put_and(sorted('`%s(...)`' % mangle_ident(f) for f in c.rta_map[resource]))}
 // to build up your call.
 let rb = hub.${mangle_ident(resource)}();
 </%block>
@@ -56,7 +56,7 @@ impl<'a, C, NC, A> ${ThisType} {
 	///
 	${m.description | rust_doc_comment, indent_all_but_first_by(1)}
 	% endif
-	fn ${mangle_ident(a)}(&self) -> ${RType}<'a, C, NC, A> {
+	pub fn ${mangle_ident(a)}(&self) -> ${RType}<'a, C, NC, A> {
 		${RType} {
 			hub: self.hub,
 			% for p in method_params(m):

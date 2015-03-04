@@ -2,7 +2,7 @@
 	from util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
                       rb_type, mb_type, singular, hub_type, to_fqan, indent_all_but_first_by,
                       method_params, activity_rust_type, mangle_ident, activity_input_type, get_word,
-                      split_camelcase_s, property, TREF)
+                      split_camelcase_s, property, is_pod_property, TREF)
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -37,7 +37,7 @@ ${lib.test_hub(hub_type_name, comments=False)}\
 // Usually you wouldn't bind this to a variable, but keep calling methods
 // to setup your call.
 // TODO: figoure out actual arguments ... 
-// let mb = hub.${resource}().${method}(...);
+// let mb = hub.${resource}().${mangle_ident(method)}(...);
 
 // Finally, execute your call and process the result
 // TODO: comment in once args are properly setup !
@@ -88,6 +88,13 @@ ${self._setter(resource, method, m, p, ThisType, c)}\
 		if not (m.get('request') and m.get('response')):
 			return False
 		return m.request.get(TREF, 'first') == m.response.get(TREF, 'second')
+
+	value_name = 'new_value'
+	new_value_copied = value_name + '.clone()'
+	if InType == '&str':
+		new_value_copied = value_name + '.to_string()'
+	elif is_pod_property(p):
+		new_value_copied = value_name
 %>\
 	/// Sets the *${split_camelcase_s(p.name)}* ${get_word(p, 'location')}property to the given value.
 	///
@@ -105,12 +112,8 @@ ${self._setter(resource, method, m, p, ThisType, c)}\
 	% if 'description' in p:
     ${p.description | rust_doc_comment, indent_all_but_first_by(1)}
 	% endif
-	pub fn ${mangle_ident(p.name)}(&mut self, new_value: ${InType}) -> &mut ${ThisType} {
-		% if InType == '&str':
-		self.${property(p.name)} = Some(new_value.to_string());
-		% else:
-		self.${property(p.name)} = Some(new_value.clone());
-		% endif
+	pub fn ${mangle_ident(p.name)}(&mut self, ${value_name}: ${InType}) -> &mut ${ThisType} {
+		self.${property(p.name)} = Some(${new_value_copied});
 		return self;
 	}
 </%def>
