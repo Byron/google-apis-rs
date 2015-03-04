@@ -396,3 +396,7 @@ def get_word(d, n, e = ''):
     else:
         return ''
 
+# n = 'FooBar' -> _foo_bar
+def property(n):
+    return '_' + mangle_ident(n)
+

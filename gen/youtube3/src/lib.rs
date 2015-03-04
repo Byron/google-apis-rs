@@ -3850,6 +3850,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -3858,15 +3859,14 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *hl* query property to the given value.
+	///
 	/// 
     /// The hl parameter specifies the language that should be used for text values in the API response.    
 	pub fn hl(&mut self, new_value: &str) -> &mut I18nLanguageListMethodBuilder<'a, C, NC, A> {
 		self._hl = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -3934,6 +3934,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -3942,7 +3943,6 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -4006,6 +4006,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -4016,8 +4017,8 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4026,31 +4027,30 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *mine* query property to the given value.
+	///
 	/// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's channelSections.    
 	pub fn mine(&mut self, new_value: &bool) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
 		self._mine = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *id* query property to the given value.
+	///
 	/// 
     /// The id parameter specifies a comma-separated list of the YouTube channelSection ID(s) for the resource(s) that are being retrieved. In a channelSection resource, the id property specifies the YouTube channelSection ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *channel id* query property to the given value.
+	///
 	/// 
     /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's channelSections.    
 	pub fn channel_id(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
 		self._channel_id = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -4112,8 +4112,12 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -4122,8 +4126,8 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4134,8 +4138,8 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4144,7 +4148,6 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -4205,6 +4208,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -4213,8 +4217,8 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4223,7 +4227,6 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -4284,8 +4287,12 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -4294,8 +4301,8 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4304,7 +4311,6 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -4367,6 +4373,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -4377,31 +4384,30 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *region code* query property to the given value.
+	///
 	/// 
     /// The regionCode parameter instructs the API to return the list of guide categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
 	pub fn region_code(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
 		self._region_code = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *id* query property to the given value.
+	///
 	/// 
     /// The id parameter specifies a comma-separated list of the YouTube channel category ID(s) for the resource(s) that are being retrieved. In a guideCategory resource, the id property specifies the YouTube channel category ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *hl* query property to the given value.
+	///
 	/// 
     /// The hl parameter specifies the language that will be used for text values in the API response.    
 	pub fn hl(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
 		self._hl = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -4463,8 +4469,12 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -4473,8 +4483,8 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4485,8 +4495,8 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4495,7 +4505,6 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -4562,6 +4571,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -4572,16 +4582,16 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *page token* query property to the given value.
+	///
 	/// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
 	pub fn page_token(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
 		self._page_token = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4592,8 +4602,8 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4602,39 +4612,38 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *mine* query property to the given value.
+	///
 	/// 
     /// Set this parameter's value to true to instruct the API to only return playlists owned by the authenticated user.    
 	pub fn mine(&mut self, new_value: &bool) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
 		self._mine = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *max results* query property to the given value.
+	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
 	pub fn max_results(&mut self, new_value: &u32) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
 		self._max_results = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *id* query property to the given value.
+	///
 	/// 
     /// The id parameter specifies a comma-separated list of the YouTube playlist ID(s) for the resource(s) that are being retrieved. In a playlist resource, the id property specifies the playlist's YouTube playlist ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *channel id* query property to the given value.
+	///
 	/// 
     /// This value indicates that the API should only return the specified channel's playlists.    
 	pub fn channel_id(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
 		self._channel_id = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -4695,6 +4704,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -4703,8 +4713,8 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4713,7 +4723,6 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -4774,8 +4783,12 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -4786,8 +4799,8 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4796,7 +4809,6 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -4857,6 +4869,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *video id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -4865,15 +4878,14 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 		self._video_id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
 	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ThumbnailSetMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -4943,6 +4955,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -4953,24 +4966,24 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *video category id* query property to the given value.
+	///
 	/// 
     /// The videoCategoryId parameter identifies the video category for which the chart should be retrieved. This parameter can only be used in conjunction with the chart parameter. By default, charts are not restricted to a particular category.    
 	pub fn video_category_id(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
 		self._video_category_id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *region code* query property to the given value.
+	///
 	/// 
     /// The regionCode parameter instructs the API to select a video chart available in the specified region. This parameter can only be used in conjunction with the chart parameter. The parameter value is an ISO 3166-1 alpha-2 country code.    
 	pub fn region_code(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
 		self._region_code = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *page token* query property to the given value.
+	///
 	/// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     /// 
@@ -4979,8 +4992,8 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 		self._page_token = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -4989,16 +5002,16 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *my rating* query property to the given value.
+	///
 	/// 
     /// Set this parameter's value to like or dislike to instruct the API to only return videos liked or disliked by the authenticated user.    
 	pub fn my_rating(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
 		self._my_rating = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *max results* query property to the given value.
+	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     /// 
@@ -5007,39 +5020,38 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 		self._max_results = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *locale* query property to the given value.
+	///
 	/// 
     /// DEPRECATED    
 	pub fn locale(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
 		self._locale = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *id* query property to the given value.
+	///
 	/// 
     /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) that are being retrieved. In a video resource, the id property specifies the video's ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *hl* query property to the given value.
+	///
 	/// 
     /// The hl parameter instructs the API to return a localized version of the video details. If localized text is nor available for the requested language, the localizations object in the API response will contain the requested information in the default language instead. The parameter value is a BCP-47 language code. Your application can determine whether the requested localization was returned by checking the value of the snippet.localized.language property in the API response.    
 	pub fn hl(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
 		self._hl = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *chart* query property to the given value.
+	///
 	/// 
     /// The chart parameter identifies the chart that you want to retrieve.    
 	pub fn chart(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
 		self._chart = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -5101,6 +5113,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -5109,8 +5122,8 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *rating* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -5119,8 +5132,8 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 		self._rating = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -5129,7 +5142,6 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -5190,6 +5202,7 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -5198,8 +5211,8 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -5208,7 +5221,6 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -5269,6 +5281,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -5277,8 +5290,8 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -5287,7 +5300,6 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -5348,8 +5360,12 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -5362,8 +5378,8 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -5372,7 +5388,6 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -5437,8 +5452,12 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -5447,16 +5466,16 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *stabilize* query property to the given value.
+	///
 	/// 
     /// The stabilize parameter indicates whether YouTube should adjust the video to remove shaky camera motions.    
 	pub fn stabilize(&mut self, new_value: &bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
 		self._stabilize = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -5467,8 +5486,8 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -5477,23 +5496,22 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *notify subscribers* query property to the given value.
+	///
 	/// 
     /// The notifySubscribers parameter indicates whether YouTube should send notification to subscribers about the inserted video.    
 	pub fn notify_subscribers(&mut self, new_value: &bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
 		self._notify_subscribers = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *auto levels* query property to the given value.
+	///
 	/// 
     /// The autoLevels parameter indicates whether YouTube should automatically enhance the video's lighting and color.    
 	pub fn auto_levels(&mut self, new_value: &bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
 		self._auto_levels = Some(new_value.clone());
 		return self;
 	}
-
 }
 
 
@@ -5553,8 +5571,12 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -5563,7 +5585,6 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -5633,6 +5654,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -5643,24 +5665,24 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *page token* query property to the given value.
+	///
 	/// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
 	pub fn page_token(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
 		self._page_token = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *order* query property to the given value.
+	///
 	/// 
     /// The order parameter specifies the method that will be used to sort resources in the API response.    
 	pub fn order(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
 		self._order = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -5671,8 +5693,8 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -5681,55 +5703,54 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *my subscribers* query property to the given value.
+	///
 	/// 
     /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user.    
 	pub fn my_subscribers(&mut self, new_value: &bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
 		self._my_subscribers = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *mine* query property to the given value.
+	///
 	/// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's subscriptions.    
 	pub fn mine(&mut self, new_value: &bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
 		self._mine = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *max results* query property to the given value.
+	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
 	pub fn max_results(&mut self, new_value: &u32) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
 		self._max_results = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *id* query property to the given value.
+	///
 	/// 
     /// The id parameter specifies a comma-separated list of the YouTube subscription ID(s) for the resource(s) that are being retrieved. In a subscription resource, the id property specifies the YouTube subscription ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *for channel id* query property to the given value.
+	///
 	/// 
     /// The forChannelId parameter specifies a comma-separated list of channel IDs. The API response will then only contain subscriptions matching those channels.    
 	pub fn for_channel_id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
 		self._for_channel_id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *channel id* query property to the given value.
+	///
 	/// 
     /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's subscriptions.    
 	pub fn channel_id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
 		self._channel_id = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -5789,6 +5810,7 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -5797,7 +5819,6 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -5886,6 +5907,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -5896,168 +5918,168 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *video type* query property to the given value.
+	///
 	/// 
     /// The videoType parameter lets you restrict a search to a particular type of videos.    
 	pub fn video_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._video_type = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *video syndicated* query property to the given value.
+	///
 	/// 
     /// The videoSyndicated parameter lets you to restrict a search to only videos that can be played outside youtube.com.    
 	pub fn video_syndicated(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._video_syndicated = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *video license* query property to the given value.
+	///
 	/// 
     /// The videoLicense parameter filters search results to only include videos with a particular license. YouTube lets video uploaders choose to attach either the Creative Commons license or the standard YouTube license to each of their videos.    
 	pub fn video_license(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._video_license = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *video embeddable* query property to the given value.
+	///
 	/// 
     /// The videoEmbeddable parameter lets you to restrict a search to only videos that can be embedded into a webpage.    
 	pub fn video_embeddable(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._video_embeddable = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *video duration* query property to the given value.
+	///
 	/// 
     /// The videoDuration parameter filters video search results based on their duration.    
 	pub fn video_duration(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._video_duration = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *video dimension* query property to the given value.
+	///
 	/// 
     /// The videoDimension parameter lets you restrict a search to only retrieve 2D or 3D videos.    
 	pub fn video_dimension(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._video_dimension = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *video definition* query property to the given value.
+	///
 	/// 
     /// The videoDefinition parameter lets you restrict a search to only include either high definition (HD) or standard definition (SD) videos. HD videos are available for playback in at least 720p, though higher resolutions, like 1080p, might also be available.    
 	pub fn video_definition(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._video_definition = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *video category id* query property to the given value.
+	///
 	/// 
     /// The videoCategoryId parameter filters video search results based on their category.    
 	pub fn video_category_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._video_category_id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *video caption* query property to the given value.
+	///
 	/// 
     /// The videoCaption parameter indicates whether the API should filter video search results based on whether they have captions.    
 	pub fn video_caption(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._video_caption = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *type* query property to the given value.
+	///
 	/// 
     /// The type parameter restricts a search query to only retrieve a particular type of resource. The value is a comma-separated list of resource types.    
 	pub fn type_(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._type_ = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *topic id* query property to the given value.
+	///
 	/// 
     /// The topicId parameter indicates that the API response should only contain resources associated with the specified topic. The value identifies a Freebase topic ID.    
 	pub fn topic_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._topic_id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *safe search* query property to the given value.
+	///
 	/// 
     /// The safeSearch parameter indicates whether the search results should include restricted content as well as standard content.    
 	pub fn safe_search(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._safe_search = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *relevance language* query property to the given value.
+	///
 	/// 
     /// The relevanceLanguage parameter instructs the API to return search results that are most relevant to the specified language. The parameter value is typically an ISO 639-1 two-letter language code. However, you should use the values zh-Hans for simplified Chinese and zh-Hant for traditional Chinese. Please note that results in other languages will still be returned if they are highly relevant to the search query term.    
 	pub fn relevance_language(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._relevance_language = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *related to video id* query property to the given value.
+	///
 	/// 
     /// The relatedToVideoId parameter retrieves a list of videos that are related to the video that the parameter value identifies. The parameter value must be set to a YouTube video ID and, if you are using this parameter, the type parameter must be set to video.    
 	pub fn related_to_video_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._related_to_video_id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *region code* query property to the given value.
+	///
 	/// 
     /// The regionCode parameter instructs the API to return search results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
 	pub fn region_code(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._region_code = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *q* query property to the given value.
+	///
 	/// 
     /// The q parameter specifies the query term to search for.    
 	pub fn q(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._q = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *published before* query property to the given value.
+	///
 	/// 
     /// The publishedBefore parameter indicates that the API response should only contain resources created before the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
 	pub fn published_before(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._published_before = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *published after* query property to the given value.
+	///
 	/// 
     /// The publishedAfter parameter indicates that the API response should only contain resources created after the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
 	pub fn published_after(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._published_after = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *page token* query property to the given value.
+	///
 	/// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
 	pub fn page_token(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._page_token = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *order* query property to the given value.
+	///
 	/// 
     /// The order parameter specifies the method that will be used to order resources in the API response.    
 	pub fn order(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._order = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -6066,40 +6088,40 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *max results* query property to the given value.
+	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
 	pub fn max_results(&mut self, new_value: &u32) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._max_results = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *location radius* query property to the given value.
+	///
 	/// 
     /// The locationRadius, in conjunction with the location parameter, defines a geographic area. If the geographic coordinates associated with a video fall within that area, then the video may be included in search results. This parameter value must be a floating point number followed by a measurement unit. Valid measurement units are m, km, ft, and mi. For example, valid parameter values include 1500m, 5km, 10000ft, and 0.75mi. The API does not support locationRadius parameter values larger than 1000 kilometers.    
 	pub fn location_radius(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._location_radius = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *location* query property to the given value.
+	///
 	/// 
     /// The location parameter restricts a search to videos that have a geographical location specified in their metadata. The value is a string that specifies geographic latitude/longitude coordinates e.g. (37.42307,-122.08427)    
 	pub fn location(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._location = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *for mine* query property to the given value.
+	///
 	/// 
     /// The forMine parameter restricts the search to only retrieve videos owned by the authenticated user. If you set this parameter to true, then the type parameter's value must also be set to video.    
 	pub fn for_mine(&mut self, new_value: &bool) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._for_mine = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *for content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -6108,31 +6130,30 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 		self._for_content_owner = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *event type* query property to the given value.
+	///
 	/// 
     /// The eventType parameter restricts a search to broadcast events.    
 	pub fn event_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._event_type = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *channel type* query property to the given value.
+	///
 	/// 
     /// The channelType parameter lets you restrict a search to a particular type of channel.    
 	pub fn channel_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._channel_type = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *channel id* query property to the given value.
+	///
 	/// 
     /// The channelId parameter indicates that the API response should only contain resources created by the channel    
 	pub fn channel_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
 		self._channel_id = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -6193,6 +6214,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -6201,15 +6223,14 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *hl* query property to the given value.
+	///
 	/// 
     /// The hl parameter specifies the language that should be used for text values in the API response.    
 	pub fn hl(&mut self, new_value: &str) -> &mut I18nRegionListMethodBuilder<'a, C, NC, A> {
 		self._hl = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -6271,8 +6292,12 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -6283,8 +6308,8 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -6295,8 +6320,8 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -6305,7 +6330,6 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -6367,6 +6391,7 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -6375,8 +6400,8 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -6387,8 +6412,8 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -6397,7 +6422,6 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -6463,6 +6487,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -6471,16 +6496,16 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *page token* query property to the given value.
+	///
 	/// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
 	pub fn page_token(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
 		self._page_token = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -6491,8 +6516,8 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -6501,31 +6526,30 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *mine* query property to the given value.
+	///
 	/// 
     /// The mine parameter can be used to instruct the API to only return streams owned by the authenticated user. Set the parameter value to true to only retrieve your own streams.    
 	pub fn mine(&mut self, new_value: &bool) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
 		self._mine = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *max results* query property to the given value.
+	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set. Acceptable values are 0 to 50, inclusive. The default value is 5.    
 	pub fn max_results(&mut self, new_value: &u32) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
 		self._max_results = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *id* query property to the given value.
+	///
 	/// 
     /// The id parameter specifies a comma-separated list of YouTube stream IDs that identify the streams being retrieved. In a liveStream resource, the id property specifies the stream's ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -6587,8 +6611,12 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -6597,8 +6625,8 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -6609,8 +6637,8 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -6619,7 +6647,6 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -6680,8 +6707,12 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -6692,15 +6723,14 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
 	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelUpdateMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -6769,6 +6799,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -6779,79 +6810,78 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *page token* query property to the given value.
+	///
 	/// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
 	pub fn page_token(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
 		self._page_token = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
 	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *my subscribers* query property to the given value.
+	///
 	/// 
     /// Set this parameter's value to true to retrieve a list of channels that subscribed to the authenticated user's channel.    
 	pub fn my_subscribers(&mut self, new_value: &bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
 		self._my_subscribers = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *mine* query property to the given value.
+	///
 	/// 
     /// Set this parameter's value to true to instruct the API to only return channels owned by the authenticated user.    
 	pub fn mine(&mut self, new_value: &bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
 		self._mine = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *max results* query property to the given value.
+	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
 	pub fn max_results(&mut self, new_value: &u32) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
 		self._max_results = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *managed by me* query property to the given value.
+	///
 	/// 
     /// Set this parameter's value to true to instruct the API to only return channels managed by the content owner that the onBehalfOfContentOwner parameter specifies. The user must be authenticated as a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.    
 	pub fn managed_by_me(&mut self, new_value: &bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
 		self._managed_by_me = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *id* query property to the given value.
+	///
 	/// 
     /// The id parameter specifies a comma-separated list of the YouTube channel ID(s) for the resource(s) that are being retrieved. In a channel resource, the id property specifies the channel's YouTube channel ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *for username* query property to the given value.
+	///
 	/// 
     /// The forUsername parameter specifies a YouTube username, thereby requesting the channel associated with that username.    
 	pub fn for_username(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
 		self._for_username = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *category id* query property to the given value.
+	///
 	/// 
     /// The categoryId parameter specifies a YouTube guide category, thereby requesting YouTube channels associated with that category.    
 	pub fn category_id(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
 		self._category_id = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -6911,6 +6941,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -6919,7 +6950,6 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -6985,6 +7015,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -6995,32 +7026,32 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *video id* query property to the given value.
+	///
 	/// 
     /// The videoId parameter specifies that the request should return only the playlist items that contain the specified video.    
 	pub fn video_id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
 		self._video_id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *playlist id* query property to the given value.
+	///
 	/// 
     /// The playlistId parameter specifies the unique ID of the playlist for which you want to retrieve playlist items. Note that even though this is an optional parameter, every request to retrieve playlist items must specify a value for either the id parameter or the playlistId parameter.    
 	pub fn playlist_id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
 		self._playlist_id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *page token* query property to the given value.
+	///
 	/// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
 	pub fn page_token(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
 		self._page_token = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7029,23 +7060,22 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *max results* query property to the given value.
+	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
 	pub fn max_results(&mut self, new_value: &u32) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
 		self._max_results = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *id* query property to the given value.
+	///
 	/// 
     /// The id parameter specifies a comma-separated list of one or more unique playlist item IDs.    
 	pub fn id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -7106,8 +7136,12 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -7116,8 +7150,8 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7126,7 +7160,6 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -7186,8 +7219,12 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -7198,7 +7235,6 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -7259,6 +7295,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *channel id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -7267,15 +7304,14 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 		self._channel_id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
 	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut WatermarkSetMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -7336,6 +7372,7 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *channel id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -7344,15 +7381,14 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 		self._channel_id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
 	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -7418,6 +7454,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -7426,8 +7463,8 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -7436,16 +7473,16 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *walltime* query property to the given value.
+	///
 	/// 
     /// The walltime parameter specifies the wall clock time at which the specified slate change will occur. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.    
 	pub fn walltime(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 		self._walltime = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7456,8 +7493,8 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7466,8 +7503,8 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *offset time ms* query property to the given value.
+	///
 	/// 
     /// The offsetTimeMs parameter specifies a positive time offset when the specified slate change will occur. The value is measured in milliseconds from the beginning of the broadcast's monitor stream, which is the time that the testing phase for the broadcast began. Even though it is specified in milliseconds, the value is actually an approximation, and YouTube completes the requested action as closely as possible to that time.
     /// 
@@ -7478,15 +7515,14 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 		self._offset_time_ms = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *display slate* query property to the given value.
+	///
 	/// 
     /// The displaySlate parameter specifies whether the slate is being enabled or disabled.    
 	pub fn display_slate(&mut self, new_value: &bool) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 		self._display_slate = Some(new_value.clone());
 		return self;
 	}
-
 }
 
 
@@ -7548,8 +7584,12 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -7560,8 +7600,8 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7572,8 +7612,8 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7582,7 +7622,6 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -7644,8 +7683,12 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -7654,8 +7697,8 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7666,8 +7709,8 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7676,7 +7719,6 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -7740,6 +7782,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -7748,8 +7791,8 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -7758,16 +7801,16 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *stream id* query property to the given value.
+	///
 	/// 
     /// The streamId parameter specifies the unique ID of the video stream that is being bound to a broadcast. If this parameter is omitted, the API will remove any existing binding between the broadcast and a video stream.    
 	pub fn stream_id(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 		self._stream_id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7778,8 +7821,8 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7788,7 +7831,6 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -7855,6 +7897,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -7863,16 +7906,16 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *page token* query property to the given value.
+	///
 	/// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
 	pub fn page_token(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 		self._page_token = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7883,8 +7926,8 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -7893,39 +7936,38 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *mine* query property to the given value.
+	///
 	/// 
     /// The mine parameter can be used to instruct the API to only return broadcasts owned by the authenticated user. Set the parameter value to true to only retrieve your own broadcasts.    
 	pub fn mine(&mut self, new_value: &bool) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 		self._mine = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *max results* query property to the given value.
+	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
 	pub fn max_results(&mut self, new_value: &u32) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 		self._max_results = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *id* query property to the given value.
+	///
 	/// 
     /// The id parameter specifies a comma-separated list of YouTube broadcast IDs that identify the broadcasts being retrieved. In a liveBroadcast resource, the id property specifies the broadcast's ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *broadcast status* query property to the given value.
+	///
 	/// 
     /// The broadcastStatus parameter filters the API response to only include broadcasts with the specified status.    
 	pub fn broadcast_status(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 		self._broadcast_status = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -7987,6 +8029,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -7995,8 +8038,8 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -8007,8 +8050,8 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -8017,7 +8060,6 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -8081,6 +8123,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *broadcast status* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -8089,8 +8132,8 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 		self._broadcast_status = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *id* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -8099,8 +8142,8 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -8109,8 +8152,8 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner channel* query property to the given value.
+	///
 	/// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -8121,8 +8164,8 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *on behalf of content owner* query property to the given value.
+	///
 	/// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
@@ -8131,7 +8174,6 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 		self._on_behalf_of_content_owner = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -8194,6 +8236,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -8202,31 +8245,30 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *region code* query property to the given value.
+	///
 	/// 
     /// The regionCode parameter instructs the API to return the list of video categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
 	pub fn region_code(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
 		self._region_code = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *id* query property to the given value.
+	///
 	/// 
     /// The id parameter specifies a comma-separated list of video category IDs for the resources that you are retrieving.    
 	pub fn id(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
 		self._id = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *hl* query property to the given value.
+	///
 	/// 
     /// The hl parameter specifies the language that should be used for text values in the API response.    
 	pub fn hl(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
 		self._hl = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -8294,6 +8336,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
+	///
 	/// Even though the property as already been set when instantiating this call, 
 	/// we provide this method for API completeness.
 	/// 
@@ -8304,71 +8347,70 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *region code* query property to the given value.
+	///
 	/// 
     /// The regionCode parameter instructs the API to return results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code. YouTube uses this value when the authorized user's previous activity on YouTube does not provide enough information to generate the activity feed.    
 	pub fn region_code(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
 		self._region_code = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *published before* query property to the given value.
+	///
 	/// 
     /// The publishedBefore parameter specifies the date and time before which an activity must have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be excluded from the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
 	pub fn published_before(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
 		self._published_before = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *published after* query property to the given value.
+	///
 	/// 
     /// The publishedAfter parameter specifies the earliest date and time that an activity could have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be included in the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
 	pub fn published_after(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
 		self._published_after = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *page token* query property to the given value.
+	///
 	/// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
 	pub fn page_token(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
 		self._page_token = Some(new_value.to_string());
 		return self;
 	}
-
 	/// Sets the *mine* query property to the given value.
+	///
 	/// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's activities.    
 	pub fn mine(&mut self, new_value: &bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
 		self._mine = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *max results* query property to the given value.
+	///
 	/// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
 	pub fn max_results(&mut self, new_value: &u32) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
 		self._max_results = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *home* query property to the given value.
+	///
 	/// 
     /// Set this parameter's value to true to retrieve the activity feed that displays on the YouTube home page for the currently authenticated user.    
 	pub fn home(&mut self, new_value: &bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
 		self._home = Some(new_value.clone());
 		return self;
 	}
-
 	/// Sets the *channel id* query property to the given value.
+	///
 	/// 
     /// The channelId parameter specifies a unique YouTube channel ID. The API will then return a list of that channel's activities.    
 	pub fn channel_id(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
 		self._channel_id = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
@@ -8432,8 +8474,12 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
 	}
 
 	/// Sets the *part* query property to the given value.
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
+	///
+	/// Even though the *parts* list is automatically derived from *Resource* passed in 
+	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+	/// like statistics that are generated server side. Therefore you should use this method to specify 
+	/// the parts you provide in addition to the ones you want in the response.
 	/// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -8442,7 +8488,6 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
 		self._part = Some(new_value.to_string());
 		return self;
 	}
-
 }
 
 
