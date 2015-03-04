@@ -1,8 +1,8 @@
 <%! import util %>\
 <%namespace name="mutil" file="lib/util.mako"/>\
-# DO NOT EDIT !
-# This file was generated automatically by '${self.uri}'
-# DO NOT EDIT !
+<%block filter="util.hash_comment">\
+<%mutil:gen_info source="${self.uri}" />\
+</%block>
 [package]
 
 name = "${mutil.library_name()}"
@@ -23,9 +23,6 @@ cookie = "= 0.1.13"
 hyper = "*"
 rustc-serialize = "*"
 yup-oauth2 = "*"
-
-[dependencies.cmn]
-path = "${directories.common}/.."
 
 [dev-dependencies]
 yup-hyper-mock = "*"

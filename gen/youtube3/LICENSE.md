@@ -1,13 +1,12 @@
-## -*- coding: utf-8 -*-
-<%! import util %>\
-<%namespace name="mutil" file="lib/util.mako"/>\
-<%block filter="util.markdown_comment">\
-<%mutil:gen_info source="${self.uri}" />\
-</%block>
+<!---
+DO NOT EDIT !
+This file was generated automatically from 'src/mako/LICENSE.md.mako'
+DO NOT EDIT !
+-->
 The MIT License (MIT)
 =====================
 
-Copyright © `${copyright.years}` ${util.put_and(["`%s`" % a for a in copyright.authors])}
+Copyright © `2015` `Sebastian Thiel`
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
