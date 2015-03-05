@@ -4,7 +4,7 @@
                       method_params, activity_rust_type, mangle_ident, activity_input_type, get_word,
                       split_camelcase_s, property, is_pod_property, TREF, method_io, IO_REQUEST, 
                       schema_to_required_property, rust_copy_value_s, is_required_property,
-                      hash_comment, build_all_params, REQUEST_VALUE_PROPERTY_NAME)
+                      hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME)
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -33,11 +33,10 @@ ${m.description | rust_doc_comment}
 /// Instantiate a resource method builder
 ///
 <%block filter="rust_doc_test_norun, rust_doc_comment">\
-${capture(util.test_prelude) | hash_comment}\
+${capture(util.test_prelude) | hide_rust_doc_test}\
 
 <%block filter="rust_test_fn_invisible">\
-${capture(lib.test_hub, hub_type_name, comments=False) | hash_comment}\
-
+${capture(lib.test_hub, hub_type_name, comments=False) | hide_rust_doc_test}
 // Usually you wouldn't bind this to a variable, but keep calling methods
 // to setup your call.
 ## % for p 

@@ -49,6 +49,10 @@ def rust_comment(s):
 def hash_comment(s):
     return re_linestart.sub('# ', s)
 
+# hides lines in rust examples, if not already hidden, or empty.
+def hide_rust_doc_test(s):
+    return re.sub('^[^#\n]', lambda m: '# ' + m.group(), s, flags=re.MULTILINE)
+
 # remove the first indentation (must be spaces !)
 def unindent(s):
     return re_first_4_spaces.sub('', s)
