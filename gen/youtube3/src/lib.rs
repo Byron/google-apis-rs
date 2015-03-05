@@ -241,6 +241,7 @@ pub struct VideoConversionPings {
 
 impl Part for VideoConversionPings {}
 
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -275,6 +276,7 @@ pub struct SubscriptionListResponse {
 
 impl ResponseResult for SubscriptionListResponse {}
 
+
 /// Information about a resource that received a positive (like) rating.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -286,6 +288,7 @@ pub struct ActivityContentDetailsLike {
 }
 
 impl Part for ActivityContentDetailsLike {}
+
 
 /// There is no detailed description.
 /// 
@@ -314,6 +317,7 @@ pub struct LiveBroadcastSnippet {
 }
 
 impl Part for LiveBroadcastSnippet {}
+
 
 /// Describes original video file properties, including technical details about audio and video streams, but also metadata information like content length, digitization time, or geotagging information.
 /// 
@@ -348,6 +352,7 @@ pub struct VideoFileDetails {
 
 impl Part for VideoFileDetails {}
 
+
 /// Playlist localization setting
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -361,6 +366,7 @@ pub struct PlaylistLocalization {
 }
 
 impl Part for PlaylistLocalization {}
+
 
 /// A playlist resource represents a YouTube playlist. A playlist is a collection of videos that can be viewed sequentially and shared with other users. A playlist can contain up to 200 videos, and YouTube does not limit the number of playlists that each user creates. By default, playlists are publicly visible to other users, but playlists can be public or private.
 /// 
@@ -404,9 +410,10 @@ pub struct Playlist {
 	pub localizations: HashMap<String, PlaylistLocalization>,
 }
 
-impl RequestResult for Playlist {}
+impl RequestValue for Playlist {}
 impl Resource for Playlist {}
 impl ResponseResult for Playlist {}
+
 
 /// There is no detailed description.
 /// 
@@ -442,6 +449,7 @@ pub struct PlaylistItemListResponse {
 
 impl ResponseResult for PlaylistItemListResponse {}
 
+
 /// A pair Property / Value.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -455,6 +463,7 @@ pub struct PropertyValue {
 }
 
 impl Part for PropertyValue {}
+
 
 /// Describes a temporal position of a visual widget inside a video.
 /// 
@@ -471,6 +480,7 @@ pub struct InvideoTiming {
 }
 
 impl Part for InvideoTiming {}
+
 
 /// Basic details about a playlist, including title, description and thumbnails.
 /// 
@@ -500,6 +510,7 @@ pub struct PlaylistSnippet {
 
 impl Part for PlaylistSnippet {}
 
+
 /// The auditDetails object encapsulates channel data that is relevant for YouTube Partners during the audit process.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -517,6 +528,7 @@ pub struct ChannelAuditDetails {
 }
 
 impl Part for ChannelAuditDetails {}
+
 
 /// A live stream describes a live ingestion point.
 /// 
@@ -547,9 +559,10 @@ pub struct LiveStream {
 	pub id: Option<String>,
 }
 
-impl RequestResult for LiveStream {}
+impl RequestValue for LiveStream {}
 impl Resource for LiveStream {}
 impl ResponseResult for LiveStream {}
+
 
 /// There is no detailed description.
 /// 
@@ -577,6 +590,7 @@ pub struct ThumbnailSetResponse {
 
 impl ResponseResult for ThumbnailSetResponse {}
 
+
 /// Information about the uploaded video.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -588,6 +602,7 @@ pub struct ActivityContentDetailsUpload {
 }
 
 impl Part for ActivityContentDetailsUpload {}
+
 
 /// Branding properties for the channel view.
 /// 
@@ -625,6 +640,7 @@ pub struct ChannelSettings {
 
 impl Part for ChannelSettings {}
 
+
 /// Statistics about the video, such as the number of times the video was viewed or liked.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -645,6 +661,7 @@ pub struct VideoStatistics {
 
 impl Part for VideoStatistics {}
 
+
 /// Brief description of the live stream cdn settings.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -660,6 +677,7 @@ pub struct CdnSettings {
 }
 
 impl Part for CdnSettings {}
+
 
 /// There is no detailed description.
 /// 
@@ -687,6 +705,7 @@ pub struct VideoGetRatingResponse {
 
 impl ResponseResult for VideoGetRatingResponse {}
 
+
 /// Basic details about a video category, such as its localized title.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -703,6 +722,7 @@ pub struct VideoCategorySnippet {
 
 impl Part for VideoCategorySnippet {}
 
+
 /// Details about a resource which was added to a channel.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -714,6 +734,7 @@ pub struct ActivityContentDetailsChannelItem {
 }
 
 impl Part for ActivityContentDetailsChannelItem {}
+
 
 /// Basic details about an i18n language, such as language code and human-readable name.
 /// 
@@ -728,6 +749,7 @@ pub struct I18nLanguageSnippet {
 }
 
 impl Part for I18nLanguageSnippet {}
+
 
 /// Basic details about a subscription, including title, description and thumbnails of the subscribed item.
 /// 
@@ -753,6 +775,7 @@ pub struct SubscriptionSnippet {
 
 impl Part for SubscriptionSnippet {}
 
+
 /// Details about a channelsection, including playlists and channels.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -766,6 +789,7 @@ pub struct ChannelSectionContentDetails {
 }
 
 impl Part for ChannelSectionContentDetails {}
+
 
 /// There is no detailed description.
 /// 
@@ -792,6 +816,7 @@ pub struct I18nRegionListResponse {
 }
 
 impl ResponseResult for I18nRegionListResponse {}
+
 
 /// There is no detailed description.
 /// 
@@ -827,6 +852,7 @@ pub struct LiveStreamListResponse {
 
 impl ResponseResult for LiveStreamListResponse {}
 
+
 /// Describes a single promoted item.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -845,6 +871,7 @@ pub struct PromotedItem {
 
 impl Part for PromotedItem {}
 
+
 /// Branding properties of a YouTube channel.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -862,6 +889,7 @@ pub struct ChannelBrandingSettings {
 }
 
 impl Part for ChannelBrandingSettings {}
+
 
 /// There is no detailed description.
 /// 
@@ -897,6 +925,7 @@ pub struct PlaylistListResponse {
 
 impl ResponseResult for PlaylistListResponse {}
 
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -921,7 +950,8 @@ pub struct InvideoBranding {
 	pub image_bytes: Option<String>,
 }
 
-impl RequestResult for InvideoBranding {}
+impl RequestValue for InvideoBranding {}
+
 
 /// Information about the playlist item's privacy status.
 /// 
@@ -934,6 +964,7 @@ pub struct PlaylistItemStatus {
 }
 
 impl Part for PlaylistItemStatus {}
+
 
 /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
 /// 
@@ -948,6 +979,7 @@ pub struct ChannelConversionPing {
 }
 
 impl Part for ChannelConversionPing {}
+
 
 /// Describes an invideo promotion campaign consisting of multiple promoted items. A campaign belongs to a single channel_id.
 /// 
@@ -966,6 +998,7 @@ pub struct InvideoPromotion {
 }
 
 impl Part for InvideoPromotion {}
+
 
 /// A playlistItem resource identifies another resource, such as a video, that is included in a playlist. In addition, the playlistItem  resource contains details about the included resource that pertain specifically to how that resource is used in that playlist.
 /// 
@@ -1003,9 +1036,10 @@ pub struct PlaylistItem {
 	pub id: Option<String>,
 }
 
-impl RequestResult for PlaylistItem {}
+impl RequestValue for PlaylistItem {}
 impl Resource for PlaylistItem {}
 impl ResponseResult for PlaylistItem {}
+
 
 /// There is no detailed description.
 /// 
@@ -1041,6 +1075,7 @@ pub struct GuideCategoryListResponse {
 
 impl ResponseResult for GuideCategoryListResponse {}
 
+
 /// Localized versions of certain video properties (e.g. title).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1054,6 +1089,7 @@ pub struct VideoLocalization {
 }
 
 impl Part for VideoLocalization {}
+
 
 /// Basic details about a channel section, including title, style and position.
 /// 
@@ -1079,6 +1115,7 @@ pub struct ChannelSectionSnippet {
 
 impl Part for ChannelSectionSnippet {}
 
+
 /// Details about the content of a channel.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1093,6 +1130,7 @@ pub struct ChannelContentDetails {
 
 impl Part for ChannelContentDetails {}
 
+
 /// Stub token pagination template to suppress results.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1101,6 +1139,7 @@ impl Part for ChannelContentDetails {}
 pub struct TokenPagination;
 
 impl Part for TokenPagination {}
+
 
 /// There is no detailed description.
 /// 
@@ -1119,6 +1158,7 @@ pub struct PlaylistItemContentDetails {
 }
 
 impl Part for PlaylistItemContentDetails {}
+
 
 /// Internal representation of thumbnails for a YouTube resource.
 /// 
@@ -1140,6 +1180,7 @@ pub struct ThumbnailDetails {
 
 impl Part for ThumbnailDetails {}
 
+
 /// Details about monetization of a YouTube Video.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1151,6 +1192,7 @@ pub struct VideoMonetizationDetails {
 }
 
 impl Part for VideoMonetizationDetails {}
+
 
 /// Information that identifies the recommended resource.
 /// 
@@ -1168,6 +1210,7 @@ pub struct ActivityContentDetailsRecommendation {
 
 impl Part for ActivityContentDetailsRecommendation {}
 
+
 /// Recording information associated with the video.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1184,6 +1227,7 @@ pub struct VideoRecordingDetails {
 
 impl Part for VideoRecordingDetails {}
 
+
 /// Information about a channel that a user subscribed to.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1196,6 +1240,7 @@ pub struct ActivityContentDetailsSubscription {
 
 impl Part for ActivityContentDetailsSubscription {}
 
+
 /// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1207,6 +1252,7 @@ pub struct ChannelConversionPings {
 }
 
 impl Part for ChannelConversionPings {}
+
 
 /// Details about the content of an activity: the video that was shared, the channel that was subscribed to, etc.
 /// 
@@ -1240,6 +1286,7 @@ pub struct ActivityContentDetails {
 
 impl Part for ActivityContentDetails {}
 
+
 /// A i18nRegion resource identifies a region where YouTube is available.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1258,6 +1305,7 @@ pub struct I18nRegion {
 
 impl Part for I18nRegion {}
 
+
 /// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1271,6 +1319,7 @@ pub struct ChannelContentOwnerDetails {
 }
 
 impl Part for ChannelContentOwnerDetails {}
+
 
 /// Describes processing status and progress and availability of some other Video resource parts.
 /// 
@@ -1298,6 +1347,7 @@ pub struct VideoProcessingDetails {
 
 impl Part for VideoProcessingDetails {}
 
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1316,6 +1366,7 @@ pub struct LiveBroadcastStatus {
 
 impl Part for LiveBroadcastStatus {}
 
+
 /// Details about the content to witch a subscription refers.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1331,6 +1382,7 @@ pub struct SubscriptionContentDetails {
 }
 
 impl Part for SubscriptionContentDetails {}
+
 
 /// A video resource represents a YouTube video.
 /// 
@@ -1391,9 +1443,10 @@ pub struct Video {
 	pub recording_details: Option<VideoRecordingDetails>,
 }
 
-impl RequestResult for Video {}
+impl RequestValue for Video {}
 impl Resource for Video {}
 impl ResponseResult for Video {}
+
 
 /// Geographical coordinates of a point, in WGS84.
 /// 
@@ -1411,6 +1464,7 @@ pub struct GeoPoint {
 
 impl Part for GeoPoint {}
 
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1427,6 +1481,7 @@ pub struct VideoAgeGating {
 
 impl Part for VideoAgeGating {}
 
+
 /// Player to be used for a video playback.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1438,6 +1493,7 @@ pub struct VideoPlayer {
 }
 
 impl Part for VideoPlayer {}
+
 
 /// Basic details about a channel, including title, description and thumbnails.
 /// 
@@ -1461,6 +1517,7 @@ pub struct ChannelSnippet {
 
 impl Part for ChannelSnippet {}
 
+
 /// Branding properties for the watch.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1477,6 +1534,7 @@ pub struct WatchSettings {
 
 impl Part for WatchSettings {}
 
+
 /// ChannelSection localization setting
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1488,6 +1546,7 @@ pub struct ChannelSectionLocalization {
 }
 
 impl Part for ChannelSectionLocalization {}
+
 
 /// DEPRECATED Region restriction of the video.
 /// 
@@ -1503,6 +1562,7 @@ pub struct VideoContentDetailsRegionRestriction {
 
 impl Part for VideoContentDetailsRegionRestriction {}
 
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1516,6 +1576,7 @@ pub struct VideoRating {
 }
 
 impl Part for VideoRating {}
+
 
 /// Describes a single promoted item id. It is a union of various possible types.
 /// 
@@ -1534,6 +1595,7 @@ pub struct PromotedItemId {
 }
 
 impl Part for PromotedItemId {}
+
 
 /// A subscription resource contains information about a YouTube user subscription. A subscription notifies a user when new videos are added to a channel or when another user takes one of several actions on YouTube, such as uploading a video, rating a video, or commenting on a video.
 /// 
@@ -1563,9 +1625,10 @@ pub struct Subscription {
 	pub id: Option<String>,
 }
 
-impl RequestResult for Subscription {}
+impl RequestValue for Subscription {}
 impl Resource for Subscription {}
 impl ResponseResult for Subscription {}
+
 
 /// Basic details about an i18n region, such as region code and human-readable name.
 /// 
@@ -1580,6 +1643,7 @@ pub struct I18nRegionSnippet {
 }
 
 impl Part for I18nRegionSnippet {}
+
 
 /// Information about a new playlist item.
 /// 
@@ -1597,6 +1661,7 @@ pub struct ActivityContentDetailsPlaylistItem {
 
 impl Part for ActivityContentDetailsPlaylistItem {}
 
+
 /// Describes the spatial position of a visual widget inside a video. It is a union of various position types, out of which only will be set one.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1611,6 +1676,7 @@ pub struct InvideoPosition {
 
 impl Part for InvideoPosition {}
 
+
 /// Information about a resource that received a comment.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1622,6 +1688,7 @@ pub struct ActivityContentDetailsComment {
 }
 
 impl Part for ActivityContentDetailsComment {}
+
 
 /// Basic details about a guide category.
 /// 
@@ -1636,6 +1703,7 @@ pub struct GuideCategorySnippet {
 }
 
 impl Part for GuideCategorySnippet {}
+
 
 /// Basic details about a video, including title, description, uploader, thumbnails and category.
 /// 
@@ -1669,6 +1737,7 @@ pub struct VideoSnippet {
 
 impl Part for VideoSnippet {}
 
+
 /// Project specific details about the content of a YouTube Video.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1680,6 +1749,7 @@ pub struct VideoProjectDetails {
 }
 
 impl Part for VideoProjectDetails {}
+
 
 /// Detailed settings of a stream.
 /// 
@@ -1699,6 +1769,7 @@ pub struct LiveStreamContentDetails {
 }
 
 impl Part for LiveStreamContentDetails {}
+
 
 /// Detailed settings of a broadcast.
 /// 
@@ -1734,6 +1805,7 @@ pub struct LiveBroadcastContentDetails {
 
 impl Part for LiveBroadcastContentDetails {}
 
+
 /// Basic details about a video category, such as its localized title.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1760,6 +1832,7 @@ pub struct VideoStatus {
 
 impl Part for VideoStatus {}
 
+
 /// A guideCategory resource identifies a category that YouTube algorithmically assigns based on a channel's content or other indicators, such as the channel's popularity. The list is similar to video categories, with the difference being that a video's uploader can assign a video category but only YouTube can assign a channel category.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1777,6 +1850,7 @@ pub struct GuideCategory {
 }
 
 impl Part for GuideCategory {}
+
 
 /// There is no detailed description.
 /// 
@@ -1804,6 +1878,7 @@ pub struct ChannelSectionListResponse {
 
 impl ResponseResult for ChannelSectionListResponse {}
 
+
 /// Settings and Info of the monitor stream
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1823,6 +1898,7 @@ pub struct MonitorStreamInfo {
 }
 
 impl Part for MonitorStreamInfo {}
+
 
 /// There is no detailed description.
 /// 
@@ -1850,6 +1926,7 @@ pub struct I18nLanguageListResponse {
 
 impl ResponseResult for I18nLanguageListResponse {}
 
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1865,6 +1942,7 @@ pub struct LocalizedProperty {
 }
 
 impl Part for LocalizedProperty {}
+
 
 /// A liveBroadcast resource represents an event that will be streamed, via live video, on YouTube.
 /// 
@@ -1896,9 +1974,10 @@ pub struct LiveBroadcast {
 	pub id: Option<String>,
 }
 
-impl RequestResult for LiveBroadcast {}
+impl RequestValue for LiveBroadcast {}
 impl Resource for LiveBroadcast {}
 impl ResponseResult for LiveBroadcast {}
+
 
 /// Information about a video stream.
 /// 
@@ -1926,6 +2005,7 @@ pub struct VideoFileDetailsVideoStream {
 
 impl Part for VideoFileDetailsVideoStream {}
 
+
 /// A thumbnail is an image representing a YouTube resource.
 /// 
 /// # Activities
@@ -1947,6 +2027,7 @@ pub struct Thumbnail {
 }
 
 impl Resource for Thumbnail {}
+
 
 /// A channel resource contains information about a YouTube channel.
 /// 
@@ -1991,9 +2072,10 @@ pub struct Channel {
 	pub localizations: HashMap<String, ChannelLocalization>,
 }
 
-impl RequestResult for Channel {}
+impl RequestValue for Channel {}
 impl Resource for Channel {}
 impl ResponseResult for Channel {}
+
 
 /// Statistics about a channel: number of subscribers, number of videos in the channel, etc.
 /// 
@@ -2015,6 +2097,7 @@ pub struct ChannelStatistics {
 
 impl Part for ChannelStatistics {}
 
+
 /// Details about a social network post.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2035,6 +2118,7 @@ pub struct ActivityContentDetailsSocial {
 
 impl Part for ActivityContentDetailsSocial {}
 
+
 /// Channel localization setting
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2048,6 +2132,7 @@ pub struct ChannelLocalization {
 }
 
 impl Part for ChannelLocalization {}
+
 
 /// A resource id is a generic reference that points to another YouTube resource.
 /// 
@@ -2067,6 +2152,7 @@ pub struct ResourceId {
 
 impl Part for ResourceId {}
 
+
 /// A search result contains information about a YouTube video, channel, or playlist that matches the search parameters specified in an API request. While a search result points to a uniquely identifiable resource, like a video, it does not have its own persistent data.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2084,6 +2170,7 @@ pub struct SearchResult {
 }
 
 impl Part for SearchResult {}
+
 
 /// There is no detailed description.
 /// 
@@ -2119,6 +2206,7 @@ pub struct VideoCategoryListResponse {
 
 impl ResponseResult for VideoCategoryListResponse {}
 
+
 /// Basic details about an activity, including title, description, thumbnails, activity type and group.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2145,6 +2233,7 @@ pub struct ActivitySnippet {
 
 impl Part for ActivitySnippet {}
 
+
 /// Video processing progress and completion time estimate.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2163,6 +2252,7 @@ pub struct VideoProcessingDetailsProcessingProgress {
 }
 
 impl Part for VideoProcessingDetailsProcessingProgress {}
+
 
 /// There is no detailed description.
 /// 
@@ -2198,6 +2288,7 @@ pub struct SearchListResponse {
 
 impl ResponseResult for SearchListResponse {}
 
+
 /// Freebase topic information related to the channel.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2209,6 +2300,7 @@ pub struct ChannelTopicDetails {
 }
 
 impl Part for ChannelTopicDetails {}
+
 
 /// There is no detailed description.
 /// 
@@ -2244,6 +2336,7 @@ pub struct VideoListResponse {
 
 impl ResponseResult for VideoListResponse {}
 
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2256,6 +2349,7 @@ pub struct LanguageTag {
 
 impl Part for LanguageTag {}
 
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2267,6 +2361,7 @@ pub struct PlaylistStatus {
 }
 
 impl Part for PlaylistStatus {}
+
 
 /// Details about the content of a YouTube Video.
 /// 
@@ -2294,6 +2389,7 @@ pub struct VideoContentDetails {
 
 impl Part for VideoContentDetails {}
 
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2312,6 +2408,7 @@ pub struct LiveStreamSnippet {
 
 impl Part for LiveStreamSnippet {}
 
+
 /// JSON template for the status part of a channel.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2327,6 +2424,7 @@ pub struct ChannelStatus {
 }
 
 impl Part for ChannelStatus {}
+
 
 /// There is no detailed description.
 /// 
@@ -2362,6 +2460,7 @@ pub struct ChannelListResponse {
 
 impl ResponseResult for ChannelListResponse {}
 
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -2389,9 +2488,10 @@ pub struct ChannelSection {
 	pub localizations: HashMap<String, ChannelSectionLocalization>,
 }
 
-impl RequestResult for ChannelSection {}
+impl RequestValue for ChannelSection {}
 impl Resource for ChannelSection {}
 impl ResponseResult for ChannelSection {}
+
 
 /// There is no detailed description.
 /// 
@@ -2427,6 +2527,7 @@ pub struct LiveBroadcastListResponse {
 
 impl ResponseResult for LiveBroadcastListResponse {}
 
+
 /// Brief description of the live stream status.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2438,6 +2539,7 @@ pub struct LiveStreamStatus {
 }
 
 impl Part for LiveStreamStatus {}
+
 
 /// Details about the live streaming metadata.
 /// 
@@ -2458,6 +2560,7 @@ pub struct VideoLiveStreamingDetails {
 }
 
 impl Part for VideoLiveStreamingDetails {}
+
 
 /// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 65
 /// 
@@ -2597,6 +2700,7 @@ pub struct ContentRating {
 
 impl Part for ContentRating {}
 
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -2631,6 +2735,7 @@ pub struct ActivityListResponse {
 
 impl ResponseResult for ActivityListResponse {}
 
+
 /// An activity resource contains information about an action that a particular channel, or user, has taken on YouTube.The actions reported in activity feeds include rating a video, sharing a video, marking a video as a favorite, commenting on a video, uploading a video, and so forth. Each activity resource identifies the type of action, the channel associated with the action, and the resource(s) associated with the action, such as the video that was rated or uploaded.
 /// 
 /// # Activities
@@ -2655,8 +2760,9 @@ pub struct Activity {
 	pub id: Option<String>,
 }
 
-impl RequestResult for Activity {}
+impl RequestValue for Activity {}
 impl ResponseResult for Activity {}
+
 
 /// Basic details about a subscription's subscriber including title, description, channel ID and thumbnails.
 /// 
@@ -2675,6 +2781,7 @@ pub struct SubscriptionSubscriberSnippet {
 }
 
 impl Part for SubscriptionSubscriberSnippet {}
+
 
 /// Branding properties for images associated with the channel.
 /// 
@@ -2730,6 +2837,7 @@ pub struct ImageSettings {
 
 impl Part for ImageSettings {}
 
+
 /// Details about a resource which is being promoted.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2760,6 +2868,7 @@ pub struct ActivityContentDetailsPromotedItem {
 
 impl Part for ActivityContentDetailsPromotedItem {}
 
+
 /// Rights management policy for YouTube resources.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2774,6 +2883,7 @@ pub struct AccessPolicy {
 
 impl Part for AccessPolicy {}
 
+
 /// Details about a channel bulletin post.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2785,6 +2895,7 @@ pub struct ActivityContentDetailsBulletin {
 }
 
 impl Part for ActivityContentDetailsBulletin {}
+
 
 /// An i18nLanguage resource identifies a UI language currently supported by YouTube.
 /// 
@@ -2804,6 +2915,7 @@ pub struct I18nLanguage {
 
 impl Part for I18nLanguage {}
 
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2817,6 +2929,7 @@ pub struct LocalizedString {
 }
 
 impl Part for LocalizedString {}
+
 
 /// Information about an audio stream.
 /// 
@@ -2836,6 +2949,7 @@ pub struct VideoFileDetailsAudioStream {
 
 impl Part for VideoFileDetailsAudioStream {}
 
+
 /// Freebase topic information related to the video.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2849,6 +2963,7 @@ pub struct VideoTopicDetails {
 }
 
 impl Part for VideoTopicDetails {}
+
 
 /// Describes information necessary for ingesting an RTMP or an HTTP stream.
 /// 
@@ -2870,6 +2985,7 @@ pub struct IngestionInfo {
 
 impl Part for IngestionInfo {}
 
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2883,6 +2999,7 @@ pub struct VideoConversionPing {
 }
 
 impl Part for VideoConversionPing {}
+
 
 /// A videoCategory resource identifies a category that has been or could be associated with uploaded videos.
 /// 
@@ -2901,6 +3018,7 @@ pub struct VideoCategory {
 }
 
 impl Part for VideoCategory {}
+
 
 /// Basic details about a playlist, including title, description and thumbnails.
 /// 
@@ -2930,6 +3048,7 @@ pub struct PlaylistItemSnippet {
 
 impl Part for PlaylistItemSnippet {}
 
+
 /// Information about a video that was marked as a favorite video.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2942,6 +3061,7 @@ pub struct ActivityContentDetailsFavorite {
 
 impl Part for ActivityContentDetailsFavorite {}
 
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2953,6 +3073,7 @@ pub struct PlaylistPlayer {
 }
 
 impl Part for PlaylistPlayer {}
+
 
 /// A single tag suggestion with it's relevance information.
 /// 
@@ -2967,6 +3088,7 @@ pub struct VideoSuggestionsTagSuggestion {
 }
 
 impl Part for VideoSuggestionsTagSuggestion {}
+
 
 /// Specifies suggestions on how to improve video content, including encoding hints, tag suggestions, and editor suggestions.
 /// 
@@ -2987,6 +3109,7 @@ pub struct VideoSuggestions {
 }
 
 impl Part for VideoSuggestions {}
+
 
 /// Basic details about a search result, including title, description and thumbnails of the item referenced by the search result.
 /// 
@@ -3012,6 +3135,7 @@ pub struct SearchResultSnippet {
 
 impl Part for SearchResultSnippet {}
 
+
 /// A channel banner returned as the response to a channel_banner.insert call.
 /// 
 /// # Activities
@@ -3032,8 +3156,9 @@ pub struct ChannelBannerResource {
 	pub etag: Option<String>,
 }
 
-impl RequestResult for ChannelBannerResource {}
+impl RequestValue for ChannelBannerResource {}
 impl ResponseResult for ChannelBannerResource {}
+
 
 /// There is no detailed description.
 /// 
@@ -3046,6 +3171,7 @@ pub struct PlaylistContentDetails {
 }
 
 impl Part for PlaylistContentDetails {}
+
 
 /// Paging details for lists of resources, including total number of items available and number of resources returned in a single page.
 /// 
@@ -3060,6 +3186,7 @@ pub struct PageInfo {
 }
 
 impl Part for PageInfo {}
+
 
 
 // ###################
@@ -3085,6 +3212,7 @@ pub struct ChannelContentDetailsRelatedplaylists {
 
 impl NestedType for ChannelContentDetailsRelatedplaylists {}
 impl Part for ChannelContentDetailsRelatedplaylists {}
+
 
 
 // ###################
@@ -3135,10 +3263,10 @@ impl<'a, C, NC, A> I18nLanguageMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of supported languages.    
-	pub fn list(&self) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 		I18nLanguageListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_hl: Default::default(),
 		}
 	}
@@ -3248,10 +3376,10 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns channelSection resources that match the API request criteria.    
-	pub fn list(&self) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 		ChannelSectionListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_on_behalf_of_content_owner: Default::default(),
 			_mine: Default::default(),
 			_id: Default::default(),
@@ -3262,10 +3390,11 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Adds a channelSection for the authenticated user's channel.    
-	pub fn insert(&self) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self, request: &ChannelSection) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 		ChannelSectionInsertMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
@@ -3274,10 +3403,10 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a channelSection.    
-	pub fn delete(&self) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self, id: &str) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 		ChannelSectionDeleteMethodBuilder {
 			hub: self.hub,
-			_id: Default::default(),
+			_id: id.to_string(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -3285,10 +3414,11 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Update a channelSection.    
-	pub fn update(&self) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self, request: &ChannelSection) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 		ChannelSectionUpdateMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -3340,10 +3470,10 @@ impl<'a, C, NC, A> GuideCategoryMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of categories that can be associated with YouTube channels.    
-	pub fn list(&self) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 		GuideCategoryListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_region_code: Default::default(),
 			_id: Default::default(),
 			_hl: Default::default(),
@@ -3397,10 +3527,11 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Creates a playlist.    
-	pub fn insert(&self) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self, request: &Playlist) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 		PlaylistInsertMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
@@ -3409,10 +3540,10 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.    
-	pub fn list(&self) -> PlaylistListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> PlaylistListMethodBuilder<'a, C, NC, A> {
 		PlaylistListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_page_token: Default::default(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
@@ -3426,10 +3557,10 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a playlist.    
-	pub fn delete(&self) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self, id: &str) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 		PlaylistDeleteMethodBuilder {
 			hub: self.hub,
-			_id: Default::default(),
+			_id: id.to_string(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -3437,10 +3568,11 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.    
-	pub fn update(&self) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self, request: &Playlist) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 		PlaylistUpdateMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -3492,10 +3624,10 @@ impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Uploads a custom video thumbnail to YouTube and sets it for a video.    
-	pub fn set(&self) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
+	pub fn set(&self, video_id: &str) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 		ThumbnailSetMethodBuilder {
 			hub: self.hub,
-			_video_id: Default::default(),
+			_video_id: video_id.to_string(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -3547,10 +3679,10 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of videos that match the API request parameters.    
-	pub fn list(&self) -> VideoListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> VideoListMethodBuilder<'a, C, NC, A> {
 		VideoListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_video_category_id: Default::default(),
 			_region_code: Default::default(),
 			_page_token: Default::default(),
@@ -3567,11 +3699,11 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Add a like or dislike rating to a video or remove a rating from a video.    
-	pub fn rate(&self) -> VideoRateMethodBuilder<'a, C, NC, A> {
+	pub fn rate(&self, id: &str, rating: &str) -> VideoRateMethodBuilder<'a, C, NC, A> {
 		VideoRateMethodBuilder {
 			hub: self.hub,
-			_id: Default::default(),
-			_rating: Default::default(),
+			_id: id.to_string(),
+			_rating: rating.to_string(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -3579,10 +3711,10 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Retrieves the ratings that the authorized user gave to a list of specified videos.    
-	pub fn get_rating(&self) -> VideoGetratingMethodBuilder<'a, C, NC, A> {
+	pub fn get_rating(&self, id: &str) -> VideoGetratingMethodBuilder<'a, C, NC, A> {
 		VideoGetratingMethodBuilder {
 			hub: self.hub,
-			_id: Default::default(),
+			_id: id.to_string(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -3590,10 +3722,10 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a YouTube video.    
-	pub fn delete(&self) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self, id: &str) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
 		VideoDeleteMethodBuilder {
 			hub: self.hub,
-			_id: Default::default(),
+			_id: id.to_string(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -3601,10 +3733,11 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Updates a video's metadata.    
-	pub fn update(&self) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self, request: &Video) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
 		VideoUpdateMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -3612,10 +3745,11 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Uploads a video to YouTube and optionally sets the video's metadata.    
-	pub fn insert(&self) -> VideoInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self, request: &Video) -> VideoInsertMethodBuilder<'a, C, NC, A> {
 		VideoInsertMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_stabilize: Default::default(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
@@ -3671,20 +3805,21 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Adds a subscription for the authenticated user's channel.    
-	pub fn insert(&self) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self, request: &Subscription) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 		SubscriptionInsertMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 		}
 	}
 	
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns subscription resources that match the API request criteria.    
-	pub fn list(&self) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
 		SubscriptionListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_page_token: Default::default(),
 			_order: Default::default(),
 			_on_behalf_of_content_owner_channel: Default::default(),
@@ -3701,10 +3836,10 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a subscription.    
-	pub fn delete(&self) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self, id: &str) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 		SubscriptionDeleteMethodBuilder {
 			hub: self.hub,
-			_id: Default::default(),
+			_id: id.to_string(),
 		}
 	}
 }
@@ -3755,10 +3890,10 @@ impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.    
-	pub fn list(&self) -> SearchListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> SearchListMethodBuilder<'a, C, NC, A> {
 		SearchListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_video_type: Default::default(),
 			_video_syndicated: Default::default(),
 			_video_license: Default::default(),
@@ -3838,10 +3973,10 @@ impl<'a, C, NC, A> I18nRegionMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of supported regions.    
-	pub fn list(&self) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
 		I18nRegionListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_hl: Default::default(),
 		}
 	}
@@ -3893,10 +4028,11 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.    
-	pub fn update(&self) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self, request: &LiveStream) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 		LiveStreamUpdateMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
@@ -3905,10 +4041,10 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a video stream.    
-	pub fn delete(&self) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self, id: &str) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 		LiveStreamDeleteMethodBuilder {
 			hub: self.hub,
-			_id: Default::default(),
+			_id: id.to_string(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
@@ -3917,10 +4053,10 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of video streams that match the API request parameters.    
-	pub fn list(&self) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
 		LiveStreamListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_page_token: Default::default(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
@@ -3933,10 +4069,11 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.    
-	pub fn insert(&self) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self, request: &LiveStream) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 		LiveStreamInsertMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
@@ -3989,10 +4126,11 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Updates a channel's metadata.    
-	pub fn update(&self) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self, request: &Channel) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 		ChannelUpdateMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -4000,10 +4138,10 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a collection of zero or more channel resources that match the request criteria.    
-	pub fn list(&self) -> ChannelListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> ChannelListMethodBuilder<'a, C, NC, A> {
 		ChannelListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_page_token: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
 			_my_subscribers: Default::default(),
@@ -4063,20 +4201,20 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a playlist item.    
-	pub fn delete(&self) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self, id: &str) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 		PlaylistItemDeleteMethodBuilder {
 			hub: self.hub,
-			_id: Default::default(),
+			_id: id.to_string(),
 		}
 	}
 	
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.    
-	pub fn list(&self) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 		PlaylistItemListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_video_id: Default::default(),
 			_playlist_id: Default::default(),
 			_page_token: Default::default(),
@@ -4089,10 +4227,11 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Adds a resource to a playlist.    
-	pub fn insert(&self) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self, request: &PlaylistItem) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 		PlaylistItemInsertMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -4100,10 +4239,11 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Modifies a playlist item. For example, you could update the item's position in the playlist.    
-	pub fn update(&self) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self, request: &PlaylistItem) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 		PlaylistItemUpdateMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 		}
 	}
 }
@@ -4154,10 +4294,10 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Uploads a watermark image to YouTube and sets it for a channel.    
-	pub fn set(&self) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
+	pub fn set(&self, channel_id: &str) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
 		WatermarkSetMethodBuilder {
 			hub: self.hub,
-			_channel_id: Default::default(),
+			_channel_id: channel_id.to_string(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -4165,10 +4305,10 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a watermark.    
-	pub fn unset(&self) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
+	pub fn unset(&self, channel_id: &str) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 		WatermarkUnsetMethodBuilder {
 			hub: self.hub,
-			_channel_id: Default::default(),
+			_channel_id: channel_id.to_string(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -4220,11 +4360,11 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Controls the settings for a slate that can be displayed in the broadcast stream.    
-	pub fn control(&self) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+	pub fn control(&self, id: &str, part: &str) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastControlMethodBuilder {
 			hub: self.hub,
-			_id: Default::default(),
-			_part: Default::default(),
+			_id: id.to_string(),
+			_part: part.to_string(),
 			_walltime: Default::default(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
@@ -4236,10 +4376,11 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.    
-	pub fn update(&self) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+	pub fn update(&self, request: &LiveBroadcast) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastUpdateMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
@@ -4248,10 +4389,11 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Creates a broadcast.    
-	pub fn insert(&self) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self, request: &LiveBroadcast) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastInsertMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
@@ -4260,11 +4402,11 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.    
-	pub fn bind(&self) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+	pub fn bind(&self, id: &str, part: &str) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastBindMethodBuilder {
 			hub: self.hub,
-			_id: Default::default(),
-			_part: Default::default(),
+			_id: id.to_string(),
+			_part: part.to_string(),
 			_stream_id: Default::default(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
@@ -4274,10 +4416,10 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of YouTube broadcasts that match the API request parameters.    
-	pub fn list(&self) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_page_token: Default::default(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
@@ -4291,10 +4433,10 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Deletes a broadcast.    
-	pub fn delete(&self) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+	pub fn delete(&self, id: &str) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastDeleteMethodBuilder {
 			hub: self.hub,
-			_id: Default::default(),
+			_id: id.to_string(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
@@ -4303,12 +4445,12 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.    
-	pub fn transition(&self) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+	pub fn transition(&self, broadcast_status: &str, id: &str, part: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 		LiveBroadcastTransitionMethodBuilder {
 			hub: self.hub,
-			_broadcast_status: Default::default(),
-			_id: Default::default(),
-			_part: Default::default(),
+			_broadcast_status: broadcast_status.to_string(),
+			_id: id.to_string(),
+			_part: part.to_string(),
 			_on_behalf_of_content_owner_channel: Default::default(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
@@ -4361,10 +4503,10 @@ impl<'a, C, NC, A> VideoCategoryMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of categories that can be associated with YouTube videos.    
-	pub fn list(&self) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 		VideoCategoryListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_region_code: Default::default(),
 			_id: Default::default(),
 			_hl: Default::default(),
@@ -4418,10 +4560,10 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.    
-	pub fn list(&self) -> ActivityListMethodBuilder<'a, C, NC, A> {
+	pub fn list(&self, part: &str) -> ActivityListMethodBuilder<'a, C, NC, A> {
 		ActivityListMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 			_region_code: Default::default(),
 			_published_before: Default::default(),
 			_published_after: Default::default(),
@@ -4438,10 +4580,10 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 	/// Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
     /// 
     /// Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite.
-	pub fn insert(&self) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self, part: &str) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
 		ActivityInsertMethodBuilder {
 			hub: self.hub,
-			_part: Default::default(),
+			_part: part.to_string(),
 		}
 	}
 }
@@ -4495,8 +4637,8 @@ pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _hl: Option<String>,
+	_part:	String,
+	_hl:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nLanguageListMethodBuilder<'a, C, NC, A> {}
@@ -4517,7 +4659,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
 	pub fn part(&mut self, new_value: &str) -> &mut I18nLanguageListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *hl* query property to the given value.
@@ -4576,7 +4718,7 @@ pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _on_behalf_of_content_owner: Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelBannerInsertMethodBuilder<'a, C, NC, A> {}
@@ -4644,11 +4786,11 @@ pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _mine: Option<bool>,
-    _id: Option<String>,
-    _channel_id: Option<String>,
+	_part:	String,
+	_on_behalf_of_content_owner:     Option<String>,
+	_mine:     Option<bool>,
+	_id:     Option<String>,
+	_channel_id:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionListMethodBuilder<'a, C, NC, A> {}
@@ -4671,7 +4813,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set part=snippet, the API response will also contain all of those nested properties.
 	pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -4752,9 +4894,10 @@ pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_request:	ChannelSection,
+	_part:	String,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionInsertMethodBuilder<'a, C, NC, A> {}
@@ -4768,6 +4911,15 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &ChannelSection) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -4780,7 +4932,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
 	pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner channel* query property to the given value.
@@ -4849,8 +5001,8 @@ pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _id: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_id:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {}
@@ -4871,7 +5023,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -4928,8 +5080,9 @@ pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_request:	ChannelSection,
+	_part:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {}
@@ -4943,6 +5096,15 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &ChannelSection) -> &mut ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -4955,7 +5117,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
 	pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -5012,10 +5174,10 @@ pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _region_code: Option<String>,
-    _id: Option<String>,
-    _hl: Option<String>,
+	_part:	String,
+	_region_code:     Option<String>,
+	_id:     Option<String>,
+	_hl:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for GuideCategoryListMethodBuilder<'a, C, NC, A> {}
@@ -5038,7 +5200,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a guideCategory resource, the snippet property contains other properties, such as the category's title. If you set part=snippet, the API response will also contain all of those nested properties.
 	pub fn part(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *region code* query property to the given value.
@@ -5109,9 +5271,10 @@ pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_request:	Playlist,
+	_part:	String,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistInsertMethodBuilder<'a, C, NC, A> {}
@@ -5125,6 +5288,15 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &Playlist) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -5137,7 +5309,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
     /// 
     /// The part names that you can include in the parameter value are snippet and status.
 	pub fn part(&mut self, new_value: &str) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner channel* query property to the given value.
@@ -5206,14 +5378,14 @@ pub struct PlaylistListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _page_token: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _mine: Option<bool>,
-    _max_results: Option<u32>,
-    _id: Option<String>,
-    _channel_id: Option<String>,
+	_part:	String,
+	_page_token:     Option<String>,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
+	_mine:     Option<bool>,
+	_max_results:     Option<u32>,
+	_id:     Option<String>,
+	_channel_id:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistListMethodBuilder<'a, C, NC, A> {}
@@ -5236,7 +5408,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set part=snippet, the API response will contain all of those properties.
 	pub fn part(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *page token* query property to the given value.
@@ -5345,8 +5517,8 @@ pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _id: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_id:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistDeleteMethodBuilder<'a, C, NC, A> {}
@@ -5367,7 +5539,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut PlaylistDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -5424,8 +5596,9 @@ pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_request:	Playlist,
+	_part:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistUpdateMethodBuilder<'a, C, NC, A> {}
@@ -5439,6 +5612,15 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &Playlist) -> &mut PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -5453,7 +5635,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist's privacy setting is contained in the status part. As such, if your request is updating a private playlist, and the request's part parameter value includes the status part, the playlist's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the playlist will revert to the default privacy setting.
 	pub fn part(&mut self, new_value: &str) -> &mut PlaylistUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -5510,8 +5692,8 @@ pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _video_id: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_video_id:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ThumbnailSetMethodBuilder<'a, C, NC, A> {}
@@ -5532,7 +5714,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided.    
 	pub fn video_id(&mut self, new_value: &str) -> &mut ThumbnailSetMethodBuilder<'a, C, NC, A> {
-		self._video_id = Some(new_value.to_string());
+		self._video_id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -5587,17 +5769,17 @@ pub struct VideoListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _video_category_id: Option<String>,
-    _region_code: Option<String>,
-    _page_token: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _my_rating: Option<String>,
-    _max_results: Option<u32>,
-    _locale: Option<String>,
-    _id: Option<String>,
-    _hl: Option<String>,
-    _chart: Option<String>,
+	_part:	String,
+	_video_category_id:     Option<String>,
+	_region_code:     Option<String>,
+	_page_token:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
+	_my_rating:     Option<String>,
+	_max_results:     Option<u32>,
+	_locale:     Option<String>,
+	_id:     Option<String>,
+	_hl:     Option<String>,
+	_chart:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoListMethodBuilder<'a, C, NC, A> {}
@@ -5620,7 +5802,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set part=snippet, the API response will contain all of those properties.
 	pub fn part(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *video category id* query property to the given value.
@@ -5753,9 +5935,9 @@ pub struct VideoRateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _id: Option<String>,
-    _rating: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_id:	String,
+	_rating:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoRateMethodBuilder<'a, C, NC, A> {}
@@ -5776,7 +5958,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed.    
 	pub fn id(&mut self, new_value: &str) -> &mut VideoRateMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *rating* query property to the given value.
@@ -5786,7 +5968,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 	/// 
     /// Specifies the rating to record.    
 	pub fn rating(&mut self, new_value: &str) -> &mut VideoRateMethodBuilder<'a, C, NC, A> {
-		self._rating = Some(new_value.to_string());
+		self._rating = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -5843,8 +6025,8 @@ pub struct VideoGetratingMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _id: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_id:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoGetratingMethodBuilder<'a, C, NC, A> {}
@@ -5865,7 +6047,7 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut VideoGetratingMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -5922,8 +6104,8 @@ pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _id: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_id:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoDeleteMethodBuilder<'a, C, NC, A> {}
@@ -5944,7 +6126,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut VideoDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -6001,8 +6183,9 @@ pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_request:	Video,
+	_part:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoUpdateMethodBuilder<'a, C, NC, A> {}
@@ -6016,6 +6199,15 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &Video) -> &mut VideoUpdateMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -6032,7 +6224,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
     /// 
     /// In addition, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
 	pub fn part(&mut self, new_value: &str) -> &mut VideoUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -6089,12 +6281,13 @@ pub struct VideoInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _stabilize: Option<bool>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _notify_subscribers: Option<bool>,
-    _auto_levels: Option<bool>,
+	_request:	Video,
+	_part:	String,
+	_stabilize:     Option<bool>,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
+	_notify_subscribers:     Option<bool>,
+	_auto_levels:     Option<bool>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoInsertMethodBuilder<'a, C, NC, A> {}
@@ -6108,6 +6301,15 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &Video) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -6120,7 +6322,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
     /// 
     /// The part names that you can include in the parameter value are snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails. However, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
 	pub fn part(&mut self, new_value: &str) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *stabilize* query property to the given value.
@@ -6213,7 +6415,8 @@ pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
+	_request:	Subscription,
+	_part:	String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionInsertMethodBuilder<'a, C, NC, A> {}
@@ -6227,6 +6430,15 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &Subscription) -> &mut SubscriptionInsertMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -6239,7 +6451,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
 	pub fn part(&mut self, new_value: &str) -> &mut SubscriptionInsertMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 }
@@ -6286,17 +6498,17 @@ pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _page_token: Option<String>,
-    _order: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _my_subscribers: Option<bool>,
-    _mine: Option<bool>,
-    _max_results: Option<u32>,
-    _id: Option<String>,
-    _for_channel_id: Option<String>,
-    _channel_id: Option<String>,
+	_part:	String,
+	_page_token:     Option<String>,
+	_order:     Option<String>,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
+	_my_subscribers:     Option<bool>,
+	_mine:     Option<bool>,
+	_max_results:     Option<u32>,
+	_id:     Option<String>,
+	_for_channel_id:     Option<String>,
+	_channel_id:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionListMethodBuilder<'a, C, NC, A> {}
@@ -6319,7 +6531,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set part=snippet, the API response will also contain all of those nested properties.
 	pub fn part(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *page token* query property to the given value.
@@ -6452,7 +6664,7 @@ pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _id: Option<String>,
+	_id:	String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionDeleteMethodBuilder<'a, C, NC, A> {}
@@ -6473,7 +6685,7 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 }
@@ -6520,36 +6732,36 @@ pub struct SearchListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _video_type: Option<String>,
-    _video_syndicated: Option<String>,
-    _video_license: Option<String>,
-    _video_embeddable: Option<String>,
-    _video_duration: Option<String>,
-    _video_dimension: Option<String>,
-    _video_definition: Option<String>,
-    _video_category_id: Option<String>,
-    _video_caption: Option<String>,
-    _type_: Option<String>,
-    _topic_id: Option<String>,
-    _safe_search: Option<String>,
-    _relevance_language: Option<String>,
-    _related_to_video_id: Option<String>,
-    _region_code: Option<String>,
-    _q: Option<String>,
-    _published_before: Option<String>,
-    _published_after: Option<String>,
-    _page_token: Option<String>,
-    _order: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _max_results: Option<u32>,
-    _location_radius: Option<String>,
-    _location: Option<String>,
-    _for_mine: Option<bool>,
-    _for_content_owner: Option<bool>,
-    _event_type: Option<String>,
-    _channel_type: Option<String>,
-    _channel_id: Option<String>,
+	_part:	String,
+	_video_type:     Option<String>,
+	_video_syndicated:     Option<String>,
+	_video_license:     Option<String>,
+	_video_embeddable:     Option<String>,
+	_video_duration:     Option<String>,
+	_video_dimension:     Option<String>,
+	_video_definition:     Option<String>,
+	_video_category_id:     Option<String>,
+	_video_caption:     Option<String>,
+	_type_:     Option<String>,
+	_topic_id:     Option<String>,
+	_safe_search:     Option<String>,
+	_relevance_language:     Option<String>,
+	_related_to_video_id:     Option<String>,
+	_region_code:     Option<String>,
+	_q:     Option<String>,
+	_published_before:     Option<String>,
+	_published_after:     Option<String>,
+	_page_token:     Option<String>,
+	_order:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
+	_max_results:     Option<u32>,
+	_location_radius:     Option<String>,
+	_location:     Option<String>,
+	_for_mine:     Option<bool>,
+	_for_content_owner:     Option<bool>,
+	_event_type:     Option<String>,
+	_channel_type:     Option<String>,
+	_channel_id:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SearchListMethodBuilder<'a, C, NC, A> {}
@@ -6572,7 +6784,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a search result, the snippet property contains other properties that identify the result's title, description, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
 	pub fn part(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *video type* query property to the given value.
@@ -6855,8 +7067,8 @@ pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _hl: Option<String>,
+	_part:	String,
+	_hl:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nRegionListMethodBuilder<'a, C, NC, A> {}
@@ -6877,7 +7089,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
 	pub fn part(&mut self, new_value: &str) -> &mut I18nRegionListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *hl* query property to the given value.
@@ -6932,9 +7144,10 @@ pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_request:	LiveStream,
+	_part:	String,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamUpdateMethodBuilder<'a, C, NC, A> {}
@@ -6948,6 +7161,15 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &LiveStream) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -6962,7 +7184,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. If the request body does not specify a value for a mutable property, the existing value for that property will be removed.
 	pub fn part(&mut self, new_value: &str) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner channel* query property to the given value.
@@ -7031,9 +7253,9 @@ pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _id: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_id:	String,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamDeleteMethodBuilder<'a, C, NC, A> {}
@@ -7054,7 +7276,7 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies the YouTube live stream ID for the resource that is being deleted.    
 	pub fn id(&mut self, new_value: &str) -> &mut LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner channel* query property to the given value.
@@ -7123,13 +7345,13 @@ pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _page_token: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _mine: Option<bool>,
-    _max_results: Option<u32>,
-    _id: Option<String>,
+	_part:	String,
+	_page_token:     Option<String>,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
+	_mine:     Option<bool>,
+	_max_results:     Option<u32>,
+	_id:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamListMethodBuilder<'a, C, NC, A> {}
@@ -7150,7 +7372,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.    
 	pub fn part(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *page token* query property to the given value.
@@ -7251,9 +7473,10 @@ pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_request:	LiveStream,
+	_part:	String,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamInsertMethodBuilder<'a, C, NC, A> {}
@@ -7267,6 +7490,15 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &LiveStream) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -7279,7 +7511,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
     /// 
     /// The part properties that you can include in the parameter value are id, snippet, cdn, and status.
 	pub fn part(&mut self, new_value: &str) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner channel* query property to the given value.
@@ -7348,8 +7580,9 @@ pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_request:	Channel,
+	_part:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelUpdateMethodBuilder<'a, C, NC, A> {}
@@ -7363,6 +7596,15 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &Channel) -> &mut ChannelUpdateMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -7377,7 +7619,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies.
 	pub fn part(&mut self, new_value: &str) -> &mut ChannelUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -7432,16 +7674,16 @@ pub struct ChannelListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _page_token: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _my_subscribers: Option<bool>,
-    _mine: Option<bool>,
-    _max_results: Option<u32>,
-    _managed_by_me: Option<bool>,
-    _id: Option<String>,
-    _for_username: Option<String>,
-    _category_id: Option<String>,
+	_part:	String,
+	_page_token:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
+	_my_subscribers:     Option<bool>,
+	_mine:     Option<bool>,
+	_max_results:     Option<u32>,
+	_managed_by_me:     Option<bool>,
+	_id:     Option<String>,
+	_for_username:     Option<String>,
+	_category_id:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelListMethodBuilder<'a, C, NC, A> {}
@@ -7464,7 +7706,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set part=contentDetails, the API response will also contain all of those nested properties.
 	pub fn part(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *page token* query property to the given value.
@@ -7583,7 +7825,7 @@ pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _id: Option<String>,
+	_id:	String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {}
@@ -7604,7 +7846,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID.    
 	pub fn id(&mut self, new_value: &str) -> &mut PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 }
@@ -7651,13 +7893,13 @@ pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _video_id: Option<String>,
-    _playlist_id: Option<String>,
-    _page_token: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _max_results: Option<u32>,
-    _id: Option<String>,
+	_part:	String,
+	_video_id:     Option<String>,
+	_playlist_id:     Option<String>,
+	_page_token:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
+	_max_results:     Option<u32>,
+	_id:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemListMethodBuilder<'a, C, NC, A> {}
@@ -7680,7 +7922,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set part=snippet, the API response will contain all of those properties.
 	pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *video id* query property to the given value.
@@ -7777,8 +8019,9 @@ pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_request:	PlaylistItem,
+	_part:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemInsertMethodBuilder<'a, C, NC, A> {}
@@ -7792,6 +8035,15 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &PlaylistItem) -> &mut PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -7804,7 +8056,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
     /// 
     /// The part names that you can include in the parameter value are snippet, contentDetails, and status.
 	pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -7861,7 +8113,8 @@ pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
+	_request:	PlaylistItem,
+	_part:	String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {}
@@ -7875,6 +8128,15 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &PlaylistItem) -> &mut PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -7889,7 +8151,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist item can specify a start time and end time, which identify the times portion of the video that should play when users watch the video in the playlist. If your request is updating a playlist item that sets these values, and the request's part parameter value includes the contentDetails part, the playlist item's start and end times will be updated to whatever value the request body specifies. If the request body does not specify values, the existing start and end times will be removed and replaced with the default settings.
 	pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 }
@@ -7936,8 +8198,8 @@ pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _channel_id: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_channel_id:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for WatermarkSetMethodBuilder<'a, C, NC, A> {}
@@ -7958,7 +8220,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The channelId parameter specifies a YouTube channel ID for which the watermark is being provided.    
 	pub fn channel_id(&mut self, new_value: &str) -> &mut WatermarkSetMethodBuilder<'a, C, NC, A> {
-		self._channel_id = Some(new_value.to_string());
+		self._channel_id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -8013,8 +8275,8 @@ pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _channel_id: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_channel_id:	String,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for WatermarkUnsetMethodBuilder<'a, C, NC, A> {}
@@ -8035,7 +8297,7 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The channelId parameter specifies a YouTube channel ID for which the watermark is being unset.    
 	pub fn channel_id(&mut self, new_value: &str) -> &mut WatermarkUnsetMethodBuilder<'a, C, NC, A> {
-		self._channel_id = Some(new_value.to_string());
+		self._channel_id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner* query property to the given value.
@@ -8090,13 +8352,13 @@ pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _id: Option<String>,
-    _part: Option<String>,
-    _walltime: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _offset_time_ms: Option<String>,
-    _display_slate: Option<bool>,
+	_id:	String,
+	_part:	String,
+	_walltime:     Option<String>,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
+	_offset_time_ms:     Option<String>,
+	_display_slate:     Option<bool>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastControlMethodBuilder<'a, C, NC, A> {}
@@ -8117,7 +8379,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated.    
 	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *part* query property to the given value.
@@ -8127,7 +8389,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
 	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *walltime* query property to the given value.
@@ -8224,9 +8486,10 @@ pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_request:	LiveBroadcast,
+	_part:	String,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {}
@@ -8240,6 +8503,15 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &LiveBroadcast) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -8254,7 +8526,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a broadcast's privacy status is defined in the status part. As such, if your request is updating a private or unlisted broadcast, and the request's part parameter value includes the status part, the broadcast's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the broadcast will revert to the default privacy setting.
 	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner channel* query property to the given value.
@@ -8323,9 +8595,10 @@ pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_request:	LiveBroadcast,
+	_part:	String,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {}
@@ -8339,6 +8612,15 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &LiveBroadcast) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 
@@ -8351,7 +8633,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
     /// 
     /// The part properties that you can include in the parameter value are id, snippet, contentDetails, and status.
 	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner channel* query property to the given value.
@@ -8420,11 +8702,11 @@ pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _id: Option<String>,
-    _part: Option<String>,
-    _stream_id: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_id:	String,
+	_part:	String,
+	_stream_id:     Option<String>,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastBindMethodBuilder<'a, C, NC, A> {}
@@ -8445,7 +8727,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.    
 	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *part* query property to the given value.
@@ -8455,7 +8737,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
 	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *stream id* query property to the given value.
@@ -8532,14 +8814,14 @@ pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _page_token: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
-    _mine: Option<bool>,
-    _max_results: Option<u32>,
-    _id: Option<String>,
-    _broadcast_status: Option<String>,
+	_part:	String,
+	_page_token:     Option<String>,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
+	_mine:     Option<bool>,
+	_max_results:     Option<u32>,
+	_id:     Option<String>,
+	_broadcast_status:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastListMethodBuilder<'a, C, NC, A> {}
@@ -8560,7 +8842,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
 	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *page token* query property to the given value.
@@ -8669,9 +8951,9 @@ pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _id: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_id:	String,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {}
@@ -8692,7 +8974,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted.    
 	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner channel* query property to the given value.
@@ -8761,11 +9043,11 @@ pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _broadcast_status: Option<String>,
-    _id: Option<String>,
-    _part: Option<String>,
-    _on_behalf_of_content_owner_channel: Option<String>,
-    _on_behalf_of_content_owner: Option<String>,
+	_broadcast_status:	String,
+	_id:	String,
+	_part:	String,
+	_on_behalf_of_content_owner_channel:     Option<String>,
+	_on_behalf_of_content_owner:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {}
@@ -8786,7 +9068,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to.    
 	pub fn broadcast_status(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-		self._broadcast_status = Some(new_value.to_string());
+		self._broadcast_status = new_value.to_string();
 		return self;
 	}
 	/// Sets the *id* query property to the given value.
@@ -8796,7 +9078,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The id parameter specifies the unique ID of the broadcast that is transitioning to another status.    
 	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
+		self._id = new_value.to_string();
 		return self;
 	}
 	/// Sets the *part* query property to the given value.
@@ -8806,7 +9088,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
 	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *on behalf of content owner channel* query property to the given value.
@@ -8875,10 +9157,10 @@ pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _region_code: Option<String>,
-    _id: Option<String>,
-    _hl: Option<String>,
+	_part:	String,
+	_region_code:     Option<String>,
+	_id:     Option<String>,
+	_hl:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoCategoryListMethodBuilder<'a, C, NC, A> {}
@@ -8899,7 +9181,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 	/// 
     /// The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.    
 	pub fn part(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *region code* query property to the given value.
@@ -8970,15 +9252,15 @@ pub struct ActivityListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
-    _region_code: Option<String>,
-    _published_before: Option<String>,
-    _published_after: Option<String>,
-    _page_token: Option<String>,
-    _mine: Option<bool>,
-    _max_results: Option<u32>,
-    _home: Option<bool>,
-    _channel_id: Option<String>,
+	_part:	String,
+	_region_code:     Option<String>,
+	_published_before:     Option<String>,
+	_published_after:     Option<String>,
+	_page_token:     Option<String>,
+	_mine:     Option<bool>,
+	_max_results:     Option<u32>,
+	_home:     Option<bool>,
+	_channel_id:     Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ActivityListMethodBuilder<'a, C, NC, A> {}
@@ -9001,7 +9283,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
 	pub fn part(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 	/// Sets the *region code* query property to the given value.
@@ -9114,7 +9396,7 @@ pub struct ActivityInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _part: Option<String>,
+	_part:	String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ActivityInsertMethodBuilder<'a, C, NC, A> {}
@@ -9140,7 +9422,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
 	pub fn part(&mut self, new_value: &str) -> &mut ActivityInsertMethodBuilder<'a, C, NC, A> {
-		self._part = Some(new_value.to_string());
+		self._part = new_value.to_string();
 		return self;
 	}
 }

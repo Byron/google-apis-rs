@@ -27,6 +27,10 @@ pub struct ${s.id}\
 % for marker_trait in markers:
 impl ${marker_trait} for ${s.id} {}
 % endfor
+
+% if RESOURCE_MARKER in markers:
+
+% endif
 </%def>
 
 <%def name="doc(s, c)">\

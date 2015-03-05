@@ -24,6 +24,10 @@ DEL_METHOD = 'delete'
 NESTED_TYPE_MARKER = 'is_nested'
 SPACES_PER_TAB = 4
 
+REQUEST_PRIORITY = 100
+REQUEST_MARKER = 'RequestValue'
+RESOURCE_MARKER = 'Resource'
+
 # ==============================================================================
 ## @name Filters
 # ------------------------------------------------------------------------------
@@ -225,7 +229,7 @@ def activity_input_type(p):
     return '&%s' % n
 
 def is_pod_property(p):
-    return 'format' in p or p.type == 'boolean'
+    return 'format' in p or p.get('type','') == 'boolean'
 
 # return an iterator yielding fake-schemas that identify a nested type
 def iter_nested_types(schemas):
@@ -252,11 +256,11 @@ def schema_markers(s, c):
         # it should have at least one activity that matches it's type to qualify for the Resource trait
         for fqan, iot in activities.iteritems():
             if activity_name_to_type_name(activity_split(fqan)[0]).lower() == s.id.lower():
-                res.add('Resource')
+                res.add(RESOURCE_MARKER)
             if IO_RESPONSE in iot:
                 res.add('ResponseResult')
             if IO_REQUEST in iot:
-                res.add('RequestResult')
+                res.add(REQUEST_MARKER)
         # end for each activity
     # end handle activites
 
@@ -319,6 +323,32 @@ def method_params(m, required=None, location=None):
     # end for each parameter
     return sorted(res, key=lambda p: (p.priority, p.name), reverse=True)
 
+# return the given method's request or response schema (dict), or None.
+# optionally return only schemas with the given marker trait
+def method_io(schemas, c, m, type, marker=None):
+    s = schemas.get(m.get('request', dict()).get(TREF))
+    if s is None:
+        return s
+    if s and marker and marker not in schema_markers(s, c):
+        return None
+    return s
+
+# return string like 'n.clone()', but depending on the type name of tn (e.g. &str -> n.to_string())
+def rust_copy_value_s(n, tn, p):
+    nc = n + '.clone()'
+    if tn == '&str':
+        nc = n + '.to_string()'
+    elif is_pod_property(p):
+        nc = n
+    return nc
+
+# convert a schema into a property (for use with rust type generation).
+# n = name of the property
+def schema_to_required_property(s, n):
+    return type(s)({'name': n, TREF: s.id, 'priority': REQUEST_PRIORITY})
+
+def is_required_property(p):
+    return p.get('required', False) or p.get('priority', 0) > 0
 
 ## -- End Activity Utilities -- @}
 
