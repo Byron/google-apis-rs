@@ -3,7 +3,8 @@
                       rb_type, mb_type, singular, hub_type, to_fqan, indent_all_but_first_by,
                       method_params, activity_rust_type, mangle_ident, activity_input_type, get_word,
                       split_camelcase_s, property, is_pod_property, TREF, method_io, IO_REQUEST, 
-                      schema_to_required_property, rust_copy_value_s, is_required_property)
+                      schema_to_required_property, rust_copy_value_s, is_required_property,
+                      hash_comment, build_all_params, REQUEST_VALUE_PROPERTY_NAME)
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -18,10 +19,7 @@
 	# an identifier for a property. We prefix them to prevent clashes with the setters
 	ThisType = mb_type(resource, method) + "<'a, C, NC, A>"
 
-	request_resource = method_io(schemas, c, m, IO_REQUEST)
-	params = method_params(m)
-	if request_resource:
-		params.insert(0, schema_to_required_property(request_resource, 'request'))
+	params, request_value = build_all_params(schemas, c, m, IO_REQUEST, REQUEST_VALUE_PROPERTY_NAME)
 %>\
 % if 'description' in m:
 ${m.description | rust_doc_comment}
@@ -35,14 +33,14 @@ ${m.description | rust_doc_comment}
 /// Instantiate a resource method builder
 ///
 <%block filter="rust_doc_test_norun, rust_doc_comment">\
-${util.test_prelude()}\
+${capture(util.test_prelude) | hash_comment}\
 
 <%block filter="rust_test_fn_invisible">\
-${lib.test_hub(hub_type_name, comments=False)}\
+${capture(lib.test_hub, hub_type_name, comments=False) | hash_comment}\
 
 // Usually you wouldn't bind this to a variable, but keep calling methods
 // to setup your call.
-// TODO: figoure out actual arguments ... 
+## % for p 
 // let mb = hub.${resource}().${mangle_ident(method)}(...);
 
 // Finally, execute your call and process the result

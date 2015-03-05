@@ -3,7 +3,8 @@
                       rb_type, singular, hub_type, mangle_ident, mb_type, method_params, property,
                       to_fqan, indent_all_but_first_by, schema_markers, 
                       activity_input_type, TREF, method_io, IO_REQUEST, schema_to_required_property, 
-                      rust_copy_value_s, is_required_property)
+                      rust_copy_value_s, is_required_property, organize_params, REQUEST_VALUE_PROPERTY_NAME,
+                      build_all_params)
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -54,26 +55,8 @@ impl<'a, C, NC, A> ${ThisType} {
 
 	# skip part if we have a request resource. Only resources can have parts
 	# that we can easily deduce
-	request_resource = method_io(schemas, c, m, IO_REQUEST)
-	params = method_params(m)
-	REQUEST_RESOURCE_PROPERTY_NAME = 'request'
-	if request_resource:
-		# resource into property 
-		resprop = schema_to_required_property(request_resource, REQUEST_RESOURCE_PROPERTY_NAME)
-		params.insert(0, resprop)
-
-	part_prop = None
-	optional_props = list()
-	required_props = list()
-	for p in params:
-		if is_required_property(p):
-			if request_resource and p.name == 'part':
-				part_prop = p
-			else:
-				required_props.append(p)
-		else:
-			optional_props.append(p)
-	# end for each property
+	params, request_value = build_all_params(schemas, c, m, IO_REQUEST, REQUEST_VALUE_PROPERTY_NAME)
+	required_props, optional_props, part_prop = organize_params(params, request_value)
 
 	method_args = ''
 	if required_props:
@@ -92,8 +75,8 @@ impl<'a, C, NC, A> ${ThisType} {
 			${property(p.name)}: ${rust_copy_value_s(mangle_ident(p.name), activity_input_type(p), p)},
 			% endfor
 			## auto-generate parts from request resources
-			% if part_prop and request_resource:
-			${property(part_prop.name)}: ${mangle_ident(REQUEST_RESOURCE_PROPERTY_NAME)}.to_parts(),
+			% if part_prop and request_value:
+			${property(part_prop.name)}: ${mangle_ident(REQUEST_VALUE_PROPERTY_NAME)}.to_parts(),
 			% endif
 			% for p in optional_props:
 			${property(p.name)}: Default::default(),

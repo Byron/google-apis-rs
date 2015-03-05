@@ -26,6 +26,7 @@ SPACES_PER_TAB = 4
 
 REQUEST_PRIORITY = 100
 REQUEST_MARKER = 'RequestValue'
+REQUEST_VALUE_PROPERTY_NAME = 'request'
 
 # ==============================================================================
 ## @name Filters
@@ -348,6 +349,32 @@ def schema_to_required_property(s, n):
 
 def is_required_property(p):
     return p.get('required', False) or p.get('priority', 0) > 0
+
+# method_params(...), request_value|None -> (required_properties, optional_properties, part_prop|None)
+def organize_params(params, request_value):
+    part_prop = None
+    optional_props = list()
+    required_props = list()
+    for p in params:
+        if is_required_property(p):
+            if request_value and p.name == 'part':
+                assert part_prop is None
+                part_prop = p
+            else:
+                required_props.append(p)
+        else:
+            optional_props.append(p)
+    # end for each property
+    return required_props, optional_props, part_prop
+
+# schemas, context, method(dict), 'request'|'response', request_prop_name -> (params, request_value|None)
+def build_all_params(schemas, c, m, n, npn):
+    request_value = method_io(schemas, c, m, n)
+    params = method_params(m)
+    if request_value:
+        params.insert(0, schema_to_required_property(request_value, npn))
+    return params, request_value
+
 
 ## -- End Activity Utilities -- @}
 
