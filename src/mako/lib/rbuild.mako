@@ -1,7 +1,7 @@
 <%!
 	from util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
                       rb_type, singular, hub_type, mangle_ident, mb_type, method_params, property,
-                      to_fqan, indent_all_but_first_by, RESOURCE_MARKER, schema_markers, 
+                      to_fqan, indent_all_but_first_by, schema_markers, 
                       activity_input_type, TREF, method_io, IO_REQUEST, schema_to_required_property, 
                       rust_copy_value_s, is_required_property)
 %>\
@@ -54,7 +54,7 @@ impl<'a, C, NC, A> ${ThisType} {
 
 	# skip part if we have a request resource. Only resources can have parts
 	# that we can easily deduce
-	request_resource = method_io(schemas, c, m, IO_REQUEST, RESOURCE_MARKER)
+	request_resource = method_io(schemas, c, m, IO_REQUEST)
 	params = method_params(m)
 	REQUEST_RESOURCE_PROPERTY_NAME = 'request'
 	if request_resource:

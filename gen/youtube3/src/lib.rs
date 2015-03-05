@@ -114,7 +114,7 @@ use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::default::Default;
 
-pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestResult, NestedType};
+pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType};
 
 // ########
 // HUB ###
@@ -414,6 +414,24 @@ impl RequestValue for Playlist {}
 impl Resource for Playlist {}
 impl ResponseResult for Playlist {}
 
+impl Playlist {
+	/// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+	/// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+	/// the parts you want to see in the server response.
+	fn to_parts(&self) -> String {
+		let mut r = String::new();
+		if self.status.is_some() { r = r + "status,"; }
+		if self.kind.is_some() { r = r + "kind,"; }
+		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.snippet.is_some() { r = r + "snippet,"; }
+		if self.player.is_some() { r = r + "player,"; }
+		if self.etag.is_some() { r = r + "etag,"; }
+		if self.id.is_some() { r = r + "id,"; }
+		if self.localizations.len() > 0 { r = r + "localizations,"; }
+		r.pop();
+		r
+	}
+}
 
 /// There is no detailed description.
 /// 
@@ -563,6 +581,23 @@ impl RequestValue for LiveStream {}
 impl Resource for LiveStream {}
 impl ResponseResult for LiveStream {}
 
+impl LiveStream {
+	/// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+	/// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+	/// the parts you want to see in the server response.
+	fn to_parts(&self) -> String {
+		let mut r = String::new();
+		if self.status.is_some() { r = r + "status,"; }
+		if self.snippet.is_some() { r = r + "snippet,"; }
+		if self.kind.is_some() { r = r + "kind,"; }
+		if self.etag.is_some() { r = r + "etag,"; }
+		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.cdn.is_some() { r = r + "cdn,"; }
+		if self.id.is_some() { r = r + "id,"; }
+		r.pop();
+		r
+	}
+}
 
 /// There is no detailed description.
 /// 
@@ -952,6 +987,21 @@ pub struct InvideoBranding {
 
 impl RequestValue for InvideoBranding {}
 
+impl InvideoBranding {
+	/// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+	/// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+	/// the parts you want to see in the server response.
+	fn to_parts(&self) -> String {
+		let mut r = String::new();
+		if self.target_channel_id.is_some() { r = r + "targetChannelId,"; }
+		if self.position.is_some() { r = r + "position,"; }
+		if self.image_url.is_some() { r = r + "imageUrl,"; }
+		if self.timing.is_some() { r = r + "timing,"; }
+		if self.image_bytes.is_some() { r = r + "imageBytes,"; }
+		r.pop();
+		r
+	}
+}
 
 /// Information about the playlist item's privacy status.
 /// 
@@ -1040,6 +1090,22 @@ impl RequestValue for PlaylistItem {}
 impl Resource for PlaylistItem {}
 impl ResponseResult for PlaylistItem {}
 
+impl PlaylistItem {
+	/// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+	/// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+	/// the parts you want to see in the server response.
+	fn to_parts(&self) -> String {
+		let mut r = String::new();
+		if self.status.is_some() { r = r + "status,"; }
+		if self.snippet.is_some() { r = r + "snippet,"; }
+		if self.kind.is_some() { r = r + "kind,"; }
+		if self.etag.is_some() { r = r + "etag,"; }
+		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.id.is_some() { r = r + "id,"; }
+		r.pop();
+		r
+	}
+}
 
 /// There is no detailed description.
 /// 
@@ -1447,6 +1513,35 @@ impl RequestValue for Video {}
 impl Resource for Video {}
 impl ResponseResult for Video {}
 
+impl Video {
+	/// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+	/// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+	/// the parts you want to see in the server response.
+	fn to_parts(&self) -> String {
+		let mut r = String::new();
+		if self.status.is_some() { r = r + "status,"; }
+		if self.topic_details.is_some() { r = r + "topicDetails,"; }
+		if self.monetization_details.is_some() { r = r + "monetizationDetails,"; }
+		if self.suggestions.is_some() { r = r + "suggestions,"; }
+		if self.age_gating.is_some() { r = r + "ageGating,"; }
+		if self.file_details.is_some() { r = r + "fileDetails,"; }
+		if self.player.is_some() { r = r + "player,"; }
+		if self.id.is_some() { r = r + "id,"; }
+		if self.localizations.len() > 0 { r = r + "localizations,"; }
+		if self.live_streaming_details.is_some() { r = r + "liveStreamingDetails,"; }
+		if self.processing_details.is_some() { r = r + "processingDetails,"; }
+		if self.kind.is_some() { r = r + "kind,"; }
+		if self.statistics.is_some() { r = r + "statistics,"; }
+		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.conversion_pings.is_some() { r = r + "conversionPings,"; }
+		if self.snippet.is_some() { r = r + "snippet,"; }
+		if self.etag.is_some() { r = r + "etag,"; }
+		if self.project_details.is_some() { r = r + "projectDetails,"; }
+		if self.recording_details.is_some() { r = r + "recordingDetails,"; }
+		r.pop();
+		r
+	}
+}
 
 /// Geographical coordinates of a point, in WGS84.
 /// 
@@ -1629,6 +1724,22 @@ impl RequestValue for Subscription {}
 impl Resource for Subscription {}
 impl ResponseResult for Subscription {}
 
+impl Subscription {
+	/// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+	/// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+	/// the parts you want to see in the server response.
+	fn to_parts(&self) -> String {
+		let mut r = String::new();
+		if self.snippet.is_some() { r = r + "snippet,"; }
+		if self.kind.is_some() { r = r + "kind,"; }
+		if self.etag.is_some() { r = r + "etag,"; }
+		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.subscriber_snippet.is_some() { r = r + "subscriberSnippet,"; }
+		if self.id.is_some() { r = r + "id,"; }
+		r.pop();
+		r
+	}
+}
 
 /// Basic details about an i18n region, such as region code and human-readable name.
 /// 
@@ -1978,6 +2089,22 @@ impl RequestValue for LiveBroadcast {}
 impl Resource for LiveBroadcast {}
 impl ResponseResult for LiveBroadcast {}
 
+impl LiveBroadcast {
+	/// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+	/// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+	/// the parts you want to see in the server response.
+	fn to_parts(&self) -> String {
+		let mut r = String::new();
+		if self.status.is_some() { r = r + "status,"; }
+		if self.snippet.is_some() { r = r + "snippet,"; }
+		if self.kind.is_some() { r = r + "kind,"; }
+		if self.etag.is_some() { r = r + "etag,"; }
+		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.id.is_some() { r = r + "id,"; }
+		r.pop();
+		r
+	}
+}
 
 /// Information about a video stream.
 /// 
@@ -2076,6 +2203,30 @@ impl RequestValue for Channel {}
 impl Resource for Channel {}
 impl ResponseResult for Channel {}
 
+impl Channel {
+	/// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+	/// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+	/// the parts you want to see in the server response.
+	fn to_parts(&self) -> String {
+		let mut r = String::new();
+		if self.status.is_some() { r = r + "status,"; }
+		if self.invideo_promotion.is_some() { r = r + "invideoPromotion,"; }
+		if self.kind.is_some() { r = r + "kind,"; }
+		if self.statistics.is_some() { r = r + "statistics,"; }
+		if self.content_owner_details.is_some() { r = r + "contentOwnerDetails,"; }
+		if self.topic_details.is_some() { r = r + "topicDetails,"; }
+		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.branding_settings.is_some() { r = r + "brandingSettings,"; }
+		if self.conversion_pings.is_some() { r = r + "conversionPings,"; }
+		if self.snippet.is_some() { r = r + "snippet,"; }
+		if self.audit_details.is_some() { r = r + "auditDetails,"; }
+		if self.etag.is_some() { r = r + "etag,"; }
+		if self.id.is_some() { r = r + "id,"; }
+		if self.localizations.len() > 0 { r = r + "localizations,"; }
+		r.pop();
+		r
+	}
+}
 
 /// Statistics about a channel: number of subscribers, number of videos in the channel, etc.
 /// 
@@ -2492,6 +2643,22 @@ impl RequestValue for ChannelSection {}
 impl Resource for ChannelSection {}
 impl ResponseResult for ChannelSection {}
 
+impl ChannelSection {
+	/// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+	/// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+	/// the parts you want to see in the server response.
+	fn to_parts(&self) -> String {
+		let mut r = String::new();
+		if self.snippet.is_some() { r = r + "snippet,"; }
+		if self.kind.is_some() { r = r + "kind,"; }
+		if self.etag.is_some() { r = r + "etag,"; }
+		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.id.is_some() { r = r + "id,"; }
+		if self.localizations.len() > 0 { r = r + "localizations,"; }
+		r.pop();
+		r
+	}
+}
 
 /// There is no detailed description.
 /// 
@@ -2763,6 +2930,21 @@ pub struct Activity {
 impl RequestValue for Activity {}
 impl ResponseResult for Activity {}
 
+impl Activity {
+	/// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+	/// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+	/// the parts you want to see in the server response.
+	fn to_parts(&self) -> String {
+		let mut r = String::new();
+		if self.snippet.is_some() { r = r + "snippet,"; }
+		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.kind.is_some() { r = r + "kind,"; }
+		if self.etag.is_some() { r = r + "etag,"; }
+		if self.id.is_some() { r = r + "id,"; }
+		r.pop();
+		r
+	}
+}
 
 /// Basic details about a subscription's subscriber including title, description, channel ID and thumbnails.
 /// 
@@ -3159,6 +3341,19 @@ pub struct ChannelBannerResource {
 impl RequestValue for ChannelBannerResource {}
 impl ResponseResult for ChannelBannerResource {}
 
+impl ChannelBannerResource {
+	/// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+	/// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+	/// the parts you want to see in the server response.
+	fn to_parts(&self) -> String {
+		let mut r = String::new();
+		if self.url.is_some() { r = r + "url,"; }
+		if self.kind.is_some() { r = r + "kind,"; }
+		if self.etag.is_some() { r = r + "etag,"; }
+		r.pop();
+		r
+	}
+}
 
 /// There is no detailed description.
 /// 
@@ -3322,9 +3517,10 @@ impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
     /// - Call the channelBanners.insert method to upload the binary image data to YouTube. The image must have a 16:9 aspect ratio and be at least 2120x1192 pixels.
     /// - Extract the url property's value from the response that the API returns for step 1.
     /// - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2.
-	pub fn insert(&self) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self, request: &ChannelBannerResource) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 		ChannelBannerInsertMethodBuilder {
 			hub: self.hub,
+			_request: request.clone(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
 	}
@@ -4294,9 +4490,10 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
 	/// Create a builder to help you perform the following task:
 	///
 	/// Uploads a watermark image to YouTube and sets it for a channel.    
-	pub fn set(&self, channel_id: &str) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
+	pub fn set(&self, request: &InvideoBranding, channel_id: &str) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
 		WatermarkSetMethodBuilder {
 			hub: self.hub,
+			_request: request.clone(),
 			_channel_id: channel_id.to_string(),
 			_on_behalf_of_content_owner: Default::default(),
 		}
@@ -4580,10 +4777,11 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 	/// Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
     /// 
     /// Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite.
-	pub fn insert(&self, part: &str) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
+	pub fn insert(&self, request: &Activity) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
 		ActivityInsertMethodBuilder {
 			hub: self.hub,
-			_part: part.to_string(),
+			_request: request.clone(),
+			_part: request.to_parts(),
 		}
 	}
 }
@@ -4637,8 +4835,8 @@ pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_hl:     Option<String>,
+	_part: String,
+	_hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nLanguageListMethodBuilder<'a, C, NC, A> {}
@@ -4718,7 +4916,8 @@ pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: ChannelBannerResource,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelBannerInsertMethodBuilder<'a, C, NC, A> {}
@@ -4732,6 +4931,15 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &ChannelBannerResource) -> &mut ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *on behalf of content owner* query property to the given value.
 	///
 	/// 
@@ -4786,11 +4994,11 @@ pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_on_behalf_of_content_owner:     Option<String>,
-	_mine:     Option<bool>,
-	_id:     Option<String>,
-	_channel_id:     Option<String>,
+	_part: String,
+	_on_behalf_of_content_owner: Option<String>,
+	_mine: Option<bool>,
+	_id: Option<String>,
+	_channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionListMethodBuilder<'a, C, NC, A> {}
@@ -4894,10 +5102,10 @@ pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	ChannelSection,
-	_part:	String,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: ChannelSection,
+	_part: String,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionInsertMethodBuilder<'a, C, NC, A> {}
@@ -5001,8 +5209,8 @@ pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_id: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {}
@@ -5080,9 +5288,9 @@ pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	ChannelSection,
-	_part:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: ChannelSection,
+	_part: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {}
@@ -5174,10 +5382,10 @@ pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_region_code:     Option<String>,
-	_id:     Option<String>,
-	_hl:     Option<String>,
+	_part: String,
+	_region_code: Option<String>,
+	_id: Option<String>,
+	_hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for GuideCategoryListMethodBuilder<'a, C, NC, A> {}
@@ -5271,10 +5479,10 @@ pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	Playlist,
-	_part:	String,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: Playlist,
+	_part: String,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistInsertMethodBuilder<'a, C, NC, A> {}
@@ -5378,14 +5586,14 @@ pub struct PlaylistListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_page_token:     Option<String>,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
-	_mine:     Option<bool>,
-	_max_results:     Option<u32>,
-	_id:     Option<String>,
-	_channel_id:     Option<String>,
+	_part: String,
+	_page_token: Option<String>,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
+	_mine: Option<bool>,
+	_max_results: Option<u32>,
+	_id: Option<String>,
+	_channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistListMethodBuilder<'a, C, NC, A> {}
@@ -5517,8 +5725,8 @@ pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_id: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistDeleteMethodBuilder<'a, C, NC, A> {}
@@ -5596,9 +5804,9 @@ pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	Playlist,
-	_part:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: Playlist,
+	_part: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistUpdateMethodBuilder<'a, C, NC, A> {}
@@ -5692,8 +5900,8 @@ pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_video_id:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_video_id: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ThumbnailSetMethodBuilder<'a, C, NC, A> {}
@@ -5769,17 +5977,17 @@ pub struct VideoListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_video_category_id:     Option<String>,
-	_region_code:     Option<String>,
-	_page_token:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
-	_my_rating:     Option<String>,
-	_max_results:     Option<u32>,
-	_locale:     Option<String>,
-	_id:     Option<String>,
-	_hl:     Option<String>,
-	_chart:     Option<String>,
+	_part: String,
+	_video_category_id: Option<String>,
+	_region_code: Option<String>,
+	_page_token: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
+	_my_rating: Option<String>,
+	_max_results: Option<u32>,
+	_locale: Option<String>,
+	_id: Option<String>,
+	_hl: Option<String>,
+	_chart: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoListMethodBuilder<'a, C, NC, A> {}
@@ -5935,9 +6143,9 @@ pub struct VideoRateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id:	String,
-	_rating:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_id: String,
+	_rating: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoRateMethodBuilder<'a, C, NC, A> {}
@@ -6025,8 +6233,8 @@ pub struct VideoGetratingMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_id: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoGetratingMethodBuilder<'a, C, NC, A> {}
@@ -6104,8 +6312,8 @@ pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_id: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoDeleteMethodBuilder<'a, C, NC, A> {}
@@ -6183,9 +6391,9 @@ pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	Video,
-	_part:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: Video,
+	_part: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoUpdateMethodBuilder<'a, C, NC, A> {}
@@ -6281,13 +6489,13 @@ pub struct VideoInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	Video,
-	_part:	String,
-	_stabilize:     Option<bool>,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
-	_notify_subscribers:     Option<bool>,
-	_auto_levels:     Option<bool>,
+	_request: Video,
+	_part: String,
+	_stabilize: Option<bool>,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
+	_notify_subscribers: Option<bool>,
+	_auto_levels: Option<bool>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoInsertMethodBuilder<'a, C, NC, A> {}
@@ -6415,8 +6623,8 @@ pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	Subscription,
-	_part:	String,
+	_request: Subscription,
+	_part: String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionInsertMethodBuilder<'a, C, NC, A> {}
@@ -6498,17 +6706,17 @@ pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_page_token:     Option<String>,
-	_order:     Option<String>,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
-	_my_subscribers:     Option<bool>,
-	_mine:     Option<bool>,
-	_max_results:     Option<u32>,
-	_id:     Option<String>,
-	_for_channel_id:     Option<String>,
-	_channel_id:     Option<String>,
+	_part: String,
+	_page_token: Option<String>,
+	_order: Option<String>,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
+	_my_subscribers: Option<bool>,
+	_mine: Option<bool>,
+	_max_results: Option<u32>,
+	_id: Option<String>,
+	_for_channel_id: Option<String>,
+	_channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionListMethodBuilder<'a, C, NC, A> {}
@@ -6664,7 +6872,7 @@ pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id:	String,
+	_id: String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionDeleteMethodBuilder<'a, C, NC, A> {}
@@ -6732,36 +6940,36 @@ pub struct SearchListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_video_type:     Option<String>,
-	_video_syndicated:     Option<String>,
-	_video_license:     Option<String>,
-	_video_embeddable:     Option<String>,
-	_video_duration:     Option<String>,
-	_video_dimension:     Option<String>,
-	_video_definition:     Option<String>,
-	_video_category_id:     Option<String>,
-	_video_caption:     Option<String>,
-	_type_:     Option<String>,
-	_topic_id:     Option<String>,
-	_safe_search:     Option<String>,
-	_relevance_language:     Option<String>,
-	_related_to_video_id:     Option<String>,
-	_region_code:     Option<String>,
-	_q:     Option<String>,
-	_published_before:     Option<String>,
-	_published_after:     Option<String>,
-	_page_token:     Option<String>,
-	_order:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
-	_max_results:     Option<u32>,
-	_location_radius:     Option<String>,
-	_location:     Option<String>,
-	_for_mine:     Option<bool>,
-	_for_content_owner:     Option<bool>,
-	_event_type:     Option<String>,
-	_channel_type:     Option<String>,
-	_channel_id:     Option<String>,
+	_part: String,
+	_video_type: Option<String>,
+	_video_syndicated: Option<String>,
+	_video_license: Option<String>,
+	_video_embeddable: Option<String>,
+	_video_duration: Option<String>,
+	_video_dimension: Option<String>,
+	_video_definition: Option<String>,
+	_video_category_id: Option<String>,
+	_video_caption: Option<String>,
+	_type_: Option<String>,
+	_topic_id: Option<String>,
+	_safe_search: Option<String>,
+	_relevance_language: Option<String>,
+	_related_to_video_id: Option<String>,
+	_region_code: Option<String>,
+	_q: Option<String>,
+	_published_before: Option<String>,
+	_published_after: Option<String>,
+	_page_token: Option<String>,
+	_order: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
+	_max_results: Option<u32>,
+	_location_radius: Option<String>,
+	_location: Option<String>,
+	_for_mine: Option<bool>,
+	_for_content_owner: Option<bool>,
+	_event_type: Option<String>,
+	_channel_type: Option<String>,
+	_channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SearchListMethodBuilder<'a, C, NC, A> {}
@@ -7067,8 +7275,8 @@ pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_hl:     Option<String>,
+	_part: String,
+	_hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nRegionListMethodBuilder<'a, C, NC, A> {}
@@ -7144,10 +7352,10 @@ pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	LiveStream,
-	_part:	String,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: LiveStream,
+	_part: String,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamUpdateMethodBuilder<'a, C, NC, A> {}
@@ -7253,9 +7461,9 @@ pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id:	String,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
+	_id: String,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamDeleteMethodBuilder<'a, C, NC, A> {}
@@ -7345,13 +7553,13 @@ pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_page_token:     Option<String>,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
-	_mine:     Option<bool>,
-	_max_results:     Option<u32>,
-	_id:     Option<String>,
+	_part: String,
+	_page_token: Option<String>,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
+	_mine: Option<bool>,
+	_max_results: Option<u32>,
+	_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamListMethodBuilder<'a, C, NC, A> {}
@@ -7473,10 +7681,10 @@ pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	LiveStream,
-	_part:	String,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: LiveStream,
+	_part: String,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamInsertMethodBuilder<'a, C, NC, A> {}
@@ -7580,9 +7788,9 @@ pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	Channel,
-	_part:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: Channel,
+	_part: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelUpdateMethodBuilder<'a, C, NC, A> {}
@@ -7674,16 +7882,16 @@ pub struct ChannelListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_page_token:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
-	_my_subscribers:     Option<bool>,
-	_mine:     Option<bool>,
-	_max_results:     Option<u32>,
-	_managed_by_me:     Option<bool>,
-	_id:     Option<String>,
-	_for_username:     Option<String>,
-	_category_id:     Option<String>,
+	_part: String,
+	_page_token: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
+	_my_subscribers: Option<bool>,
+	_mine: Option<bool>,
+	_max_results: Option<u32>,
+	_managed_by_me: Option<bool>,
+	_id: Option<String>,
+	_for_username: Option<String>,
+	_category_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelListMethodBuilder<'a, C, NC, A> {}
@@ -7825,7 +8033,7 @@ pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id:	String,
+	_id: String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {}
@@ -7893,13 +8101,13 @@ pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_video_id:     Option<String>,
-	_playlist_id:     Option<String>,
-	_page_token:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
-	_max_results:     Option<u32>,
-	_id:     Option<String>,
+	_part: String,
+	_video_id: Option<String>,
+	_playlist_id: Option<String>,
+	_page_token: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
+	_max_results: Option<u32>,
+	_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemListMethodBuilder<'a, C, NC, A> {}
@@ -8019,9 +8227,9 @@ pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	PlaylistItem,
-	_part:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: PlaylistItem,
+	_part: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemInsertMethodBuilder<'a, C, NC, A> {}
@@ -8113,8 +8321,8 @@ pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	PlaylistItem,
-	_part:	String,
+	_request: PlaylistItem,
+	_part: String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {}
@@ -8198,8 +8406,9 @@ pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_channel_id:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: InvideoBranding,
+	_channel_id: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for WatermarkSetMethodBuilder<'a, C, NC, A> {}
@@ -8213,6 +8422,15 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &InvideoBranding) -> &mut WatermarkSetMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *channel id* query property to the given value.
 	///
 	/// Even though the property as already been set when instantiating this call, 
@@ -8275,8 +8493,8 @@ pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_channel_id:	String,
-	_on_behalf_of_content_owner:     Option<String>,
+	_channel_id: String,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for WatermarkUnsetMethodBuilder<'a, C, NC, A> {}
@@ -8352,13 +8570,13 @@ pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id:	String,
-	_part:	String,
-	_walltime:     Option<String>,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
-	_offset_time_ms:     Option<String>,
-	_display_slate:     Option<bool>,
+	_id: String,
+	_part: String,
+	_walltime: Option<String>,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
+	_offset_time_ms: Option<String>,
+	_display_slate: Option<bool>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastControlMethodBuilder<'a, C, NC, A> {}
@@ -8486,10 +8704,10 @@ pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	LiveBroadcast,
-	_part:	String,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: LiveBroadcast,
+	_part: String,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {}
@@ -8595,10 +8813,10 @@ pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request:	LiveBroadcast,
-	_part:	String,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
+	_request: LiveBroadcast,
+	_part: String,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {}
@@ -8702,11 +8920,11 @@ pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id:	String,
-	_part:	String,
-	_stream_id:     Option<String>,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
+	_id: String,
+	_part: String,
+	_stream_id: Option<String>,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastBindMethodBuilder<'a, C, NC, A> {}
@@ -8814,14 +9032,14 @@ pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_page_token:     Option<String>,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
-	_mine:     Option<bool>,
-	_max_results:     Option<u32>,
-	_id:     Option<String>,
-	_broadcast_status:     Option<String>,
+	_part: String,
+	_page_token: Option<String>,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
+	_mine: Option<bool>,
+	_max_results: Option<u32>,
+	_id: Option<String>,
+	_broadcast_status: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastListMethodBuilder<'a, C, NC, A> {}
@@ -8951,9 +9169,9 @@ pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id:	String,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
+	_id: String,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {}
@@ -9043,11 +9261,11 @@ pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_broadcast_status:	String,
-	_id:	String,
-	_part:	String,
-	_on_behalf_of_content_owner_channel:     Option<String>,
-	_on_behalf_of_content_owner:     Option<String>,
+	_broadcast_status: String,
+	_id: String,
+	_part: String,
+	_on_behalf_of_content_owner_channel: Option<String>,
+	_on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {}
@@ -9157,10 +9375,10 @@ pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_region_code:     Option<String>,
-	_id:     Option<String>,
-	_hl:     Option<String>,
+	_part: String,
+	_region_code: Option<String>,
+	_id: Option<String>,
+	_hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoCategoryListMethodBuilder<'a, C, NC, A> {}
@@ -9252,15 +9470,15 @@ pub struct ActivityListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
-	_region_code:     Option<String>,
-	_published_before:     Option<String>,
-	_published_after:     Option<String>,
-	_page_token:     Option<String>,
-	_mine:     Option<bool>,
-	_max_results:     Option<u32>,
-	_home:     Option<bool>,
-	_channel_id:     Option<String>,
+	_part: String,
+	_region_code: Option<String>,
+	_published_before: Option<String>,
+	_published_after: Option<String>,
+	_page_token: Option<String>,
+	_mine: Option<bool>,
+	_max_results: Option<u32>,
+	_home: Option<bool>,
+	_channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ActivityListMethodBuilder<'a, C, NC, A> {}
@@ -9396,7 +9614,8 @@ pub struct ActivityInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part:	String,
+	_request: Activity,
+	_part: String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ActivityInsertMethodBuilder<'a, C, NC, A> {}
@@ -9410,6 +9629,15 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
 
 	}
 
+	/// Sets the *request* property to the given value.
+	///
+	/// Even though the property as already been set when instantiating this call, 
+	/// we provide this method for API completeness.
+	/// 
+	pub fn request(&mut self, new_value: &Activity) -> &mut ActivityInsertMethodBuilder<'a, C, NC, A> {
+		self._request = new_value.clone();
+		return self;
+	}
 	/// Sets the *part* query property to the given value.
 	///
 	/// Even though the *parts* list is automatically derived from *Resource* passed in 

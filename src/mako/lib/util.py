@@ -26,7 +26,6 @@ SPACES_PER_TAB = 4
 
 REQUEST_PRIORITY = 100
 REQUEST_MARKER = 'RequestValue'
-RESOURCE_MARKER = 'Resource'
 
 # ==============================================================================
 ## @name Filters
@@ -256,7 +255,7 @@ def schema_markers(s, c):
         # it should have at least one activity that matches it's type to qualify for the Resource trait
         for fqan, iot in activities.iteritems():
             if activity_name_to_type_name(activity_split(fqan)[0]).lower() == s.id.lower():
-                res.add(RESOURCE_MARKER)
+                res.add('Resource')
             if IO_RESPONSE in iot:
                 res.add('ResponseResult')
             if IO_REQUEST in iot:

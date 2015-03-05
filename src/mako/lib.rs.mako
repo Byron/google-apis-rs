@@ -34,7 +34,7 @@ use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::default::Default;
 
-pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestResult, NestedType};
+pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType};
 
 // ########
 // HUB ###
