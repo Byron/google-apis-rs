@@ -92,11 +92,16 @@
 //! 
 //! **TODO** Example calls - there should soon be a generator able to do that with proper inputs
 //! 
-//! ## About error handling
+//! ## Handling Errors
+//! 
+//! # Some details
 //! 
 //! ## About Customization/Callbacks
 //! 
-//! ## About Optionals in parts (needed for Json, otherwise I'd happily drop them)
+//! ## About parts
+//! 
+//! * Optionals needed for Json, otherwise I'd happily drop them
+//! * explain that examples use all response parts, even though they are shown for request values
 //! 
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
@@ -4877,7 +4882,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -4929,18 +4934,15 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: ChannelBannerResource = Default::default();
-/// req.url = Some("Stet".to_string());
-/// req.kind = Some("dolor".to_string());
-/// req.etag = Some("sed".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.channel_banners().insert(&req)
-///         .on_behalf_of_content_owner("accusam").doit();
+///         .on_behalf_of_content_owner("Stet").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5020,10 +5022,10 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.channel_sections().list("part")
-///         .on_behalf_of_content_owner("eos")
-///         .mine(true)
-///         .id("sadipscing")
-///         .channel_id("dolor").doit();
+///         .on_behalf_of_content_owner("sed")
+///         .mine(false)
+///         .id("ipsum")
+///         .channel_id("eos").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5055,7 +5057,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -5136,22 +5138,18 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: ChannelSection = Default::default();
 /// req.snippet = Default::default(); // is ChannelSectionSnippet
-/// req.kind = Some("consetetur".to_string());
-/// req.etag = Some("ea".to_string());
 /// req.content_details = Default::default(); // is ChannelSectionContentDetails
-/// req.id = Some("sit".to_string());
-/// req.localizations = Default::default(); // is HashMap<String, ChannelSectionLocalization>
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.channel_sections().insert(&req)
-///         .on_behalf_of_content_owner_channel("sanctus")
-///         .on_behalf_of_content_owner("invidunt").doit();
+///         .on_behalf_of_content_owner_channel("duo")
+///         .on_behalf_of_content_owner("sadipscing").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5182,7 +5180,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5199,7 +5197,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5265,7 +5263,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.channel_sections().delete("id")
-///         .on_behalf_of_content_owner("sit").doit();
+///         .on_behalf_of_content_owner("consetetur").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5343,21 +5341,17 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: ChannelSection = Default::default();
 /// req.snippet = Default::default(); // is ChannelSectionSnippet
-/// req.kind = Some("takimata".to_string());
-/// req.etag = Some("rebum.".to_string());
 /// req.content_details = Default::default(); // is ChannelSectionContentDetails
-/// req.id = Some("consetetur".to_string());
-/// req.localizations = Default::default(); // is HashMap<String, ChannelSectionLocalization>
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.channel_sections().update(&req)
-///         .on_behalf_of_content_owner("elitr,").doit();
+///         .on_behalf_of_content_owner("ea").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5387,7 +5381,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5404,7 +5398,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5462,9 +5456,9 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.guide_categories().list("part")
-///         .region_code("sea")
-///         .id("diam")
-///         .hl("clita").doit();
+///         .region_code("sanctus")
+///         .id("invidunt")
+///         .hl("et").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5495,7 +5489,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -5565,24 +5559,18 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: Playlist = Default::default();
 /// req.status = Default::default(); // is PlaylistStatus
-/// req.kind = Some("sed".to_string());
-/// req.content_details = Default::default(); // is PlaylistContentDetails
 /// req.snippet = Default::default(); // is PlaylistSnippet
-/// req.player = Default::default(); // is PlaylistPlayer
-/// req.etag = Some("dolor".to_string());
-/// req.id = Some("labore".to_string());
-/// req.localizations = Default::default(); // is HashMap<String, PlaylistLocalization>
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.playlists().insert(&req)
-///         .on_behalf_of_content_owner_channel("kasd")
-///         .on_behalf_of_content_owner("elitr,").doit();
+///         .on_behalf_of_content_owner_channel("sit")
+///         .on_behalf_of_content_owner("takimata").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5613,7 +5601,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5630,7 +5618,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5702,13 +5690,13 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.playlists().list("part")
-///         .page_token("accusam")
-///         .on_behalf_of_content_owner_channel("kasd")
-///         .on_behalf_of_content_owner("ea")
+///         .page_token("consetetur")
+///         .on_behalf_of_content_owner_channel("elitr,")
+///         .on_behalf_of_content_owner("sed")
 ///         .mine(true)
-///         .max_results(48)
-///         .id("sadipscing")
-///         .channel_id("nonumy").doit();
+///         .max_results(60)
+///         .id("clita")
+///         .channel_id("sed").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5743,7 +5731,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -5851,7 +5839,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.playlists().delete("id")
-///         .on_behalf_of_content_owner("et").doit();
+///         .on_behalf_of_content_owner("labore").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5929,23 +5917,17 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: Playlist = Default::default();
 /// req.status = Default::default(); // is PlaylistStatus
-/// req.kind = Some("gubergren,".to_string());
-/// req.content_details = Default::default(); // is PlaylistContentDetails
 /// req.snippet = Default::default(); // is PlaylistSnippet
-/// req.player = Default::default(); // is PlaylistPlayer
-/// req.etag = Some("diam".to_string());
-/// req.id = Some("et".to_string());
-/// req.localizations = Default::default(); // is HashMap<String, PlaylistLocalization>
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.playlists().update(&req)
-///         .on_behalf_of_content_owner("sanctus").doit();
+///         .on_behalf_of_content_owner("kasd").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5975,7 +5957,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5992,7 +5974,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6048,7 +6030,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.thumbnails().set("videoId")
-///         .on_behalf_of_content_owner("consetetur").doit();
+///         .on_behalf_of_content_owner("kasd").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6137,16 +6119,16 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.videos().list("part")
-///         .video_category_id("accusam")
-///         .region_code("amet.")
-///         .page_token("clita")
-///         .on_behalf_of_content_owner("erat,")
-///         .my_rating("amet,")
-///         .max_results(28)
-///         .locale("amet.")
-///         .id("erat,")
-///         .hl("no")
-///         .chart("est").doit();
+///         .video_category_id("kasd")
+///         .region_code("ea")
+///         .page_token("rebum.")
+///         .on_behalf_of_content_owner("dolor")
+///         .my_rating("sadipscing")
+///         .max_results(10)
+///         .locale("sed")
+///         .id("et")
+///         .hl("gubergren,")
+///         .chart("diam").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6184,7 +6166,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -6325,7 +6307,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.videos().rate("id", "rating")
-///         .on_behalf_of_content_owner("erat,").doit();
+///         .on_behalf_of_content_owner("sed").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6412,7 +6394,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.videos().get_rating("id")
-///         .on_behalf_of_content_owner("rebum.").doit();
+///         .on_behalf_of_content_owner("aliquyam").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6488,7 +6470,7 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.videos().delete("id")
-///         .on_behalf_of_content_owner("voluptua.").doit();
+///         .on_behalf_of_content_owner("amet.").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6576,34 +6558,27 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: Video = Default::default();
 /// req.status = Default::default(); // is VideoStatus
 /// req.topic_details = Default::default(); // is VideoTopicDetails
-/// req.monetization_details = Default::default(); // is VideoMonetizationDetails
 /// req.suggestions = Default::default(); // is VideoSuggestions
-/// req.age_gating = Default::default(); // is VideoAgeGating
 /// req.file_details = Default::default(); // is VideoFileDetails
 /// req.player = Default::default(); // is VideoPlayer
-/// req.id = Some("dolor".to_string());
 /// req.localizations = Default::default(); // is HashMap<String, VideoLocalization>
 /// req.live_streaming_details = Default::default(); // is VideoLiveStreamingDetails
 /// req.processing_details = Default::default(); // is VideoProcessingDetails
-/// req.kind = Some("amet,".to_string());
 /// req.statistics = Default::default(); // is VideoStatistics
 /// req.content_details = Default::default(); // is VideoContentDetails
-/// req.conversion_pings = Default::default(); // is VideoConversionPings
 /// req.snippet = Default::default(); // is VideoSnippet
-/// req.etag = Some("dolore".to_string());
-/// req.project_details = Default::default(); // is VideoProjectDetails
 /// req.recording_details = Default::default(); // is VideoRecordingDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.videos().update(&req)
-///         .on_behalf_of_content_owner("At").doit();
+///         .on_behalf_of_content_owner("clita").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6633,7 +6608,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6660,7 +6635,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6740,38 +6715,31 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: Video = Default::default();
 /// req.status = Default::default(); // is VideoStatus
 /// req.topic_details = Default::default(); // is VideoTopicDetails
-/// req.monetization_details = Default::default(); // is VideoMonetizationDetails
 /// req.suggestions = Default::default(); // is VideoSuggestions
-/// req.age_gating = Default::default(); // is VideoAgeGating
 /// req.file_details = Default::default(); // is VideoFileDetails
 /// req.player = Default::default(); // is VideoPlayer
-/// req.id = Some("dolores".to_string());
 /// req.localizations = Default::default(); // is HashMap<String, VideoLocalization>
 /// req.live_streaming_details = Default::default(); // is VideoLiveStreamingDetails
 /// req.processing_details = Default::default(); // is VideoProcessingDetails
-/// req.kind = Some("diam".to_string());
 /// req.statistics = Default::default(); // is VideoStatistics
 /// req.content_details = Default::default(); // is VideoContentDetails
-/// req.conversion_pings = Default::default(); // is VideoConversionPings
 /// req.snippet = Default::default(); // is VideoSnippet
-/// req.etag = Some("Lorem".to_string());
-/// req.project_details = Default::default(); // is VideoProjectDetails
 /// req.recording_details = Default::default(); // is VideoRecordingDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.videos().insert(&req)
-///         .stabilize(false)
-///         .on_behalf_of_content_owner_channel("elitr,")
-///         .on_behalf_of_content_owner("At")
-///         .notify_subscribers(false)
-///         .auto_levels(true).doit();
+///         .stabilize(true)
+///         .on_behalf_of_content_owner_channel("amet,")
+///         .on_behalf_of_content_owner("accusam")
+///         .notify_subscribers(true)
+///         .auto_levels(false).doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6805,7 +6773,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6832,7 +6800,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6934,15 +6902,11 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: Subscription = Default::default();
 /// req.snippet = Default::default(); // is SubscriptionSnippet
-/// req.kind = Some("sanctus".to_string());
-/// req.etag = Some("dolor".to_string());
 /// req.content_details = Default::default(); // is SubscriptionContentDetails
-/// req.subscriber_snippet = Default::default(); // is SubscriptionSubscriberSnippet
-/// req.id = Some("diam".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6975,7 +6939,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6992,7 +6956,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -7041,16 +7005,16 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.subscriptions().list("part")
-///         .page_token("diam")
-///         .order("nonumy")
-///         .on_behalf_of_content_owner_channel("dolor")
-///         .on_behalf_of_content_owner("nonumy")
-///         .my_subscribers(true)
-///         .mine(false)
-///         .max_results(52)
-///         .id("sed")
-///         .for_channel_id("At")
-///         .channel_id("dolore").doit();
+///         .page_token("est")
+///         .order("sit")
+///         .on_behalf_of_content_owner_channel("ipsum")
+///         .on_behalf_of_content_owner("erat,")
+///         .my_subscribers(false)
+///         .mine(true)
+///         .max_results(40)
+///         .id("voluptua.")
+///         .for_channel_id("dolor")
+///         .channel_id("amet,").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7088,7 +7052,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -7286,35 +7250,35 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.search().list("part")
-///         .video_type("At")
-///         .video_syndicated("sit")
-///         .video_license("et")
-///         .video_embeddable("ipsum")
-///         .video_duration("eos")
-///         .video_dimension("amet.")
-///         .video_definition("ut")
-///         .video_category_id("et")
-///         .video_caption("elitr,")
-///         .type_("est")
-///         .topic_id("Lorem")
-///         .safe_search("justo")
-///         .relevance_language("et")
-///         .related_to_video_id("ut")
-///         .region_code("et")
-///         .q("gubergren,")
-///         .published_before("est")
-///         .published_after("voluptua.")
-///         .page_token("et")
-///         .order("invidunt")
-///         .on_behalf_of_content_owner("dolore")
-///         .max_results(79)
-///         .location_radius("elitr,")
-///         .location("invidunt")
+///         .video_type("dolores")
+///         .video_syndicated("diam")
+///         .video_license("Lorem")
+///         .video_embeddable("kasd")
+///         .video_duration("elitr,")
+///         .video_dimension("At")
+///         .video_definition("sit")
+///         .video_category_id("clita")
+///         .video_caption("sanctus")
+///         .type_("dolor")
+///         .topic_id("diam")
+///         .safe_search("voluptua.")
+///         .relevance_language("diam")
+///         .related_to_video_id("nonumy")
+///         .region_code("dolor")
+///         .q("nonumy")
+///         .published_before("sit")
+///         .published_after("sed")
+///         .page_token("ipsum")
+///         .order("sed")
+///         .on_behalf_of_content_owner("At")
+///         .max_results(17)
+///         .location_radius("ea")
+///         .location("ut")
 ///         .for_mine(true)
 ///         .for_content_owner(true)
-///         .event_type("sit")
-///         .channel_type("justo")
-///         .channel_id("accusam").doit();
+///         .event_type("et")
+///         .channel_type("ipsum")
+///         .channel_id("eos").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7371,7 +7335,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -7655,7 +7619,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.i18n_regions().list("part")
-///         .hl("sit").doit();
+///         .hl("ut").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7684,7 +7648,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -7738,23 +7702,20 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: LiveStream = Default::default();
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
-/// req.kind = Some("est".to_string());
-/// req.etag = Some("diam".to_string());
-/// req.content_details = Default::default(); // is LiveStreamContentDetails
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("ipsum".to_string());
+/// req.id = Some("et".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.live_streams().update(&req)
-///         .on_behalf_of_content_owner_channel("voluptua.")
-///         .on_behalf_of_content_owner("Lorem").doit();
+///         .on_behalf_of_content_owner_channel("elitr,")
+///         .on_behalf_of_content_owner("est").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7785,7 +7746,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -7804,7 +7765,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -7874,8 +7835,8 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.live_streams().delete("id")
-///         .on_behalf_of_content_owner_channel("et")
-///         .on_behalf_of_content_owner("sadipscing").doit();
+///         .on_behalf_of_content_owner_channel("justo")
+///         .on_behalf_of_content_owner("et").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7971,11 +7932,11 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 /// // Values shown here are random and not representative !
 /// let result = hub.live_streams().list("part")
 ///         .page_token("et")
-///         .on_behalf_of_content_owner_channel("At")
-///         .on_behalf_of_content_owner("sanctus")
+///         .on_behalf_of_content_owner_channel("gubergren,")
+///         .on_behalf_of_content_owner("est")
 ///         .mine(true)
-///         .max_results(0)
-///         .id("sanctus").doit();
+///         .max_results(78)
+///         .id("invidunt").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8009,7 +7970,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8111,23 +8072,20 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: LiveStream = Default::default();
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
-/// req.kind = Some("ipsum".to_string());
-/// req.etag = Some("justo".to_string());
-/// req.content_details = Default::default(); // is LiveStreamContentDetails
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("sit".to_string());
+/// req.id = Some("dolore".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.live_streams().insert(&req)
-///         .on_behalf_of_content_owner_channel("dolor")
-///         .on_behalf_of_content_owner("Stet").doit();
+///         .on_behalf_of_content_owner_channel("accusam")
+///         .on_behalf_of_content_owner("elitr,").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8158,7 +8116,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8177,7 +8135,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8247,29 +8205,17 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: Channel = Default::default();
-/// req.status = Default::default(); // is ChannelStatus
 /// req.invideo_promotion = Default::default(); // is InvideoPromotion
-/// req.kind = Some("et".to_string());
-/// req.statistics = Default::default(); // is ChannelStatistics
-/// req.content_owner_details = Default::default(); // is ChannelContentOwnerDetails
-/// req.topic_details = Default::default(); // is ChannelTopicDetails
-/// req.content_details = Default::default(); // is ChannelContentDetails
-/// req.branding_settings = Default::default(); // is ChannelBrandingSettings
-/// req.conversion_pings = Default::default(); // is ChannelConversionPings
-/// req.snippet = Default::default(); // is ChannelSnippet
-/// req.audit_details = Default::default(); // is ChannelAuditDetails
-/// req.etag = Some("amet.".to_string());
-/// req.id = Some("ea".to_string());
-/// req.localizations = Default::default(); // is HashMap<String, ChannelLocalization>
+/// req.id = Some("invidunt".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.channels().update(&req)
-///         .on_behalf_of_content_owner("sit").doit();
+///         .on_behalf_of_content_owner("dolor").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8299,7 +8245,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8316,7 +8262,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8378,15 +8324,15 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.channels().list("part")
-///         .page_token("ipsum")
-///         .on_behalf_of_content_owner("est")
-///         .my_subscribers(true)
+///         .page_token("sit")
+///         .on_behalf_of_content_owner("justo")
+///         .my_subscribers(false)
 ///         .mine(false)
-///         .max_results(83)
+///         .max_results(49)
 ///         .managed_by_me(true)
-///         .id("ut")
-///         .for_username("erat,")
-///         .category_id("erat,").doit();
+///         .id("diam")
+///         .for_username("ipsum")
+///         .category_id("voluptua.").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8423,7 +8369,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8612,12 +8558,12 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.playlist_items().list("part")
-///         .video_id("justo")
-///         .playlist_id("clita")
-///         .page_token("clita")
-///         .on_behalf_of_content_owner("dolor")
-///         .max_results(75)
-///         .id("magna").doit();
+///         .video_id("et")
+///         .playlist_id("sadipscing")
+///         .page_token("At")
+///         .on_behalf_of_content_owner("et")
+///         .max_results(25)
+///         .id("sanctus").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8651,7 +8597,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8750,21 +8696,18 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: PlaylistItem = Default::default();
 /// req.status = Default::default(); // is PlaylistItemStatus
 /// req.snippet = Default::default(); // is PlaylistItemSnippet
-/// req.kind = Some("sanctus".to_string());
-/// req.etag = Some("diam".to_string());
 /// req.content_details = Default::default(); // is PlaylistItemContentDetails
-/// req.id = Some("clita".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.playlist_items().insert(&req)
-///         .on_behalf_of_content_owner("ipsum").doit();
+///         .on_behalf_of_content_owner("duo").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8794,7 +8737,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -8812,7 +8755,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -8870,15 +8813,12 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: PlaylistItem = Default::default();
 /// req.status = Default::default(); // is PlaylistItemStatus
 /// req.snippet = Default::default(); // is PlaylistItemSnippet
-/// req.kind = Some("ipsum".to_string());
-/// req.etag = Some("sanctus".to_string());
 /// req.content_details = Default::default(); // is PlaylistItemContentDetails
-/// req.id = Some("et".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -8911,7 +8851,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -8929,7 +8869,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -8974,20 +8914,15 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: InvideoBranding = Default::default();
-/// req.target_channel_id = Some("dolor".to_string());
-/// req.position = Default::default(); // is InvideoPosition
-/// req.image_url = Some("ea".to_string());
-/// req.timing = Default::default(); // is InvideoTiming
-/// req.image_bytes = Some("invidunt".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.watermarks().set(&req, "channelId")
-///         .on_behalf_of_content_owner("aliquyam").doit();
+///         .on_behalf_of_content_owner("sanctus").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9071,7 +9006,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.watermarks().unset("channelId")
-///         .on_behalf_of_content_owner("et").doit();
+///         .on_behalf_of_content_owner("justo").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9151,11 +9086,11 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.live_broadcasts().control("id", "part")
-///         .walltime("sit")
-///         .on_behalf_of_content_owner_channel("consetetur")
-///         .on_behalf_of_content_owner("justo")
-///         .offset_time_ms("sit")
-///         .display_slate(true).doit();
+///         .walltime("Stet")
+///         .on_behalf_of_content_owner_channel("et")
+///         .on_behalf_of_content_owner("amet.")
+///         .offset_time_ms("ea")
+///         .display_slate(false).doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9199,7 +9134,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9297,22 +9232,20 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: LiveBroadcast = Default::default();
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
-/// req.kind = Some("amet,".to_string());
-/// req.etag = Some("et".to_string());
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
-/// req.id = Some("ipsum".to_string());
+/// req.id = Some("sit".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.live_broadcasts().update(&req)
-///         .on_behalf_of_content_owner_channel("amet,")
-///         .on_behalf_of_content_owner("sanctus").doit();
+///         .on_behalf_of_content_owner_channel("ipsum")
+///         .on_behalf_of_content_owner("est").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9343,7 +9276,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9362,7 +9295,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9436,22 +9369,20 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: LiveBroadcast = Default::default();
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
-/// req.kind = Some("dolore".to_string());
-/// req.etag = Some("tempor".to_string());
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
-/// req.id = Some("aliquyam".to_string());
+/// req.id = Some("et".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.live_broadcasts().insert(&req)
-///         .on_behalf_of_content_owner_channel("accusam")
-///         .on_behalf_of_content_owner("labore").doit();
+///         .on_behalf_of_content_owner_channel("diam")
+///         .on_behalf_of_content_owner("dolores").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9482,7 +9413,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9501,7 +9432,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9575,9 +9506,9 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.live_broadcasts().bind("id", "part")
-///         .stream_id("sanctus")
-///         .on_behalf_of_content_owner_channel("eos")
-///         .on_behalf_of_content_owner("sadipscing").doit();
+///         .stream_id("erat,")
+///         .on_behalf_of_content_owner_channel("erat,")
+///         .on_behalf_of_content_owner("invidunt").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9619,7 +9550,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9699,12 +9630,12 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.live_broadcasts().list("part")
-///         .page_token("amet.")
-///         .on_behalf_of_content_owner_channel("et")
-///         .on_behalf_of_content_owner("eirmod")
+///         .page_token("justo")
+///         .on_behalf_of_content_owner_channel("clita")
+///         .on_behalf_of_content_owner("clita")
 ///         .mine(true)
-///         .max_results(14)
-///         .id("diam")
+///         .max_results(75)
+///         .id("magna")
 ///         .broadcast_status("sanctus").doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9740,7 +9671,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9846,7 +9777,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.live_broadcasts().delete("id")
-///         .on_behalf_of_content_owner_channel("amet,")
+///         .on_behalf_of_content_owner_channel("clita")
 ///         .on_behalf_of_content_owner("ipsum").doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9942,7 +9873,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.live_broadcasts().transition("broadcastStatus", "id", "part")
-///         .on_behalf_of_content_owner_channel("At")
+///         .on_behalf_of_content_owner_channel("et")
 ///         .on_behalf_of_content_owner("dolor").doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9995,7 +9926,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -10065,9 +9996,9 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.video_categories().list("part")
-///         .region_code("eirmod")
-///         .id("sed")
-///         .hl("ipsum").doit();
+///         .region_code("invidunt")
+///         .id("aliquyam")
+///         .hl("clita").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -10098,7 +10029,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -10169,14 +10100,14 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are random and not representative !
 /// let result = hub.activities().list("part")
-///         .region_code("kasd")
-///         .published_before("aliquyam")
-///         .published_after("et")
-///         .page_token("labore")
-///         .mine(true)
-///         .max_results(27)
+///         .region_code("sanctus")
+///         .published_before("no")
+///         .published_after("sit")
+///         .page_token("consetetur")
+///         .mine(false)
+///         .max_results(48)
 ///         .home(true)
-///         .channel_id("et").doit();
+///         .channel_id("amet,").doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -10212,7 +10143,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -10325,14 +10256,11 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure.
+/// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are random and not representative !
 /// let mut req: Activity = Default::default();
 /// req.snippet = Default::default(); // is ActivitySnippet
 /// req.content_details = Default::default(); // is ActivityContentDetails
-/// req.kind = Some("rebum.".to_string());
-/// req.etag = Some("et".to_string());
-/// req.id = Some("erat,".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -10365,7 +10293,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -10382,7 +10310,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-    
+
     /// **Settable Parts**
     /// 
     /// * *snippet*

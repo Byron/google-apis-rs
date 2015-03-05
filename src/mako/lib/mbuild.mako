@@ -7,10 +7,14 @@
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts)
 
-    def make_parts_desc(part_prop):
+    def get_parts(part_prop):
         if not part_prop:
-            return None
-        parts = extract_parts(part_prop.get('description', ''))
+            return list()
+        return extract_parts(part_prop.get('description', ''))
+
+    def make_parts_desc(part_prop):
+        
+        parts = get_parts(part_prop)
         if not parts:
             return None
         part_desc = "**Settable Parts**\n\n"
@@ -39,6 +43,7 @@
             break
     # end for each param
     part_desc = make_parts_desc(part_prop)
+    parts = get_parts(part_prop)
 %>\
 % if 'description' in m:
 ${m.description | rust_doc_comment}
@@ -55,7 +60,7 @@ ${part_desc | rust_doc_comment}
 /// Instantiate a resource method builder
 ///
 <%block filter="rust_doc_comment">\
-${self.usage(resource, method, params, request_value)}\
+${self.usage(resource, method, params, request_value, parts)}\
 </%block>
 pub struct ${ThisType}
     where NC: 'a,
@@ -130,7 +135,7 @@ ${self._setter(resource, method, m, p, part_prop, ThisType, c)}\
     /// we provide this method for API completeness.
     % endif
     % if part_desc:
-    
+
     ${part_desc | rust_doc_comment, indent_all_but_first_by(1)}
     % endif
     /// 
@@ -147,7 +152,7 @@ ${self._setter(resource, method, m, p, part_prop, ThisType, c)}\
 ## creates a setter for the call builder
 ###############################################################################################
 ###############################################################################################
-<%def name="usage(resource, method, params, request_value)">\
+<%def name="usage(resource, method, params, request_value, parts)">\
 <%
     hub_type_name = hub_type(canonicalName)
     required_props, optional_props, part_prop = organize_params(params, request_value)
@@ -182,10 +187,13 @@ ${capture(util.test_prelude) | hide_rust_doc_test}\
 ${capture(lib.test_hub, hub_type_name, comments=False) | hide_rust_doc_test}
 % if request_value:
 // As the method needs a request, you would usually fill it with the desired information
-// into the respective structure.
+// into the respective structure. Some of the parts shown here might not be applicable !
 // ${random_value_warning}
 let mut ${rb_name}: ${request_value.id} = Default::default();
 % for spn, sp in request_value.get('properties', dict()).iteritems():
+% if spn not in parts:
+<% continue %>
+% endif
 <%
     rtn = trv(spn, sp, request_value.id)
     assignment = rnd_arg_val_for_type(rtn)

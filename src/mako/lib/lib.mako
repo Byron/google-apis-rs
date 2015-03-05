@@ -64,11 +64,16 @@ ${self.hub_usage_example(rust_doc)}\
 
 **TODO** Example calls - there should soon be a generator able to do that with proper inputs
 
-${'##'} About error handling
+${'##'} Handling Errors
+
+# Some details
 
 ${'##'} About Customization/Callbacks
 
-${'##'} About Optionals in parts (needed for Json, otherwise I'd happily drop them)
+${'##'} About parts
+
+* Optionals needed for Json, otherwise I'd happily drop them
+* explain that examples use all response parts, even though they are shown for request values
 
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
