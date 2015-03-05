@@ -4821,6 +4821,10 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *i18nLanguage* resource.
 /// It is not used directly, but through a `I18nLanguageMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -4873,6 +4877,11 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
     /// 
     /// The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
     pub fn part(mut self, new_value: &str) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
@@ -4983,6 +4992,11 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *channelSection* resource.
 /// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5041,6 +5055,12 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
     /// 
     /// The part parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
     /// 
@@ -5091,6 +5111,10 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 /// A builder for the *insert* method supported by a *channelSection* resource.
 /// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *snippet*
+/// * *contentDetails*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5158,6 +5182,11 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
     /// 
     pub fn request(mut self, new_value: &ChannelSection) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -5170,6 +5199,11 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -5284,6 +5318,10 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 /// A builder for the *update* method supported by a *channelSection* resource.
 /// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *snippet*
+/// * *contentDetails*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5349,6 +5387,11 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
     /// 
     pub fn request(mut self, new_value: &ChannelSection) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -5361,6 +5404,11 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -5387,6 +5435,10 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *guideCategory* resource.
 /// It is not used directly, but through a `GuideCategoryMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5443,6 +5495,11 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
     /// 
     /// The part parameter specifies a comma-separated list of one or more guideCategory resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     /// 
@@ -5483,6 +5540,10 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 /// A builder for the *insert* method supported by a *playlist* resource.
 /// It is not used directly, but through a `PlaylistMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *snippet*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5552,6 +5613,11 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *status*
     /// 
     pub fn request(mut self, new_value: &Playlist) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -5564,6 +5630,11 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *status*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -5602,6 +5673,12 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *playlist* resource.
 /// It is not used directly, but through a `PlaylistMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *status*
+/// * *contentDetails*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5666,6 +5743,13 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *status*
+    /// * *contentDetails*
     /// 
     /// The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, status, and contentDetails.
     /// 
@@ -5820,6 +5904,10 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 /// A builder for the *update* method supported by a *playlist* resource.
 /// It is not used directly, but through a `PlaylistMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *snippet*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5887,6 +5975,11 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *status*
     /// 
     pub fn request(mut self, new_value: &Playlist) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -5899,6 +5992,11 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *status*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -6001,6 +6099,21 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *video* resource.
 /// It is not used directly, but through a `VideoMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
+/// * *fileDetails*
+/// * *liveStreamingDetails*
+/// * *localizations*
+/// * *player*
+/// * *processingDetails*
+/// * *recordingDetails*
+/// * *statistics*
+/// * *status*
+/// * *suggestions*
+/// * *topicDetails*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -6071,6 +6184,22 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *fileDetails*
+    /// * *liveStreamingDetails*
+    /// * *localizations*
+    /// * *player*
+    /// * *processingDetails*
+    /// * *recordingDetails*
+    /// * *statistics*
+    /// * *status*
+    /// * *suggestions*
+    /// * *topicDetails*
     /// 
     /// The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
     /// 
@@ -6412,6 +6541,20 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 /// A builder for the *update* method supported by a *video* resource.
 /// It is not used directly, but through a `VideoMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *snippet*
+/// * *contentDetails*
+/// * *fileDetails*
+/// * *liveStreamingDetails*
+/// * *localizations*
+/// * *player*
+/// * *processingDetails*
+/// * *recordingDetails*
+/// * *statistics*
+/// * *status*
+/// * *suggestions*
+/// * *topicDetails*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -6490,6 +6633,21 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *fileDetails*
+    /// * *liveStreamingDetails*
+    /// * *localizations*
+    /// * *player*
+    /// * *processingDetails*
+    /// * *recordingDetails*
+    /// * *statistics*
+    /// * *status*
+    /// * *suggestions*
+    /// * *topicDetails*
     /// 
     pub fn request(mut self, new_value: &Video) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -6502,6 +6660,21 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *fileDetails*
+    /// * *liveStreamingDetails*
+    /// * *localizations*
+    /// * *player*
+    /// * *processingDetails*
+    /// * *recordingDetails*
+    /// * *statistics*
+    /// * *status*
+    /// * *suggestions*
+    /// * *topicDetails*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -6532,6 +6705,20 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// A builder for the *insert* method supported by a *video* resource.
 /// It is not used directly, but through a `VideoMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *snippet*
+/// * *contentDetails*
+/// * *fileDetails*
+/// * *liveStreamingDetails*
+/// * *localizations*
+/// * *player*
+/// * *processingDetails*
+/// * *recordingDetails*
+/// * *statistics*
+/// * *status*
+/// * *suggestions*
+/// * *topicDetails*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -6618,6 +6805,21 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *fileDetails*
+    /// * *liveStreamingDetails*
+    /// * *localizations*
+    /// * *player*
+    /// * *processingDetails*
+    /// * *recordingDetails*
+    /// * *statistics*
+    /// * *status*
+    /// * *suggestions*
+    /// * *topicDetails*
     /// 
     pub fn request(mut self, new_value: &Video) -> VideoInsertMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -6630,6 +6832,21 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *fileDetails*
+    /// * *liveStreamingDetails*
+    /// * *localizations*
+    /// * *player*
+    /// * *processingDetails*
+    /// * *recordingDetails*
+    /// * *statistics*
+    /// * *status*
+    /// * *suggestions*
+    /// * *topicDetails*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -6692,6 +6909,10 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 /// A builder for the *insert* method supported by a *subscription* resource.
 /// It is not used directly, but through a `SubscriptionMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *snippet*
+/// * *contentDetails*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -6754,6 +6975,11 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
     /// 
     pub fn request(mut self, new_value: &Subscription) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -6766,6 +6992,11 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -6782,6 +7013,11 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *subscription* resource.
 /// It is not used directly, but through a `SubscriptionMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -6852,6 +7088,12 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
     /// 
     /// The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
     /// 
@@ -7017,6 +7259,10 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *search* resource.
 /// It is not used directly, but through a `SearchMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7125,6 +7371,11 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
     /// 
     /// The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     /// 
@@ -7377,6 +7628,10 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *i18nRegion* resource.
 /// It is not used directly, but through a `I18nRegionMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7429,6 +7684,11 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
     /// 
     /// The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
     pub fn part(mut self, new_value: &str) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
@@ -7451,6 +7711,12 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 /// A builder for the *update* method supported by a *liveStream* resource.
 /// It is not used directly, but through a `LiveStreamMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *cdn*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7519,6 +7785,13 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *cdn*
+    /// * *status*
     /// 
     pub fn request(mut self, new_value: &LiveStream) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -7531,6 +7804,13 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *cdn*
+    /// * *status*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -7661,6 +7941,12 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *liveStream* resource.
 /// It is not used directly, but through a `LiveStreamMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *cdn*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7723,6 +8009,13 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *cdn*
+    /// * *status*
     /// 
     /// The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.    
     pub fn part(mut self, new_value: &str) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
@@ -7791,6 +8084,12 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 /// A builder for the *insert* method supported by a *liveStream* resource.
 /// It is not used directly, but through a `LiveStreamMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *cdn*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7859,6 +8158,13 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *cdn*
+    /// * *status*
     /// 
     pub fn request(mut self, new_value: &LiveStream) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -7871,6 +8177,13 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *cdn*
+    /// * *status*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -7909,6 +8222,10 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 /// A builder for the *update* method supported by a *channel* resource.
 /// It is not used directly, but through a `ChannelMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *invideoPromotion*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7982,6 +8299,11 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *invideoPromotion*
     /// 
     pub fn request(mut self, new_value: &Channel) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -7994,6 +8316,11 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *invideoPromotion*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -8020,6 +8347,14 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *channel* resource.
 /// It is not used directly, but through a `ChannelMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
+/// * *statistics*
+/// * *topicDetails*
+/// * *invideoPromotion*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8088,6 +8423,15 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *statistics*
+    /// * *topicDetails*
+    /// * *invideoPromotion*
     /// 
     /// The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, statistics, topicDetails, and invideoPromotion.
     /// 
@@ -8239,6 +8583,12 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *playlistItem* resource.
 /// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8301,6 +8651,13 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     /// The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     /// 
@@ -8367,6 +8724,11 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 /// A builder for the *insert* method supported by a *playlistItem* resource.
 /// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *snippet*
+/// * *contentDetails*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8432,6 +8794,12 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     pub fn request(mut self, new_value: &PlaylistItem) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -8444,6 +8812,12 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -8470,6 +8844,11 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 /// A builder for the *update* method supported by a *playlistItem* resource.
 /// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *snippet*
+/// * *contentDetails*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8532,6 +8911,12 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     pub fn request(mut self, new_value: &PlaylistItem) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -8544,6 +8929,12 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -8731,6 +9122,12 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 /// A builder for the *control* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8802,6 +9199,13 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
     pub fn part(mut self, new_value: &str) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
@@ -8866,6 +9270,12 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 /// A builder for the *update* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8933,6 +9343,13 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     pub fn request(mut self, new_value: &LiveBroadcast) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -8945,6 +9362,13 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -8985,6 +9409,12 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 /// A builder for the *insert* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9052,6 +9482,13 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     pub fn request(mut self, new_value: &LiveBroadcast) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -9064,6 +9501,13 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
@@ -9102,6 +9546,12 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 /// A builder for the *bind* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9169,6 +9619,13 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
     pub fn part(mut self, new_value: &str) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
@@ -9213,6 +9670,12 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9277,6 +9740,13 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
     pub fn part(mut self, new_value: &str) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
@@ -9443,6 +9913,12 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 /// A builder for the *transition* method supported by a *liveBroadcast* resource.
 /// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
+/// * *status*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9519,6 +9995,13 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
+    /// * *status*
     /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
     pub fn part(mut self, new_value: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
@@ -9555,6 +10038,10 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *videoCategory* resource.
 /// It is not used directly, but through a `VideoCategoryMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9611,6 +10098,11 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
     /// 
     /// The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.    
     pub fn part(mut self, new_value: &str) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
@@ -9649,6 +10141,11 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 /// A builder for the *list* method supported by a *activity* resource.
 /// It is not used directly, but through a `ActivityMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *id*
+/// * *snippet*
+/// * *contentDetails*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9715,6 +10212,12 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *id*
+    /// * *snippet*
+    /// * *contentDetails*
     /// 
     /// The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
     /// 
@@ -9797,6 +10300,10 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 /// A builder for the *insert* method supported by a *activity* resource.
 /// It is not used directly, but through a `ActivityMethodsBuilder`.
 ///
+/// **Settable Parts**
+/// 
+/// * *snippet*
+/// * *contentDetails*
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9858,6 +10365,11 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
     /// 
     pub fn request(mut self, new_value: &Activity) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
         self._request = new_value.clone();
@@ -9870,6 +10382,11 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
+    
+    /// **Settable Parts**
+    /// 
+    /// * *snippet*
+    /// * *contentDetails*
     /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 

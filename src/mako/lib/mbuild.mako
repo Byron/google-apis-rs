@@ -5,7 +5,18 @@
                       split_camelcase_s, property, is_pod_property, TREF, method_io, IO_REQUEST, 
                       schema_to_required_property, rust_copy_value_s, is_required_property,
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
-                      indent_by, to_rust_type, rnd_arg_val_for_type)
+                      indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts)
+
+    def make_parts_desc(part_prop):
+        if not part_prop:
+            return None
+        parts = extract_parts(part_prop.get('description', ''))
+        if not parts:
+            return None
+        part_desc = "**Settable Parts**\n\n"
+        part_desc += ''.join('* *%s*\n' % part for part in parts)
+        part_desc = part_desc[:-1]
+        return part_desc
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -21,6 +32,13 @@
     ThisType = mb_type(resource, method) + "<'a, C, NC, A>"
 
     params, request_value = build_all_params(schemas, c, m, IO_REQUEST, REQUEST_VALUE_PROPERTY_NAME)
+    part_prop = None
+    for p in params:
+        if p.name == 'part':
+            part_prop = p
+            break
+    # end for each param
+    part_desc = make_parts_desc(part_prop)
 %>\
 % if 'description' in m:
 ${m.description | rust_doc_comment}
@@ -29,6 +47,9 @@ ${m.description | rust_doc_comment}
 /// A builder for the *${method}* method supported by a *${singular(resource)}* resource.
 /// It is not used directly, but through a `${rb_type(resource)}`.
 ///
+% if part_desc:
+${part_desc | rust_doc_comment}
+% endif
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -66,7 +87,7 @@ impl<'a, C, NC, A> ${ThisType} {
 
 ## SETTERS ###############
 % for p in params:
-${self._setter(resource, method, m, p, ThisType, c)}\
+${self._setter(resource, method, m, p, part_prop, ThisType, c)}\
 % endfor
 }
 </%def>
@@ -75,7 +96,7 @@ ${self._setter(resource, method, m, p, ThisType, c)}\
 ## creates a setter for the call builder
 ###############################################################################################
 ###############################################################################################
-<%def name="_setter(resource, method, m, p, ThisType, c)">\
+<%def name="_setter(resource, method, m, p, part_prop, ThisType, c)">\
 <%
     InType = activity_input_type(p)
 
@@ -90,6 +111,11 @@ ${self._setter(resource, method, m, p, ThisType, c)}\
     new_value_copied = rust_copy_value_s(value_name, InType, p)
     if not is_required_property(p):
         new_value_copied = 'Some(%s)' % new_value_copied
+
+    part_desc = None
+    if part_prop is not None and p.name in ('part', REQUEST_VALUE_PROPERTY_NAME):
+        part_desc = make_parts_desc(part_prop)
+    # end part description
 %>\
     /// Sets the *${split_camelcase_s(p.name)}* ${get_word(p, 'location')}property to the given value.
     ///
@@ -102,6 +128,10 @@ ${self._setter(resource, method, m, p, ThisType, c)}\
     % elif is_required_property(p):
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
+    % endif
+    % if part_desc:
+    
+    ${part_desc | rust_doc_comment, indent_all_but_first_by(1)}
     % endif
     /// 
     % if 'description' in p:

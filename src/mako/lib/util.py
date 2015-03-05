@@ -6,6 +6,7 @@ seed(7337)
 
 re_linestart = re.compile('^', flags=re.MULTILINE)
 re_first_4_spaces = re.compile('^ {1,4}', flags=re.MULTILINE)
+re_desc_parts = re.compile("((the part (names|properties) that you can include in the parameter value are)|(supported values are ))(.*?)\.", flags=re.IGNORECASE|re.MULTILINE)
 
 USE_FORMAT = 'use_format_field'
 TYPE_MAP = {'boolean' : 'bool',
@@ -162,6 +163,21 @@ def split_camelcase_s(s):
 def camel_to_under(s):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', s)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+# there are property descriptions from which parts can be extracted. Regex is based on youtube ... it's sufficiently
+# easy enough to add more cases ... 
+# return ['part', ...] or []
+def extract_parts(desc):
+    res = list()
+    m = re_desc_parts.search(desc)
+    if m is None:
+        return res
+    for part in m.groups()[-1].split(' '):
+        part = part.strip(',').strip()
+        if not part or part == 'and':
+            continue
+        res.append(part)
+    return res
 
 ## -- End Natural Language Utilities -- @}
 
