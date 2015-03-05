@@ -4830,7 +4830,6 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4841,14 +4840,12 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.i18n_languages().list("part")
-///         .hl("eos");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.i18n_languages().list("part")
+///         .hl("eos").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
@@ -4911,7 +4908,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::ChannelBannerResource;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4922,22 +4919,20 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: ChannelBannerResource = Default::default();
-/// request.url = Some("Stet".to_string());
-/// request.kind = Some("dolor".to_string());
-/// request.etag = Some("sed".to_string());
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: ChannelBannerResource = Default::default();
+/// req.url = Some("Stet".to_string());
+/// req.kind = Some("dolor".to_string());
+/// req.etag = Some("sed".to_string());
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.channel_banners().insert(&request)
-///         .on_behalf_of_content_owner("accusam");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.channel_banners().insert(&req)
+///         .on_behalf_of_content_owner("accusam").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
@@ -4997,7 +4992,6 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5008,17 +5002,15 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.channel_sections().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.channel_sections().list("part")
 ///         .on_behalf_of_content_owner("eos")
 ///         .mine(true)
 ///         .id("sadipscing")
-///         .channel_id("dolor");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .channel_id("dolor").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
@@ -5108,7 +5100,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::ChannelSection;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5119,26 +5111,24 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: ChannelSection = Default::default();
-/// request.snippet = Default::default();
-/// request.kind = Some("consetetur".to_string());
-/// request.etag = Some("ea".to_string());
-/// request.content_details = Default::default();
-/// request.id = Some("sit".to_string());
-/// request.localizations = Default::default();
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: ChannelSection = Default::default();
+/// req.snippet = Default::default(); // is ChannelSectionSnippet
+/// req.kind = Some("consetetur".to_string());
+/// req.etag = Some("ea".to_string());
+/// req.content_details = Default::default(); // is ChannelSectionContentDetails
+/// req.id = Some("sit".to_string());
+/// req.localizations = Default::default(); // is HashMap<String, ChannelSectionLocalization>
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.channel_sections().insert(&request)
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.channel_sections().insert(&req)
 ///         .on_behalf_of_content_owner_channel("sanctus")
-///         .on_behalf_of_content_owner("invidunt");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .on_behalf_of_content_owner("invidunt").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
@@ -5227,7 +5217,6 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5238,14 +5227,12 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.channel_sections().delete("id")
-///         .on_behalf_of_content_owner("sit");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.channel_sections().delete("id")
+///         .on_behalf_of_content_owner("sit").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
@@ -5306,7 +5293,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::ChannelSection;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5317,25 +5304,23 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: ChannelSection = Default::default();
-/// request.snippet = Default::default();
-/// request.kind = Some("takimata".to_string());
-/// request.etag = Some("rebum.".to_string());
-/// request.content_details = Default::default();
-/// request.id = Some("consetetur".to_string());
-/// request.localizations = Default::default();
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: ChannelSection = Default::default();
+/// req.snippet = Default::default(); // is ChannelSectionSnippet
+/// req.kind = Some("takimata".to_string());
+/// req.etag = Some("rebum.".to_string());
+/// req.content_details = Default::default(); // is ChannelSectionContentDetails
+/// req.id = Some("consetetur".to_string());
+/// req.localizations = Default::default(); // is HashMap<String, ChannelSectionLocalization>
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.channel_sections().update(&request)
-///         .on_behalf_of_content_owner("elitr,");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.channel_sections().update(&req)
+///         .on_behalf_of_content_owner("elitr,").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
@@ -5411,7 +5396,6 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5422,16 +5406,14 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.guide_categories().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.guide_categories().list("part")
 ///         .region_code("sea")
 ///         .id("diam")
-///         .hl("clita");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .hl("clita").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
@@ -5510,7 +5492,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::Playlist;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5521,28 +5503,26 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: Playlist = Default::default();
-/// request.status = Default::default();
-/// request.kind = Some("sed".to_string());
-/// request.content_details = Default::default();
-/// request.snippet = Default::default();
-/// request.player = Default::default();
-/// request.etag = Some("dolor".to_string());
-/// request.id = Some("labore".to_string());
-/// request.localizations = Default::default();
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: Playlist = Default::default();
+/// req.status = Default::default(); // is PlaylistStatus
+/// req.kind = Some("sed".to_string());
+/// req.content_details = Default::default(); // is PlaylistContentDetails
+/// req.snippet = Default::default(); // is PlaylistSnippet
+/// req.player = Default::default(); // is PlaylistPlayer
+/// req.etag = Some("dolor".to_string());
+/// req.id = Some("labore".to_string());
+/// req.localizations = Default::default(); // is HashMap<String, PlaylistLocalization>
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.playlists().insert(&request)
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.playlists().insert(&req)
 ///         .on_behalf_of_content_owner_channel("kasd")
-///         .on_behalf_of_content_owner("elitr,");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .on_behalf_of_content_owner("elitr,").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
@@ -5631,7 +5611,6 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5642,20 +5621,18 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.playlists().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.playlists().list("part")
 ///         .page_token("accusam")
 ///         .on_behalf_of_content_owner_channel("kasd")
 ///         .on_behalf_of_content_owner("ea")
 ///         .mine(true)
 ///         .max_results(48)
 ///         .id("sadipscing")
-///         .channel_id("nonumy");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .channel_id("nonumy").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistListMethodBuilder<'a, C, NC, A>
@@ -5776,7 +5753,6 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5787,14 +5763,12 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.playlists().delete("id")
-///         .on_behalf_of_content_owner("et");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.playlists().delete("id")
+///         .on_behalf_of_content_owner("et").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
@@ -5855,7 +5829,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::Playlist;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5866,27 +5840,25 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: Playlist = Default::default();
-/// request.status = Default::default();
-/// request.kind = Some("gubergren,".to_string());
-/// request.content_details = Default::default();
-/// request.snippet = Default::default();
-/// request.player = Default::default();
-/// request.etag = Some("diam".to_string());
-/// request.id = Some("et".to_string());
-/// request.localizations = Default::default();
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: Playlist = Default::default();
+/// req.status = Default::default(); // is PlaylistStatus
+/// req.kind = Some("gubergren,".to_string());
+/// req.content_details = Default::default(); // is PlaylistContentDetails
+/// req.snippet = Default::default(); // is PlaylistSnippet
+/// req.player = Default::default(); // is PlaylistPlayer
+/// req.etag = Some("diam".to_string());
+/// req.id = Some("et".to_string());
+/// req.localizations = Default::default(); // is HashMap<String, PlaylistLocalization>
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.playlists().update(&request)
-///         .on_behalf_of_content_owner("sanctus");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.playlists().update(&req)
+///         .on_behalf_of_content_owner("sanctus").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
@@ -5964,7 +5936,6 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5975,14 +5946,12 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.thumbnails().set("videoId")
-///         .on_behalf_of_content_owner("consetetur");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.thumbnails().set("videoId")
+///         .on_behalf_of_content_owner("consetetur").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
@@ -6041,7 +6010,6 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6052,10 +6020,10 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.videos().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.videos().list("part")
 ///         .video_category_id("accusam")
 ///         .region_code("amet.")
 ///         .page_token("clita")
@@ -6065,10 +6033,8 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 ///         .locale("amet.")
 ///         .id("erat,")
 ///         .hl("no")
-///         .chart("est");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .chart("est").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoListMethodBuilder<'a, C, NC, A>
@@ -6216,7 +6182,6 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6227,14 +6192,12 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.videos().rate("id", "rating")
-///         .on_behalf_of_content_owner("erat,");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.videos().rate("id", "rating")
+///         .on_behalf_of_content_owner("erat,").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoRateMethodBuilder<'a, C, NC, A>
@@ -6306,7 +6269,6 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6317,14 +6279,12 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.videos().get_rating("id")
-///         .on_behalf_of_content_owner("rebum.");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.videos().get_rating("id")
+///         .on_behalf_of_content_owner("rebum.").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoGetratingMethodBuilder<'a, C, NC, A>
@@ -6385,7 +6345,6 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6396,14 +6355,12 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.videos().delete("id")
-///         .on_behalf_of_content_owner("voluptua.");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.videos().delete("id")
+///         .on_behalf_of_content_owner("voluptua.").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
@@ -6464,7 +6421,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::Video;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6475,38 +6432,36 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: Video = Default::default();
-/// request.status = Default::default();
-/// request.topic_details = Default::default();
-/// request.monetization_details = Default::default();
-/// request.suggestions = Default::default();
-/// request.age_gating = Default::default();
-/// request.file_details = Default::default();
-/// request.player = Default::default();
-/// request.id = Some("dolor".to_string());
-/// request.localizations = Default::default();
-/// request.live_streaming_details = Default::default();
-/// request.processing_details = Default::default();
-/// request.kind = Some("amet,".to_string());
-/// request.statistics = Default::default();
-/// request.content_details = Default::default();
-/// request.conversion_pings = Default::default();
-/// request.snippet = Default::default();
-/// request.etag = Some("dolore".to_string());
-/// request.project_details = Default::default();
-/// request.recording_details = Default::default();
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: Video = Default::default();
+/// req.status = Default::default(); // is VideoStatus
+/// req.topic_details = Default::default(); // is VideoTopicDetails
+/// req.monetization_details = Default::default(); // is VideoMonetizationDetails
+/// req.suggestions = Default::default(); // is VideoSuggestions
+/// req.age_gating = Default::default(); // is VideoAgeGating
+/// req.file_details = Default::default(); // is VideoFileDetails
+/// req.player = Default::default(); // is VideoPlayer
+/// req.id = Some("dolor".to_string());
+/// req.localizations = Default::default(); // is HashMap<String, VideoLocalization>
+/// req.live_streaming_details = Default::default(); // is VideoLiveStreamingDetails
+/// req.processing_details = Default::default(); // is VideoProcessingDetails
+/// req.kind = Some("amet,".to_string());
+/// req.statistics = Default::default(); // is VideoStatistics
+/// req.content_details = Default::default(); // is VideoContentDetails
+/// req.conversion_pings = Default::default(); // is VideoConversionPings
+/// req.snippet = Default::default(); // is VideoSnippet
+/// req.etag = Some("dolore".to_string());
+/// req.project_details = Default::default(); // is VideoProjectDetails
+/// req.recording_details = Default::default(); // is VideoRecordingDetails
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.videos().update(&request)
-///         .on_behalf_of_content_owner("At");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.videos().update(&req)
+///         .on_behalf_of_content_owner("At").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
@@ -6586,7 +6541,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::Video;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6597,42 +6552,40 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: Video = Default::default();
-/// request.status = Default::default();
-/// request.topic_details = Default::default();
-/// request.monetization_details = Default::default();
-/// request.suggestions = Default::default();
-/// request.age_gating = Default::default();
-/// request.file_details = Default::default();
-/// request.player = Default::default();
-/// request.id = Some("dolores".to_string());
-/// request.localizations = Default::default();
-/// request.live_streaming_details = Default::default();
-/// request.processing_details = Default::default();
-/// request.kind = Some("diam".to_string());
-/// request.statistics = Default::default();
-/// request.content_details = Default::default();
-/// request.conversion_pings = Default::default();
-/// request.snippet = Default::default();
-/// request.etag = Some("Lorem".to_string());
-/// request.project_details = Default::default();
-/// request.recording_details = Default::default();
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: Video = Default::default();
+/// req.status = Default::default(); // is VideoStatus
+/// req.topic_details = Default::default(); // is VideoTopicDetails
+/// req.monetization_details = Default::default(); // is VideoMonetizationDetails
+/// req.suggestions = Default::default(); // is VideoSuggestions
+/// req.age_gating = Default::default(); // is VideoAgeGating
+/// req.file_details = Default::default(); // is VideoFileDetails
+/// req.player = Default::default(); // is VideoPlayer
+/// req.id = Some("dolores".to_string());
+/// req.localizations = Default::default(); // is HashMap<String, VideoLocalization>
+/// req.live_streaming_details = Default::default(); // is VideoLiveStreamingDetails
+/// req.processing_details = Default::default(); // is VideoProcessingDetails
+/// req.kind = Some("diam".to_string());
+/// req.statistics = Default::default(); // is VideoStatistics
+/// req.content_details = Default::default(); // is VideoContentDetails
+/// req.conversion_pings = Default::default(); // is VideoConversionPings
+/// req.snippet = Default::default(); // is VideoSnippet
+/// req.etag = Some("Lorem".to_string());
+/// req.project_details = Default::default(); // is VideoProjectDetails
+/// req.recording_details = Default::default(); // is VideoRecordingDetails
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.videos().insert(&request)
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.videos().insert(&req)
 ///         .stabilize(false)
 ///         .on_behalf_of_content_owner_channel("elitr,")
 ///         .on_behalf_of_content_owner("At")
 ///         .notify_subscribers(false)
-///         .auto_levels(true);
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .auto_levels(true).doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoInsertMethodBuilder<'a, C, NC, A>
@@ -6748,7 +6701,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::Subscription;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6759,24 +6712,21 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: Subscription = Default::default();
-/// request.snippet = Default::default();
-/// request.kind = Some("sanctus".to_string());
-/// request.etag = Some("dolor".to_string());
-/// request.content_details = Default::default();
-/// request.subscriber_snippet = Default::default();
-/// request.id = Some("diam".to_string());
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: Subscription = Default::default();
+/// req.snippet = Default::default(); // is SubscriptionSnippet
+/// req.kind = Some("sanctus".to_string());
+/// req.etag = Some("dolor".to_string());
+/// req.content_details = Default::default(); // is SubscriptionContentDetails
+/// req.subscriber_snippet = Default::default(); // is SubscriptionSubscriberSnippet
+/// req.id = Some("diam".to_string());
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.subscriptions().insert(&request);
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// let result = hub.subscriptions().insert(&req).doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
@@ -6841,7 +6791,6 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6852,10 +6801,10 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.subscriptions().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.subscriptions().list("part")
 ///         .page_token("diam")
 ///         .order("nonumy")
 ///         .on_behalf_of_content_owner_channel("dolor")
@@ -6865,10 +6814,8 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 ///         .max_results(52)
 ///         .id("sed")
 ///         .for_channel_id("At")
-///         .channel_id("dolore");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .channel_id("dolore").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
@@ -7016,7 +6963,6 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7027,13 +6973,10 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.subscriptions().delete("id");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// let result = hub.subscriptions().delete("id").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
@@ -7083,7 +7026,6 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7094,10 +7036,10 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.search().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.search().list("part")
 ///         .video_type("At")
 ///         .video_syndicated("sit")
 ///         .video_license("et")
@@ -7126,10 +7068,8 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 ///         .for_content_owner(true)
 ///         .event_type("sit")
 ///         .channel_type("justo")
-///         .channel_id("accusam");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .channel_id("accusam").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct SearchListMethodBuilder<'a, C, NC, A>
@@ -7446,7 +7386,6 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7457,14 +7396,12 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.i18n_regions().list("part")
-///         .hl("sit");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.i18n_regions().list("part")
+///         .hl("sit").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
@@ -7523,7 +7460,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::LiveStream;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7534,27 +7471,25 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: LiveStream = Default::default();
-/// request.status = Default::default();
-/// request.snippet = Default::default();
-/// request.kind = Some("est".to_string());
-/// request.etag = Some("diam".to_string());
-/// request.content_details = Default::default();
-/// request.cdn = Default::default();
-/// request.id = Some("ipsum".to_string());
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: LiveStream = Default::default();
+/// req.status = Default::default(); // is LiveStreamStatus
+/// req.snippet = Default::default(); // is LiveStreamSnippet
+/// req.kind = Some("est".to_string());
+/// req.etag = Some("diam".to_string());
+/// req.content_details = Default::default(); // is LiveStreamContentDetails
+/// req.cdn = Default::default(); // is CdnSettings
+/// req.id = Some("ipsum".to_string());
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.live_streams().update(&request)
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.live_streams().update(&req)
 ///         .on_behalf_of_content_owner_channel("voluptua.")
-///         .on_behalf_of_content_owner("Lorem");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .on_behalf_of_content_owner("Lorem").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
@@ -7645,7 +7580,6 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7656,15 +7590,13 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.live_streams().delete("id")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.live_streams().delete("id")
 ///         .on_behalf_of_content_owner_channel("et")
-///         .on_behalf_of_content_owner("sadipscing");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .on_behalf_of_content_owner("sadipscing").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
@@ -7738,7 +7670,6 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7749,19 +7680,17 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.live_streams().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.live_streams().list("part")
 ///         .page_token("et")
 ///         .on_behalf_of_content_owner_channel("At")
 ///         .on_behalf_of_content_owner("sanctus")
 ///         .mine(true)
 ///         .max_results(0)
-///         .id("sanctus");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .id("sanctus").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
@@ -7871,7 +7800,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::LiveStream;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7882,27 +7811,25 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: LiveStream = Default::default();
-/// request.status = Default::default();
-/// request.snippet = Default::default();
-/// request.kind = Some("ipsum".to_string());
-/// request.etag = Some("justo".to_string());
-/// request.content_details = Default::default();
-/// request.cdn = Default::default();
-/// request.id = Some("sit".to_string());
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: LiveStream = Default::default();
+/// req.status = Default::default(); // is LiveStreamStatus
+/// req.snippet = Default::default(); // is LiveStreamSnippet
+/// req.kind = Some("ipsum".to_string());
+/// req.etag = Some("justo".to_string());
+/// req.content_details = Default::default(); // is LiveStreamContentDetails
+/// req.cdn = Default::default(); // is CdnSettings
+/// req.id = Some("sit".to_string());
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.live_streams().insert(&request)
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.live_streams().insert(&req)
 ///         .on_behalf_of_content_owner_channel("dolor")
-///         .on_behalf_of_content_owner("Stet");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .on_behalf_of_content_owner("Stet").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
@@ -7991,7 +7918,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::Channel;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8002,33 +7929,31 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: Channel = Default::default();
-/// request.status = Default::default();
-/// request.invideo_promotion = Default::default();
-/// request.kind = Some("et".to_string());
-/// request.statistics = Default::default();
-/// request.content_owner_details = Default::default();
-/// request.topic_details = Default::default();
-/// request.content_details = Default::default();
-/// request.branding_settings = Default::default();
-/// request.conversion_pings = Default::default();
-/// request.snippet = Default::default();
-/// request.audit_details = Default::default();
-/// request.etag = Some("amet.".to_string());
-/// request.id = Some("ea".to_string());
-/// request.localizations = Default::default();
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: Channel = Default::default();
+/// req.status = Default::default(); // is ChannelStatus
+/// req.invideo_promotion = Default::default(); // is InvideoPromotion
+/// req.kind = Some("et".to_string());
+/// req.statistics = Default::default(); // is ChannelStatistics
+/// req.content_owner_details = Default::default(); // is ChannelContentOwnerDetails
+/// req.topic_details = Default::default(); // is ChannelTopicDetails
+/// req.content_details = Default::default(); // is ChannelContentDetails
+/// req.branding_settings = Default::default(); // is ChannelBrandingSettings
+/// req.conversion_pings = Default::default(); // is ChannelConversionPings
+/// req.snippet = Default::default(); // is ChannelSnippet
+/// req.audit_details = Default::default(); // is ChannelAuditDetails
+/// req.etag = Some("amet.".to_string());
+/// req.id = Some("ea".to_string());
+/// req.localizations = Default::default(); // is HashMap<String, ChannelLocalization>
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.channels().update(&request)
-///         .on_behalf_of_content_owner("sit");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.channels().update(&req)
+///         .on_behalf_of_content_owner("sit").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
@@ -8104,7 +8029,6 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8115,10 +8039,10 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.channels().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.channels().list("part")
 ///         .page_token("ipsum")
 ///         .on_behalf_of_content_owner("est")
 ///         .my_subscribers(true)
@@ -8127,10 +8051,8 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 ///         .managed_by_me(true)
 ///         .id("ut")
 ///         .for_username("erat,")
-///         .category_id("erat,");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .category_id("erat,").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelListMethodBuilder<'a, C, NC, A>
@@ -8263,7 +8185,6 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8274,13 +8195,10 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.playlist_items().delete("id");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// let result = hub.playlist_items().delete("id").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
@@ -8330,7 +8248,6 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8341,19 +8258,17 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.playlist_items().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.playlist_items().list("part")
 ///         .video_id("justo")
 ///         .playlist_id("clita")
 ///         .page_token("clita")
 ///         .on_behalf_of_content_owner("dolor")
 ///         .max_results(75)
-///         .id("magna");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .id("magna").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
@@ -8461,7 +8376,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::PlaylistItem;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8472,25 +8387,23 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: PlaylistItem = Default::default();
-/// request.status = Default::default();
-/// request.snippet = Default::default();
-/// request.kind = Some("sanctus".to_string());
-/// request.etag = Some("diam".to_string());
-/// request.content_details = Default::default();
-/// request.id = Some("clita".to_string());
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: PlaylistItem = Default::default();
+/// req.status = Default::default(); // is PlaylistItemStatus
+/// req.snippet = Default::default(); // is PlaylistItemSnippet
+/// req.kind = Some("sanctus".to_string());
+/// req.etag = Some("diam".to_string());
+/// req.content_details = Default::default(); // is PlaylistItemContentDetails
+/// req.id = Some("clita".to_string());
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.playlist_items().insert(&request)
-///         .on_behalf_of_content_owner("ipsum");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.playlist_items().insert(&req)
+///         .on_behalf_of_content_owner("ipsum").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
@@ -8566,7 +8479,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::PlaylistItem;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8577,24 +8490,21 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: PlaylistItem = Default::default();
-/// request.status = Default::default();
-/// request.snippet = Default::default();
-/// request.kind = Some("ipsum".to_string());
-/// request.etag = Some("sanctus".to_string());
-/// request.content_details = Default::default();
-/// request.id = Some("et".to_string());
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: PlaylistItem = Default::default();
+/// req.status = Default::default(); // is PlaylistItemStatus
+/// req.snippet = Default::default(); // is PlaylistItemSnippet
+/// req.kind = Some("ipsum".to_string());
+/// req.etag = Some("sanctus".to_string());
+/// req.content_details = Default::default(); // is PlaylistItemContentDetails
+/// req.id = Some("et".to_string());
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.playlist_items().update(&request);
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// let result = hub.playlist_items().update(&req).doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
@@ -8661,7 +8571,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::InvideoBranding;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8672,24 +8582,22 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: InvideoBranding = Default::default();
-/// request.target_channel_id = Some("dolor".to_string());
-/// request.position = Default::default();
-/// request.image_url = Some("ea".to_string());
-/// request.timing = Default::default();
-/// request.image_bytes = Some("invidunt".to_string());
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: InvideoBranding = Default::default();
+/// req.target_channel_id = Some("dolor".to_string());
+/// req.position = Default::default(); // is InvideoPosition
+/// req.image_url = Some("ea".to_string());
+/// req.timing = Default::default(); // is InvideoTiming
+/// req.image_bytes = Some("invidunt".to_string());
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.watermarks().set(&request, "channelId")
-///         .on_behalf_of_content_owner("aliquyam");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.watermarks().set(&req, "channelId")
+///         .on_behalf_of_content_owner("aliquyam").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
@@ -8758,7 +8666,6 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8769,14 +8676,12 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.watermarks().unset("channelId")
-///         .on_behalf_of_content_owner("et");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.watermarks().unset("channelId")
+///         .on_behalf_of_content_owner("et").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
@@ -8835,7 +8740,6 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8846,18 +8750,16 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.live_broadcasts().control("id", "part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.live_broadcasts().control("id", "part")
 ///         .walltime("sit")
 ///         .on_behalf_of_content_owner_channel("consetetur")
 ///         .on_behalf_of_content_owner("justo")
 ///         .offset_time_ms("sit")
-///         .display_slate(true);
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .display_slate(true).doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
@@ -8973,7 +8875,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::LiveBroadcast;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8984,26 +8886,24 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: LiveBroadcast = Default::default();
-/// request.status = Default::default();
-/// request.snippet = Default::default();
-/// request.kind = Some("amet,".to_string());
-/// request.etag = Some("et".to_string());
-/// request.content_details = Default::default();
-/// request.id = Some("ipsum".to_string());
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: LiveBroadcast = Default::default();
+/// req.status = Default::default(); // is LiveBroadcastStatus
+/// req.snippet = Default::default(); // is LiveBroadcastSnippet
+/// req.kind = Some("amet,".to_string());
+/// req.etag = Some("et".to_string());
+/// req.content_details = Default::default(); // is LiveBroadcastContentDetails
+/// req.id = Some("ipsum".to_string());
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.live_broadcasts().update(&request)
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.live_broadcasts().update(&req)
 ///         .on_behalf_of_content_owner_channel("amet,")
-///         .on_behalf_of_content_owner("sanctus");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .on_behalf_of_content_owner("sanctus").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
@@ -9094,7 +8994,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::LiveBroadcast;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9105,26 +9005,24 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: LiveBroadcast = Default::default();
-/// request.status = Default::default();
-/// request.snippet = Default::default();
-/// request.kind = Some("dolore".to_string());
-/// request.etag = Some("tempor".to_string());
-/// request.content_details = Default::default();
-/// request.id = Some("aliquyam".to_string());
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: LiveBroadcast = Default::default();
+/// req.status = Default::default(); // is LiveBroadcastStatus
+/// req.snippet = Default::default(); // is LiveBroadcastSnippet
+/// req.kind = Some("dolore".to_string());
+/// req.etag = Some("tempor".to_string());
+/// req.content_details = Default::default(); // is LiveBroadcastContentDetails
+/// req.id = Some("aliquyam".to_string());
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.live_broadcasts().insert(&request)
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.live_broadcasts().insert(&req)
 ///         .on_behalf_of_content_owner_channel("accusam")
-///         .on_behalf_of_content_owner("labore");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .on_behalf_of_content_owner("labore").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
@@ -9213,7 +9111,6 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9224,16 +9121,14 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.live_broadcasts().bind("id", "part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.live_broadcasts().bind("id", "part")
 ///         .stream_id("sanctus")
 ///         .on_behalf_of_content_owner_channel("eos")
-///         .on_behalf_of_content_owner("sadipscing");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .on_behalf_of_content_owner("sadipscing").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
@@ -9327,7 +9222,6 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9338,20 +9232,18 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.live_broadcasts().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.live_broadcasts().list("part")
 ///         .page_token("amet.")
 ///         .on_behalf_of_content_owner_channel("et")
 ///         .on_behalf_of_content_owner("eirmod")
 ///         .mine(true)
 ///         .max_results(14)
 ///         .id("diam")
-///         .broadcast_status("sanctus");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .broadcast_status("sanctus").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
@@ -9470,7 +9362,6 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9481,15 +9372,13 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.live_broadcasts().delete("id")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.live_broadcasts().delete("id")
 ///         .on_behalf_of_content_owner_channel("amet,")
-///         .on_behalf_of_content_owner("ipsum");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .on_behalf_of_content_owner("ipsum").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
@@ -9563,7 +9452,6 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9574,15 +9462,13 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.live_broadcasts().transition("broadcastStatus", "id", "part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.live_broadcasts().transition("broadcastStatus", "id", "part")
 ///         .on_behalf_of_content_owner_channel("At")
-///         .on_behalf_of_content_owner("dolor");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .on_behalf_of_content_owner("dolor").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
@@ -9678,7 +9564,6 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9689,16 +9574,14 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.video_categories().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.video_categories().list("part")
 ///         .region_code("eirmod")
 ///         .id("sed")
-///         .hl("ipsum");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .hl("ipsum").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
@@ -9775,7 +9658,6 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9786,10 +9668,10 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.activities().list("part")
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are random and not representative !
+/// let result = hub.activities().list("part")
 ///         .region_code("kasd")
 ///         .published_before("aliquyam")
 ///         .published_after("et")
@@ -9797,10 +9679,8 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 ///         .mine(true)
 ///         .max_results(27)
 ///         .home(true)
-///         .channel_id("et");
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+///         .channel_id("et").doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ActivityListMethodBuilder<'a, C, NC, A>
@@ -9926,7 +9806,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::*;
+/// # use youtube3::Activity;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9937,23 +9817,20 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information.
-/// // What can actually be filled in depends on the actual call - the following is just a 
-/// // random selection of properties ! Values are random and not representative !
-/// let mut request: Activity = Default::default();
-/// request.snippet = Default::default();
-/// request.content_details = Default::default();
-/// request.kind = Some("rebum.".to_string());
-/// request.etag = Some("et".to_string());
-/// request.id = Some("erat,".to_string());
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure.
+/// // Values shown here are random and not representative !
+/// let mut req: Activity = Default::default();
+/// req.snippet = Default::default(); // is ActivitySnippet
+/// req.content_details = Default::default(); // is ActivityContentDetails
+/// req.kind = Some("rebum.".to_string());
+/// req.etag = Some("et".to_string());
+/// req.id = Some("erat,".to_string());
 /// 
-/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
-/// // by calling the respective setters.
-/// // Values are random and not representative !
-/// let mut mb = hub.activities().insert(&request);
-/// 
-/// // Finally, execute your call and process the result
-/// mb.doit()
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// let result = hub.activities().insert(&req).doit();
+/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ActivityInsertMethodBuilder<'a, C, NC, A>
