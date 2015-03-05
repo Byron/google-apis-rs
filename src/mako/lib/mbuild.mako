@@ -22,6 +22,7 @@
 
     params, request_value = build_all_params(schemas, c, m, IO_REQUEST, REQUEST_VALUE_PROPERTY_NAME)
     required_props, optional_props, part_prop = organize_params(params, request_value)
+    is_string_value = lambda v: v.endswith('"')
 
     # rvfrt = random value for rust type
     rvfrt = lambda spn, sp, sn=None: rnd_arg_val_for_type(to_rust_type(sn, spn, sp, allow_optionals=False))
@@ -33,7 +34,7 @@
             continue
         v = rvfrt(p.name, p)
         # we chose to replace random strings with their meaning, as indicated by the name !
-        if v.endswith('"'):
+        if is_string_value(v):
             v = '"%s"' % p.name
         required_args.append(v)
     # end for each required property
@@ -52,6 +53,7 @@ ${m.description | rust_doc_comment}
 ///
 <%block filter="rust_doc_test_norun, rust_doc_comment">\
 ${capture(util.test_prelude) | hide_rust_doc_test}\
+# use ${util.library_name()}::*;
 <%block filter="rust_test_fn_invisible">\
 ${capture(lib.test_hub, hub_type_name, comments=False) | hide_rust_doc_test}
 % if request_value:
@@ -60,19 +62,20 @@ ${capture(lib.test_hub, hub_type_name, comments=False) | hide_rust_doc_test}
 // random selection of properties ! Values are random and not representative !
 let mut ${rb_name}: ${request_value.id} = Default::default();
 % for spn, sp in request_value.get('properties', dict()).iteritems():
+<%
+    assignment = rvfrt(spn, sp)
+    if is_string_value(assignment):
+        assignment = assignment + '.to_string()'
+%>\
 ## ${to_rust_type(request_value.id, spn, sp, allow_optionals=False)}
-${rb_name}.${mangle_ident(spn)} = ${rvfrt(spn, sp)};
-% if loop.index == 3:
-// ... and so forth ...
-<% break %>
-% endif
+${rb_name}.${mangle_ident(spn)} = ${assignment};
 % endfor
 
 % endif
 // Even though you wouldn't bind this to a variable, you can configure optional parameters
 // by calling the respective setters.
 // Values are random and not representative !
-let mut mb = hub.${resource}().${mangle_ident(method)}(${required_args})\
+let mut mb = hub.${mangle_ident(resource)}().${mangle_ident(method)}(${required_args})\
 % for p in optional_props:
 
 <%block  filter="indent_by(8)">\
@@ -156,7 +159,7 @@ ${self._setter(resource, method, m, p, ThisType, c)}\
     % if 'description' in p:
     ${p.description | rust_doc_comment, indent_all_but_first_by(1)}
     % endif
-    pub fn ${mangle_ident(p.name)}(&mut self, ${value_name}: ${InType}) -> &mut ${ThisType} {
+    pub fn ${mangle_ident(p.name)}(mut self, ${value_name}: ${InType}) -> ${ThisType} {
         self.${property(p.name)} = ${new_value_copied};
         return self;
     }
