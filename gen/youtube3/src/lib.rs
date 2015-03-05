@@ -116,6 +116,26 @@ use std::default::Default;
 
 pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType};
 
+
+// ##############
+// UTILITIES ###
+// ############
+
+/// This macro is advertised in the documentation, which is why we deliver it as well
+#[macro_export]
+macro_rules! map(
+    { $($key:expr => $value:expr),+ } => {
+        {
+            let mut m = ::std::collections::HashMap::new();
+            $(
+                m.insert($key, $value);
+            )+
+            m
+        }
+     };
+);
+
+
 // ########
 // HUB ###
 // ######
@@ -4808,7 +4828,6 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4819,13 +4838,14 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.i18nLanguages().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.i18nLanguages().list("part")
+///         .hl("eos");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
@@ -4834,39 +4854,39 @@ pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_hl: Option<String>,
+    _part: String,
+    _hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nLanguageListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
-	pub fn part(&mut self, new_value: &str) -> &mut I18nLanguageListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *hl* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut I18nLanguageListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *hl* query property to the given value.
+    ///
+    /// 
     /// The hl parameter specifies the language that should be used for text values in the API response.    
-	pub fn hl(&mut self, new_value: &str) -> &mut I18nLanguageListMethodBuilder<'a, C, NC, A> {
-		self._hl = Some(new_value.to_string());
-		return self;
-	}
+    pub fn hl(&mut self, new_value: &str) -> &mut I18nLanguageListMethodBuilder<'a, C, NC, A> {
+        self._hl = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -4888,7 +4908,6 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4899,13 +4918,22 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.channelBanners().insert(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: ChannelBannerResource = Default::default();
+/// request.url = "Stet";
+/// request.kind = "dolor";
+/// request.etag = "sed";
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.channelBanners().insert(&request)
+///         .on_behalf_of_content_owner("accusam");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
@@ -4914,40 +4942,40 @@ pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: ChannelBannerResource,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: ChannelBannerResource,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelBannerInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &ChannelBannerResource) -> &mut ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &ChannelBannerResource) -> &mut ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -4965,7 +4993,6 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4976,13 +5003,17 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.channelSections().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.channelSections().list("part")
+///         .on_behalf_of_content_owner("eos")
+///         .mine(true)
+///         .id("sadipscing")
+///         .channel_id("dolor");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
@@ -4991,70 +5022,70 @@ pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_on_behalf_of_content_owner: Option<String>,
-	_mine: Option<bool>,
-	_id: Option<String>,
-	_channel_id: Option<String>,
+    _part: String,
+    _on_behalf_of_content_owner: Option<String>,
+    _mine: Option<bool>,
+    _id: Option<String>,
+    _channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set part=snippet, the API response will also contain all of those nested properties.
-	pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *mine* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *mine* query property to the given value.
+    ///
+    /// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's channelSections.    
-	pub fn mine(&mut self, new_value: bool) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value);
-		return self;
-	}
-	/// Sets the *id* query property to the given value.
-	///
-	/// 
+    pub fn mine(&mut self, new_value: bool) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
+        self._mine = Some(new_value);
+        return self;
+    }
+    /// Sets the *id* query property to the given value.
+    ///
+    /// 
     /// The id parameter specifies a comma-separated list of the YouTube channelSection ID(s) for the resource(s) that are being retrieved. In a channelSection resource, the id property specifies the YouTube channelSection ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *channel id* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
+        self._id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *channel id* query property to the given value.
+    ///
+    /// 
     /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's channelSections.    
-	pub fn channel_id(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
-		self._channel_id = Some(new_value.to_string());
-		return self;
-	}
+    pub fn channel_id(&mut self, new_value: &str) -> &mut ChannelSectionListMethodBuilder<'a, C, NC, A> {
+        self._channel_id = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -5072,7 +5103,6 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5083,13 +5113,25 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.channelSections().insert(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: ChannelSection = Default::default();
+/// request.snippet = &Default::default();
+/// request.kind = "consetetur";
+/// request.etag = "ea";
+/// request.content_details = &Default::default();
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.channelSections().insert(&request)
+///         .on_behalf_of_content_owner_channel("sit")
+///         .on_behalf_of_content_owner("sanctus");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
@@ -5098,69 +5140,69 @@ pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: ChannelSection,
-	_part: String,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: ChannelSection,
+    _part: String,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &ChannelSection) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &ChannelSection) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
-	pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -5178,7 +5220,6 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5189,13 +5230,14 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.channelSections().delete(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.channelSections().delete("id")
+///         .on_behalf_of_content_owner("et");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
@@ -5204,41 +5246,41 @@ pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _id: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -5256,7 +5298,6 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5267,13 +5308,24 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.channelSections().update(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: ChannelSection = Default::default();
+/// request.snippet = &Default::default();
+/// request.kind = "sit";
+/// request.etag = "takimata";
+/// request.content_details = &Default::default();
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.channelSections().update(&request)
+///         .on_behalf_of_content_owner("rebum.");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
@@ -5282,56 +5334,56 @@ pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: ChannelSection,
-	_part: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: ChannelSection,
+    _part: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &ChannelSection) -> &mut ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &ChannelSection) -> &mut ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
-	pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -5349,7 +5401,6 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5360,13 +5411,16 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.guideCategories().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.guideCategories().list("part")
+///         .region_code("elitr,")
+///         .id("sed")
+///         .hl("sea");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
@@ -5375,59 +5429,59 @@ pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_region_code: Option<String>,
-	_id: Option<String>,
-	_hl: Option<String>,
+    _part: String,
+    _region_code: Option<String>,
+    _id: Option<String>,
+    _hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for GuideCategoryListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more guideCategory resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a guideCategory resource, the snippet property contains other properties, such as the category's title. If you set part=snippet, the API response will also contain all of those nested properties.
-	pub fn part(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *region code* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *region code* query property to the given value.
+    ///
+    /// 
     /// The regionCode parameter instructs the API to return the list of guide categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
-	pub fn region_code(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
-		self._region_code = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *id* query property to the given value.
-	///
-	/// 
+    pub fn region_code(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
+        self._region_code = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *id* query property to the given value.
+    ///
+    /// 
     /// The id parameter specifies a comma-separated list of the YouTube channel category ID(s) for the resource(s) that are being retrieved. In a guideCategory resource, the id property specifies the YouTube channel category ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *hl* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
+        self._id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *hl* query property to the given value.
+    ///
+    /// 
     /// The hl parameter specifies the language that will be used for text values in the API response.    
-	pub fn hl(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
-		self._hl = Some(new_value.to_string());
-		return self;
-	}
+    pub fn hl(&mut self, new_value: &str) -> &mut GuideCategoryListMethodBuilder<'a, C, NC, A> {
+        self._hl = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -5445,7 +5499,6 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5456,13 +5509,25 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.playlists().insert(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: Playlist = Default::default();
+/// request.status = &Default::default();
+/// request.kind = "diam";
+/// request.content_details = &Default::default();
+/// request.snippet = &Default::default();
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.playlists().insert(&request)
+///         .on_behalf_of_content_owner_channel("clita")
+///         .on_behalf_of_content_owner("sed");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
@@ -5471,69 +5536,69 @@ pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: Playlist,
-	_part: String,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: Playlist,
+    _part: String,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &Playlist) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &Playlist) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet and status.
-	pub fn part(&mut self, new_value: &str) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -5551,7 +5616,6 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5562,13 +5626,20 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.playlists().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.playlists().list("part")
+///         .page_token("labore")
+///         .on_behalf_of_content_owner_channel("kasd")
+///         .on_behalf_of_content_owner("elitr,")
+///         .mine(true)
+///         .max_results(79)
+///         .id("kasd")
+///         .channel_id("ea");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct PlaylistListMethodBuilder<'a, C, NC, A>
@@ -5577,101 +5648,101 @@ pub struct PlaylistListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_page_token: Option<String>,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
-	_mine: Option<bool>,
-	_max_results: Option<u32>,
-	_id: Option<String>,
-	_channel_id: Option<String>,
+    _part: String,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
+    _channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, status, and contentDetails.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set part=snippet, the API response will contain all of those properties.
-	pub fn part(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *page token* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *page token* query property to the given value.
+    ///
+    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-	pub fn page_token(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
-		self._page_token = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn page_token(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+        self._page_token = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *mine* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *mine* query property to the given value.
+    ///
+    /// 
     /// Set this parameter's value to true to instruct the API to only return playlists owned by the authenticated user.    
-	pub fn mine(&mut self, new_value: bool) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value);
-		return self;
-	}
-	/// Sets the *max results* query property to the given value.
-	///
-	/// 
+    pub fn mine(&mut self, new_value: bool) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+        self._mine = Some(new_value);
+        return self;
+    }
+    /// Sets the *max results* query property to the given value.
+    ///
+    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: u32) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value);
-		return self;
-	}
-	/// Sets the *id* query property to the given value.
-	///
-	/// 
+    pub fn max_results(&mut self, new_value: u32) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+        self._max_results = Some(new_value);
+        return self;
+    }
+    /// Sets the *id* query property to the given value.
+    ///
+    /// 
     /// The id parameter specifies a comma-separated list of the YouTube playlist ID(s) for the resource(s) that are being retrieved. In a playlist resource, the id property specifies the playlist's YouTube playlist ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *channel id* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+        self._id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *channel id* query property to the given value.
+    ///
+    /// 
     /// This value indicates that the API should only return the specified channel's playlists.    
-	pub fn channel_id(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
-		self._channel_id = Some(new_value.to_string());
-		return self;
-	}
+    pub fn channel_id(&mut self, new_value: &str) -> &mut PlaylistListMethodBuilder<'a, C, NC, A> {
+        self._channel_id = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -5689,7 +5760,6 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5700,13 +5770,14 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.playlists().delete(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.playlists().delete("id")
+///         .on_behalf_of_content_owner("dolor");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
@@ -5715,41 +5786,41 @@ pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _id: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut PlaylistDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut PlaylistDeleteMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistDeleteMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistDeleteMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -5767,7 +5838,6 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5778,13 +5848,24 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.playlists().update(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: Playlist = Default::default();
+/// request.status = &Default::default();
+/// request.kind = "sadipscing";
+/// request.content_details = &Default::default();
+/// request.snippet = &Default::default();
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.playlists().update(&request)
+///         .on_behalf_of_content_owner("nonumy");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
@@ -5793,58 +5874,58 @@ pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: Playlist,
-	_part: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: Playlist,
+    _part: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &Playlist) -> &mut PlaylistUpdateMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &Playlist) -> &mut PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet and status.
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist's privacy setting is contained in the status part. As such, if your request is updating a private playlist, and the request's part parameter value includes the status part, the playlist's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the playlist will revert to the default privacy setting.
-	pub fn part(&mut self, new_value: &str) -> &mut PlaylistUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistUpdateMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -5862,7 +5943,6 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5873,13 +5953,14 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.thumbnails().set(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.thumbnails().set("videoId")
+///         .on_behalf_of_content_owner("et");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
@@ -5888,39 +5969,39 @@ pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_video_id: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _video_id: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ThumbnailSetMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *video id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *video id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided.    
-	pub fn video_id(&mut self, new_value: &str) -> &mut ThumbnailSetMethodBuilder<'a, C, NC, A> {
-		self._video_id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn video_id(&mut self, new_value: &str) -> &mut ThumbnailSetMethodBuilder<'a, C, NC, A> {
+        self._video_id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ThumbnailSetMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ThumbnailSetMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -5938,7 +6019,6 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5949,13 +6029,23 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.videos().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.videos().list("part")
+///         .video_category_id("diam")
+///         .region_code("et")
+///         .page_token("sanctus")
+///         .on_behalf_of_content_owner("sed")
+///         .my_rating("consetetur")
+///         .max_results(69)
+///         .locale("accusam")
+///         .id("amet.")
+///         .hl("clita")
+///         .chart("erat,");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct VideoListMethodBuilder<'a, C, NC, A>
@@ -5964,128 +6054,128 @@ pub struct VideoListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_video_category_id: Option<String>,
-	_region_code: Option<String>,
-	_page_token: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
-	_my_rating: Option<String>,
-	_max_results: Option<u32>,
-	_locale: Option<String>,
-	_id: Option<String>,
-	_hl: Option<String>,
-	_chart: Option<String>,
+    _part: String,
+    _video_category_id: Option<String>,
+    _region_code: Option<String>,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _my_rating: Option<String>,
+    _max_results: Option<u32>,
+    _locale: Option<String>,
+    _id: Option<String>,
+    _hl: Option<String>,
+    _chart: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set part=snippet, the API response will contain all of those properties.
-	pub fn part(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *video category id* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *video category id* query property to the given value.
+    ///
+    /// 
     /// The videoCategoryId parameter identifies the video category for which the chart should be retrieved. This parameter can only be used in conjunction with the chart parameter. By default, charts are not restricted to a particular category.    
-	pub fn video_category_id(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._video_category_id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *region code* query property to the given value.
-	///
-	/// 
+    pub fn video_category_id(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+        self._video_category_id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *region code* query property to the given value.
+    ///
+    /// 
     /// The regionCode parameter instructs the API to select a video chart available in the specified region. This parameter can only be used in conjunction with the chart parameter. The parameter value is an ISO 3166-1 alpha-2 country code.    
-	pub fn region_code(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._region_code = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *page token* query property to the given value.
-	///
-	/// 
+    pub fn region_code(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+        self._region_code = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *page token* query property to the given value.
+    ///
+    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     /// 
     /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
-	pub fn page_token(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._page_token = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn page_token(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+        self._page_token = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *my rating* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *my rating* query property to the given value.
+    ///
+    /// 
     /// Set this parameter's value to like or dislike to instruct the API to only return videos liked or disliked by the authenticated user.    
-	pub fn my_rating(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._my_rating = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *max results* query property to the given value.
-	///
-	/// 
+    pub fn my_rating(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+        self._my_rating = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *max results* query property to the given value.
+    ///
+    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     /// 
     /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
-	pub fn max_results(&mut self, new_value: u32) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value);
-		return self;
-	}
-	/// Sets the *locale* query property to the given value.
-	///
-	/// 
+    pub fn max_results(&mut self, new_value: u32) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+        self._max_results = Some(new_value);
+        return self;
+    }
+    /// Sets the *locale* query property to the given value.
+    ///
+    /// 
     /// DEPRECATED    
-	pub fn locale(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._locale = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *id* query property to the given value.
-	///
-	/// 
+    pub fn locale(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+        self._locale = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *id* query property to the given value.
+    ///
+    /// 
     /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) that are being retrieved. In a video resource, the id property specifies the video's ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *hl* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+        self._id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *hl* query property to the given value.
+    ///
+    /// 
     /// The hl parameter instructs the API to return a localized version of the video details. If localized text is nor available for the requested language, the localizations object in the API response will contain the requested information in the default language instead. The parameter value is a BCP-47 language code. Your application can determine whether the requested localization was returned by checking the value of the snippet.localized.language property in the API response.    
-	pub fn hl(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._hl = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *chart* query property to the given value.
-	///
-	/// 
+    pub fn hl(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+        self._hl = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *chart* query property to the given value.
+    ///
+    /// 
     /// The chart parameter identifies the chart that you want to retrieve.    
-	pub fn chart(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
-		self._chart = Some(new_value.to_string());
-		return self;
-	}
+    pub fn chart(&mut self, new_value: &str) -> &mut VideoListMethodBuilder<'a, C, NC, A> {
+        self._chart = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -6103,7 +6193,6 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6114,13 +6203,14 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.videos().rate(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.videos().rate("id", "rating")
+///         .on_behalf_of_content_owner("amet.");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct VideoRateMethodBuilder<'a, C, NC, A>
@@ -6129,52 +6219,52 @@ pub struct VideoRateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id: String,
-	_rating: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _id: String,
+    _rating: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoRateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed.    
-	pub fn id(&mut self, new_value: &str) -> &mut VideoRateMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *rating* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut VideoRateMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *rating* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// Specifies the rating to record.    
-	pub fn rating(&mut self, new_value: &str) -> &mut VideoRateMethodBuilder<'a, C, NC, A> {
-		self._rating = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn rating(&mut self, new_value: &str) -> &mut VideoRateMethodBuilder<'a, C, NC, A> {
+        self._rating = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoRateMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoRateMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -6192,7 +6282,6 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6203,13 +6292,14 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.videos().get_rating(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.videos().get_rating("id")
+///         .on_behalf_of_content_owner("no");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct VideoGetratingMethodBuilder<'a, C, NC, A>
@@ -6218,41 +6308,41 @@ pub struct VideoGetratingMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _id: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoGetratingMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut VideoGetratingMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut VideoGetratingMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoGetratingMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoGetratingMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -6270,7 +6360,6 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6281,13 +6370,14 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.videos().delete(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.videos().delete("id")
+///         .on_behalf_of_content_owner("sit");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
@@ -6296,41 +6386,41 @@ pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _id: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut VideoDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut VideoDeleteMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoDeleteMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoDeleteMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -6348,7 +6438,6 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6359,13 +6448,24 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.videos().update(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: Video = Default::default();
+/// request.status = &Default::default();
+/// request.topic_details = &Default::default();
+/// request.monetization_details = &Default::default();
+/// request.suggestions = &Default::default();
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.videos().update(&request)
+///         .on_behalf_of_content_owner("ipsum");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
@@ -6374,39 +6474,39 @@ pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: Video,
-	_part: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: Video,
+    _part: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &Video) -> &mut VideoUpdateMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &Video) -> &mut VideoUpdateMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
@@ -6414,20 +6514,20 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a video's privacy setting is contained in the status part. As such, if your request is updating a private video, and the request's part parameter value includes the status part, the video's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the video will revert to the default privacy setting.
     /// 
     /// In addition, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
-	pub fn part(&mut self, new_value: &str) -> &mut VideoUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut VideoUpdateMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoUpdateMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoUpdateMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -6445,7 +6545,6 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6456,13 +6555,28 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.videos().insert(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: Video = Default::default();
+/// request.status = &Default::default();
+/// request.topic_details = &Default::default();
+/// request.monetization_details = &Default::default();
+/// request.suggestions = &Default::default();
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.videos().insert(&request)
+///         .stabilize(false)
+///         .on_behalf_of_content_owner_channel("amet.")
+///         .on_behalf_of_content_owner("rebum.")
+///         .notify_subscribers(false)
+///         .auto_levels(false);
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct VideoInsertMethodBuilder<'a, C, NC, A>
@@ -6471,96 +6585,96 @@ pub struct VideoInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: Video,
-	_part: String,
-	_stabilize: Option<bool>,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
-	_notify_subscribers: Option<bool>,
-	_auto_levels: Option<bool>,
+    _request: Video,
+    _part: String,
+    _stabilize: Option<bool>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _notify_subscribers: Option<bool>,
+    _auto_levels: Option<bool>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &Video) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &Video) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails. However, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
-	pub fn part(&mut self, new_value: &str) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *stabilize* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *stabilize* query property to the given value.
+    ///
+    /// 
     /// The stabilize parameter indicates whether YouTube should adjust the video to remove shaky camera motions.    
-	pub fn stabilize(&mut self, new_value: bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
-		self._stabilize = Some(new_value);
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn stabilize(&mut self, new_value: bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+        self._stabilize = Some(new_value);
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *notify subscribers* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *notify subscribers* query property to the given value.
+    ///
+    /// 
     /// The notifySubscribers parameter indicates whether YouTube should send notification to subscribers about the inserted video.    
-	pub fn notify_subscribers(&mut self, new_value: bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
-		self._notify_subscribers = Some(new_value);
-		return self;
-	}
-	/// Sets the *auto levels* query property to the given value.
-	///
-	/// 
+    pub fn notify_subscribers(&mut self, new_value: bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+        self._notify_subscribers = Some(new_value);
+        return self;
+    }
+    /// Sets the *auto levels* query property to the given value.
+    ///
+    /// 
     /// The autoLevels parameter indicates whether YouTube should automatically enhance the video's lighting and color.    
-	pub fn auto_levels(&mut self, new_value: bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
-		self._auto_levels = Some(new_value);
-		return self;
-	}
+    pub fn auto_levels(&mut self, new_value: bool) -> &mut VideoInsertMethodBuilder<'a, C, NC, A> {
+        self._auto_levels = Some(new_value);
+        return self;
+    }
 }
 
 
@@ -6578,7 +6692,6 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6589,13 +6702,23 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.subscriptions().insert(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: Subscription = Default::default();
+/// request.snippet = &Default::default();
+/// request.kind = "dolor";
+/// request.etag = "amet,";
+/// request.content_details = &Default::default();
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.subscriptions().insert(&request);
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
@@ -6604,45 +6727,45 @@ pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: Subscription,
-	_part: String,
+    _request: Subscription,
+    _part: String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &Subscription) -> &mut SubscriptionInsertMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &Subscription) -> &mut SubscriptionInsertMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
-	pub fn part(&mut self, new_value: &str) -> &mut SubscriptionInsertMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
+    pub fn part(&mut self, new_value: &str) -> &mut SubscriptionInsertMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
 }
 
 
@@ -6660,7 +6783,6 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6671,13 +6793,23 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.subscriptions().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.subscriptions().list("part")
+///         .page_token("At")
+///         .order("dolores")
+///         .on_behalf_of_content_owner_channel("diam")
+///         .on_behalf_of_content_owner("Lorem")
+///         .my_subscribers(false)
+///         .mine(false)
+///         .max_results(75)
+///         .id("sit")
+///         .for_channel_id("clita")
+///         .channel_id("sanctus");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
@@ -6686,128 +6818,128 @@ pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_page_token: Option<String>,
-	_order: Option<String>,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
-	_my_subscribers: Option<bool>,
-	_mine: Option<bool>,
-	_max_results: Option<u32>,
-	_id: Option<String>,
-	_for_channel_id: Option<String>,
-	_channel_id: Option<String>,
+    _part: String,
+    _page_token: Option<String>,
+    _order: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _my_subscribers: Option<bool>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
+    _for_channel_id: Option<String>,
+    _channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set part=snippet, the API response will also contain all of those nested properties.
-	pub fn part(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *page token* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *page token* query property to the given value.
+    ///
+    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-	pub fn page_token(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._page_token = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *order* query property to the given value.
-	///
-	/// 
+    pub fn page_token(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._page_token = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *order* query property to the given value.
+    ///
+    /// 
     /// The order parameter specifies the method that will be used to sort resources in the API response.    
-	pub fn order(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._order = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn order(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._order = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *my subscribers* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *my subscribers* query property to the given value.
+    ///
+    /// 
     /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user.    
-	pub fn my_subscribers(&mut self, new_value: bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._my_subscribers = Some(new_value);
-		return self;
-	}
-	/// Sets the *mine* query property to the given value.
-	///
-	/// 
+    pub fn my_subscribers(&mut self, new_value: bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._my_subscribers = Some(new_value);
+        return self;
+    }
+    /// Sets the *mine* query property to the given value.
+    ///
+    /// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's subscriptions.    
-	pub fn mine(&mut self, new_value: bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value);
-		return self;
-	}
-	/// Sets the *max results* query property to the given value.
-	///
-	/// 
+    pub fn mine(&mut self, new_value: bool) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._mine = Some(new_value);
+        return self;
+    }
+    /// Sets the *max results* query property to the given value.
+    ///
+    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: u32) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value);
-		return self;
-	}
-	/// Sets the *id* query property to the given value.
-	///
-	/// 
+    pub fn max_results(&mut self, new_value: u32) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._max_results = Some(new_value);
+        return self;
+    }
+    /// Sets the *id* query property to the given value.
+    ///
+    /// 
     /// The id parameter specifies a comma-separated list of the YouTube subscription ID(s) for the resource(s) that are being retrieved. In a subscription resource, the id property specifies the YouTube subscription ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *for channel id* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *for channel id* query property to the given value.
+    ///
+    /// 
     /// The forChannelId parameter specifies a comma-separated list of channel IDs. The API response will then only contain subscriptions matching those channels.    
-	pub fn for_channel_id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._for_channel_id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *channel id* query property to the given value.
-	///
-	/// 
+    pub fn for_channel_id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._for_channel_id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *channel id* query property to the given value.
+    ///
+    /// 
     /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's subscriptions.    
-	pub fn channel_id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
-		self._channel_id = Some(new_value.to_string());
-		return self;
-	}
+    pub fn channel_id(&mut self, new_value: &str) -> &mut SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._channel_id = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -6825,7 +6957,6 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6836,13 +6967,13 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.subscriptions().delete(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.subscriptions().delete("id");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
@@ -6851,30 +6982,30 @@ pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id: String,
+    _id: String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
+    pub fn id(&mut self, new_value: &str) -> &mut SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
 }
 
 
@@ -6892,7 +7023,6 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6903,13 +7033,42 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.search().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.search().list("part")
+///         .video_type("voluptua.")
+///         .video_syndicated("diam")
+///         .video_license("nonumy")
+///         .video_embeddable("dolor")
+///         .video_duration("nonumy")
+///         .video_dimension("sit")
+///         .video_definition("sed")
+///         .video_category_id("ipsum")
+///         .video_caption("sed")
+///         .type_("At")
+///         .topic_id("dolore")
+///         .safe_search("ea")
+///         .relevance_language("ut")
+///         .related_to_video_id("At")
+///         .region_code("sit")
+///         .q("et")
+///         .published_before("ipsum")
+///         .published_after("eos")
+///         .page_token("amet.")
+///         .order("ut")
+///         .on_behalf_of_content_owner("et")
+///         .max_results(7)
+///         .location_radius("est")
+///         .location("Lorem")
+///         .for_mine(false)
+///         .for_content_owner(false)
+///         .event_type("ut")
+///         .channel_type("et")
+///         .channel_id("gubergren,");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct SearchListMethodBuilder<'a, C, NC, A>
@@ -6918,297 +7077,297 @@ pub struct SearchListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_video_type: Option<String>,
-	_video_syndicated: Option<String>,
-	_video_license: Option<String>,
-	_video_embeddable: Option<String>,
-	_video_duration: Option<String>,
-	_video_dimension: Option<String>,
-	_video_definition: Option<String>,
-	_video_category_id: Option<String>,
-	_video_caption: Option<String>,
-	_type_: Option<String>,
-	_topic_id: Option<String>,
-	_safe_search: Option<String>,
-	_relevance_language: Option<String>,
-	_related_to_video_id: Option<String>,
-	_region_code: Option<String>,
-	_q: Option<String>,
-	_published_before: Option<String>,
-	_published_after: Option<String>,
-	_page_token: Option<String>,
-	_order: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
-	_max_results: Option<u32>,
-	_location_radius: Option<String>,
-	_location: Option<String>,
-	_for_mine: Option<bool>,
-	_for_content_owner: Option<bool>,
-	_event_type: Option<String>,
-	_channel_type: Option<String>,
-	_channel_id: Option<String>,
+    _part: String,
+    _video_type: Option<String>,
+    _video_syndicated: Option<String>,
+    _video_license: Option<String>,
+    _video_embeddable: Option<String>,
+    _video_duration: Option<String>,
+    _video_dimension: Option<String>,
+    _video_definition: Option<String>,
+    _video_category_id: Option<String>,
+    _video_caption: Option<String>,
+    _type_: Option<String>,
+    _topic_id: Option<String>,
+    _safe_search: Option<String>,
+    _relevance_language: Option<String>,
+    _related_to_video_id: Option<String>,
+    _region_code: Option<String>,
+    _q: Option<String>,
+    _published_before: Option<String>,
+    _published_after: Option<String>,
+    _page_token: Option<String>,
+    _order: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _max_results: Option<u32>,
+    _location_radius: Option<String>,
+    _location: Option<String>,
+    _for_mine: Option<bool>,
+    _for_content_owner: Option<bool>,
+    _event_type: Option<String>,
+    _channel_type: Option<String>,
+    _channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for SearchListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a search result, the snippet property contains other properties that identify the result's title, description, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
-	pub fn part(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *video type* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *video type* query property to the given value.
+    ///
+    /// 
     /// The videoType parameter lets you restrict a search to a particular type of videos.    
-	pub fn video_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._video_type = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *video syndicated* query property to the given value.
-	///
-	/// 
+    pub fn video_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._video_type = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *video syndicated* query property to the given value.
+    ///
+    /// 
     /// The videoSyndicated parameter lets you to restrict a search to only videos that can be played outside youtube.com.    
-	pub fn video_syndicated(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._video_syndicated = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *video license* query property to the given value.
-	///
-	/// 
+    pub fn video_syndicated(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._video_syndicated = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *video license* query property to the given value.
+    ///
+    /// 
     /// The videoLicense parameter filters search results to only include videos with a particular license. YouTube lets video uploaders choose to attach either the Creative Commons license or the standard YouTube license to each of their videos.    
-	pub fn video_license(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._video_license = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *video embeddable* query property to the given value.
-	///
-	/// 
+    pub fn video_license(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._video_license = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *video embeddable* query property to the given value.
+    ///
+    /// 
     /// The videoEmbeddable parameter lets you to restrict a search to only videos that can be embedded into a webpage.    
-	pub fn video_embeddable(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._video_embeddable = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *video duration* query property to the given value.
-	///
-	/// 
+    pub fn video_embeddable(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._video_embeddable = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *video duration* query property to the given value.
+    ///
+    /// 
     /// The videoDuration parameter filters video search results based on their duration.    
-	pub fn video_duration(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._video_duration = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *video dimension* query property to the given value.
-	///
-	/// 
+    pub fn video_duration(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._video_duration = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *video dimension* query property to the given value.
+    ///
+    /// 
     /// The videoDimension parameter lets you restrict a search to only retrieve 2D or 3D videos.    
-	pub fn video_dimension(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._video_dimension = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *video definition* query property to the given value.
-	///
-	/// 
+    pub fn video_dimension(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._video_dimension = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *video definition* query property to the given value.
+    ///
+    /// 
     /// The videoDefinition parameter lets you restrict a search to only include either high definition (HD) or standard definition (SD) videos. HD videos are available for playback in at least 720p, though higher resolutions, like 1080p, might also be available.    
-	pub fn video_definition(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._video_definition = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *video category id* query property to the given value.
-	///
-	/// 
+    pub fn video_definition(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._video_definition = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *video category id* query property to the given value.
+    ///
+    /// 
     /// The videoCategoryId parameter filters video search results based on their category.    
-	pub fn video_category_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._video_category_id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *video caption* query property to the given value.
-	///
-	/// 
+    pub fn video_category_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._video_category_id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *video caption* query property to the given value.
+    ///
+    /// 
     /// The videoCaption parameter indicates whether the API should filter video search results based on whether they have captions.    
-	pub fn video_caption(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._video_caption = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *type* query property to the given value.
-	///
-	/// 
+    pub fn video_caption(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._video_caption = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *type* query property to the given value.
+    ///
+    /// 
     /// The type parameter restricts a search query to only retrieve a particular type of resource. The value is a comma-separated list of resource types.    
-	pub fn type_(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._type_ = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *topic id* query property to the given value.
-	///
-	/// 
+    pub fn type_(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._type_ = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *topic id* query property to the given value.
+    ///
+    /// 
     /// The topicId parameter indicates that the API response should only contain resources associated with the specified topic. The value identifies a Freebase topic ID.    
-	pub fn topic_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._topic_id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *safe search* query property to the given value.
-	///
-	/// 
+    pub fn topic_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._topic_id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *safe search* query property to the given value.
+    ///
+    /// 
     /// The safeSearch parameter indicates whether the search results should include restricted content as well as standard content.    
-	pub fn safe_search(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._safe_search = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *relevance language* query property to the given value.
-	///
-	/// 
+    pub fn safe_search(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._safe_search = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *relevance language* query property to the given value.
+    ///
+    /// 
     /// The relevanceLanguage parameter instructs the API to return search results that are most relevant to the specified language. The parameter value is typically an ISO 639-1 two-letter language code. However, you should use the values zh-Hans for simplified Chinese and zh-Hant for traditional Chinese. Please note that results in other languages will still be returned if they are highly relevant to the search query term.    
-	pub fn relevance_language(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._relevance_language = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *related to video id* query property to the given value.
-	///
-	/// 
+    pub fn relevance_language(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._relevance_language = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *related to video id* query property to the given value.
+    ///
+    /// 
     /// The relatedToVideoId parameter retrieves a list of videos that are related to the video that the parameter value identifies. The parameter value must be set to a YouTube video ID and, if you are using this parameter, the type parameter must be set to video.    
-	pub fn related_to_video_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._related_to_video_id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *region code* query property to the given value.
-	///
-	/// 
+    pub fn related_to_video_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._related_to_video_id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *region code* query property to the given value.
+    ///
+    /// 
     /// The regionCode parameter instructs the API to return search results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
-	pub fn region_code(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._region_code = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *q* query property to the given value.
-	///
-	/// 
+    pub fn region_code(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._region_code = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *q* query property to the given value.
+    ///
+    /// 
     /// The q parameter specifies the query term to search for.    
-	pub fn q(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._q = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *published before* query property to the given value.
-	///
-	/// 
+    pub fn q(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._q = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *published before* query property to the given value.
+    ///
+    /// 
     /// The publishedBefore parameter indicates that the API response should only contain resources created before the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
-	pub fn published_before(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._published_before = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *published after* query property to the given value.
-	///
-	/// 
+    pub fn published_before(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._published_before = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *published after* query property to the given value.
+    ///
+    /// 
     /// The publishedAfter parameter indicates that the API response should only contain resources created after the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
-	pub fn published_after(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._published_after = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *page token* query property to the given value.
-	///
-	/// 
+    pub fn published_after(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._published_after = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *page token* query property to the given value.
+    ///
+    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-	pub fn page_token(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._page_token = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *order* query property to the given value.
-	///
-	/// 
+    pub fn page_token(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._page_token = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *order* query property to the given value.
+    ///
+    /// 
     /// The order parameter specifies the method that will be used to order resources in the API response.    
-	pub fn order(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._order = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn order(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._order = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *max results* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *max results* query property to the given value.
+    ///
+    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: u32) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value);
-		return self;
-	}
-	/// Sets the *location radius* query property to the given value.
-	///
-	/// 
+    pub fn max_results(&mut self, new_value: u32) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._max_results = Some(new_value);
+        return self;
+    }
+    /// Sets the *location radius* query property to the given value.
+    ///
+    /// 
     /// The locationRadius, in conjunction with the location parameter, defines a geographic area. If the geographic coordinates associated with a video fall within that area, then the video may be included in search results. This parameter value must be a floating point number followed by a measurement unit. Valid measurement units are m, km, ft, and mi. For example, valid parameter values include 1500m, 5km, 10000ft, and 0.75mi. The API does not support locationRadius parameter values larger than 1000 kilometers.    
-	pub fn location_radius(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._location_radius = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *location* query property to the given value.
-	///
-	/// 
+    pub fn location_radius(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._location_radius = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *location* query property to the given value.
+    ///
+    /// 
     /// The location parameter restricts a search to videos that have a geographical location specified in their metadata. The value is a string that specifies geographic latitude/longitude coordinates e.g. (37.42307,-122.08427)    
-	pub fn location(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._location = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *for mine* query property to the given value.
-	///
-	/// 
+    pub fn location(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._location = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *for mine* query property to the given value.
+    ///
+    /// 
     /// The forMine parameter restricts the search to only retrieve videos owned by the authenticated user. If you set this parameter to true, then the type parameter's value must also be set to video.    
-	pub fn for_mine(&mut self, new_value: bool) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._for_mine = Some(new_value);
-		return self;
-	}
-	/// Sets the *for content owner* query property to the given value.
-	///
-	/// 
+    pub fn for_mine(&mut self, new_value: bool) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._for_mine = Some(new_value);
+        return self;
+    }
+    /// Sets the *for content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The forContentOwner parameter restricts the search to only retrieve resources owned by the content owner specified by the onBehalfOfContentOwner parameter. The user must be authenticated using a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.
-	pub fn for_content_owner(&mut self, new_value: bool) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._for_content_owner = Some(new_value);
-		return self;
-	}
-	/// Sets the *event type* query property to the given value.
-	///
-	/// 
+    pub fn for_content_owner(&mut self, new_value: bool) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._for_content_owner = Some(new_value);
+        return self;
+    }
+    /// Sets the *event type* query property to the given value.
+    ///
+    /// 
     /// The eventType parameter restricts a search to broadcast events.    
-	pub fn event_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._event_type = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *channel type* query property to the given value.
-	///
-	/// 
+    pub fn event_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._event_type = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *channel type* query property to the given value.
+    ///
+    /// 
     /// The channelType parameter lets you restrict a search to a particular type of channel.    
-	pub fn channel_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._channel_type = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *channel id* query property to the given value.
-	///
-	/// 
+    pub fn channel_type(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._channel_type = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *channel id* query property to the given value.
+    ///
+    /// 
     /// The channelId parameter indicates that the API response should only contain resources created by the channel    
-	pub fn channel_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
-		self._channel_id = Some(new_value.to_string());
-		return self;
-	}
+    pub fn channel_id(&mut self, new_value: &str) -> &mut SearchListMethodBuilder<'a, C, NC, A> {
+        self._channel_id = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -7226,7 +7385,6 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7237,13 +7395,14 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.i18nRegions().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.i18nRegions().list("part")
+///         .hl("voluptua.");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
@@ -7252,39 +7411,39 @@ pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_hl: Option<String>,
+    _part: String,
+    _hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nRegionListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
-	pub fn part(&mut self, new_value: &str) -> &mut I18nRegionListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *hl* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut I18nRegionListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *hl* query property to the given value.
+    ///
+    /// 
     /// The hl parameter specifies the language that should be used for text values in the API response.    
-	pub fn hl(&mut self, new_value: &str) -> &mut I18nRegionListMethodBuilder<'a, C, NC, A> {
-		self._hl = Some(new_value.to_string());
-		return self;
-	}
+    pub fn hl(&mut self, new_value: &str) -> &mut I18nRegionListMethodBuilder<'a, C, NC, A> {
+        self._hl = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -7302,7 +7461,6 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7313,13 +7471,25 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.liveStreams().update(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: LiveStream = Default::default();
+/// request.status = &Default::default();
+/// request.snippet = &Default::default();
+/// request.kind = "et";
+/// request.etag = "invidunt";
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.liveStreams().update(&request)
+///         .on_behalf_of_content_owner_channel("dolore")
+///         .on_behalf_of_content_owner("accusam");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
@@ -7328,71 +7498,71 @@ pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: LiveStream,
-	_part: String,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: LiveStream,
+    _part: String,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &LiveStream) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &LiveStream) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part properties that you can include in the parameter value are id, snippet, cdn, and status.
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. If the request body does not specify a value for a mutable property, the existing value for that property will be removed.
-	pub fn part(&mut self, new_value: &str) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -7410,7 +7580,6 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7421,13 +7590,15 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.liveStreams().delete(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.liveStreams().delete("id")
+///         .on_behalf_of_content_owner_channel("invidunt")
+///         .on_behalf_of_content_owner("dolor");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
@@ -7436,54 +7607,54 @@ pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id: String,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
+    _id: String,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies the YouTube live stream ID for the resource that is being deleted.    
-	pub fn id(&mut self, new_value: &str) -> &mut LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -7501,7 +7672,6 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7512,13 +7682,19 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.liveStreams().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.liveStreams().list("part")
+///         .page_token("sit")
+///         .on_behalf_of_content_owner_channel("justo")
+///         .on_behalf_of_content_owner("accusam")
+///         .mine(false)
+///         .max_results(49)
+///         .id("est");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
@@ -7527,90 +7703,90 @@ pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_page_token: Option<String>,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
-	_mine: Option<bool>,
-	_max_results: Option<u32>,
-	_id: Option<String>,
+    _part: String,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.    
-	pub fn part(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *page token* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *page token* query property to the given value.
+    ///
+    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-	pub fn page_token(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
-		self._page_token = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn page_token(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+        self._page_token = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *mine* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *mine* query property to the given value.
+    ///
+    /// 
     /// The mine parameter can be used to instruct the API to only return streams owned by the authenticated user. Set the parameter value to true to only retrieve your own streams.    
-	pub fn mine(&mut self, new_value: bool) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value);
-		return self;
-	}
-	/// Sets the *max results* query property to the given value.
-	///
-	/// 
+    pub fn mine(&mut self, new_value: bool) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+        self._mine = Some(new_value);
+        return self;
+    }
+    /// Sets the *max results* query property to the given value.
+    ///
+    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set. Acceptable values are 0 to 50, inclusive. The default value is 5.    
-	pub fn max_results(&mut self, new_value: u32) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value);
-		return self;
-	}
-	/// Sets the *id* query property to the given value.
-	///
-	/// 
+    pub fn max_results(&mut self, new_value: u32) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+        self._max_results = Some(new_value);
+        return self;
+    }
+    /// Sets the *id* query property to the given value.
+    ///
+    /// 
     /// The id parameter specifies a comma-separated list of YouTube stream IDs that identify the streams being retrieved. In a liveStream resource, the id property specifies the stream's ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
-		return self;
-	}
+    pub fn id(&mut self, new_value: &str) -> &mut LiveStreamListMethodBuilder<'a, C, NC, A> {
+        self._id = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -7628,7 +7804,6 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7639,13 +7814,25 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.liveStreams().insert(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: LiveStream = Default::default();
+/// request.status = &Default::default();
+/// request.snippet = &Default::default();
+/// request.kind = "diam";
+/// request.etag = "ipsum";
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.liveStreams().insert(&request)
+///         .on_behalf_of_content_owner_channel("voluptua.")
+///         .on_behalf_of_content_owner("Lorem");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
@@ -7654,69 +7841,69 @@ pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: LiveStream,
-	_part: String,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: LiveStream,
+    _part: String,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &LiveStream) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &LiveStream) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part properties that you can include in the parameter value are id, snippet, cdn, and status.
-	pub fn part(&mut self, new_value: &str) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -7734,7 +7921,6 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7745,13 +7931,24 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.channels().update(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: Channel = Default::default();
+/// request.status = &Default::default();
+/// request.invideo_promotion = &Default::default();
+/// request.kind = "ipsum";
+/// request.statistics = &Default::default();
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.channels().update(&request)
+///         .on_behalf_of_content_owner("et");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
@@ -7760,56 +7957,56 @@ pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: Channel,
-	_part: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: Channel,
+    _part: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &Channel) -> &mut ChannelUpdateMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &Channel) -> &mut ChannelUpdateMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are id and invideoPromotion.
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies.
-	pub fn part(&mut self, new_value: &str) -> &mut ChannelUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut ChannelUpdateMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelUpdateMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelUpdateMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -7827,7 +8024,6 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7838,13 +8034,22 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.channels().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.channels().list("part")
+///         .page_token("At")
+///         .on_behalf_of_content_owner("et")
+///         .my_subscribers(false)
+///         .mine(true)
+///         .max_results(82)
+///         .managed_by_me(false)
+///         .id("sanctus")
+///         .for_username("ipsum")
+///         .category_id("justo");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct ChannelListMethodBuilder<'a, C, NC, A>
@@ -7853,113 +8058,113 @@ pub struct ChannelListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_page_token: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
-	_my_subscribers: Option<bool>,
-	_mine: Option<bool>,
-	_max_results: Option<u32>,
-	_managed_by_me: Option<bool>,
-	_id: Option<String>,
-	_for_username: Option<String>,
-	_category_id: Option<String>,
+    _part: String,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _my_subscribers: Option<bool>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _managed_by_me: Option<bool>,
+    _id: Option<String>,
+    _for_username: Option<String>,
+    _category_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, statistics, topicDetails, and invideoPromotion.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set part=contentDetails, the API response will also contain all of those nested properties.
-	pub fn part(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *page token* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *page token* query property to the given value.
+    ///
+    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-	pub fn page_token(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._page_token = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn page_token(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+        self._page_token = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *my subscribers* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *my subscribers* query property to the given value.
+    ///
+    /// 
     /// Set this parameter's value to true to retrieve a list of channels that subscribed to the authenticated user's channel.    
-	pub fn my_subscribers(&mut self, new_value: bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._my_subscribers = Some(new_value);
-		return self;
-	}
-	/// Sets the *mine* query property to the given value.
-	///
-	/// 
+    pub fn my_subscribers(&mut self, new_value: bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+        self._my_subscribers = Some(new_value);
+        return self;
+    }
+    /// Sets the *mine* query property to the given value.
+    ///
+    /// 
     /// Set this parameter's value to true to instruct the API to only return channels owned by the authenticated user.    
-	pub fn mine(&mut self, new_value: bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value);
-		return self;
-	}
-	/// Sets the *max results* query property to the given value.
-	///
-	/// 
+    pub fn mine(&mut self, new_value: bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+        self._mine = Some(new_value);
+        return self;
+    }
+    /// Sets the *max results* query property to the given value.
+    ///
+    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: u32) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value);
-		return self;
-	}
-	/// Sets the *managed by me* query property to the given value.
-	///
-	/// 
+    pub fn max_results(&mut self, new_value: u32) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+        self._max_results = Some(new_value);
+        return self;
+    }
+    /// Sets the *managed by me* query property to the given value.
+    ///
+    /// 
     /// Set this parameter's value to true to instruct the API to only return channels managed by the content owner that the onBehalfOfContentOwner parameter specifies. The user must be authenticated as a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.    
-	pub fn managed_by_me(&mut self, new_value: bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._managed_by_me = Some(new_value);
-		return self;
-	}
-	/// Sets the *id* query property to the given value.
-	///
-	/// 
+    pub fn managed_by_me(&mut self, new_value: bool) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+        self._managed_by_me = Some(new_value);
+        return self;
+    }
+    /// Sets the *id* query property to the given value.
+    ///
+    /// 
     /// The id parameter specifies a comma-separated list of the YouTube channel ID(s) for the resource(s) that are being retrieved. In a channel resource, the id property specifies the channel's YouTube channel ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *for username* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+        self._id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *for username* query property to the given value.
+    ///
+    /// 
     /// The forUsername parameter specifies a YouTube username, thereby requesting the channel associated with that username.    
-	pub fn for_username(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._for_username = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *category id* query property to the given value.
-	///
-	/// 
+    pub fn for_username(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+        self._for_username = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *category id* query property to the given value.
+    ///
+    /// 
     /// The categoryId parameter specifies a YouTube guide category, thereby requesting YouTube channels associated with that category.    
-	pub fn category_id(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
-		self._category_id = Some(new_value.to_string());
-		return self;
-	}
+    pub fn category_id(&mut self, new_value: &str) -> &mut ChannelListMethodBuilder<'a, C, NC, A> {
+        self._category_id = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -7977,7 +8182,6 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7988,13 +8192,13 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.playlistItems().delete(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.playlistItems().delete("id");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
@@ -8003,30 +8207,30 @@ pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id: String,
+    _id: String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
+    pub fn id(&mut self, new_value: &str) -> &mut PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
 }
 
 
@@ -8044,7 +8248,6 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8055,13 +8258,19 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.playlistItems().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.playlistItems().list("part")
+///         .video_id("Stet")
+///         .playlist_id("et")
+///         .page_token("amet.")
+///         .on_behalf_of_content_owner("ea")
+///         .max_results(49)
+///         .id("sit");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
@@ -8070,88 +8279,88 @@ pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_video_id: Option<String>,
-	_playlist_id: Option<String>,
-	_page_token: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
-	_max_results: Option<u32>,
-	_id: Option<String>,
+    _part: String,
+    _video_id: Option<String>,
+    _playlist_id: Option<String>,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set part=snippet, the API response will contain all of those properties.
-	pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *video id* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *video id* query property to the given value.
+    ///
+    /// 
     /// The videoId parameter specifies that the request should return only the playlist items that contain the specified video.    
-	pub fn video_id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
-		self._video_id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *playlist id* query property to the given value.
-	///
-	/// 
+    pub fn video_id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+        self._video_id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *playlist id* query property to the given value.
+    ///
+    /// 
     /// The playlistId parameter specifies the unique ID of the playlist for which you want to retrieve playlist items. Note that even though this is an optional parameter, every request to retrieve playlist items must specify a value for either the id parameter or the playlistId parameter.    
-	pub fn playlist_id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
-		self._playlist_id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *page token* query property to the given value.
-	///
-	/// 
+    pub fn playlist_id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+        self._playlist_id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *page token* query property to the given value.
+    ///
+    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-	pub fn page_token(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
-		self._page_token = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn page_token(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+        self._page_token = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *max results* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *max results* query property to the given value.
+    ///
+    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: u32) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value);
-		return self;
-	}
-	/// Sets the *id* query property to the given value.
-	///
-	/// 
+    pub fn max_results(&mut self, new_value: u32) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+        self._max_results = Some(new_value);
+        return self;
+    }
+    /// Sets the *id* query property to the given value.
+    ///
+    /// 
     /// The id parameter specifies a comma-separated list of one or more unique playlist item IDs.    
-	pub fn id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
-		return self;
-	}
+    pub fn id(&mut self, new_value: &str) -> &mut PlaylistItemListMethodBuilder<'a, C, NC, A> {
+        self._id = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -8169,7 +8378,6 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8180,13 +8388,24 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.playlistItems().insert(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: PlaylistItem = Default::default();
+/// request.status = &Default::default();
+/// request.snippet = &Default::default();
+/// request.kind = "ipsum";
+/// request.etag = "est";
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.playlistItems().insert(&request)
+///         .on_behalf_of_content_owner("et");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
@@ -8195,56 +8414,56 @@ pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: PlaylistItem,
-	_part: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: PlaylistItem,
+    _part: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &PlaylistItem) -> &mut PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &PlaylistItem) -> &mut PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet, contentDetails, and status.
-	pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -8262,7 +8481,6 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8273,13 +8491,23 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.playlistItems().update(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: PlaylistItem = Default::default();
+/// request.status = &Default::default();
+/// request.snippet = &Default::default();
+/// request.kind = "diam";
+/// request.etag = "dolores";
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.playlistItems().update(&request);
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
@@ -8288,47 +8516,47 @@ pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: PlaylistItem,
-	_part: String,
+    _request: PlaylistItem,
+    _part: String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &PlaylistItem) -> &mut PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &PlaylistItem) -> &mut PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet, contentDetails, and status.
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist item can specify a start time and end time, which identify the times portion of the video that should play when users watch the video in the playlist. If your request is updating a playlist item that sets these values, and the request's part parameter value includes the contentDetails part, the playlist item's start and end times will be updated to whatever value the request body specifies. If the request body does not specify values, the existing start and end times will be removed and replaced with the default settings.
-	pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
+    pub fn part(&mut self, new_value: &str) -> &mut PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
 }
 
 
@@ -8346,7 +8574,6 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8357,13 +8584,24 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.watermarks().set(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: InvideoBranding = Default::default();
+/// request.target_channel_id = "ut";
+/// request.position = &Default::default();
+/// request.image_url = "erat,";
+/// request.timing = &Default::default();
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.watermarks().set(&request, "channelId")
+///         .on_behalf_of_content_owner("erat,");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
@@ -8372,49 +8610,49 @@ pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: InvideoBranding,
-	_channel_id: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: InvideoBranding,
+    _channel_id: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for WatermarkSetMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &InvideoBranding) -> &mut WatermarkSetMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *channel id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &InvideoBranding) -> &mut WatermarkSetMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *channel id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The channelId parameter specifies a YouTube channel ID for which the watermark is being provided.    
-	pub fn channel_id(&mut self, new_value: &str) -> &mut WatermarkSetMethodBuilder<'a, C, NC, A> {
-		self._channel_id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn channel_id(&mut self, new_value: &str) -> &mut WatermarkSetMethodBuilder<'a, C, NC, A> {
+        self._channel_id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut WatermarkSetMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut WatermarkSetMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -8432,7 +8670,6 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8443,13 +8680,14 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.watermarks().unset(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.watermarks().unset("channelId")
+///         .on_behalf_of_content_owner("eirmod");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
@@ -8458,39 +8696,39 @@ pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_channel_id: String,
-	_on_behalf_of_content_owner: Option<String>,
+    _channel_id: String,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for WatermarkUnsetMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *channel id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *channel id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The channelId parameter specifies a YouTube channel ID for which the watermark is being unset.    
-	pub fn channel_id(&mut self, new_value: &str) -> &mut WatermarkUnsetMethodBuilder<'a, C, NC, A> {
-		self._channel_id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn channel_id(&mut self, new_value: &str) -> &mut WatermarkUnsetMethodBuilder<'a, C, NC, A> {
+        self._channel_id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut WatermarkUnsetMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut WatermarkUnsetMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -8508,7 +8746,6 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8519,13 +8756,18 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.liveBroadcasts().control(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.liveBroadcasts().control("id", "part")
+///         .walltime("clita")
+///         .on_behalf_of_content_owner_channel("dolor")
+///         .on_behalf_of_content_owner("At")
+///         .offset_time_ms("magna")
+///         .display_slate(false);
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
@@ -8534,96 +8776,96 @@ pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id: String,
-	_part: String,
-	_walltime: Option<String>,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
-	_offset_time_ms: Option<String>,
-	_display_slate: Option<bool>,
+    _id: String,
+    _part: String,
+    _walltime: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _offset_time_ms: Option<String>,
+    _display_slate: Option<bool>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastControlMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated.    
-	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
-	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *walltime* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *walltime* query property to the given value.
+    ///
+    /// 
     /// The walltime parameter specifies the wall clock time at which the specified slate change will occur. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.    
-	pub fn walltime(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-		self._walltime = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn walltime(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+        self._walltime = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *offset time ms* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *offset time ms* query property to the given value.
+    ///
+    /// 
     /// The offsetTimeMs parameter specifies a positive time offset when the specified slate change will occur. The value is measured in milliseconds from the beginning of the broadcast's monitor stream, which is the time that the testing phase for the broadcast began. Even though it is specified in milliseconds, the value is actually an approximation, and YouTube completes the requested action as closely as possible to that time.
     /// 
     /// If you do not specify a value for this parameter, then YouTube performs the action as soon as possible. See the Getting started guide for more details.
     /// 
     /// Important: You should only specify a value for this parameter if your broadcast stream is delayed.
-	pub fn offset_time_ms(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-		self._offset_time_ms = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *display slate* query property to the given value.
-	///
-	/// 
+    pub fn offset_time_ms(&mut self, new_value: &str) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+        self._offset_time_ms = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *display slate* query property to the given value.
+    ///
+    /// 
     /// The displaySlate parameter specifies whether the slate is being enabled or disabled.    
-	pub fn display_slate(&mut self, new_value: bool) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-		self._display_slate = Some(new_value);
-		return self;
-	}
+    pub fn display_slate(&mut self, new_value: bool) -> &mut LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+        self._display_slate = Some(new_value);
+        return self;
+    }
 }
 
 
@@ -8641,7 +8883,6 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8652,13 +8893,25 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.liveBroadcasts().update(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: LiveBroadcast = Default::default();
+/// request.status = &Default::default();
+/// request.snippet = &Default::default();
+/// request.kind = "diam";
+/// request.etag = "clita";
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.liveBroadcasts().update(&request)
+///         .on_behalf_of_content_owner_channel("ipsum")
+///         .on_behalf_of_content_owner("ipsum");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
@@ -8667,71 +8920,71 @@ pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: LiveBroadcast,
-	_part: String,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: LiveBroadcast,
+    _part: String,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &LiveBroadcast) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &LiveBroadcast) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part properties that you can include in the parameter value are id, snippet, contentDetails, and status.
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a broadcast's privacy status is defined in the status part. As such, if your request is updating a private or unlisted broadcast, and the request's part parameter value includes the status part, the broadcast's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the broadcast will revert to the default privacy setting.
-	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -8749,7 +9002,6 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8760,13 +9012,25 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.liveBroadcasts().insert(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: LiveBroadcast = Default::default();
+/// request.status = &Default::default();
+/// request.snippet = &Default::default();
+/// request.kind = "sanctus";
+/// request.etag = "et";
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.liveBroadcasts().insert(&request)
+///         .on_behalf_of_content_owner_channel("et")
+///         .on_behalf_of_content_owner("dolor");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
@@ -8775,69 +9039,69 @@ pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: LiveBroadcast,
-	_part: String,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
+    _request: LiveBroadcast,
+    _part: String,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &LiveBroadcast) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &LiveBroadcast) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part properties that you can include in the parameter value are id, snippet, contentDetails, and status.
-	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -8855,7 +9119,6 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8866,13 +9129,16 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.liveBroadcasts().bind(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.liveBroadcasts().bind("id", "part")
+///         .stream_id("aliquyam")
+///         .on_behalf_of_content_owner_channel("clita")
+///         .on_behalf_of_content_owner("et");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
@@ -8881,74 +9147,74 @@ pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id: String,
-	_part: String,
-	_stream_id: Option<String>,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
+    _id: String,
+    _part: String,
+    _stream_id: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastBindMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.    
-	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
-	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *stream id* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *stream id* query property to the given value.
+    ///
+    /// 
     /// The streamId parameter specifies the unique ID of the video stream that is being bound to a broadcast. If this parameter is omitted, the API will remove any existing binding between the broadcast and a video stream.    
-	pub fn stream_id(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
-		self._stream_id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn stream_id(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+        self._stream_id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -8966,7 +9232,6 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8977,13 +9242,20 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.liveBroadcasts().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.liveBroadcasts().list("part")
+///         .page_token("no")
+///         .on_behalf_of_content_owner_channel("sit")
+///         .on_behalf_of_content_owner("consetetur")
+///         .mine(false)
+///         .max_results(48)
+///         .id("et")
+///         .broadcast_status("amet,");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
@@ -8992,99 +9264,99 @@ pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_page_token: Option<String>,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
-	_mine: Option<bool>,
-	_max_results: Option<u32>,
-	_id: Option<String>,
-	_broadcast_status: Option<String>,
+    _part: String,
+    _page_token: Option<String>,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _id: Option<String>,
+    _broadcast_status: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
-	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *page token* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *page token* query property to the given value.
+    ///
+    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-	pub fn page_token(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		self._page_token = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn page_token(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._page_token = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *mine* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *mine* query property to the given value.
+    ///
+    /// 
     /// The mine parameter can be used to instruct the API to only return broadcasts owned by the authenticated user. Set the parameter value to true to only retrieve your own broadcasts.    
-	pub fn mine(&mut self, new_value: bool) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value);
-		return self;
-	}
-	/// Sets the *max results* query property to the given value.
-	///
-	/// 
+    pub fn mine(&mut self, new_value: bool) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._mine = Some(new_value);
+        return self;
+    }
+    /// Sets the *max results* query property to the given value.
+    ///
+    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: u32) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value);
-		return self;
-	}
-	/// Sets the *id* query property to the given value.
-	///
-	/// 
+    pub fn max_results(&mut self, new_value: u32) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._max_results = Some(new_value);
+        return self;
+    }
+    /// Sets the *id* query property to the given value.
+    ///
+    /// 
     /// The id parameter specifies a comma-separated list of YouTube broadcast IDs that identify the broadcasts being retrieved. In a liveBroadcast resource, the id property specifies the broadcast's ID.    
-	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *broadcast status* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *broadcast status* query property to the given value.
+    ///
+    /// 
     /// The broadcastStatus parameter filters the API response to only include broadcasts with the specified status.    
-	pub fn broadcast_status(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		self._broadcast_status = Some(new_value.to_string());
-		return self;
-	}
+    pub fn broadcast_status(&mut self, new_value: &str) -> &mut LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._broadcast_status = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -9102,7 +9374,6 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9113,13 +9384,15 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.liveBroadcasts().delete(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.liveBroadcasts().delete("id")
+///         .on_behalf_of_content_owner_channel("ipsum")
+///         .on_behalf_of_content_owner("amet,");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
@@ -9128,54 +9401,54 @@ pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_id: String,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
+    _id: String,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted.    
-	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -9193,7 +9466,6 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9204,13 +9476,15 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.liveBroadcasts().transition(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.liveBroadcasts().transition("broadcastStatus", "id", "part")
+///         .on_behalf_of_content_owner_channel("aliquyam")
+///         .on_behalf_of_content_owner("accusam");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
@@ -9219,76 +9493,76 @@ pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_broadcast_status: String,
-	_id: String,
-	_part: String,
-	_on_behalf_of_content_owner_channel: Option<String>,
-	_on_behalf_of_content_owner: Option<String>,
+    _broadcast_status: String,
+    _id: String,
+    _part: String,
+    _on_behalf_of_content_owner_channel: Option<String>,
+    _on_behalf_of_content_owner: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *broadcast status* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *broadcast status* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to.    
-	pub fn broadcast_status(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-		self._broadcast_status = new_value.to_string();
-		return self;
-	}
-	/// Sets the *id* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    pub fn broadcast_status(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+        self._broadcast_status = new_value.to_string();
+        return self;
+    }
+    /// Sets the *id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The id parameter specifies the unique ID of the broadcast that is transitioning to another status.    
-	pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-		self._id = new_value.to_string();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+        self._id = new_value.to_string();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
-	pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *on behalf of content owner channel* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *on behalf of content owner channel* query property to the given value.
+    ///
+    /// 
     /// This parameter can only be used in a properly authorized request. Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-	pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *on behalf of content owner* query property to the given value.
-	///
-	/// 
+    pub fn on_behalf_of_content_owner_channel(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *on behalf of content owner* query property to the given value.
+    ///
+    /// 
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-	pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-		self._on_behalf_of_content_owner = Some(new_value.to_string());
-		return self;
-	}
+    pub fn on_behalf_of_content_owner(&mut self, new_value: &str) -> &mut LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+        self._on_behalf_of_content_owner = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -9306,7 +9580,6 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9317,13 +9590,16 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.videoCategories().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.videoCategories().list("part")
+///         .region_code("sit")
+///         .id("sed")
+///         .hl("sanctus");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
@@ -9332,57 +9608,57 @@ pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_region_code: Option<String>,
-	_id: Option<String>,
-	_hl: Option<String>,
+    _part: String,
+    _region_code: Option<String>,
+    _id: Option<String>,
+    _hl: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoCategoryListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.    
-	pub fn part(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *region code* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *region code* query property to the given value.
+    ///
+    /// 
     /// The regionCode parameter instructs the API to return the list of video categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
-	pub fn region_code(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
-		self._region_code = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *id* query property to the given value.
-	///
-	/// 
+    pub fn region_code(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
+        self._region_code = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *id* query property to the given value.
+    ///
+    /// 
     /// The id parameter specifies a comma-separated list of video category IDs for the resources that you are retrieving.    
-	pub fn id(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
-		self._id = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *hl* query property to the given value.
-	///
-	/// 
+    pub fn id(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
+        self._id = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *hl* query property to the given value.
+    ///
+    /// 
     /// The hl parameter specifies the language that should be used for text values in the API response.    
-	pub fn hl(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
-		self._hl = Some(new_value.to_string());
-		return self;
-	}
+    pub fn hl(&mut self, new_value: &str) -> &mut VideoCategoryListMethodBuilder<'a, C, NC, A> {
+        self._hl = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -9400,7 +9676,6 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9411,13 +9686,21 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.activities().list(...);
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.activities().list("part")
+///         .region_code("sadipscing")
+///         .published_before("dolore")
+///         .published_after("amet.")
+///         .page_token("et")
+///         .mine(true)
+///         .max_results(71)
+///         .home(false)
+///         .channel_id("diam");
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct ActivityListMethodBuilder<'a, C, NC, A>
@@ -9426,104 +9709,104 @@ pub struct ActivityListMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_part: String,
-	_region_code: Option<String>,
-	_published_before: Option<String>,
-	_published_after: Option<String>,
-	_page_token: Option<String>,
-	_mine: Option<bool>,
-	_max_results: Option<u32>,
-	_home: Option<bool>,
-	_channel_id: Option<String>,
+    _part: String,
+    _region_code: Option<String>,
+    _published_before: Option<String>,
+    _published_after: Option<String>,
+    _page_token: Option<String>,
+    _mine: Option<bool>,
+    _max_results: Option<u32>,
+    _home: Option<bool>,
+    _channel_id: Option<String>,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ActivityListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
     /// The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
-	pub fn part(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
-	/// Sets the *region code* query property to the given value.
-	///
-	/// 
+    pub fn part(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
+    /// Sets the *region code* query property to the given value.
+    ///
+    /// 
     /// The regionCode parameter instructs the API to return results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code. YouTube uses this value when the authorized user's previous activity on YouTube does not provide enough information to generate the activity feed.    
-	pub fn region_code(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._region_code = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *published before* query property to the given value.
-	///
-	/// 
+    pub fn region_code(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+        self._region_code = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *published before* query property to the given value.
+    ///
+    /// 
     /// The publishedBefore parameter specifies the date and time before which an activity must have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be excluded from the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-	pub fn published_before(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._published_before = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *published after* query property to the given value.
-	///
-	/// 
+    pub fn published_before(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+        self._published_before = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *published after* query property to the given value.
+    ///
+    /// 
     /// The publishedAfter parameter specifies the earliest date and time that an activity could have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be included in the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-	pub fn published_after(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._published_after = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *page token* query property to the given value.
-	///
-	/// 
+    pub fn published_after(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+        self._published_after = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *page token* query property to the given value.
+    ///
+    /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-	pub fn page_token(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._page_token = Some(new_value.to_string());
-		return self;
-	}
-	/// Sets the *mine* query property to the given value.
-	///
-	/// 
+    pub fn page_token(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+        self._page_token = Some(new_value.to_string());
+        return self;
+    }
+    /// Sets the *mine* query property to the given value.
+    ///
+    /// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's activities.    
-	pub fn mine(&mut self, new_value: bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._mine = Some(new_value);
-		return self;
-	}
-	/// Sets the *max results* query property to the given value.
-	///
-	/// 
+    pub fn mine(&mut self, new_value: bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+        self._mine = Some(new_value);
+        return self;
+    }
+    /// Sets the *max results* query property to the given value.
+    ///
+    /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-	pub fn max_results(&mut self, new_value: u32) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._max_results = Some(new_value);
-		return self;
-	}
-	/// Sets the *home* query property to the given value.
-	///
-	/// 
+    pub fn max_results(&mut self, new_value: u32) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+        self._max_results = Some(new_value);
+        return self;
+    }
+    /// Sets the *home* query property to the given value.
+    ///
+    /// 
     /// Set this parameter's value to true to retrieve the activity feed that displays on the YouTube home page for the currently authenticated user.    
-	pub fn home(&mut self, new_value: bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._home = Some(new_value);
-		return self;
-	}
-	/// Sets the *channel id* query property to the given value.
-	///
-	/// 
+    pub fn home(&mut self, new_value: bool) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+        self._home = Some(new_value);
+        return self;
+    }
+    /// Sets the *channel id* query property to the given value.
+    ///
+    /// 
     /// The channelId parameter specifies a unique YouTube channel ID. The API will then return a list of that channel's activities.    
-	pub fn channel_id(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
-		self._channel_id = Some(new_value.to_string());
-		return self;
-	}
+    pub fn channel_id(&mut self, new_value: &str) -> &mut ActivityListMethodBuilder<'a, C, NC, A> {
+        self._channel_id = Some(new_value.to_string());
+        return self;
+    }
 }
 
 
@@ -9543,7 +9826,6 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// 
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9554,13 +9836,23 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling methods
-/// // to setup your call.
-/// // let mb = hub.activities().insert(...);
+/// // As the method needs a request, you would usually fill it with the desired information.
+/// // What can actually be filled in depends on the actual call - the following is just a 
+/// // random selection of properties ! Values are random and not representative !
+/// let mut request: Activity = Default::default();
+/// request.snippet = &Default::default();
+/// request.content_details = &Default::default();
+/// request.kind = "sanctus";
+/// request.etag = "et";
+/// // ... and so forth ...
+/// 
+/// // Even though you wouldn't bind this to a variable, you can configure optional parameters
+/// // by calling the respective setters.
+/// // Values are random and not representative !
+/// let mut mb = hub.activities().insert(&request);
 /// 
 /// // Finally, execute your call and process the result
-/// // TODO: comment in once args are properly setup !
-/// // mb.do()
+/// mb.doit()
 /// # }
 /// ```
 pub struct ActivityInsertMethodBuilder<'a, C, NC, A>
@@ -9569,45 +9861,45 @@ pub struct ActivityInsertMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-	_request: Activity,
-	_part: String,
+    _request: Activity,
+    _part: String,
 }
 
 impl<'a, C, NC, A> MethodBuilder for ActivityInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
 
-	/// Perform the operation you have build so far.
-	/// Can only be called once !
-	/// TODO: Build actual call
-	pub fn doit(self) {
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn doit(self) {
 
-	}
+    }
 
-	/// Sets the *request* property to the given value.
-	///
-	/// Even though the property as already been set when instantiating this call, 
-	/// we provide this method for API completeness.
-	/// 
-	pub fn request(&mut self, new_value: &Activity) -> &mut ActivityInsertMethodBuilder<'a, C, NC, A> {
-		self._request = new_value.clone();
-		return self;
-	}
-	/// Sets the *part* query property to the given value.
-	///
-	/// Even though the *parts* list is automatically derived from *Resource* passed in 
-	/// during instantiation and indicates which values you are passing, the response would contain the very same parts.
-	/// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-	/// like statistics that are generated server side. Therefore you should use this method to specify 
-	/// the parts you provide in addition to the ones you want in the response.
-	/// 
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    /// 
+    pub fn request(&mut self, new_value: &Activity) -> &mut ActivityInsertMethodBuilder<'a, C, NC, A> {
+        self._request = new_value.clone();
+        return self;
+    }
+    /// Sets the *part* query property to the given value.
+    ///
+    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
+    /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
+    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// the parts you provide in addition to the ones you want in the response.
+    /// 
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
-	pub fn part(&mut self, new_value: &str) -> &mut ActivityInsertMethodBuilder<'a, C, NC, A> {
-		self._part = new_value.to_string();
-		return self;
-	}
+    pub fn part(&mut self, new_value: &str) -> &mut ActivityInsertMethodBuilder<'a, C, NC, A> {
+        self._part = new_value.to_string();
+        return self;
+    }
 }
 
 

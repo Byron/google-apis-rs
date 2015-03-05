@@ -1,5 +1,8 @@
 import re
+from random import (randint, random, choice, seed)
 import collections
+
+seed(7337)
 
 re_linestart = re.compile('^', flags=re.MULTILINE)
 re_first_4_spaces = re.compile('^ {1,4}', flags=re.MULTILINE)
@@ -14,6 +17,14 @@ TYPE_MAP = {'boolean' : 'bool',
             'array'   : 'Vec',
             'string'  : 'String',
             'object'  : 'HashMap'}
+
+_words = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(' ')
+RUST_TYPE_RND_MAP = {'bool': lambda: str(bool(randint(0, 1))).lower(),
+                     'u32' : lambda: randint(0, 100),
+                     'f64' : lambda: random(),
+                     'i32' : lambda: randint(-101, -1),
+                     'String': lambda: '"%s"' % choice(_words),
+}
 TREF = '$ref'
 IO_RESPONSE = 'response'
 IO_REQUEST = 'request'
@@ -81,7 +92,13 @@ def indent_all_but_first_by(tabs):
 # useful if you have defs embedded in an unindent block - they need to counteract. 
 # It's a bit itchy, but logical
 def indent(s):
-    return re_linestart.sub('    ', s)
+    return re_linestart.sub(' ' * SPACES_PER_TAB, s)
+
+# indent by given amount of spaces
+def indent_by(n):
+    def indent_inner(s):
+        return re_linestart.sub(' ' * n, s)
+    return indent_inner
 
 # return s, with trailing newline
 def trailing_newline(s):
@@ -466,3 +483,10 @@ def get_word(d, n, e = ''):
 def property(n):
     return '_' + mangle_ident(n)
 
+# given a rust type-name (no optional, as from to_rust_type), you will get a suitable random default value
+# as string suitable to be passed as reference (or copy, where applicable)
+def rnd_arg_val_for_type(tn):
+    try:
+        return str(RUST_TYPE_RND_MAP[tn]())
+    except KeyError:
+        return '&Default::default()'

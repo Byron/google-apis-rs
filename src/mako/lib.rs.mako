@@ -36,6 +36,26 @@ use std::default::Default;
 
 pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType};
 
+
+// ##############
+// UTILITIES ###
+// ############
+
+/// This macro is advertised in the documentation, which is why we deliver it as well
+#[macro_export]
+macro_rules! map(
+    { $($key:expr => $value:expr),+ } => {
+        {
+            let mut m = ::std::collections::HashMap::new();
+            $(
+                m.insert($key, $value);
+            )+
+            m
+        }
+     };
+);
+
+
 // ########
 // HUB ###
 // ######
