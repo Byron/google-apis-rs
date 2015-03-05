@@ -63,9 +63,13 @@ ${capture(lib.test_hub, hub_type_name, comments=False) | hide_rust_doc_test}
 let mut ${rb_name}: ${request_value.id} = Default::default();
 % for spn, sp in request_value.get('properties', dict()).iteritems():
 <%
-    assignment = rvfrt(spn, sp)
+    assignment = rvfrt(spn, sp, request_value.id)
     if is_string_value(assignment):
         assignment = assignment + '.to_string()'
+    if assignment.endswith('default()'):
+        assignment = assignment[1:] # cut & - it's not ok in this case :)!
+    else:
+        assignment = 'Some(%s)' % assignment
 %>\
 ## ${to_rust_type(request_value.id, spn, sp, allow_optionals=False)}
 ${rb_name}.${mangle_ident(spn)} = ${assignment};

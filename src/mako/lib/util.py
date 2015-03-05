@@ -489,6 +489,4 @@ def rnd_arg_val_for_type(tn):
     try:
         return str(RUST_TYPE_RND_MAP[tn]())
     except KeyError:
-        # be verbose to show actual type ! It's for documentation, after all, people should see what's going on
-        # right away without another lookup
-        return '&<%s as Default>::default()' % tn
+        return '&Default::default()'

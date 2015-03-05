@@ -97,6 +97,8 @@ let mut hub = YouTube::new(hyper::Client::new(), auth);
 
 ## About Customization/Callbacks
 
+## About Optionals in parts (needed for Json, otherwise I'd happily drop them)
+
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
 
