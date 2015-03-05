@@ -54,6 +54,7 @@ ${m.description | rust_doc_comment}
 ///
 % if part_desc:
 ${part_desc | rust_doc_comment}
+///
 % endif
 /// # Example
 ///
@@ -176,7 +177,7 @@ ${self._setter(resource, method, m, p, part_prop, ThisType, c)}\
     # end for each required property
     required_args = ', '.join(required_args)
 
-    random_value_warning = "Values shown here are random and not representative !"
+    random_value_warning = "Values shown here are possibly random and not representative !"
 %>\
 <%block filter="rust_doc_test_norun">\
 ${capture(util.test_prelude) | hide_rust_doc_test}\
