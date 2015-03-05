@@ -219,11 +219,12 @@ ${rb_name}.${mangle_ident(spn)} = ${assignment}
 let result = hub.${mangle_ident(resource)}().${mangle_ident(method)}(${required_args})\
 % for p in optional_props:
 
-<%block  filter="indent_by(8)">\
+<%block  filter="indent_by(13)">\
 .${mangle_ident(p.name)}(${rvfrt(p.name, p)})\
 </%block>\
 % endfor
-.${api.terms.action}();
+
+${'.' + api.terms.action | indent_by(13)}();
 // TODO: show how to handle the result !
 </%block>
 </%block>\
