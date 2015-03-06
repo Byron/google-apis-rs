@@ -25,7 +25,7 @@
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
 
-## Creates a Call builder type
+## Creates a method builder type
 ###############################################################################################
 ###############################################################################################
 <%def name="new(resource, method, c)">\
@@ -84,16 +84,11 @@ impl<'a, C, NC, A> MethodBuilder for ${ThisType} {}
 
 impl<'a, C, NC, A> ${ThisType} {
 
-    /// Perform the operation you have build so far.
-    /// Can only be called once !
-    /// TODO: Build actual call
-    pub fn ${api.terms.action}(self) {
-
-    }
+    ${self._action_fn(resource, method, params, request_value, parts)}\
 
 ## SETTERS ###############
 % for p in params:
-${self._setter(resource, method, m, p, part_prop, ThisType, c)}\
+${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 % endfor
 }
 </%def>
@@ -102,7 +97,7 @@ ${self._setter(resource, method, m, p, part_prop, ThisType, c)}\
 ## creates a setter for the call builder
 ###############################################################################################
 ###############################################################################################
-<%def name="_setter(resource, method, m, p, part_prop, ThisType, c)">\
+<%def name="_setter_fn(resource, method, m, p, part_prop, ThisType, c)">\
 <%
     InType = activity_input_type(p)
 
@@ -136,7 +131,7 @@ ${self._setter(resource, method, m, p, part_prop, ThisType, c)}\
     /// we provide this method for API completeness.
     % endif
     % if part_desc:
-
+    ///
     ${part_desc | rust_doc_comment, indent_all_but_first_by(1)}
     % endif
     /// 
@@ -150,7 +145,7 @@ ${self._setter(resource, method, m, p, part_prop, ThisType, c)}\
 </%def>
 
 
-## creates a setter for the call builder
+## creates usage docs the method builder
 ###############################################################################################
 ###############################################################################################
 <%def name="usage(resource, method, params, request_value, parts)">\
@@ -228,4 +223,18 @@ ${'.' + api.terms.action | indent_by(13)}();
 // TODO: show how to handle the result !
 </%block>
 </%block>\
+</%def>
+
+
+## create an entire 'api.terms.action' method
+###############################################################################################
+###############################################################################################
+<%def name="_action_fn(resource, method, params, request_value, parts)">\
+
+    /// Perform the operation you have build so far.
+    /// Can only be called once !
+    /// TODO: Build actual call
+    pub fn ${api.terms.action}(self) {
+
+    }
 </%def>
