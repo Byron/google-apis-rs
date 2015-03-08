@@ -6,23 +6,23 @@
 //! 
 //! Handle the following *Resources* with ease ... 
 //! 
-//! * activities (*insert* and *list*)
-//! * channel banners (*insert*)
-//! * channel sections (*delete*, *insert*, *list* and *update*)
-//! * channels (*list* and *update*)
-//! * guide categories (*list*)
-//! * i18n languages (*list*)
-//! * i18n regions (*list*)
-//! * live broadcasts (*bind*, *control*, *delete*, *insert*, *list*, *transition* and *update*)
-//! * live streams (*delete*, *insert*, *list* and *update*)
-//! * playlist items (*delete*, *insert*, *list* and *update*)
-//! * playlists (*delete*, *insert*, *list* and *update*)
-//! * search (*list*)
-//! * subscriptions (*delete*, *insert* and *list*)
-//! * thumbnails (*set*)
-//! * video categories (*list*)
-//! * videos (*delete*, *getRating*, *insert*, *list*, *rate* and *update*)
-//! * watermarks (*set* and *unset*)
+//! * activities ([*insert*](struct.ActivityInsertMethodBuilder.html) and [*list*](struct.ActivityListMethodBuilder.html))
+//! * channel banners ([*insert*](struct.ChannelBannerInsertMethodBuilder.html))
+//! * channel sections ([*delete*](struct.ChannelSectionDeleteMethodBuilder.html), [*insert*](struct.ChannelSectionInsertMethodBuilder.html), [*list*](struct.ChannelSectionListMethodBuilder.html) and [*update*](struct.ChannelSectionUpdateMethodBuilder.html))
+//! * channels ([*list*](struct.ChannelListMethodBuilder.html) and [*update*](struct.ChannelUpdateMethodBuilder.html))
+//! * guide categories ([*list*](struct.GuideCategoryListMethodBuilder.html))
+//! * i18n languages ([*list*](struct.I18nLanguageListMethodBuilder.html))
+//! * i18n regions ([*list*](struct.I18nRegionListMethodBuilder.html))
+//! * live broadcasts ([*bind*](struct.LiveBroadcastBindMethodBuilder.html), [*control*](struct.LiveBroadcastControlMethodBuilder.html), [*delete*](struct.LiveBroadcastDeleteMethodBuilder.html), [*insert*](struct.LiveBroadcastInsertMethodBuilder.html), [*list*](struct.LiveBroadcastListMethodBuilder.html), [*transition*](struct.LiveBroadcastTransitionMethodBuilder.html) and [*update*](struct.LiveBroadcastUpdateMethodBuilder.html))
+//! * live streams ([*delete*](struct.LiveStreamDeleteMethodBuilder.html), [*insert*](struct.LiveStreamInsertMethodBuilder.html), [*list*](struct.LiveStreamListMethodBuilder.html) and [*update*](struct.LiveStreamUpdateMethodBuilder.html))
+//! * playlist items ([*delete*](struct.PlaylistItemDeleteMethodBuilder.html), [*insert*](struct.PlaylistItemInsertMethodBuilder.html), [*list*](struct.PlaylistItemListMethodBuilder.html) and [*update*](struct.PlaylistItemUpdateMethodBuilder.html))
+//! * playlists ([*delete*](struct.PlaylistDeleteMethodBuilder.html), [*insert*](struct.PlaylistInsertMethodBuilder.html), [*list*](struct.PlaylistListMethodBuilder.html) and [*update*](struct.PlaylistUpdateMethodBuilder.html))
+//! * search ([*list*](struct.SearchListMethodBuilder.html))
+//! * subscriptions ([*delete*](struct.SubscriptionDeleteMethodBuilder.html), [*insert*](struct.SubscriptionInsertMethodBuilder.html) and [*list*](struct.SubscriptionListMethodBuilder.html))
+//! * thumbnails ([*set*](struct.ThumbnailSetMethodBuilder.html))
+//! * video categories ([*list*](struct.VideoCategoryListMethodBuilder.html))
+//! * videos ([*delete*](struct.VideoDeleteMethodBuilder.html), [*getRating*](struct.VideoGetRatingMethodBuilder.html), [*insert*](struct.VideoInsertMethodBuilder.html), [*list*](struct.VideoListMethodBuilder.html), [*rate*](struct.VideoRateMethodBuilder.html) and [*update*](struct.VideoUpdateMethodBuilder.html))
+//! * watermarks ([*set*](struct.WatermarkSetMethodBuilder.html) and [*unset*](struct.WatermarkUnsetMethodBuilder.html))
 //! 
 //! # Structure of this Library
 //! 
@@ -130,7 +130,7 @@ use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::default::Default;
 use std::io::{Read, Seek};
-use std::fs::File;
+use std::fs;
 
 pub use cmn::{Hub, ReadSeek, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType};
 
@@ -287,7 +287,7 @@ impl Part for VideoConversionPings {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.SubscriptionListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -422,10 +422,10 @@ impl Part for PlaylistLocalization {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * insert (request|response)
-/// * delete (none)
-/// * list (none)
-/// * update (request|response)
+/// * [insert](struct.PlaylistInsertMethodBuilder.html) (request|response)
+/// * [delete](struct.PlaylistDeleteMethodBuilder.html) (none)
+/// * [list](struct.PlaylistListMethodBuilder.html) (none)
+/// * [update](struct.PlaylistUpdateMethodBuilder.html) (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -478,7 +478,7 @@ impl Playlist {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.PlaylistItemListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -593,10 +593,10 @@ impl Part for ChannelAuditDetails {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * delete (none)
-/// * update (request|response)
-/// * list (none)
-/// * insert (request|response)
+/// * [delete](struct.LiveStreamDeleteMethodBuilder.html) (none)
+/// * [update](struct.LiveStreamUpdateMethodBuilder.html) (request|response)
+/// * [list](struct.LiveStreamListMethodBuilder.html) (none)
+/// * [insert](struct.LiveStreamInsertMethodBuilder.html) (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -646,7 +646,7 @@ impl LiveStream {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * set (response)
+/// * [set](struct.ThumbnailSetMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -761,7 +761,7 @@ impl Part for CdnSettings {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * getRating (response)
+/// * [getRating](struct.VideoGetRatingMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -873,7 +873,7 @@ impl Part for ChannelSectionContentDetails {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.I18nRegionListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -900,7 +900,7 @@ impl ResponseResult for I18nRegionListResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.LiveStreamListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -973,7 +973,7 @@ impl Part for ChannelBrandingSettings {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.PlaylistListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1008,7 +1008,7 @@ impl ResponseResult for PlaylistListResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * set (request)
+/// * [set](struct.WatermarkSetMethodBuilder.html) (request)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1106,10 +1106,10 @@ impl Part for InvideoPromotion {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * insert (request|response)
-/// * update (request|response)
-/// * list (none)
-/// * delete (none)
+/// * [insert](struct.PlaylistItemInsertMethodBuilder.html) (request|response)
+/// * [update](struct.PlaylistItemUpdateMethodBuilder.html) (request|response)
+/// * [list](struct.PlaylistItemListMethodBuilder.html) (none)
+/// * [delete](struct.PlaylistItemDeleteMethodBuilder.html) (none)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1156,7 +1156,7 @@ impl PlaylistItem {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.GuideCategoryListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1402,7 +1402,7 @@ impl Part for ActivityContentDetails {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (none)
+/// * [list](struct.I18nRegionListMethodBuilder.html) (none)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1505,12 +1505,12 @@ impl Part for SubscriptionContentDetails {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * rate (none)
-/// * getRating (none)
-/// * list (none)
-/// * insert (request|response)
-/// * update (request|response)
-/// * delete (none)
+/// * [rate](struct.VideoRateMethodBuilder.html) (none)
+/// * [getRating](struct.VideoGetRatingMethodBuilder.html) (none)
+/// * [list](struct.VideoListMethodBuilder.html) (none)
+/// * [insert](struct.VideoInsertMethodBuilder.html) (request|response)
+/// * [update](struct.VideoUpdateMethodBuilder.html) (request|response)
+/// * [delete](struct.VideoDeleteMethodBuilder.html) (none)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1747,9 +1747,9 @@ impl Part for PromotedItemId {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * insert (request|response)
-/// * list (none)
-/// * delete (none)
+/// * [insert](struct.SubscriptionInsertMethodBuilder.html) (request|response)
+/// * [list](struct.SubscriptionListMethodBuilder.html) (none)
+/// * [delete](struct.SubscriptionDeleteMethodBuilder.html) (none)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2018,7 +2018,7 @@ impl Part for GuideCategory {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.ChannelSectionListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2066,7 +2066,7 @@ impl Part for MonitorStreamInfo {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.I18nLanguageListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2110,13 +2110,13 @@ impl Part for LocalizedProperty {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * control (response)
-/// * insert (request|response)
-/// * list (none)
-/// * transition (response)
-/// * update (request|response)
-/// * delete (none)
-/// * bind (response)
+/// * [control](struct.LiveBroadcastControlMethodBuilder.html) (response)
+/// * [insert](struct.LiveBroadcastInsertMethodBuilder.html) (request|response)
+/// * [list](struct.LiveBroadcastListMethodBuilder.html) (none)
+/// * [transition](struct.LiveBroadcastTransitionMethodBuilder.html) (response)
+/// * [update](struct.LiveBroadcastUpdateMethodBuilder.html) (request|response)
+/// * [delete](struct.LiveBroadcastDeleteMethodBuilder.html) (none)
+/// * [bind](struct.LiveBroadcastBindMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2190,7 +2190,7 @@ impl Part for VideoFileDetailsVideoStream {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * set (none)
+/// * [set](struct.ThumbnailSetMethodBuilder.html) (none)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2213,8 +2213,8 @@ impl Resource for Thumbnail {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (none)
-/// * update (request|response)
+/// * [list](struct.ChannelListMethodBuilder.html) (none)
+/// * [update](struct.ChannelUpdateMethodBuilder.html) (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2380,7 +2380,7 @@ impl Part for SearchResult {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.VideoCategoryListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2462,7 +2462,7 @@ impl Part for VideoProcessingDetailsProcessingProgress {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.SearchListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2510,7 +2510,7 @@ impl Part for ChannelTopicDetails {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.VideoListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2634,7 +2634,7 @@ impl Part for ChannelStatus {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.ChannelListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2669,10 +2669,10 @@ impl ResponseResult for ChannelListResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * delete (none)
-/// * update (request|response)
-/// * list (none)
-/// * insert (request|response)
+/// * [delete](struct.ChannelSectionDeleteMethodBuilder.html) (none)
+/// * [update](struct.ChannelSectionUpdateMethodBuilder.html) (request|response)
+/// * [list](struct.ChannelSectionListMethodBuilder.html) (none)
+/// * [insert](struct.ChannelSectionInsertMethodBuilder.html) (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2719,7 +2719,7 @@ impl ChannelSection {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.LiveBroadcastListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2927,7 +2927,7 @@ impl Part for ContentRating {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (response)
+/// * [list](struct.ActivityListMethodBuilder.html) (response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -2962,7 +2962,7 @@ impl ResponseResult for ActivityListResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * insert (request|response)
+/// * [insert](struct.ActivityInsertMethodBuilder.html) (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -3138,7 +3138,7 @@ impl Part for ActivityContentDetailsBulletin {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * list (none)
+/// * [list](struct.I18nLanguageListMethodBuilder.html) (none)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -3383,7 +3383,7 @@ impl Part for SearchResultSnippet {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * insert (request|response)
+/// * [insert](struct.ChannelBannerInsertMethodBuilder.html) (request|response)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -5022,7 +5022,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
 /// # use youtube3::ChannelBannerResource;
-/// # use std::fs::File;
+/// # use std::fs;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5043,7 +5043,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_banners().insert(&req)
 ///              .on_behalf_of_content_owner("Stet")
-///              .upload_resumable(File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
+///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5069,15 +5069,28 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 
     }
 
-        /// TODO: FOO
+    /// Upload media all at once.
+    /// If the upload fails for whichever reason, all progress is lost.
+    ///
+    /// * *max size*: 6MB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
                 where R: Read {
-        self.doit(Some((stream, size, mime_type)), None::<(File, u64, mime::Mime)>, )
+        self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
-        /// TODO: BAR
+    /// Upload media in a resumeable fashion.
+    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// certain amount of time as the server maintains state temporarily.
+    /// 
+    /// TODO: Write more about how delegation works in this particular case.
+    ///
+    /// * *max size*: 6MB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
                 where RS: ReadSeek {
-        self.doit(None::<(File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
+        self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
 
     /// Sets the *request* property to the given value.
@@ -6325,7 +6338,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use std::fs::File;
+/// # use std::fs;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6341,7 +6354,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.thumbnails().set("videoId")
 ///              .on_behalf_of_content_owner("kasd")
-///              .upload_resumable(File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
+///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6367,15 +6380,28 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 
     }
 
-        /// TODO: FOO
+    /// Upload media all at once.
+    /// If the upload fails for whichever reason, all progress is lost.
+    ///
+    /// * *max size*: 2MB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
                 where R: Read {
-        self.doit(Some((stream, size, mime_type)), None::<(File, u64, mime::Mime)>, )
+        self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
-        /// TODO: BAR
+    /// Upload media in a resumeable fashion.
+    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// certain amount of time as the server maintains state temporarily.
+    /// 
+    /// TODO: Write more about how delegation works in this particular case.
+    ///
+    /// * *max size*: 2MB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
                 where RS: ReadSeek {
-        self.doit(None::<(File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
+        self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
 
     /// Sets the *video id* query property to the given value.
@@ -7134,7 +7160,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
 /// # use youtube3::Video;
-/// # use std::fs::File;
+/// # use std::fs;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7171,7 +7197,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 ///              .on_behalf_of_content_owner("accusam")
 ///              .notify_subscribers(true)
 ///              .auto_levels(false)
-///              .upload_resumable(File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
+///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7202,15 +7228,28 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 
     }
 
-        /// TODO: FOO
+    /// Upload media all at once.
+    /// If the upload fails for whichever reason, all progress is lost.
+    ///
+    /// * *max size*: 64GB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream' and 'video/*'
     pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
                 where R: Read {
-        self.doit(Some((stream, size, mime_type)), None::<(File, u64, mime::Mime)>, )
+        self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
-        /// TODO: BAR
+    /// Upload media in a resumeable fashion.
+    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// certain amount of time as the server maintains state temporarily.
+    /// 
+    /// TODO: Write more about how delegation works in this particular case.
+    ///
+    /// * *max size*: 64GB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream' and 'video/*'
     pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
                 where RS: ReadSeek {
-        self.doit(None::<(File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
+        self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
 
     /// Sets the *request* property to the given value.
@@ -9664,7 +9703,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
 /// # use youtube3::InvideoBranding;
-/// # use std::fs::File;
+/// # use std::fs;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9685,7 +9724,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().set(&req, "channelId")
 ///              .on_behalf_of_content_owner("sanctus")
-///              .upload_resumable(File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
+///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9712,15 +9751,28 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 
     }
 
-        /// TODO: FOO
+    /// Upload media all at once.
+    /// If the upload fails for whichever reason, all progress is lost.
+    ///
+    /// * *max size*: 10MB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
                 where R: Read {
-        self.doit(Some((stream, size, mime_type)), None::<(File, u64, mime::Mime)>, )
+        self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
-        /// TODO: BAR
+    /// Upload media in a resumeable fashion.
+    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// certain amount of time as the server maintains state temporarily.
+    /// 
+    /// TODO: Write more about how delegation works in this particular case.
+    ///
+    /// * *max size*: 10MB
+    /// * *multipart*: yes
+    /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
                 where RS: ReadSeek {
-        self.doit(None::<(File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
+        self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
 
     /// Sets the *request* property to the given value.

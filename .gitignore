@@ -1,5 +1,6 @@
 .timestamp
 .pyenv
+*.go
 *.pyc
 **target/
 .api.deps

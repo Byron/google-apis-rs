@@ -1,6 +1,6 @@
 <%! from util import (activity_split, put_and, md_italic, split_camelcase_s, canonical_type_name, 
                       rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment, markdown_rust_block,
-                      unindent_first_by, mangle_ident)  %>\
+                      unindent_first_by, mangle_ident, mb_type, singular)  %>\
 <%namespace name="util" file="util.mako"/>\
 
 ## If rust-doc is True, examples will be made to work for rust doc tests. Otherwise they are set 
@@ -18,7 +18,22 @@
 Handle the following *Resources* with ease ... 
 
 % for r in sorted(c.rta_map.keys()):
-* ${split_camelcase_s(r)} (${put_and(md_italic(sorted(c.rta_map[r])))})
+<%
+    md_methods = list()
+    for method in sorted(c.rta_map[r]):
+        if rust_doc:
+            md_methods.append("[*%s*](struct.%s.html)" % (method, mb_type(r, method)))
+        else:
+            # TODO: link to final destination, possibly just have one for all ...
+            md_methods.append("*%s*" % method)
+
+    md_resource = split_camelcase_s(r)
+    sn = singular(canonical_type_name(r))
+
+    if rust_ddoc and sn in schemas:
+        md_resource = '[%s](struct.%s.html)' % (md_resource, singular(canonical_type_name(r)))
+%>\
+* ${md_resource} (${put_and(md_methods)})
 % endfor
 
 # Structure of this Library

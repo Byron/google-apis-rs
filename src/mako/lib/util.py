@@ -43,7 +43,9 @@ NESTED_TYPE_MARKER = 'is_nested'
 SPACES_PER_TAB = 4
 
 REQUEST_PRIORITY = 100
-REQUEST_MARKER = 'RequestValue'
+REQUEST_MARKER_TRAIT = 'RequestValue'
+PART_MARKER_TRAIT = 'Part'
+NESTED_MARKER_TRAIT = 'NestedType'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
 
 PROTOCOL_TYPE_INFO = {
@@ -55,7 +57,7 @@ If the upload fails for whichever reason, all progress is lost.""",
         'default': 'fs::File',
         'where': 'Read',
         'suffix': '',
-        'example_value': 'fs::File::open("filepath.ext").unwrap(), 148, "application/octet-stream".parse().unwrap()'
+        'example_value': 'fs::File::open("file.ext").unwrap(), 148, "application/octet-stream".parse().unwrap()'
     },
     'resumable' : {
         'arg_name': 'resumeable_stream',
@@ -68,7 +70,7 @@ TODO: Write more about how delegation works in this particular case.""",
         'default': 'fs::File',
         'where': 'ReadSeek',
         'suffix': '_resumable',
-        'example_value': 'fs::File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap()'
+        'example_value': 'fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap()'
     }
 }
 
@@ -339,7 +341,7 @@ def schema_markers(s, c):
 
     activities = c.sta_map.get(s.id, dict())
     if len(activities) == 0:
-        res.add('Part')
+        res.add(PART_MARKER_TRAIT)
     else:
         # it should have at least one activity that matches it's type to qualify for the Resource trait
         for fqan, iot in activities.iteritems():
@@ -348,12 +350,12 @@ def schema_markers(s, c):
             if IO_RESPONSE in iot:
                 res.add('ResponseResult')
             if IO_REQUEST in iot:
-                res.add(REQUEST_MARKER)
+                res.add(REQUEST_MARKER_TRAIT)
         # end for each activity
     # end handle activites
 
     if is_nested_type(s):
-        res.add('NestedType')
+        res.add(NESTED_MARKER_TRAIT)
 
     return sorted(res)
 
