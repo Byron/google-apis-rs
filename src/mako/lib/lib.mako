@@ -1,6 +1,6 @@
 <%! from util import (activity_split, put_and, md_italic, split_camelcase_s, canonical_type_name, 
                       rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment, markdown_rust_block,
-                      unindent_first_by)  %>\
+                      unindent_first_by, mangle_ident)  %>\
 <%namespace name="util" file="util.mako"/>\
 
 ## If rust-doc is True, examples will be made to work for rust doc tests. Otherwise they are set 
@@ -47,7 +47,7 @@ Or specifically ...
 ```ignore
 % for an, a in c.sta_map[fr.id].iteritems():
 <% resource, activity = activity_split(an) %>\
-let r = hub.${resource}().${activity}(...).${api.terms.action}()
+let r = hub.${mangle_ident(resource)}().${activity}(...).${api.terms.action}()
 % endfor
 ```
 

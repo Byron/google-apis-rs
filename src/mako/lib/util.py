@@ -16,6 +16,8 @@ TYPE_MAP = {'boolean' : 'bool',
             'double'  : 'f64',
             'float'   : 'f32',
             'int32'   : 'i32',
+            'int64'   : 'i64',
+            'uint64'  : 'u64',
             'array'   : 'Vec',
             'string'  : 'String',
             'object'  : 'HashMap'}
@@ -23,8 +25,11 @@ TYPE_MAP = {'boolean' : 'bool',
 _words = [w.strip(',') for w in "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(' ')]
 RUST_TYPE_RND_MAP = {'bool': lambda: str(bool(randint(0, 1))).lower(),
                      'u32' : lambda: randint(0, 100),
+                     'u64' : lambda: randint(0, 100),
                      'f64' : lambda: random(),
+                     'f32' : lambda: random(),
                      'i32' : lambda: randint(-101, -1),
+                     'i64' : lambda: randint(-101, -1),
                      'String': lambda: '"%s"' % choice(_words),
 }
 TREF = '$ref'
@@ -218,7 +223,7 @@ def canonical_type_name(s):
     return s[:1].upper() + s[1:]
 
 def nested_type_name(sn, pn):
-    return sn + pn.capitalize()
+    return sn + canonical_type_name(pn)
 
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
@@ -273,7 +278,7 @@ def to_rust_type(sn, pn, t, allow_optionals=True):
 
 # return True if this property is actually a nested type
 def is_nested_type_property(t):
-    return 'type' in t and t.type == 'object' and 'properties' in t
+    return 'type' in t and t.type == 'object' and 'properties' in t or ('items' in t and 'properties' in t.items)
 
 # Return True if the schema is nested
 def is_nested_type(s):
@@ -295,16 +300,24 @@ def is_pod_property(p):
 
 # return an iterator yielding fake-schemas that identify a nested type
 def iter_nested_types(schemas):
+    def iter_nested_properties(prefix, properties):
+        for pn, p in properties.iteritems():
+            if is_nested_type_property(p):
+                ns = p.copy()
+                ns.id = nested_type_name(prefix, pn)
+                ns[NESTED_TYPE_MARKER] = True
+                if 'items' in p:
+                    ns.update(p.items.iteritems())
+                yield ns
+                for np in iter_nested_properties(prefix + canonical_type_name(pn), ns.properties):
+                    yield np
+                # can be recursive ... 
+        # end for ach property
     for s in schemas.values():
         if 'properties' not in s:
             continue
-        for pn, p in s.properties.iteritems():
-            if is_nested_type_property(p):
-                ns = p.copy()
-                ns.id = nested_type_name(s.id, pn)
-                ns[NESTED_TYPE_MARKER] = True
-                yield ns
-        # end for ach property
+        for np in iter_nested_properties(s.id, s.properties):
+            yield np
     # end for aech schma
 
 # Return sorted type names of all markers applicable to the given schema
@@ -353,7 +366,7 @@ def to_fqan(name, resource, method):
 
 # videos -> Video
 def activity_name_to_type_name(an):
-    return an.capitalize()[:-1]
+    return canonical_type_name(an)[:-1]
 
 # yields (resource, activity, activity_data)
 def iter_acitivities(c):
@@ -552,7 +565,7 @@ def mb_type_params_s(m):
 
 # return type name for a method on the given resource
 def mb_type(r, m):
-    return "%s%sMethodBuilder" % (singular(canonical_type_name(r)), m.capitalize())
+    return "%s%sMethodBuilder" % (singular(canonical_type_name(r)), canonical_type_name(m))
 
 def hub_type(canonicalName):
     return canonical_type_name(canonicalName)

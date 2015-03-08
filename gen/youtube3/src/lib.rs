@@ -48,12 +48,13 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.videos().rate(...).doit()
-//! let r = hub.videos().getRating(...).doit()
-//! let r = hub.videos().list(...).doit()
-//! let r = hub.videos().insert(...).doit()
-//! let r = hub.videos().update(...).doit()
-//! let r = hub.videos().delete(...).doit()
+//! let r = hub.live_broadcasts().control(...).doit()
+//! let r = hub.live_broadcasts().insert(...).doit()
+//! let r = hub.live_broadcasts().list(...).doit()
+//! let r = hub.live_broadcasts().transition(...).doit()
+//! let r = hub.live_broadcasts().update(...).doit()
+//! let r = hub.live_broadcasts().delete(...).doit()
+//! let r = hub.live_broadcasts().bind(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -126,7 +127,7 @@ use std::marker::PhantomData;
 use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::default::Default;
-use std::io::{Read, Seek}
+use std::io::{Read, Seek};
 
 pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType};
 
@@ -589,7 +590,9 @@ impl Part for ChannelAuditDetails {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * delete (none)
 /// * update (request|response)
+/// * list (none)
 /// * insert (request|response)
 /// 
 /// 
@@ -1102,6 +1105,8 @@ impl Part for InvideoPromotion {}
 /// 
 /// * insert (request|response)
 /// * update (request|response)
+/// * list (none)
+/// * delete (none)
 /// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
@@ -1223,7 +1228,7 @@ impl Part for ChannelSectionSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentDetails {
 	/// no description provided
-	pub related_playlists: HashMap<String, ChannelContentDetailsRelatedplaylists>,
+	pub related_playlists: HashMap<String, ChannelContentDetailsRelatedPlaylists>,
 	/// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.
 	pub google_plus_user_id: Option<String>,
 }
@@ -1389,7 +1394,13 @@ impl Part for ActivityContentDetails {}
 
 /// A i18nRegion resource identifies a region where YouTube is available.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (none)
+/// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nRegion {
@@ -1403,7 +1414,7 @@ pub struct I18nRegion {
 	pub id: Option<String>,
 }
 
-impl Part for I18nRegion {}
+impl Resource for I18nRegion {}
 
 
 /// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.
@@ -2098,8 +2109,10 @@ impl Part for LocalizedProperty {}
 /// 
 /// * control (response)
 /// * insert (request|response)
-/// * update (request|response)
+/// * list (none)
 /// * transition (response)
+/// * update (request|response)
+/// * delete (none)
 /// * bind (response)
 /// 
 /// 
@@ -2653,7 +2666,9 @@ impl ResponseResult for ChannelListResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * delete (none)
 /// * update (request|response)
+/// * list (none)
 /// * insert (request|response)
 /// 
 /// 
@@ -3115,7 +3130,13 @@ impl Part for ActivityContentDetailsBulletin {}
 
 /// An i18nLanguage resource identifies a UI language currently supported by YouTube.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * list (none)
+/// 
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct I18nLanguage {
@@ -3129,7 +3150,7 @@ pub struct I18nLanguage {
 	pub id: Option<String>,
 }
 
-impl Part for I18nLanguage {}
+impl Resource for I18nLanguage {}
 
 
 /// There is no detailed description.
@@ -3426,7 +3447,7 @@ impl Part for PageInfo {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
-pub struct ChannelContentDetailsRelatedplaylists {
+pub struct ChannelContentDetailsRelatedPlaylists {
 	/// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.
 	pub uploads: Option<String>,
 	/// The ID of the playlist that contains the channel"s watch history. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
@@ -3439,8 +3460,8 @@ pub struct ChannelContentDetailsRelatedplaylists {
 	pub watch_later: Option<String>,
 }
 
-impl NestedType for ChannelContentDetailsRelatedplaylists {}
-impl Part for ChannelContentDetailsRelatedplaylists {}
+impl NestedType for ChannelContentDetailsRelatedPlaylists {}
+impl Part for ChannelContentDetailsRelatedPlaylists {}
 
 
 
@@ -3941,8 +3962,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves the ratings that the authorized user gave to a list of specified videos.    
-    pub fn get_rating(&self, id: &str) -> VideoGetratingMethodBuilder<'a, C, NC, A> {
-        VideoGetratingMethodBuilder {
+    pub fn get_rating(&self, id: &str) -> VideoGetRatingMethodBuilder<'a, C, NC, A> {
+        VideoGetRatingMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
@@ -6511,7 +6532,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
-pub struct VideoGetratingMethodBuilder<'a, C, NC, A>
+pub struct VideoGetRatingMethodBuilder<'a, C, NC, A>
     where NC: 'a,
            C: 'a,
            A: 'a, {
@@ -6521,9 +6542,9 @@ pub struct VideoGetratingMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
 }
 
-impl<'a, C, NC, A> MethodBuilder for VideoGetratingMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for VideoGetRatingMethodBuilder<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> {
 
     
     /// Perform the operation you have build so far.
@@ -6539,7 +6560,7 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID.    
-    pub fn id(mut self, new_value: &str) -> VideoGetratingMethodBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> VideoGetRatingMethodBuilder<'a, C, NC, A> {
         self._id = new_value.to_string();
         return self;
     }
@@ -6549,7 +6570,7 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoGetratingMethodBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoGetRatingMethodBuilder<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         return self;
     }
