@@ -1,4 +1,6 @@
 use std::marker::MarkerTrait;
+use std::io::{Read, Seek};
+use std::borrow::BorrowMut;
 
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
@@ -28,3 +30,7 @@ pub trait Part: MarkerTrait {}
 /// Identifies types which are only used by other types internally.
 /// They have no special meaning, this trait just marks them for completeness.
 pub trait NestedType: MarkerTrait {}
+
+/// A utility to specify reader types which provide seeking capabilities too
+pub trait ReadSeek: Seek + Read {}
+impl<T: Seek + Read> ReadSeek for T {}

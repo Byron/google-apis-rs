@@ -6,7 +6,7 @@
                       schema_to_required_property, rust_copy_value_s, is_required_property,
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
-                      hub_type_params_s)
+                      hub_type_params_s, method_media_params)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -103,7 +103,7 @@ impl${mb_tparams} MethodBuilder for ${ThisType} {}
 
 impl${mb_tparams} ${ThisType} {
 
-    ${self._action_fn(resource, method, params, request_value, parts)}\
+${self._action_fn(resource, method, m, params, request_value, parts)}\
 
 ## SETTERS ###############
 % for p in params:
@@ -259,12 +259,49 @@ ${'.' + api.terms.action | indent_by(13)}();
 ## create an entire 'api.terms.action' method
 ###############################################################################################
 ###############################################################################################
-<%def name="_action_fn(resource, method, params, request_value, parts)">\
+<%def name="_action_fn(resource, method, m, params, request_value, parts)">\
+<%
+    media_params = method_media_params(m)
 
+    type_params = ''
+    where = ''
+    qualifier = 'pub '
+    add_args = ''
+    rtype = '()'
+
+    if media_params:
+        stripped = lambda s: s.strip().strip(',')
+        qualifier = ''
+        for p in media_params:
+            type_params += p.type.param + (' = %s, ' % p.type.default)
+            where += p.type.param + ': BorrowMut<' + p.type.where + '>, '
+            add_args += p.type.arg_name + ': ' + ('Option<%s>' % p.type.param) + ', '
+        # end for each param
+        where = ' where ' + stripped(where)
+        type_params = '<' + stripped(type_params) + '>'
+        add_args = ', ' + stripped(add_args)
+    # end handle media params
+
+    action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
+%>
     /// Perform the operation you have build so far.
-    /// Can only be called once !
     /// TODO: Build actual call
-    pub fn ${api.terms.action}(self) {
+    ${action_fn} {
 
     }
+
+    % for p in media_params:
+    pub fn ${api.terms.upload_action}${p.type.suffix}<${p.type.param}>(mut self, ${p.type.arg_name}: ${p.type.param}) -> ${rtype}
+                where ${p.type.param}: BorrowMut<${p.type.where}> {
+        self.${api.terms.action}(\
+        % for _ in range(0, loop.index):
+None, \
+        % endfor
+Some(${p.type.arg_name}), \
+        % for _ in range(loop.index+1, len(media_params)):
+None, \
+        % endfor
+)
+    }
+    % endfor
 </%def>

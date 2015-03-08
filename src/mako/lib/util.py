@@ -48,14 +48,20 @@ REQUEST_VALUE_PROPERTY_NAME = 'request'
 
 PROTOCOL_TYPE_INFO = {
     'simple' : {
+        'arg_name': 'stream',
         'param': 'R',
         'description': 'TODO: FOO',
-        'where': 'R: Read'
+        'default': 'File',
+        'where': 'Read',
+        'suffix': '',
     },
     'resumable' : {
+        'arg_name': 'resumeable_stream',
         'param': 'RS',
         'description': 'TODO: BAR',
-        'where': 'RS: Read+Seek'
+        'default': 'File',
+        'where': 'ReadSeek',
+        'suffix': '_resumable',
     }
 }
 
@@ -458,12 +464,10 @@ def method_media_params(m):
         # the pi (proto-info) dict can be shown to the user
         pi = {'multipart': proto.multipart, 'maxSize': mu.maxSize, 'mimeTypes': mu.accept}
         try:
-            ti = PROTOCOL_TYPE_INFO[pn]
+            ti = type(m)(PROTOCOL_TYPE_INFO[pn])
         except KeyError:
             raise AssertionError("media upload protocol '%s' is not implemented" % pn)
         p = type(m)({'name': 'media_%s',
-             'priority': 0, 
-             TREF: ti.member_type,
              'info': pi, 
              'path': proto.path, 
              'type': ti,

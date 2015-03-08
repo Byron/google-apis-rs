@@ -33,8 +33,9 @@ use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::default::Default;
 use std::io::{Read, Seek};
+use std::fs::File;
 
-pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType};
+pub use cmn::{Hub, ReadSeek, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType};
 
 
 // ##############

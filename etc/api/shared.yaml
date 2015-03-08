@@ -18,6 +18,8 @@ api:
   terms:
     # how to actually do something with the API
     action: doit
+    # when a resource is supposed to be uploaded
+    upload_action: upload
   templates:
   # all output directories are relative to the one set for the respective API
     - source: README.md
