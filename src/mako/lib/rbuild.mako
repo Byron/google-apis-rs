@@ -84,6 +84,7 @@ impl${rb_params} ${ThisType} {
             % for p in optional_props:
             ${property(p.name)}: Default::default(),
             % endfor
+            _additional_params: Default::default()
         }
     }
     % endfor ## for each activity

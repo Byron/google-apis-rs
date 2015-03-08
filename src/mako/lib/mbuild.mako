@@ -95,6 +95,8 @@ pub struct ${ThisType}
  ${activity_rust_type(p)},
     % endif
 % endfor
+## A generic map for additinal parameters. Sometimes you can set some that are documented online only
+    _additional_params: HashMap<String, String>
 }
 
 impl${mb_tparams} MethodBuilder for ${ThisType} {}
@@ -107,6 +109,17 @@ impl${mb_tparams} ${ThisType} {
 % for p in params:
 ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 % endfor
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    pub fn param(mut self, name: &str, value: &str) -> ${ThisType} {
+        self._additional_params.insert(name.to_string(), value.to_string());
+        self
+    }
 }
 </%def>
 
@@ -157,7 +170,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     % endif
     pub fn ${mangle_ident(p.name)}(mut self, ${value_name}: ${InType}) -> ${ThisType} {
         self.${property(p.name)} = ${new_value_copied};
-        return self;
+        self
     }
 </%def>
 

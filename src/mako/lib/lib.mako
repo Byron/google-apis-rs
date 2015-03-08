@@ -80,6 +80,7 @@ ${'##'} About builder arguments
 * pods are copy
 * strings are &str
 * request values are borrowed
+* additional parameters using `param()`
 
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
