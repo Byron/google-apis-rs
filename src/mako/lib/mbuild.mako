@@ -273,8 +273,8 @@ ${'.' + api.terms.action | indent_by(13)}();
         stripped = lambda s: s.strip().strip(',')
         qualifier = ''
         for p in media_params:
-            type_params += p.type.param + (' = %s, ' % p.type.default)
-            where += p.type.param + ': BorrowMut<' + p.type.where + '>, '
+            type_params += p.type.param + ', '
+            where += p.type.param + ': ' + p.type.where + ', '
             add_args += p.type.arg_name + ': ' + ('Option<%s>' % p.type.param) + ', '
         # end for each param
         where = ' where ' + stripped(where)
@@ -292,14 +292,14 @@ ${'.' + api.terms.action | indent_by(13)}();
 
     % for p in media_params:
     pub fn ${api.terms.upload_action}${p.type.suffix}<${p.type.param}>(mut self, ${p.type.arg_name}: ${p.type.param}) -> ${rtype}
-                where ${p.type.param}: BorrowMut<${p.type.where}> {
+                where ${p.type.param}: ${p.type.where} {
         self.${api.terms.action}(\
         % for _ in range(0, loop.index):
-None, \
+None::<${p.type.default}>, \
         % endfor
 Some(${p.type.arg_name}), \
         % for _ in range(loop.index+1, len(media_params)):
-None, \
+None::<${p.type.default}>, \
         % endfor
 )
     }
