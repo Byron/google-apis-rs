@@ -16,10 +16,6 @@ license = "${copyright.license_abbrev}"
 keywords = ["${name}", ${", ".join(util.estr(cargo.keywords))}]
 
 [dependencies]
-# Just to get hyper to work !
-openssl = "= 0.4.3"
-# Just to get hyper to work !
-cookie = "= 0.1.13"
 hyper = "*"
 rustc-serialize = "*"
 yup-oauth2 = "*"

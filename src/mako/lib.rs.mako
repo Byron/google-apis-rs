@@ -1,12 +1,11 @@
-<% 
-	from util import (iter_nested_types, new_context, rust_comment, rust_doc_comment,
-                      rust_module_doc_comment, rb_type, hub_type, mangle_ident)
-	nested_schemas = list(iter_nested_types(schemas))
+<%  
+    from util import (iter_nested_types, new_context, rust_comment, rust_doc_comment,
+                      rust_module_doc_comment, rb_type, hub_type, mangle_ident, hub_type_params_s)
 
- 	c = new_context(resources)
-
-	hub_type = hub_type(canonicalName)
-    
+    nested_schemas = list(iter_nested_types(schemas))
+    c = new_context(resources)
+    hub_type = hub_type(canonicalName)
+    ht_params = hub_type_params_s()
 %>\
 <%namespace name="lib" file="lib/lib.mako"/>\
 <%namespace name="util" file="lib/util.mako"/>\
@@ -69,20 +68,20 @@ macro_rules! map(
 <%block filter="rust_doc_comment">\
 <%lib:hub_usage_example/>\
 </%block>
-pub struct ${hub_type}<C, NC, A> {
+pub struct ${hub_type}${ht_params} {
     client: RefCell<C>,
     auth: RefCell<A>,
     _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for ${hub_type}<C, NC, A> {}
+impl<'a, C, NC, A> Hub for ${hub_type}${ht_params} {}
 
-impl<'a, C, NC, A> ${hub_type}<C, NC, A>
+impl<'a, C, NC, A> ${hub_type}${ht_params}
     where  NC: hyper::net::NetworkConnector,
             C: BorrowMut<hyper::Client<NC>> + 'a,
             A: oauth2::GetToken {
 
-    pub fn new(client: C, authenticator: A) -> ${hub_type}<C, NC, A> {
+    pub fn new(client: C, authenticator: A) -> ${hub_type}${ht_params} {
         ${hub_type} {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),

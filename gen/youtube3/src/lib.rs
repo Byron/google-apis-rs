@@ -103,6 +103,12 @@
 //! * Optionals needed for Json, otherwise I'd happily drop them
 //! * explain that examples use all response parts, even though they are shown for request values
 //! 
+//! ## About builder arguments
+//! 
+//! * pods are copy
+//! * strings are &str
+//! * request values are borrowed
+//! 
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
@@ -3481,17 +3487,17 @@ pub struct I18nLanguageMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for I18nLanguageMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> I18nLanguageMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a list of supported languages.    
-	pub fn list(&self, part: &str) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
-		I18nLanguageListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_hl: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of supported languages.    
+    pub fn list(&self, part: &str) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
+        I18nLanguageListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _hl: Default::default(),
+        }
+    }
 }
 
 
@@ -3536,21 +3542,21 @@ pub struct ChannelBannerMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelBannerMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Uploads a channel banner image to YouTube. This method represents the first two steps in a three-step process to update the banner image for a channel:
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Uploads a channel banner image to YouTube. This method represents the first two steps in a three-step process to update the banner image for a channel:
     /// 
     /// - Call the channelBanners.insert method to upload the binary image data to YouTube. The image must have a 16:9 aspect ratio and be at least 2120x1192 pixels.
     /// - Extract the url property's value from the response that the API returns for step 1.
     /// - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2.
-	pub fn insert(&self, request: &ChannelBannerResource) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
-		ChannelBannerInsertMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
+    pub fn insert(&self, request: &ChannelBannerResource) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
+        ChannelBannerInsertMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
 }
 
 
@@ -3595,56 +3601,56 @@ pub struct ChannelSectionMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelSectionMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns channelSection resources that match the API request criteria.    
-	pub fn list(&self, part: &str) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
-		ChannelSectionListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_on_behalf_of_content_owner: Default::default(),
-			_mine: Default::default(),
-			_id: Default::default(),
-			_channel_id: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Adds a channelSection for the authenticated user's channel.    
-	pub fn insert(&self, request: &ChannelSection) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
-		ChannelSectionInsertMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Deletes a channelSection.    
-	pub fn delete(&self, id: &str) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
-		ChannelSectionDeleteMethodBuilder {
-			hub: self.hub,
-			_id: id.to_string(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Update a channelSection.    
-	pub fn update(&self, request: &ChannelSection) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
-		ChannelSectionUpdateMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns channelSection resources that match the API request criteria.    
+    pub fn list(&self, part: &str) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
+        ChannelSectionListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _on_behalf_of_content_owner: Default::default(),
+            _mine: Default::default(),
+            _id: Default::default(),
+            _channel_id: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Adds a channelSection for the authenticated user's channel.    
+    pub fn insert(&self, request: &ChannelSection) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+        ChannelSectionInsertMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a channelSection.    
+    pub fn delete(&self, id: &str) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
+        ChannelSectionDeleteMethodBuilder {
+            hub: self.hub,
+            _id: id.to_string(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Update a channelSection.    
+    pub fn update(&self, request: &ChannelSection) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+        ChannelSectionUpdateMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
 }
 
 
@@ -3689,19 +3695,19 @@ pub struct GuideCategoryMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for GuideCategoryMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> GuideCategoryMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a list of categories that can be associated with YouTube channels.    
-	pub fn list(&self, part: &str) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
-		GuideCategoryListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_region_code: Default::default(),
-			_id: Default::default(),
-			_hl: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of categories that can be associated with YouTube channels.    
+    pub fn list(&self, part: &str) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
+        GuideCategoryListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _region_code: Default::default(),
+            _id: Default::default(),
+            _hl: Default::default(),
+        }
+    }
 }
 
 
@@ -3746,59 +3752,59 @@ pub struct PlaylistMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for PlaylistMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Creates a playlist.    
-	pub fn insert(&self, request: &Playlist) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
-		PlaylistInsertMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.    
-	pub fn list(&self, part: &str) -> PlaylistListMethodBuilder<'a, C, NC, A> {
-		PlaylistListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_page_token: Default::default(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-			_mine: Default::default(),
-			_max_results: Default::default(),
-			_id: Default::default(),
-			_channel_id: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Deletes a playlist.    
-	pub fn delete(&self, id: &str) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
-		PlaylistDeleteMethodBuilder {
-			hub: self.hub,
-			_id: id.to_string(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.    
-	pub fn update(&self, request: &Playlist) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
-		PlaylistUpdateMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a playlist.    
+    pub fn insert(&self, request: &Playlist) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
+        PlaylistInsertMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.    
+    pub fn list(&self, part: &str) -> PlaylistListMethodBuilder<'a, C, NC, A> {
+        PlaylistListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _page_token: Default::default(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _mine: Default::default(),
+            _max_results: Default::default(),
+            _id: Default::default(),
+            _channel_id: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a playlist.    
+    pub fn delete(&self, id: &str) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
+        PlaylistDeleteMethodBuilder {
+            hub: self.hub,
+            _id: id.to_string(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.    
+    pub fn update(&self, request: &Playlist) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+        PlaylistUpdateMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
 }
 
 
@@ -3843,17 +3849,17 @@ pub struct ThumbnailMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for ThumbnailMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Uploads a custom video thumbnail to YouTube and sets it for a video.    
-	pub fn set(&self, video_id: &str) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
-		ThumbnailSetMethodBuilder {
-			hub: self.hub,
-			_video_id: video_id.to_string(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Uploads a custom video thumbnail to YouTube and sets it for a video.    
+    pub fn set(&self, video_id: &str) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
+        ThumbnailSetMethodBuilder {
+            hub: self.hub,
+            _video_id: video_id.to_string(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
 }
 
 
@@ -3898,88 +3904,88 @@ pub struct VideoMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for VideoMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a list of videos that match the API request parameters.    
-	pub fn list(&self, part: &str) -> VideoListMethodBuilder<'a, C, NC, A> {
-		VideoListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_video_category_id: Default::default(),
-			_region_code: Default::default(),
-			_page_token: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-			_my_rating: Default::default(),
-			_max_results: Default::default(),
-			_locale: Default::default(),
-			_id: Default::default(),
-			_hl: Default::default(),
-			_chart: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Add a like or dislike rating to a video or remove a rating from a video.    
-	pub fn rate(&self, id: &str, rating: &str) -> VideoRateMethodBuilder<'a, C, NC, A> {
-		VideoRateMethodBuilder {
-			hub: self.hub,
-			_id: id.to_string(),
-			_rating: rating.to_string(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Retrieves the ratings that the authorized user gave to a list of specified videos.    
-	pub fn get_rating(&self, id: &str) -> VideoGetratingMethodBuilder<'a, C, NC, A> {
-		VideoGetratingMethodBuilder {
-			hub: self.hub,
-			_id: id.to_string(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Deletes a YouTube video.    
-	pub fn delete(&self, id: &str) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
-		VideoDeleteMethodBuilder {
-			hub: self.hub,
-			_id: id.to_string(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Updates a video's metadata.    
-	pub fn update(&self, request: &Video) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
-		VideoUpdateMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Uploads a video to YouTube and optionally sets the video's metadata.    
-	pub fn insert(&self, request: &Video) -> VideoInsertMethodBuilder<'a, C, NC, A> {
-		VideoInsertMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_stabilize: Default::default(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-			_notify_subscribers: Default::default(),
-			_auto_levels: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of videos that match the API request parameters.    
+    pub fn list(&self, part: &str) -> VideoListMethodBuilder<'a, C, NC, A> {
+        VideoListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _video_category_id: Default::default(),
+            _region_code: Default::default(),
+            _page_token: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _my_rating: Default::default(),
+            _max_results: Default::default(),
+            _locale: Default::default(),
+            _id: Default::default(),
+            _hl: Default::default(),
+            _chart: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Add a like or dislike rating to a video or remove a rating from a video.    
+    pub fn rate(&self, id: &str, rating: &str) -> VideoRateMethodBuilder<'a, C, NC, A> {
+        VideoRateMethodBuilder {
+            hub: self.hub,
+            _id: id.to_string(),
+            _rating: rating.to_string(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves the ratings that the authorized user gave to a list of specified videos.    
+    pub fn get_rating(&self, id: &str) -> VideoGetratingMethodBuilder<'a, C, NC, A> {
+        VideoGetratingMethodBuilder {
+            hub: self.hub,
+            _id: id.to_string(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a YouTube video.    
+    pub fn delete(&self, id: &str) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
+        VideoDeleteMethodBuilder {
+            hub: self.hub,
+            _id: id.to_string(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a video's metadata.    
+    pub fn update(&self, request: &Video) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
+        VideoUpdateMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Uploads a video to YouTube and optionally sets the video's metadata.    
+    pub fn insert(&self, request: &Video) -> VideoInsertMethodBuilder<'a, C, NC, A> {
+        VideoInsertMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _stabilize: Default::default(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _notify_subscribers: Default::default(),
+            _auto_levels: Default::default(),
+        }
+    }
 }
 
 
@@ -4024,47 +4030,47 @@ pub struct SubscriptionMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for SubscriptionMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Adds a subscription for the authenticated user's channel.    
-	pub fn insert(&self, request: &Subscription) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
-		SubscriptionInsertMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns subscription resources that match the API request criteria.    
-	pub fn list(&self, part: &str) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
-		SubscriptionListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_page_token: Default::default(),
-			_order: Default::default(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-			_my_subscribers: Default::default(),
-			_mine: Default::default(),
-			_max_results: Default::default(),
-			_id: Default::default(),
-			_for_channel_id: Default::default(),
-			_channel_id: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Deletes a subscription.    
-	pub fn delete(&self, id: &str) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
-		SubscriptionDeleteMethodBuilder {
-			hub: self.hub,
-			_id: id.to_string(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Adds a subscription for the authenticated user's channel.    
+    pub fn insert(&self, request: &Subscription) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
+        SubscriptionInsertMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns subscription resources that match the API request criteria.    
+    pub fn list(&self, part: &str) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
+        SubscriptionListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _page_token: Default::default(),
+            _order: Default::default(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _my_subscribers: Default::default(),
+            _mine: Default::default(),
+            _max_results: Default::default(),
+            _id: Default::default(),
+            _for_channel_id: Default::default(),
+            _channel_id: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a subscription.    
+    pub fn delete(&self, id: &str) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
+        SubscriptionDeleteMethodBuilder {
+            hub: self.hub,
+            _id: id.to_string(),
+        }
+    }
 }
 
 
@@ -4109,45 +4115,45 @@ pub struct SearchMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for SearchMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.    
-	pub fn list(&self, part: &str) -> SearchListMethodBuilder<'a, C, NC, A> {
-		SearchListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_video_type: Default::default(),
-			_video_syndicated: Default::default(),
-			_video_license: Default::default(),
-			_video_embeddable: Default::default(),
-			_video_duration: Default::default(),
-			_video_dimension: Default::default(),
-			_video_definition: Default::default(),
-			_video_category_id: Default::default(),
-			_video_caption: Default::default(),
-			_type_: Default::default(),
-			_topic_id: Default::default(),
-			_safe_search: Default::default(),
-			_relevance_language: Default::default(),
-			_related_to_video_id: Default::default(),
-			_region_code: Default::default(),
-			_q: Default::default(),
-			_published_before: Default::default(),
-			_published_after: Default::default(),
-			_page_token: Default::default(),
-			_order: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-			_max_results: Default::default(),
-			_location_radius: Default::default(),
-			_location: Default::default(),
-			_for_mine: Default::default(),
-			_for_content_owner: Default::default(),
-			_event_type: Default::default(),
-			_channel_type: Default::default(),
-			_channel_id: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.    
+    pub fn list(&self, part: &str) -> SearchListMethodBuilder<'a, C, NC, A> {
+        SearchListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _video_type: Default::default(),
+            _video_syndicated: Default::default(),
+            _video_license: Default::default(),
+            _video_embeddable: Default::default(),
+            _video_duration: Default::default(),
+            _video_dimension: Default::default(),
+            _video_definition: Default::default(),
+            _video_category_id: Default::default(),
+            _video_caption: Default::default(),
+            _type_: Default::default(),
+            _topic_id: Default::default(),
+            _safe_search: Default::default(),
+            _relevance_language: Default::default(),
+            _related_to_video_id: Default::default(),
+            _region_code: Default::default(),
+            _q: Default::default(),
+            _published_before: Default::default(),
+            _published_after: Default::default(),
+            _page_token: Default::default(),
+            _order: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _max_results: Default::default(),
+            _location_radius: Default::default(),
+            _location: Default::default(),
+            _for_mine: Default::default(),
+            _for_content_owner: Default::default(),
+            _event_type: Default::default(),
+            _channel_type: Default::default(),
+            _channel_id: Default::default(),
+        }
+    }
 }
 
 
@@ -4192,17 +4198,17 @@ pub struct I18nRegionMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for I18nRegionMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> I18nRegionMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a list of supported regions.    
-	pub fn list(&self, part: &str) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
-		I18nRegionListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_hl: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of supported regions.    
+    pub fn list(&self, part: &str) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
+        I18nRegionListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _hl: Default::default(),
+        }
+    }
 }
 
 
@@ -4247,60 +4253,60 @@ pub struct LiveStreamMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for LiveStreamMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.    
-	pub fn update(&self, request: &LiveStream) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
-		LiveStreamUpdateMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Deletes a video stream.    
-	pub fn delete(&self, id: &str) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
-		LiveStreamDeleteMethodBuilder {
-			hub: self.hub,
-			_id: id.to_string(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a list of video streams that match the API request parameters.    
-	pub fn list(&self, part: &str) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
-		LiveStreamListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_page_token: Default::default(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-			_mine: Default::default(),
-			_max_results: Default::default(),
-			_id: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.    
-	pub fn insert(&self, request: &LiveStream) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
-		LiveStreamInsertMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.    
+    pub fn update(&self, request: &LiveStream) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+        LiveStreamUpdateMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a video stream.    
+    pub fn delete(&self, id: &str) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+        LiveStreamDeleteMethodBuilder {
+            hub: self.hub,
+            _id: id.to_string(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of video streams that match the API request parameters.    
+    pub fn list(&self, part: &str) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
+        LiveStreamListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _page_token: Default::default(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _mine: Default::default(),
+            _max_results: Default::default(),
+            _id: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.    
+    pub fn insert(&self, request: &LiveStream) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+        LiveStreamInsertMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
 }
 
 
@@ -4345,37 +4351,37 @@ pub struct ChannelMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Updates a channel's metadata.    
-	pub fn update(&self, request: &Channel) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
-		ChannelUpdateMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a collection of zero or more channel resources that match the request criteria.    
-	pub fn list(&self, part: &str) -> ChannelListMethodBuilder<'a, C, NC, A> {
-		ChannelListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_page_token: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-			_my_subscribers: Default::default(),
-			_mine: Default::default(),
-			_max_results: Default::default(),
-			_managed_by_me: Default::default(),
-			_id: Default::default(),
-			_for_username: Default::default(),
-			_category_id: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a channel's metadata.    
+    pub fn update(&self, request: &Channel) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
+        ChannelUpdateMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a collection of zero or more channel resources that match the request criteria.    
+    pub fn list(&self, part: &str) -> ChannelListMethodBuilder<'a, C, NC, A> {
+        ChannelListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _page_token: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _my_subscribers: Default::default(),
+            _mine: Default::default(),
+            _max_results: Default::default(),
+            _managed_by_me: Default::default(),
+            _id: Default::default(),
+            _for_username: Default::default(),
+            _category_id: Default::default(),
+        }
+    }
 }
 
 
@@ -4420,55 +4426,55 @@ pub struct PlaylistItemMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for PlaylistItemMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Deletes a playlist item.    
-	pub fn delete(&self, id: &str) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
-		PlaylistItemDeleteMethodBuilder {
-			hub: self.hub,
-			_id: id.to_string(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.    
-	pub fn list(&self, part: &str) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
-		PlaylistItemListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_video_id: Default::default(),
-			_playlist_id: Default::default(),
-			_page_token: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-			_max_results: Default::default(),
-			_id: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Adds a resource to a playlist.    
-	pub fn insert(&self, request: &PlaylistItem) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
-		PlaylistItemInsertMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Modifies a playlist item. For example, you could update the item's position in the playlist.    
-	pub fn update(&self, request: &PlaylistItem) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
-		PlaylistItemUpdateMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a playlist item.    
+    pub fn delete(&self, id: &str) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
+        PlaylistItemDeleteMethodBuilder {
+            hub: self.hub,
+            _id: id.to_string(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.    
+    pub fn list(&self, part: &str) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
+        PlaylistItemListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _video_id: Default::default(),
+            _playlist_id: Default::default(),
+            _page_token: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _max_results: Default::default(),
+            _id: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Adds a resource to a playlist.    
+    pub fn insert(&self, request: &PlaylistItem) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+        PlaylistItemInsertMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Modifies a playlist item. For example, you could update the item's position in the playlist.    
+    pub fn update(&self, request: &PlaylistItem) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
+        PlaylistItemUpdateMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+        }
+    }
 }
 
 
@@ -4513,29 +4519,29 @@ pub struct WatermarkMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for WatermarkMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Uploads a watermark image to YouTube and sets it for a channel.    
-	pub fn set(&self, request: &InvideoBranding, channel_id: &str) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
-		WatermarkSetMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_channel_id: channel_id.to_string(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Deletes a watermark.    
-	pub fn unset(&self, channel_id: &str) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
-		WatermarkUnsetMethodBuilder {
-			hub: self.hub,
-			_channel_id: channel_id.to_string(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Uploads a watermark image to YouTube and sets it for a channel.    
+    pub fn set(&self, request: &InvideoBranding, channel_id: &str) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
+        WatermarkSetMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _channel_id: channel_id.to_string(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a watermark.    
+    pub fn unset(&self, channel_id: &str) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
+        WatermarkUnsetMethodBuilder {
+            hub: self.hub,
+            _channel_id: channel_id.to_string(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
 }
 
 
@@ -4580,105 +4586,105 @@ pub struct LiveBroadcastMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for LiveBroadcastMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Controls the settings for a slate that can be displayed in the broadcast stream.    
-	pub fn control(&self, id: &str, part: &str) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-		LiveBroadcastControlMethodBuilder {
-			hub: self.hub,
-			_id: id.to_string(),
-			_part: part.to_string(),
-			_walltime: Default::default(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-			_offset_time_ms: Default::default(),
-			_display_slate: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.    
-	pub fn update(&self, request: &LiveBroadcast) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
-		LiveBroadcastUpdateMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Creates a broadcast.    
-	pub fn insert(&self, request: &LiveBroadcast) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
-		LiveBroadcastInsertMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.    
-	pub fn bind(&self, id: &str, part: &str) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
-		LiveBroadcastBindMethodBuilder {
-			hub: self.hub,
-			_id: id.to_string(),
-			_part: part.to_string(),
-			_stream_id: Default::default(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a list of YouTube broadcasts that match the API request parameters.    
-	pub fn list(&self, part: &str) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-		LiveBroadcastListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_page_token: Default::default(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-			_mine: Default::default(),
-			_max_results: Default::default(),
-			_id: Default::default(),
-			_broadcast_status: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Deletes a broadcast.    
-	pub fn delete(&self, id: &str) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
-		LiveBroadcastDeleteMethodBuilder {
-			hub: self.hub,
-			_id: id.to_string(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.    
-	pub fn transition(&self, broadcast_status: &str, id: &str, part: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-		LiveBroadcastTransitionMethodBuilder {
-			hub: self.hub,
-			_broadcast_status: broadcast_status.to_string(),
-			_id: id.to_string(),
-			_part: part.to_string(),
-			_on_behalf_of_content_owner_channel: Default::default(),
-			_on_behalf_of_content_owner: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Controls the settings for a slate that can be displayed in the broadcast stream.    
+    pub fn control(&self, id: &str, part: &str) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+        LiveBroadcastControlMethodBuilder {
+            hub: self.hub,
+            _id: id.to_string(),
+            _part: part.to_string(),
+            _walltime: Default::default(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _offset_time_ms: Default::default(),
+            _display_slate: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.    
+    pub fn update(&self, request: &LiveBroadcast) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+        LiveBroadcastUpdateMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a broadcast.    
+    pub fn insert(&self, request: &LiveBroadcast) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+        LiveBroadcastInsertMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.    
+    pub fn bind(&self, id: &str, part: &str) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+        LiveBroadcastBindMethodBuilder {
+            hub: self.hub,
+            _id: id.to_string(),
+            _part: part.to_string(),
+            _stream_id: Default::default(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of YouTube broadcasts that match the API request parameters.    
+    pub fn list(&self, part: &str) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        LiveBroadcastListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _page_token: Default::default(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+            _mine: Default::default(),
+            _max_results: Default::default(),
+            _id: Default::default(),
+            _broadcast_status: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a broadcast.    
+    pub fn delete(&self, id: &str) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+        LiveBroadcastDeleteMethodBuilder {
+            hub: self.hub,
+            _id: id.to_string(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.    
+    pub fn transition(&self, broadcast_status: &str, id: &str, part: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+        LiveBroadcastTransitionMethodBuilder {
+            hub: self.hub,
+            _broadcast_status: broadcast_status.to_string(),
+            _id: id.to_string(),
+            _part: part.to_string(),
+            _on_behalf_of_content_owner_channel: Default::default(),
+            _on_behalf_of_content_owner: Default::default(),
+        }
+    }
 }
 
 
@@ -4723,19 +4729,19 @@ pub struct VideoCategoryMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for VideoCategoryMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoCategoryMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a list of categories that can be associated with YouTube videos.    
-	pub fn list(&self, part: &str) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
-		VideoCategoryListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_region_code: Default::default(),
-			_id: Default::default(),
-			_hl: Default::default(),
-		}
-	}
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of categories that can be associated with YouTube videos.    
+    pub fn list(&self, part: &str) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
+        VideoCategoryListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _region_code: Default::default(),
+            _id: Default::default(),
+            _hl: Default::default(),
+        }
+    }
 }
 
 
@@ -4780,37 +4786,37 @@ pub struct ActivityMethodsBuilder<'a, C, NC, A>
 impl<'a, C, NC, A> ResourceMethodsBuilder for ActivityMethodsBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.    
-	pub fn list(&self, part: &str) -> ActivityListMethodBuilder<'a, C, NC, A> {
-		ActivityListMethodBuilder {
-			hub: self.hub,
-			_part: part.to_string(),
-			_region_code: Default::default(),
-			_published_before: Default::default(),
-			_published_after: Default::default(),
-			_page_token: Default::default(),
-			_mine: Default::default(),
-			_max_results: Default::default(),
-			_home: Default::default(),
-			_channel_id: Default::default(),
-		}
-	}
-	
-	/// Create a builder to help you perform the following task:
-	///
-	/// Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.    
+    pub fn list(&self, part: &str) -> ActivityListMethodBuilder<'a, C, NC, A> {
+        ActivityListMethodBuilder {
+            hub: self.hub,
+            _part: part.to_string(),
+            _region_code: Default::default(),
+            _published_before: Default::default(),
+            _published_after: Default::default(),
+            _page_token: Default::default(),
+            _mine: Default::default(),
+            _max_results: Default::default(),
+            _home: Default::default(),
+            _channel_id: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
     /// 
     /// Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite.
-	pub fn insert(&self, request: &Activity) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
-		ActivityInsertMethodBuilder {
-			hub: self.hub,
-			_request: request.clone(),
-			_part: request.to_parts(),
-		}
-	}
+    pub fn insert(&self, request: &Activity) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
+        ActivityInsertMethodBuilder {
+            hub: self.hub,
+            _request: request.clone(),
+            _part: request.to_parts(),
+        }
+    }
 }
 
 
@@ -4830,6 +4836,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// 
 /// * *id*
 /// * *snippet*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -4851,9 +4858,10 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_languages().list("part")
-///         .hl("eos").doit();
+///              .hl("eos")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -4871,6 +4879,7 @@ impl<'a, C, NC, A> MethodBuilder for I18nLanguageListMethodBuilder<'a, C, NC, A>
 
 impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -4882,7 +4891,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -4935,14 +4944,15 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: ChannelBannerResource = Default::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_banners().insert(&req)
-///         .on_behalf_of_content_owner("Stet").doit();
+///              .on_behalf_of_content_owner("Stet")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -4960,6 +4970,7 @@ impl<'a, C, NC, A> MethodBuilder for ChannelBannerInsertMethodBuilder<'a, C, NC,
 
 impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -4999,6 +5010,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 /// * *id*
 /// * *snippet*
 /// * *contentDetails*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5020,12 +5032,13 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().list("part")
-///         .on_behalf_of_content_owner("sed")
-///         .mine(false)
-///         .id("ipsum")
-///         .channel_id("eos").doit();
+///              .on_behalf_of_content_owner("sed")
+///              .mine(false)
+///              .id("ipsum")
+///              .channel_id("eos")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5046,6 +5059,7 @@ impl<'a, C, NC, A> MethodBuilder for ChannelSectionListMethodBuilder<'a, C, NC, 
 
 impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -5057,7 +5071,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -5117,6 +5131,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *snippet*
 /// * *contentDetails*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5139,17 +5154,18 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: ChannelSection = Default::default();
 /// req.snippet = Default::default(); // is ChannelSectionSnippet
 /// req.content_details = Default::default(); // is ChannelSectionContentDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().insert(&req)
-///         .on_behalf_of_content_owner_channel("duo")
-///         .on_behalf_of_content_owner("sadipscing").doit();
+///              .on_behalf_of_content_owner_channel("duo")
+///              .on_behalf_of_content_owner("sadipscing")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5169,6 +5185,7 @@ impl<'a, C, NC, A> MethodBuilder for ChannelSectionInsertMethodBuilder<'a, C, NC
 
 impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -5180,7 +5197,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5197,7 +5214,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5261,9 +5278,10 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().delete("id")
-///         .on_behalf_of_content_owner("consetetur").doit();
+///              .on_behalf_of_content_owner("consetetur")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5281,6 +5299,7 @@ impl<'a, C, NC, A> MethodBuilder for ChannelSectionDeleteMethodBuilder<'a, C, NC
 
 impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -5320,6 +5339,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *snippet*
 /// * *contentDetails*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5342,16 +5362,17 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: ChannelSection = Default::default();
 /// req.snippet = Default::default(); // is ChannelSectionSnippet
 /// req.content_details = Default::default(); // is ChannelSectionContentDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().update(&req)
-///         .on_behalf_of_content_owner("ea").doit();
+///              .on_behalf_of_content_owner("ea")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5370,6 +5391,7 @@ impl<'a, C, NC, A> MethodBuilder for ChannelSectionUpdateMethodBuilder<'a, C, NC
 
 impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -5381,7 +5403,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5398,7 +5420,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5433,6 +5455,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *id*
 /// * *snippet*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5454,11 +5477,12 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.guide_categories().list("part")
-///         .region_code("sanctus")
-///         .id("invidunt")
-///         .hl("et").doit();
+///              .region_code("sanctus")
+///              .id("invidunt")
+///              .hl("et")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5478,6 +5502,7 @@ impl<'a, C, NC, A> MethodBuilder for GuideCategoryListMethodBuilder<'a, C, NC, A
 
 impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -5489,7 +5514,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -5538,6 +5563,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *snippet*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5560,17 +5586,18 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: Playlist = Default::default();
 /// req.status = Default::default(); // is PlaylistStatus
 /// req.snippet = Default::default(); // is PlaylistSnippet
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().insert(&req)
-///         .on_behalf_of_content_owner_channel("sit")
-///         .on_behalf_of_content_owner("takimata").doit();
+///              .on_behalf_of_content_owner_channel("sit")
+///              .on_behalf_of_content_owner("takimata")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5590,6 +5617,7 @@ impl<'a, C, NC, A> MethodBuilder for PlaylistInsertMethodBuilder<'a, C, NC, A> {
 
 impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -5601,7 +5629,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5618,7 +5646,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5667,6 +5695,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *status*
 /// * *contentDetails*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5688,15 +5717,16 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().list("part")
-///         .page_token("consetetur")
-///         .on_behalf_of_content_owner_channel("elitr,")
-///         .on_behalf_of_content_owner("sed")
-///         .mine(true)
-///         .max_results(60)
-///         .id("clita")
-///         .channel_id("sed").doit();
+///              .page_token("consetetur")
+///              .on_behalf_of_content_owner_channel("elitr")
+///              .on_behalf_of_content_owner("sed")
+///              .mine(true)
+///              .max_results(60)
+///              .id("clita")
+///              .channel_id("sed")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5720,6 +5750,7 @@ impl<'a, C, NC, A> MethodBuilder for PlaylistListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -5731,7 +5762,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -5837,9 +5868,10 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().delete("id")
-///         .on_behalf_of_content_owner("labore").doit();
+///              .on_behalf_of_content_owner("labore")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5857,6 +5889,7 @@ impl<'a, C, NC, A> MethodBuilder for PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 
 impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -5896,6 +5929,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *snippet*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5918,16 +5952,17 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: Playlist = Default::default();
 /// req.status = Default::default(); // is PlaylistStatus
 /// req.snippet = Default::default(); // is PlaylistSnippet
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().update(&req)
-///         .on_behalf_of_content_owner("kasd").doit();
+///              .on_behalf_of_content_owner("kasd")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5946,6 +5981,7 @@ impl<'a, C, NC, A> MethodBuilder for PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 
 impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -5957,7 +5993,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -5974,7 +6010,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6028,9 +6064,10 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.thumbnails().set("videoId")
-///         .on_behalf_of_content_owner("kasd").doit();
+///              .on_behalf_of_content_owner("kasd")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6048,6 +6085,7 @@ impl<'a, C, NC, A> MethodBuilder for ThumbnailSetMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -6096,6 +6134,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 /// * *status*
 /// * *suggestions*
 /// * *topicDetails*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -6117,18 +6156,19 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().list("part")
-///         .video_category_id("kasd")
-///         .region_code("ea")
-///         .page_token("rebum.")
-///         .on_behalf_of_content_owner("dolor")
-///         .my_rating("sadipscing")
-///         .max_results(10)
-///         .locale("sed")
-///         .id("et")
-///         .hl("gubergren,")
-///         .chart("diam").doit();
+///              .video_category_id("kasd")
+///              .region_code("ea")
+///              .page_token("rebum.")
+///              .on_behalf_of_content_owner("dolor")
+///              .my_rating("sadipscing")
+///              .max_results(10)
+///              .locale("sed")
+///              .id("et")
+///              .hl("gubergren")
+///              .chart("diam")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6155,6 +6195,7 @@ impl<'a, C, NC, A> MethodBuilder for VideoListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -6166,7 +6207,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -6305,9 +6346,10 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().rate("id", "rating")
-///         .on_behalf_of_content_owner("sed").doit();
+///              .on_behalf_of_content_owner("sed")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6326,6 +6368,7 @@ impl<'a, C, NC, A> MethodBuilder for VideoRateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -6392,9 +6435,10 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().get_rating("id")
-///         .on_behalf_of_content_owner("aliquyam").doit();
+///              .on_behalf_of_content_owner("aliquyam")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6412,6 +6456,7 @@ impl<'a, C, NC, A> MethodBuilder for VideoGetratingMethodBuilder<'a, C, NC, A> {
 
 impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -6468,9 +6513,10 @@ impl<'a, C, NC, A> VideoGetratingMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().delete("id")
-///         .on_behalf_of_content_owner("amet.").doit();
+///              .on_behalf_of_content_owner("amet.")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6488,6 +6534,7 @@ impl<'a, C, NC, A> MethodBuilder for VideoDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -6537,6 +6584,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 /// * *status*
 /// * *suggestions*
 /// * *topicDetails*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -6559,7 +6607,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: Video = Default::default();
 /// req.status = Default::default(); // is VideoStatus
 /// req.topic_details = Default::default(); // is VideoTopicDetails
@@ -6576,9 +6624,10 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().update(&req)
-///         .on_behalf_of_content_owner("clita").doit();
+///              .on_behalf_of_content_owner("clita")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6597,6 +6646,7 @@ impl<'a, C, NC, A> MethodBuilder for VideoUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -6608,7 +6658,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6635,7 +6685,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6694,6 +6744,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// * *status*
 /// * *suggestions*
 /// * *topicDetails*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -6716,7 +6767,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: Video = Default::default();
 /// req.status = Default::default(); // is VideoStatus
 /// req.topic_details = Default::default(); // is VideoTopicDetails
@@ -6733,13 +6784,14 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().insert(&req)
-///         .stabilize(true)
-///         .on_behalf_of_content_owner_channel("amet,")
-///         .on_behalf_of_content_owner("accusam")
-///         .notify_subscribers(true)
-///         .auto_levels(false).doit();
+///              .stabilize(true)
+///              .on_behalf_of_content_owner_channel("amet")
+///              .on_behalf_of_content_owner("accusam")
+///              .notify_subscribers(true)
+///              .auto_levels(false)
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6762,6 +6814,7 @@ impl<'a, C, NC, A> MethodBuilder for VideoInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -6773,7 +6826,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6800,7 +6853,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6881,6 +6934,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *snippet*
 /// * *contentDetails*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -6903,14 +6957,15 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: Subscription = Default::default();
 /// req.snippet = Default::default(); // is SubscriptionSnippet
 /// req.content_details = Default::default(); // is SubscriptionContentDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// let result = hub.subscriptions().insert(&req).doit();
+/// let result = hub.subscriptions().insert(&req)
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6928,6 +6983,7 @@ impl<'a, C, NC, A> MethodBuilder for SubscriptionInsertMethodBuilder<'a, C, NC, 
 
 impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -6939,7 +6995,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6956,7 +7012,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -6982,6 +7038,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 /// * *id*
 /// * *snippet*
 /// * *contentDetails*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7003,18 +7060,19 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().list("part")
-///         .page_token("est")
-///         .order("sit")
-///         .on_behalf_of_content_owner_channel("ipsum")
-///         .on_behalf_of_content_owner("erat,")
-///         .my_subscribers(false)
-///         .mine(true)
-///         .max_results(40)
-///         .id("voluptua.")
-///         .for_channel_id("dolor")
-///         .channel_id("amet,").doit();
+///              .page_token("est")
+///              .order("sit")
+///              .on_behalf_of_content_owner_channel("ipsum")
+///              .on_behalf_of_content_owner("erat")
+///              .my_subscribers(false)
+///              .mine(true)
+///              .max_results(40)
+///              .id("voluptua.")
+///              .for_channel_id("dolor")
+///              .channel_id("amet")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7041,6 +7099,7 @@ impl<'a, C, NC, A> MethodBuilder for SubscriptionListMethodBuilder<'a, C, NC, A>
 
 impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -7052,7 +7111,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -7181,7 +7240,8 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// let result = hub.subscriptions().delete("id").doit();
+/// let result = hub.subscriptions().delete("id")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7198,6 +7258,7 @@ impl<'a, C, NC, A> MethodBuilder for SubscriptionDeleteMethodBuilder<'a, C, NC, 
 
 impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -7227,6 +7288,7 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *id*
 /// * *snippet*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7248,37 +7310,38 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.search().list("part")
-///         .video_type("dolores")
-///         .video_syndicated("diam")
-///         .video_license("Lorem")
-///         .video_embeddable("kasd")
-///         .video_duration("elitr,")
-///         .video_dimension("At")
-///         .video_definition("sit")
-///         .video_category_id("clita")
-///         .video_caption("sanctus")
-///         .type_("dolor")
-///         .topic_id("diam")
-///         .safe_search("voluptua.")
-///         .relevance_language("diam")
-///         .related_to_video_id("nonumy")
-///         .region_code("dolor")
-///         .q("nonumy")
-///         .published_before("sit")
-///         .published_after("sed")
-///         .page_token("ipsum")
-///         .order("sed")
-///         .on_behalf_of_content_owner("At")
-///         .max_results(17)
-///         .location_radius("ea")
-///         .location("ut")
-///         .for_mine(true)
-///         .for_content_owner(true)
-///         .event_type("et")
-///         .channel_type("ipsum")
-///         .channel_id("eos").doit();
+///              .video_type("dolores")
+///              .video_syndicated("diam")
+///              .video_license("Lorem")
+///              .video_embeddable("kasd")
+///              .video_duration("elitr")
+///              .video_dimension("At")
+///              .video_definition("sit")
+///              .video_category_id("clita")
+///              .video_caption("sanctus")
+///              .type_("dolor")
+///              .topic_id("diam")
+///              .safe_search("voluptua.")
+///              .relevance_language("diam")
+///              .related_to_video_id("nonumy")
+///              .region_code("dolor")
+///              .q("nonumy")
+///              .published_before("sit")
+///              .published_after("sed")
+///              .page_token("ipsum")
+///              .order("sed")
+///              .on_behalf_of_content_owner("At")
+///              .max_results(17)
+///              .location_radius("ea")
+///              .location("ut")
+///              .for_mine(true)
+///              .for_content_owner(true)
+///              .event_type("et")
+///              .channel_type("ipsum")
+///              .channel_id("eos")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7324,6 +7387,7 @@ impl<'a, C, NC, A> MethodBuilder for SearchListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -7335,7 +7399,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -7596,6 +7660,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *id*
 /// * *snippet*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7617,9 +7682,10 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_regions().list("part")
-///         .hl("ut").doit();
+///              .hl("ut")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7637,6 +7703,7 @@ impl<'a, C, NC, A> MethodBuilder for I18nRegionListMethodBuilder<'a, C, NC, A> {
 
 impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -7648,7 +7715,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -7681,6 +7748,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *cdn*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7703,7 +7771,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: LiveStream = Default::default();
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
@@ -7712,10 +7780,11 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().update(&req)
-///         .on_behalf_of_content_owner_channel("elitr,")
-///         .on_behalf_of_content_owner("est").doit();
+///              .on_behalf_of_content_owner_channel("elitr")
+///              .on_behalf_of_content_owner("est")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7735,6 +7804,7 @@ impl<'a, C, NC, A> MethodBuilder for LiveStreamUpdateMethodBuilder<'a, C, NC, A>
 
 impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -7746,7 +7816,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -7765,7 +7835,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -7833,10 +7903,11 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().delete("id")
-///         .on_behalf_of_content_owner_channel("justo")
-///         .on_behalf_of_content_owner("et").doit();
+///              .on_behalf_of_content_owner_channel("justo")
+///              .on_behalf_of_content_owner("et")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7855,6 +7926,7 @@ impl<'a, C, NC, A> MethodBuilder for LiveStreamDeleteMethodBuilder<'a, C, NC, A>
 
 impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -7908,6 +7980,7 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *cdn*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7929,14 +8002,15 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().list("part")
-///         .page_token("et")
-///         .on_behalf_of_content_owner_channel("gubergren,")
-///         .on_behalf_of_content_owner("est")
-///         .mine(true)
-///         .max_results(78)
-///         .id("invidunt").doit();
+///              .page_token("et")
+///              .on_behalf_of_content_owner_channel("gubergren")
+///              .on_behalf_of_content_owner("est")
+///              .mine(true)
+///              .max_results(78)
+///              .id("invidunt")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7959,6 +8033,7 @@ impl<'a, C, NC, A> MethodBuilder for LiveStreamListMethodBuilder<'a, C, NC, A> {
 
 impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -7970,7 +8045,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8051,6 +8126,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *cdn*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8073,7 +8149,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: LiveStream = Default::default();
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
@@ -8082,10 +8158,11 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().insert(&req)
-///         .on_behalf_of_content_owner_channel("accusam")
-///         .on_behalf_of_content_owner("elitr,").doit();
+///              .on_behalf_of_content_owner_channel("accusam")
+///              .on_behalf_of_content_owner("elitr")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8105,6 +8182,7 @@ impl<'a, C, NC, A> MethodBuilder for LiveStreamInsertMethodBuilder<'a, C, NC, A>
 
 impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -8116,7 +8194,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8135,7 +8213,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8184,6 +8262,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *id*
 /// * *invideoPromotion*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8206,16 +8285,17 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: Channel = Default::default();
 /// req.invideo_promotion = Default::default(); // is InvideoPromotion
 /// req.id = Some("invidunt".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().update(&req)
-///         .on_behalf_of_content_owner("dolor").doit();
+///              .on_behalf_of_content_owner("dolor")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8234,6 +8314,7 @@ impl<'a, C, NC, A> MethodBuilder for ChannelUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -8245,7 +8326,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8262,7 +8343,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8301,6 +8382,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 /// * *statistics*
 /// * *topicDetails*
 /// * *invideoPromotion*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8322,17 +8404,18 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().list("part")
-///         .page_token("sit")
-///         .on_behalf_of_content_owner("justo")
-///         .my_subscribers(false)
-///         .mine(false)
-///         .max_results(49)
-///         .managed_by_me(true)
-///         .id("diam")
-///         .for_username("ipsum")
-///         .category_id("voluptua.").doit();
+///              .page_token("sit")
+///              .on_behalf_of_content_owner("justo")
+///              .my_subscribers(false)
+///              .mine(false)
+///              .max_results(49)
+///              .managed_by_me(true)
+///              .id("diam")
+///              .for_username("ipsum")
+///              .category_id("voluptua.")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8358,6 +8441,7 @@ impl<'a, C, NC, A> MethodBuilder for ChannelListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -8369,7 +8453,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8487,7 +8571,8 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// let result = hub.playlist_items().delete("id").doit();
+/// let result = hub.playlist_items().delete("id")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8504,6 +8589,7 @@ impl<'a, C, NC, A> MethodBuilder for PlaylistItemDeleteMethodBuilder<'a, C, NC, 
 
 impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -8535,6 +8621,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8556,14 +8643,15 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().list("part")
-///         .video_id("et")
-///         .playlist_id("sadipscing")
-///         .page_token("At")
-///         .on_behalf_of_content_owner("et")
-///         .max_results(25)
-///         .id("sanctus").doit();
+///              .video_id("et")
+///              .playlist_id("sadipscing")
+///              .page_token("At")
+///              .on_behalf_of_content_owner("et")
+///              .max_results(25)
+///              .id("sanctus")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8586,6 +8674,7 @@ impl<'a, C, NC, A> MethodBuilder for PlaylistItemListMethodBuilder<'a, C, NC, A>
 
 impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -8597,7 +8686,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -8675,6 +8764,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8697,7 +8787,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: PlaylistItem = Default::default();
 /// req.status = Default::default(); // is PlaylistItemStatus
 /// req.snippet = Default::default(); // is PlaylistItemSnippet
@@ -8705,9 +8795,10 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().insert(&req)
-///         .on_behalf_of_content_owner("duo").doit();
+///              .on_behalf_of_content_owner("duo")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8726,6 +8817,7 @@ impl<'a, C, NC, A> MethodBuilder for PlaylistItemInsertMethodBuilder<'a, C, NC, 
 
 impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -8737,7 +8829,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -8755,7 +8847,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -8792,6 +8884,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8814,7 +8907,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: PlaylistItem = Default::default();
 /// req.status = Default::default(); // is PlaylistItemStatus
 /// req.snippet = Default::default(); // is PlaylistItemSnippet
@@ -8822,7 +8915,8 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// let result = hub.playlist_items().update(&req).doit();
+/// let result = hub.playlist_items().update(&req)
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8840,6 +8934,7 @@ impl<'a, C, NC, A> MethodBuilder for PlaylistItemUpdateMethodBuilder<'a, C, NC, 
 
 impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -8851,7 +8946,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -8869,7 +8964,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -8915,14 +9010,15 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: InvideoBranding = Default::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().set(&req, "channelId")
-///         .on_behalf_of_content_owner("sanctus").doit();
+///              .on_behalf_of_content_owner("sanctus")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -8941,6 +9037,7 @@ impl<'a, C, NC, A> MethodBuilder for WatermarkSetMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -9004,9 +9101,10 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().unset("channelId")
-///         .on_behalf_of_content_owner("justo").doit();
+///              .on_behalf_of_content_owner("justo")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9024,6 +9122,7 @@ impl<'a, C, NC, A> MethodBuilder for WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 
 impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -9063,6 +9162,7 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9084,13 +9184,14 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().control("id", "part")
-///         .walltime("Stet")
-///         .on_behalf_of_content_owner_channel("et")
-///         .on_behalf_of_content_owner("amet.")
-///         .offset_time_ms("ea")
-///         .display_slate(false).doit();
+///              .walltime("Stet")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("amet.")
+///              .offset_time_ms("ea")
+///              .display_slate(false)
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9113,6 +9214,7 @@ impl<'a, C, NC, A> MethodBuilder for LiveBroadcastControlMethodBuilder<'a, C, NC
 
 impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -9134,7 +9236,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9211,6 +9313,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9233,7 +9336,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: LiveBroadcast = Default::default();
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
@@ -9242,10 +9345,11 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().update(&req)
-///         .on_behalf_of_content_owner_channel("ipsum")
-///         .on_behalf_of_content_owner("est").doit();
+///              .on_behalf_of_content_owner_channel("ipsum")
+///              .on_behalf_of_content_owner("est")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9265,6 +9369,7 @@ impl<'a, C, NC, A> MethodBuilder for LiveBroadcastUpdateMethodBuilder<'a, C, NC,
 
 impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -9276,7 +9381,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9295,7 +9400,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9348,6 +9453,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9370,7 +9476,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: LiveBroadcast = Default::default();
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
@@ -9379,10 +9485,11 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().insert(&req)
-///         .on_behalf_of_content_owner_channel("diam")
-///         .on_behalf_of_content_owner("dolores").doit();
+///              .on_behalf_of_content_owner_channel("diam")
+///              .on_behalf_of_content_owner("dolores")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9402,6 +9509,7 @@ impl<'a, C, NC, A> MethodBuilder for LiveBroadcastInsertMethodBuilder<'a, C, NC,
 
 impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -9413,7 +9521,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9432,7 +9540,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9483,6 +9591,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9504,11 +9613,12 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().bind("id", "part")
-///         .stream_id("erat,")
-///         .on_behalf_of_content_owner_channel("erat,")
-///         .on_behalf_of_content_owner("invidunt").doit();
+///              .stream_id("erat")
+///              .on_behalf_of_content_owner_channel("erat")
+///              .on_behalf_of_content_owner("invidunt")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9529,6 +9639,7 @@ impl<'a, C, NC, A> MethodBuilder for LiveBroadcastBindMethodBuilder<'a, C, NC, A
 
 impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -9550,7 +9661,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9607,6 +9718,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9628,15 +9740,16 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().list("part")
-///         .page_token("justo")
-///         .on_behalf_of_content_owner_channel("clita")
-///         .on_behalf_of_content_owner("clita")
-///         .mine(true)
-///         .max_results(75)
-///         .id("magna")
-///         .broadcast_status("sanctus").doit();
+///              .page_token("justo")
+///              .on_behalf_of_content_owner_channel("clita")
+///              .on_behalf_of_content_owner("clita")
+///              .mine(true)
+///              .max_results(75)
+///              .id("magna")
+///              .broadcast_status("sanctus")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9660,6 +9773,7 @@ impl<'a, C, NC, A> MethodBuilder for LiveBroadcastListMethodBuilder<'a, C, NC, A
 
 impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -9671,7 +9785,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9775,10 +9889,11 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().delete("id")
-///         .on_behalf_of_content_owner_channel("clita")
-///         .on_behalf_of_content_owner("ipsum").doit();
+///              .on_behalf_of_content_owner_channel("clita")
+///              .on_behalf_of_content_owner("ipsum")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9797,6 +9912,7 @@ impl<'a, C, NC, A> MethodBuilder for LiveBroadcastDeleteMethodBuilder<'a, C, NC,
 
 impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -9850,6 +9966,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 /// * *status*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9871,10 +9988,11 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().transition("broadcastStatus", "id", "part")
-///         .on_behalf_of_content_owner_channel("et")
-///         .on_behalf_of_content_owner("dolor").doit();
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("dolor")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9895,6 +10013,7 @@ impl<'a, C, NC, A> MethodBuilder for LiveBroadcastTransitionMethodBuilder<'a, C,
 
 impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -9926,7 +10045,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -9973,6 +10092,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *id*
 /// * *snippet*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9994,11 +10114,12 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.video_categories().list("part")
-///         .region_code("invidunt")
-///         .id("aliquyam")
-///         .hl("clita").doit();
+///              .region_code("invidunt")
+///              .id("aliquyam")
+///              .hl("clita")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -10018,6 +10139,7 @@ impl<'a, C, NC, A> MethodBuilder for VideoCategoryListMethodBuilder<'a, C, NC, A
 
 impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -10029,7 +10151,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -10077,6 +10199,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 /// * *id*
 /// * *snippet*
 /// * *contentDetails*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -10098,16 +10221,17 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().list("part")
-///         .region_code("sanctus")
-///         .published_before("no")
-///         .published_after("sit")
-///         .page_token("consetetur")
-///         .mine(false)
-///         .max_results(48)
-///         .home(true)
-///         .channel_id("amet,").doit();
+///              .region_code("sanctus")
+///              .published_before("no")
+///              .published_after("sit")
+///              .page_token("consetetur")
+///              .mine(false)
+///              .max_results(48)
+///              .home(true)
+///              .channel_id("amet")
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -10132,6 +10256,7 @@ impl<'a, C, NC, A> MethodBuilder for ActivityListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -10143,7 +10268,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *id*
@@ -10235,6 +10360,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *snippet*
 /// * *contentDetails*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -10257,14 +10383,15 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are random and not representative !
+/// // Values shown here are possibly random and not representative !
 /// let mut req: Activity = Default::default();
 /// req.snippet = Default::default(); // is ActivitySnippet
 /// req.content_details = Default::default(); // is ActivityContentDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
-/// let result = hub.activities().insert(&req).doit();
+/// let result = hub.activities().insert(&req)
+///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -10282,6 +10409,7 @@ impl<'a, C, NC, A> MethodBuilder for ActivityInsertMethodBuilder<'a, C, NC, A> {
 
 impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
 
+    
     /// Perform the operation you have build so far.
     /// Can only be called once !
     /// TODO: Build actual call
@@ -10293,7 +10421,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*
@@ -10310,7 +10438,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify 
     /// the parts you provide in addition to the ones you want in the response.
-
+    ///
     /// **Settable Parts**
     /// 
     /// * *snippet*

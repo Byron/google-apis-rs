@@ -5,7 +5,8 @@
                       split_camelcase_s, property, is_pod_property, TREF, method_io, IO_REQUEST, 
                       schema_to_required_property, rust_copy_value_s, is_required_property,
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
-                      indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts)
+                      indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
+                      hub_type_params_s)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -33,7 +34,8 @@
     hub_type_name = hub_type(canonicalName)
     m = c.fqan_map[to_fqan(name, resource, method)]
     # an identifier for a property. We prefix them to prevent clashes with the setters
-    ThisType = mb_type(resource, method) + "<'a, C, NC, A>"
+    mb_tparams = mb_type_params_s(m)
+    ThisType = mb_type(resource, method) + mb_tparams
 
     params, request_value = build_all_params(schemas, c, m, IO_REQUEST, REQUEST_VALUE_PROPERTY_NAME)
     part_prop = None
@@ -68,7 +70,7 @@ pub struct ${ThisType}
            C: 'a,
            A: 'a, {
 
-    hub: &'a ${hub_type_name}<C, NC, A>,
+    hub: &'a ${hub_type_name}${hub_type_params_s()},
 ## PROPERTIES ###############
 % for p in params:
     ${property(p.name)}:\
@@ -80,9 +82,9 @@ pub struct ${ThisType}
 % endfor
 }
 
-impl<'a, C, NC, A> MethodBuilder for ${ThisType} {}
+impl${mb_tparams} MethodBuilder for ${ThisType} {}
 
-impl<'a, C, NC, A> ${ThisType} {
+impl${mb_tparams} ${ThisType} {
 
     ${self._action_fn(resource, method, params, request_value, parts)}\
 

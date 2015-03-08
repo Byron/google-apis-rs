@@ -40,6 +40,8 @@ REQUEST_PRIORITY = 100
 REQUEST_MARKER = 'RequestValue'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
 
+HUB_TYPE_PARAMETERS = ('C', 'NC', 'A')
+
 # ==============================================================================
 ## @name Filters
 # ------------------------------------------------------------------------------
@@ -477,6 +479,21 @@ def library_name(name, version):
 # return type name of a resource method builder, from a resource name
 def rb_type(r):
     return "%sMethodsBuilder" % singular(canonical_type_name(r))
+
+def _to_type_params_s(p):
+    return '<%s>' % ', '.join(p)
+
+# return type parameters of a the hub, ready for use in Rust code
+def hub_type_params_s():
+    return _to_type_params_s(HUB_TYPE_PARAMETERS)
+
+# type parameters for a resource builder - keeps hub as borrow
+def rb_type_params_s():
+    return _to_type_params_s(("'a", ) + HUB_TYPE_PARAMETERS)
+
+# type params for the given method builder, as string suitable for Rust code
+def mb_type_params_s(m):
+    return _to_type_params_s(("'a", ) + HUB_TYPE_PARAMETERS)
 
 # return type name for a method on the given resource
 def mb_type(r, m):

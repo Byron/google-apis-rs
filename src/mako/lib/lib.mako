@@ -75,6 +75,12 @@ ${'##'} About parts
 * Optionals needed for Json, otherwise I'd happily drop them
 * explain that examples use all response parts, even though they are shown for request values
 
+${'##'} About builder arguments
+
+* pods are copy
+* strings are &str
+* request values are borrowed
+
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
 </%def>
