@@ -12,6 +12,8 @@ api:
   list:
     - name: youtube
       version: v3
+    - name: drive
+      version: v2
   base_path: "etc/api"
   terms:
     # how to actually do something with the API

@@ -1,17 +1,17 @@
+<%namespace name="lib" file="lib/lib.mako"/>\
+<%namespace name="util" file="lib/util.mako"/>\
+<%namespace name="rbuild" file="lib/rbuild.mako"/>\
+<%namespace name="mbuild" file="lib/mbuild.mako"/>\
+<%namespace name="schema" file="lib/schema.mako"/>\
 <%  
     from util import (iter_nested_types, new_context, rust_comment, rust_doc_comment,
                       rust_module_doc_comment, rb_type, hub_type, mangle_ident, hub_type_params_s)
 
     nested_schemas = list(iter_nested_types(schemas))
     c = new_context(resources)
-    hub_type = hub_type(canonicalName)
+    hub_type = hub_type(util.canonical_name())
     ht_params = hub_type_params_s()
 %>\
-<%namespace name="lib" file="lib/lib.mako"/>\
-<%namespace name="util" file="lib/util.mako"/>\
-<%namespace name="rbuild" file="lib/rbuild.mako"/>\
-<%namespace name="mbuild" file="lib/mbuild.mako"/>\
-<%namespace name="schema" file="lib/schema.mako"/>\
 <%block filter="rust_comment">\
 <%util:gen_info source="${self.uri}" />\
 </%block>
@@ -19,7 +19,7 @@
 <%block filter="rust_module_doc_comment">\
 ${lib.docs(c)}
 </%block>
-#![feature(core)]
+#![feature(core,io)]
 
 extern crate hyper;
 extern crate "rustc-serialize" as rustc_serialize;
@@ -32,6 +32,7 @@ use std::marker::PhantomData;
 use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::default::Default;
+use std::io::{Read, Seek}
 
 pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType};
 

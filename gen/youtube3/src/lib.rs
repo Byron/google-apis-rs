@@ -113,7 +113,7 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core)]
+#![feature(core,io)]
 
 extern crate hyper;
 extern crate "rustc-serialize" as rustc_serialize;
@@ -126,6 +126,7 @@ use std::marker::PhantomData;
 use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::default::Default;
+use std::io::{Read, Seek}
 
 pub use cmn::{Hub, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType};
 
@@ -4837,6 +4838,14 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// * *id*
 /// * *snippet*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5011,6 +5020,14 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5131,6 +5148,13 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *snippet*
 /// * *contentDetails*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
 ///
@@ -5340,6 +5364,13 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5456,6 +5487,14 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
 /// * *id*
 /// * *snippet*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -5563,6 +5602,13 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *snippet*
 /// * *status*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
 ///
@@ -5695,6 +5741,14 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *status*
 /// * *contentDetails*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
 ///
@@ -5930,6 +5984,13 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *status*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -6134,6 +6195,14 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 /// * *status*
 /// * *suggestions*
 /// * *topicDetails*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
 ///
@@ -6585,6 +6654,13 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> {
 /// * *suggestions*
 /// * *topicDetails*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -6744,6 +6820,14 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// * *status*
 /// * *suggestions*
 /// * *topicDetails*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.upload*
+/// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
 ///
@@ -6935,6 +7019,13 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7038,6 +7129,14 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
 /// * *id*
 /// * *snippet*
 /// * *contentDetails*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
 ///
@@ -7288,6 +7387,14 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *id*
 /// * *snippet*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
 ///
@@ -7661,6 +7768,14 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> {
 /// * *id*
 /// * *snippet*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -7748,6 +7863,10 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *cdn*
 /// * *status*
+///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
 ///
 /// # Example
 ///
@@ -7981,6 +8100,13 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
 /// * *cdn*
 /// * *status*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8127,6 +8253,10 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> {
 /// * *cdn*
 /// * *status*
 ///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8263,6 +8393,13 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
 /// * *id*
 /// * *invideoPromotion*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8382,6 +8519,15 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> {
 /// * *statistics*
 /// * *topicDetails*
 /// * *invideoPromotion*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+/// * *https://www.googleapis.com/auth/youtubepartner-channel-audit*
 ///
 /// # Example
 ///
@@ -8622,6 +8768,14 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
 /// * *contentDetails*
 /// * *status*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8765,6 +8919,13 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> {
 /// * *contentDetails*
 /// * *status*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -8884,6 +9045,13 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 /// * *status*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
 ///
@@ -9163,6 +9331,10 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
 /// * *contentDetails*
 /// * *status*
 ///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9314,6 +9486,10 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
 /// * *contentDetails*
 /// * *status*
 ///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9454,6 +9630,10 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
 /// * *contentDetails*
 /// * *status*
 ///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9592,6 +9772,10 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
 /// * *contentDetails*
 /// * *status*
 ///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -9718,6 +9902,13 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
 /// * *snippet*
 /// * *contentDetails*
 /// * *status*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
 ///
 /// # Example
 ///
@@ -9967,6 +10158,10 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
 /// * *contentDetails*
 /// * *status*
 ///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -10093,6 +10288,14 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
 /// * *id*
 /// * *snippet*
 ///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
+/// * *https://www.googleapis.com/auth/youtubepartner*
+///
 /// # Example
 ///
 /// Instantiate a resource method builder
@@ -10199,6 +10402,13 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> {
 /// * *id*
 /// * *snippet*
 /// * *contentDetails*
+///
+/// # Scopes
+///
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.readonly*
 ///
 /// # Example
 ///
@@ -10360,6 +10570,10 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> {
 /// 
 /// * *snippet*
 /// * *contentDetails*
+///
+/// # Scopes
+///
+/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
 ///
 /// # Example
 ///

@@ -31,7 +31,7 @@
 ###############################################################################################
 <%def name="new(resource, method, c)">\
 <% 
-    hub_type_name = hub_type(canonicalName)
+    hub_type_name = hub_type(util.canonical_name())
     m = c.fqan_map[to_fqan(name, resource, method)]
     # an identifier for a property. We prefix them to prevent clashes with the setters
     mb_tparams = mb_type_params_s(m)
@@ -62,7 +62,7 @@ ${part_desc | rust_doc_comment}
 ///
 /// You will need authorization for \
 % if len(m.scopes) > 1:
-at least one of the following scopes to make a valid call:
+at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 % for s in m.scopes:
 /// * *${s}*
@@ -167,7 +167,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 ###############################################################################################
 <%def name="usage(resource, method, params, request_value, parts)">\
 <%
-    hub_type_name = hub_type(canonicalName)
+    hub_type_name = hub_type(util.canonical_name())
     required_props, optional_props, part_prop = organize_params(params, request_value)
     is_string_value = lambda v: v.endswith('"')
 

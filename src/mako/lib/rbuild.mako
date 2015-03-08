@@ -14,7 +14,7 @@
 ###############################################################################################
 <%def name="new(resource, c)">\
 <% 
-    hub_type_name = hub_type(canonicalName)
+    hub_type_name = hub_type(util.canonical_name())
     rb_params = rb_type_params_s()
     ThisType = rb_type(resource) + rb_params
 %>\

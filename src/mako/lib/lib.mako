@@ -126,7 +126,7 @@ let mut hub = ${hub_type}::new(hyper::Client::new(), auth);\
 ${util.test_prelude()}\
 
 <%block filter="test_filter">\
-${self.test_hub(canonical_type_name(canonicalName))}\
+${self.test_hub(canonical_type_name(util.canonical_name()))}\
 </%block>
 </%block>
 </%def>

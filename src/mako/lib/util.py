@@ -14,6 +14,7 @@ TYPE_MAP = {'boolean' : 'bool',
             'number'  : USE_FORMAT,
             'uint32'  : 'u32',
             'double'  : 'f64',
+            'float'   : 'f32',
             'int32'   : 'i32',
             'array'   : 'Vec',
             'string'  : 'String',
@@ -39,6 +40,28 @@ SPACES_PER_TAB = 4
 REQUEST_PRIORITY = 100
 REQUEST_MARKER = 'RequestValue'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
+
+PROTOCOL_TYPE_INFO = {
+    'simple' : {
+        'param': 'R',
+        'description': 'TODO: FOO',
+        'where': 'R: Read'
+    },
+    'resumable' : {
+        'param': 'RS',
+        'description': 'TODO: BAR',
+        'where': 'RS: Read+Seek'
+    }
+}
+
+data_unit_multipliers = {
+    'kb': 1024,
+    'mb': 1024 ** 2,
+    'gb': 1024 ** 3,
+    'tb': 1024 ** 4,
+    'pb': 1024 ** 5,
+    '%': 1,
+}
 
 HUB_TYPE_PARAMETERS = ('C', 'NC', 'A')
 
@@ -342,7 +365,7 @@ def iter_acitivities(c):
 def method_params(m, required=None, location=None):
     res = list()
     po = m.get('parameterOrder', [])
-    for pn, p in m.parameters.iteritems():
+    for pn, p in m.get('parameters', dict()).iteritems():
         if required is not None and p.get('required', False) != required:
             continue
         if location is not None and p.get('location', '') != location:
@@ -406,7 +429,37 @@ def organize_params(params, request_value):
     # end for each property
     return required_props, optional_props, part_prop
 
-# returns method parameters based on whether we can make uploads
+# returns method parameters based on whether we can make uploads, and which protocols are supported
+# or empty list if there is no media upload
+def method_media_params(m):
+    if not m.get('supportsMediaUpload', False):
+        return []
+
+    mu = m.get('mediaUpload')
+    assert mu is not None
+
+    # actually, one of them is required, but we can't encode that ... 
+    # runtime will have to check
+    res = list()
+    for pn, proto in mu.protocols.iteritems():
+        # the pi (proto-info) dict can be shown to the user
+        pi = {'multipart': proto.multipart, 'maxSize': mu.maxSize, 'mimeTypes': mu.accept}
+        try:
+            ti = PROTOCOL_TYPE_INFO[pn]
+        except KeyError:
+            raise AssertionError("media upload protocol '%s' is not implemented" % pn)
+        p = type(m)({'name': 'media_%s',
+             'priority': 0, 
+             TREF: ti.member_type,
+             'info': pi, 
+             'path': proto.path, 
+             'type': ti,
+             'description': ti.description,
+             'max_size': size_to_bytes(mu.maxSize)})
+        res.append(p)
+    # end for each proto
+
+    return res
 
 # schemas, context, method(dict), 'request'|'response', request_prop_name -> (params, request_value|None)
 def build_all_params(schemas, c, m, n, npn):
@@ -525,3 +578,17 @@ def rnd_arg_val_for_type(tn):
         return str(RUST_TYPE_RND_MAP[tn]())
     except KeyError:
         return '&Default::default()'
+
+# Converts a size to the respective integer
+# size string like 1MB or 2TB, or 35.5KB
+def size_to_bytes(size):
+    unit = size[-2:].lower()
+    if unit[0] in '0123456789':
+        assert unit[1] in '0123456789'
+        return int(size)
+    # end handle no unit
+    try:
+        return int(data_unit_multipliers[unit] * float(size[:-2]))
+    except KeyError:
+        raise ValueError("Invalid unit: '%s'" % unit)
+    # end handle errors gracefully

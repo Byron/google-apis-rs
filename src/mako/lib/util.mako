@@ -31,3 +31,12 @@ extern crate "yup-oauth2" as oauth2;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate ${self.library_name()};
 </%def>
+
+## Define the canonical name, if present, or name otherwise
+<%def name="canonical_name()" buffered="True">\
+% if canonicalName is UNDEFINED:
+${name}\
+% else:
+${canonicalName}\
+% endif
+</%def>
