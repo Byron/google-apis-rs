@@ -24,6 +24,7 @@ ${lib.docs(c)}
 extern crate hyper;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate "yup-oauth2" as oauth2;
+extern crate mime;
 
 mod cmn;
 

@@ -78,7 +78,7 @@ the *${m.scopes[0]}* scope to make a valid call.
 /// Instantiate a resource method builder
 ///
 <%block filter="rust_doc_comment">\
-${self.usage(resource, method, params, request_value, parts)}\
+${self.usage(resource, method, m, params, request_value, parts)}\
 </%block>
 pub struct ${ThisType}
     where NC: 'a,
@@ -178,7 +178,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 ## creates usage docs the method builder
 ###############################################################################################
 ###############################################################################################
-<%def name="usage(resource, method, params, request_value, parts)">\
+<%def name="usage(resource, method, m, params, request_value, parts)">\
 <%
     hub_type_name = hub_type(util.canonical_name())
     required_props, optional_props, part_prop = organize_params(params, request_value)
@@ -202,12 +202,20 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     # end for each required property
     required_args = ', '.join(required_args)
 
+    media_params = method_media_params(m)
+
+    action_name = media_params and (api.terms.upload_action + media_params[-1].type.suffix) or api.terms.action
+    action_args = media_params and media_params[-1].type.example_value or ''
+
     random_value_warning = "Values shown here are possibly random and not representative !"
 %>\
 <%block filter="rust_doc_test_norun">\
 ${capture(util.test_prelude) | hide_rust_doc_test}\
 % if request_value:
 # use ${util.library_name()}::${request_value.id};
+% endif
+% if media_params:
+# use std::fs::File;
 % endif
 <%block filter="rust_test_fn_invisible">\
 ${capture(lib.test_hub, hub_type_name, comments=False) | hide_rust_doc_test}
@@ -237,7 +245,7 @@ ${rb_name}.${mangle_ident(spn)} = ${assignment}
 
 % endif
 // You can configure optional parameters by calling the respective setters at will, and
-// execute the final call using `${api.terms.action}()`.
+// execute the final call using `${action_name}(${action_args and '...' or ''})`.
 % if optional_props:
 // ${random_value_warning}
 % endif
@@ -249,7 +257,7 @@ let result = hub.${mangle_ident(resource)}().${mangle_ident(method)}(${required_
 </%block>\
 % endfor
 
-${'.' + api.terms.action | indent_by(13)}();
+${'.' + action_name | indent_by(13)}(${action_args});
 // TODO: show how to handle the result !
 </%block>
 </%block>\
@@ -275,7 +283,7 @@ ${'.' + api.terms.action | indent_by(13)}();
         for p in media_params:
             type_params += p.type.param + ', '
             where += p.type.param + ': ' + p.type.where + ', '
-            add_args += p.type.arg_name + ': ' + ('Option<%s>' % p.type.param) + ', '
+            add_args += p.type.arg_name + ': ' + ('Option<(%s, u64, mime::Mime)>' % p.type.param) + ', '
         # end for each param
         where = ' where ' + stripped(where)
         type_params = '<' + stripped(type_params) + '>'
@@ -291,15 +299,19 @@ ${'.' + api.terms.action | indent_by(13)}();
     }
 
     % for p in media_params:
-    pub fn ${api.terms.upload_action}${p.type.suffix}<${p.type.param}>(mut self, ${p.type.arg_name}: ${p.type.param}) -> ${rtype}
+    <% 
+        none_type = 'None::<(' + p.type.default + ', u64, mime::Mime)>' 
+    %>\
+    /// ${p.description}
+    pub fn ${api.terms.upload_action}${p.type.suffix}<${p.type.param}>(mut self, ${p.type.arg_name}: ${p.type.param}, size: u64, mime_type: mime::Mime) -> ${rtype}
                 where ${p.type.param}: ${p.type.where} {
         self.${api.terms.action}(\
         % for _ in range(0, loop.index):
-None::<${p.type.default}>, \
+${none_type}, \
         % endfor
-Some(${p.type.arg_name}), \
+Some((${p.type.arg_name}, size, mime_type)), \
         % for _ in range(loop.index+1, len(media_params)):
-None::<${p.type.default}>, \
+${none_type}, \
         % endfor
 )
     }

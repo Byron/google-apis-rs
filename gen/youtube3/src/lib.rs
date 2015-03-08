@@ -120,6 +120,7 @@
 extern crate hyper;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate "yup-oauth2" as oauth2;
+extern crate mime;
 
 mod cmn;
 
@@ -5021,6 +5022,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
 /// # use youtube3::ChannelBannerResource;
+/// # use std::fs::File;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5037,11 +5039,11 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> {
 /// let mut req: ChannelBannerResource = Default::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
+/// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_banners().insert(&req)
 ///              .on_behalf_of_content_owner("Stet")
-///              .doit();
+///              .upload_resumable(File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5063,18 +5065,19 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
 
     /// Perform the operation you have build so far.
     /// TODO: Build actual call
-    fn doit<R = File, RS = File>(mut self, stream: Option<R>, resumeable_stream: Option<RS>) -> () where R: BorrowMut<Read>, RS: BorrowMut<ReadSeek> {
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
 
     }
 
-    pub fn upload<R>(mut self, stream: R) -> ()
-                where R: BorrowMut<Read> {
-        let mut v: Option<File> = None;
-        self.doit(Some(stream), v)
+        /// TODO: FOO
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
+                where R: Read {
+        self.doit(Some((stream, size, mime_type)), None::<(File, u64, mime::Mime)>, )
     }
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS) -> ()
-                where RS: BorrowMut<ReadSeek> {
-        self.doit(None, Some(resumeable_stream), )
+        /// TODO: BAR
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
+                where RS: ReadSeek {
+        self.doit(None::<(File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
 
     /// Sets the *request* property to the given value.
@@ -6322,6 +6325,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
+/// # use std::fs::File;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6333,11 +6337,11 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
+/// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.thumbnails().set("videoId")
 ///              .on_behalf_of_content_owner("kasd")
-///              .doit();
+///              .upload_resumable(File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -6359,17 +6363,19 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> {
 
     /// Perform the operation you have build so far.
     /// TODO: Build actual call
-    fn doit<R = File, RS = File>(mut self, stream: Option<R>, resumeable_stream: Option<RS>) -> () where R: BorrowMut<Read>, RS: BorrowMut<ReadSeek> {
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
 
     }
 
-    pub fn upload<R>(mut self, stream: R) -> ()
-                where R: BorrowMut<Read> {
-        self.doit(Some(stream), None, )
+        /// TODO: FOO
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
+                where R: Read {
+        self.doit(Some((stream, size, mime_type)), None::<(File, u64, mime::Mime)>, )
     }
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS) -> ()
-                where RS: BorrowMut<ReadSeek> {
-        self.doit(None, Some(resumeable_stream), )
+        /// TODO: BAR
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
+                where RS: ReadSeek {
+        self.doit(None::<(File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
 
     /// Sets the *video id* query property to the given value.
@@ -7128,6 +7134,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
 /// # use youtube3::Video;
+/// # use std::fs::File;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7156,7 +7163,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 /// req.recording_details = Default::default(); // is VideoRecordingDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
+/// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().insert(&req)
 ///              .stabilize(true)
@@ -7164,7 +7171,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> {
 ///              .on_behalf_of_content_owner("accusam")
 ///              .notify_subscribers(true)
 ///              .auto_levels(false)
-///              .doit();
+///              .upload_resumable(File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7191,17 +7198,19 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> {
 
     /// Perform the operation you have build so far.
     /// TODO: Build actual call
-    fn doit<R = File, RS = File>(mut self, stream: Option<R>, resumeable_stream: Option<RS>) -> () where R: BorrowMut<Read>, RS: BorrowMut<ReadSeek> {
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
 
     }
 
-    pub fn upload<R>(mut self, stream: R) -> ()
-                where R: BorrowMut<Read> {
-        self.doit(Some(stream), None, )
+        /// TODO: FOO
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
+                where R: Read {
+        self.doit(Some((stream, size, mime_type)), None::<(File, u64, mime::Mime)>, )
     }
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS) -> ()
-                where RS: BorrowMut<ReadSeek> {
-        self.doit(None, Some(resumeable_stream), )
+        /// TODO: BAR
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
+                where RS: ReadSeek {
+        self.doit(None::<(File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
 
     /// Sets the *request* property to the given value.
@@ -9655,6 +9664,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
 /// # use youtube3::InvideoBranding;
+/// # use std::fs::File;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9671,11 +9681,11 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
 /// let mut req: InvideoBranding = Default::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
+/// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().set(&req, "channelId")
 ///              .on_behalf_of_content_owner("sanctus")
-///              .doit();
+///              .upload_resumable(File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -9698,17 +9708,19 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> {
 
     /// Perform the operation you have build so far.
     /// TODO: Build actual call
-    fn doit<R = File, RS = File>(mut self, stream: Option<R>, resumeable_stream: Option<RS>) -> () where R: BorrowMut<Read>, RS: BorrowMut<ReadSeek> {
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
 
     }
 
-    pub fn upload<R>(mut self, stream: R) -> ()
-                where R: BorrowMut<Read> {
-        self.doit(Some(stream), None, )
+        /// TODO: FOO
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
+                where R: Read {
+        self.doit(Some((stream, size, mime_type)), None::<(File, u64, mime::Mime)>, )
     }
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS) -> ()
-                where RS: BorrowMut<ReadSeek> {
-        self.doit(None, Some(resumeable_stream), )
+        /// TODO: BAR
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
+                where RS: ReadSeek {
+        self.doit(None::<(File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
 
     /// Sets the *request* property to the given value.

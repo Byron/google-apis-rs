@@ -54,6 +54,7 @@ PROTOCOL_TYPE_INFO = {
         'default': 'File',
         'where': 'Read',
         'suffix': '',
+        'example_value': 'File::open("filepath.ext").unwrap(), 148, "application/octet-stream".parse().unwrap()'
     },
     'resumable' : {
         'arg_name': 'resumeable_stream',
@@ -62,6 +63,7 @@ PROTOCOL_TYPE_INFO = {
         'default': 'File',
         'where': 'ReadSeek',
         'suffix': '_resumable',
+        'example_value': 'File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap()'
     }
 }
 
