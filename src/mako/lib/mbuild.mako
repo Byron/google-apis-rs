@@ -6,7 +6,7 @@
                       schema_to_required_property, rust_copy_value_s, is_required_property,
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
-                      hub_type_params_s, method_media_params)
+                      hub_type_params_s, method_media_params, enclose_in)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -215,7 +215,7 @@ ${capture(util.test_prelude) | hide_rust_doc_test}\
 # use ${util.library_name()}::${request_value.id};
 % endif
 % if media_params:
-# use std::fs::File;
+# use std::fs;
 % endif
 <%block filter="rust_test_fn_invisible">\
 ${capture(lib.test_hub, hub_type_name, comments=False) | hide_rust_doc_test}
@@ -299,10 +299,14 @@ ${'.' + action_name | indent_by(13)}(${action_args});
     }
 
     % for p in media_params:
-    <% 
+<% 
         none_type = 'None::<(' + p.type.default + ', u64, mime::Mime)>' 
-    %>\
-    /// ${p.description}
+%>\
+    ${p.description | rust_doc_comment, indent_all_but_first_by(1)}
+    ///
+    % for item_name, item in p.info.iteritems():
+    /// * *${split_camelcase_s(item_name)}*: ${isinstance(item, (list, tuple)) and put_and(enclose_in("'", item)) or str(item)}
+    % endfor
     pub fn ${api.terms.upload_action}${p.type.suffix}<${p.type.param}>(mut self, ${p.type.arg_name}: ${p.type.param}, size: u64, mime_type: mime::Mime) -> ${rtype}
                 where ${p.type.param}: ${p.type.where} {
         self.${api.terms.action}(\

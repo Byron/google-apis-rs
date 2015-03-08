@@ -50,20 +50,25 @@ PROTOCOL_TYPE_INFO = {
     'simple' : {
         'arg_name': 'stream',
         'param': 'R',
-        'description': 'TODO: FOO',
-        'default': 'File',
+        'description': """Upload media all at once.
+If the upload fails for whichever reason, all progress is lost.""",
+        'default': 'fs::File',
         'where': 'Read',
         'suffix': '',
-        'example_value': 'File::open("filepath.ext").unwrap(), 148, "application/octet-stream".parse().unwrap()'
+        'example_value': 'fs::File::open("filepath.ext").unwrap(), 148, "application/octet-stream".parse().unwrap()'
     },
     'resumable' : {
         'arg_name': 'resumeable_stream',
         'param': 'RS',
-        'description': 'TODO: BAR',
-        'default': 'File',
+        'description': """Upload media in a resumeable fashion.
+Even if the upload fails or is interrupted, it can be resumed for a 
+certain amount of time as the server maintains state temporarily.
+
+TODO: Write more about how delegation works in this particular case.""",
+        'default': 'fs::File',
         'where': 'ReadSeek',
         'suffix': '_resumable',
-        'example_value': 'File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap()'
+        'example_value': 'fs::File::open("filepath.ext").unwrap(), 282, "application/octet-stream".parse().unwrap()'
     }
 }
 
@@ -464,7 +469,7 @@ def method_media_params(m):
     res = list()
     for pn, proto in mu.protocols.iteritems():
         # the pi (proto-info) dict can be shown to the user
-        pi = {'multipart': proto.multipart, 'maxSize': mu.maxSize, 'mimeTypes': mu.accept}
+        pi = {'multipart': proto.multipart and 'yes' or 'no', 'maxSize': mu.maxSize, 'validMimeTypes': mu.accept}
         try:
             ti = type(m)(PROTOCOL_TYPE_INFO[pn])
         except KeyError:
