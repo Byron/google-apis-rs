@@ -57,6 +57,21 @@ ${m.description | rust_doc_comment}
 % if part_desc:
 ${part_desc | rust_doc_comment}
 ///
+% if m.get('scopes'):
+/// # Scopes
+///
+/// You will need authorization for \
+% if len(m.scopes) > 1:
+at least one of the following scopes to make a valid call:
+/// 
+% for s in m.scopes:
+/// * *${s}*
+% endfor
+% else:
+the *${m.scopes[0]}* scope to make a valid call.
+% endif
+% endif
+///
 % endif
 /// # Example
 ///

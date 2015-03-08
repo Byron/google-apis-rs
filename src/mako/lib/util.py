@@ -406,6 +406,8 @@ def organize_params(params, request_value):
     # end for each property
     return required_props, optional_props, part_prop
 
+# returns method parameters based on whether we can make uploads
+
 # schemas, context, method(dict), 'request'|'response', request_prop_name -> (params, request_value|None)
 def build_all_params(schemas, c, m, n, npn):
     request_value = method_io(schemas, c, m, n)
