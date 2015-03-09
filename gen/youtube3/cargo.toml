@@ -16,6 +16,7 @@ keywords = ["youtube", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+url = "*"
 rustc-serialize = "*"
 yup-oauth2 = "*"
 

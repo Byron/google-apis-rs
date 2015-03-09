@@ -275,6 +275,8 @@ ${'.' + action_name | indent_by(13)}(${action_args});
 ###############################################################################################
 <%def name="_action_fn(resource, method, m, params, request_value, parts)">\
 <%
+    import os.path
+    join_url = lambda b, e: b.strip('/') + e
     media_params = method_media_params(m)
 
     type_params = ''
@@ -343,11 +345,35 @@ ${'.' + action_name | indent_by(13)}(${action_args});
             params.push((&name, value.clone()));
         }
 
+        % if media_params:
+        let mut url = \
+            % for mp in media_params:
+            % if loop.first:
+if \
+            % else:
+else if \
+            % endif
+${mp.type.arg_name}.is_some() {
+                "${join_url(rootUrl, mp.path)}".to_string()
+            } \
+            % endfor
+else { 
+                unreachable!() 
+        };
+        % else:
+        let mut url = "${baseUrl}".to_string();
+        % endif
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         % if response_schema:
         let response: ${response_schema.id} = Default::default();
         % else:
         let response = ();
         % endif
+
+
         ## let mut params: Vec<(String, String)> = Vec::with_capacity
         ## // note: cloned() shouldn't be needed, see issue
         ## // https://github.com/servo/rust-url/issues/81

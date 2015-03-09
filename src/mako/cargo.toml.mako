@@ -18,6 +18,7 @@ keywords = ["${name}", ${", ".join(estr(cargo.keywords))}]
 [dependencies]
 hyper = "*"
 mime = "*"
+url = "*"
 rustc-serialize = "*"
 yup-oauth2 = "*"
 

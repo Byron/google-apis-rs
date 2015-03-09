@@ -24,6 +24,9 @@
 //! * [videos](struct.Video.html) ([*delete*](struct.VideoDeleteMethodBuilder.html), [*getRating*](struct.VideoGetRatingMethodBuilder.html), [*insert*](struct.VideoInsertMethodBuilder.html), [*list*](struct.VideoListMethodBuilder.html), [*rate*](struct.VideoRateMethodBuilder.html) and [*update*](struct.VideoUpdateMethodBuilder.html))
 //! * watermarks ([*set*](struct.WatermarkSetMethodBuilder.html) and [*unset*](struct.WatermarkUnsetMethodBuilder.html))
 //! 
+//! Everything else about the *YouTube* API can be found at the
+//! [official documentation site](https://developers.google.com/youtube/v3).
+//! 
 //! # Structure of this Library
 //! 
 //! The API is structured into the following primary items:
@@ -121,6 +124,7 @@ extern crate hyper;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate "yup-oauth2" as oauth2;
 extern crate mime;
+extern crate url;
 
 mod cmn;
 
@@ -5017,10 +5021,17 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: I18nLanguageListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -5148,10 +5159,23 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = if stream.is_some() {
+                "https://www.googleapis.com/upload/youtube/v3/channelBanners/insert".to_string()
+            } else if resumeable_stream.is_some() {
+                "https://www.googleapis.com/resumable/upload/youtube/v3/channelBanners/insert".to_string()
+            } else { 
+                unreachable!() 
+        };
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: ChannelBannerResource = Default::default();
+
+
 
 
         Result::Success(response)
@@ -5317,10 +5341,17 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: ChannelSectionListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -5496,10 +5527,17 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: ChannelSection = Default::default();
+
+
 
 
         Result::Success(response)
@@ -5650,10 +5688,17 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response = ();
+
+
 
 
         Result::Success(response)
@@ -5792,10 +5837,17 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: ChannelSection = Default::default();
+
+
 
 
         Result::Success(response)
@@ -5957,10 +6009,17 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: GuideCategoryListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -6125,10 +6184,17 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: Playlist = Default::default();
+
+
 
 
         Result::Success(response)
@@ -6324,10 +6390,17 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: PlaylistListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -6503,10 +6576,17 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response = ();
+
+
 
 
         Result::Success(response)
@@ -6645,10 +6725,17 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: Playlist = Default::default();
+
+
 
 
         Result::Success(response)
@@ -6790,10 +6877,23 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = if stream.is_some() {
+                "https://www.googleapis.com/upload/youtube/v3/thumbnails/set".to_string()
+            } else if resumeable_stream.is_some() {
+                "https://www.googleapis.com/resumable/upload/youtube/v3/thumbnails/set".to_string()
+            } else { 
+                unreachable!() 
+        };
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: ThumbnailSetResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -6998,10 +7098,17 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: VideoListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -7212,10 +7319,17 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response = ();
+
+
 
 
         Result::Success(response)
@@ -7340,10 +7454,17 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: VideoGetRatingResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -7458,10 +7579,17 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response = ();
+
+
 
 
         Result::Success(response)
@@ -7620,10 +7748,17 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: Video = Default::default();
+
+
 
 
         Result::Success(response)
@@ -7852,10 +7987,23 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = if stream.is_some() {
+                "https://www.googleapis.com/upload/youtube/v3/videos".to_string()
+            } else if resumeable_stream.is_some() {
+                "https://www.googleapis.com/resumable/upload/youtube/v3/videos".to_string()
+            } else { 
+                unreachable!() 
+        };
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: Video = Default::default();
+
+
 
 
         Result::Success(response)
@@ -8092,10 +8240,17 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: Subscription = Default::default();
+
+
 
 
         Result::Success(response)
@@ -8283,10 +8438,17 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: SubscriptionListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -8480,10 +8642,17 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response = ();
+
+
 
 
         Result::Success(response)
@@ -8741,10 +8910,17 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: SearchListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -9105,10 +9281,17 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: I18nRegionListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -9256,10 +9439,17 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: LiveStream = Default::default();
+
+
 
 
         Result::Success(response)
@@ -9421,10 +9611,17 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response = ();
+
+
 
 
         Result::Success(response)
@@ -9590,10 +9787,17 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: LiveStreamListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -9789,10 +9993,17 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: LiveStream = Default::default();
+
+
 
 
         Result::Success(response)
@@ -9971,10 +10182,17 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: Channel = Default::default();
+
+
 
 
         Result::Success(response)
@@ -10171,10 +10389,17 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: ChannelListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -10357,10 +10582,17 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response = ();
+
+
 
 
         Result::Success(response)
@@ -10505,10 +10737,17 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: PlaylistItemListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -10698,10 +10937,17 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: PlaylistItem = Default::default();
+
+
 
 
         Result::Success(response)
@@ -10863,10 +11109,17 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: PlaylistItem = Default::default();
+
+
 
 
         Result::Success(response)
@@ -11007,10 +11260,23 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = if stream.is_some() {
+                "https://www.googleapis.com/upload/youtube/v3/watermarks/set".to_string()
+            } else if resumeable_stream.is_some() {
+                "https://www.googleapis.com/resumable/upload/youtube/v3/watermarks/set".to_string()
+            } else { 
+                unreachable!() 
+        };
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response = ();
+
+
 
 
         Result::Success(response)
@@ -11155,10 +11421,17 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response = ();
+
+
 
 
         Result::Success(response)
@@ -11304,10 +11577,17 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: LiveBroadcast = Default::default();
+
+
 
 
         Result::Success(response)
@@ -11509,10 +11789,17 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: LiveBroadcast = Default::default();
+
+
 
 
         Result::Success(response)
@@ -11699,10 +11986,17 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: LiveBroadcast = Default::default();
+
+
 
 
         Result::Success(response)
@@ -11880,10 +12174,17 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: LiveBroadcast = Default::default();
+
+
 
 
         Result::Success(response)
@@ -12079,10 +12380,17 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: LiveBroadcastListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -12261,10 +12569,17 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response = ();
+
+
 
 
         Result::Success(response)
@@ -12411,10 +12726,17 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: LiveBroadcast = Default::default();
+
+
 
 
         Result::Success(response)
@@ -12591,10 +12913,17 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: VideoCategoryListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -12776,10 +13105,17 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: ActivityListResponse = Default::default();
+
+
 
 
         Result::Success(response)
@@ -12974,10 +13310,17 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             }
         }
         for (name, value) in self._additional_params.iter() {
-            params.push((name, value.clone()));
+            params.push((&name, value.clone()));
         }
 
+        let mut url = "https://www.googleapis.com/youtube/v3/".to_string();
+
+        url.push('?');
+        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
         let response: Activity = Default::default();
+
+
 
 
         Result::Success(response)

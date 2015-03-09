@@ -36,6 +36,11 @@ Handle the following *Resources* with ease ...
 * ${md_resource} (${put_and(md_methods)})
 % endfor
 
+% if documentationLink:
+Everything else about the *${util.canonical_name()}* API can be found at the
+[official documentation site](${documentationLink}).
+% endif
+
 # Structure of this Library
 
 The API is structured into the following primary items:

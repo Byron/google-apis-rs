@@ -27,6 +27,9 @@ Handle the following *Resources* with ease ...
 * videos (*delete*, *getRating*, *insert*, *list*, *rate* and *update*)
 * watermarks (*set* and *unset*)
 
+Everything else about the *YouTube* API can be found at the
+[official documentation site](https://developers.google.com/youtube/v3).
+
 # Structure of this Library
 
 The API is structured into the following primary items:
