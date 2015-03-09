@@ -115,6 +115,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
         ChannelSectionInsertMethodBuilder {
             hub: self.hub,
             _delegate: Default::default(),
+            _part: None,
         }
     }
 }
@@ -126,6 +127,7 @@ pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
 
     hub: &'a YouTube<C, NC, A>,
     _delegate: Option<&'a mut Delegate>,
+    _part: Option<String>,
 }
 
 
@@ -134,6 +136,10 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Perform the operation you have build so far.
     /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(1);
+        if self._part.is_none() {
+            self._parts = "parts from request value".to_string();
+        }
         if self._delegate.is_some() {
             self._delegate.as_mut().unwrap().connection_error(hyper::HttpError::HttpStatusError);
         }

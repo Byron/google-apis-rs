@@ -5004,8 +5004,12 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        params.push(("part", self._part.to_string()));
+        if self._hl.is_some() {
+            params.push(("hl", self._hl.unwrap().to_string()));
+        }
 
     }
 
@@ -5120,8 +5124,11 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -5264,8 +5271,21 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6);
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
+        if self._mine.is_some() {
+            params.push(("mine", self._mine.unwrap().to_string()));
+        }
+        if self._id.is_some() {
+            params.push(("id", self._id.unwrap().to_string()));
+        }
+        if self._channel_id.is_some() {
+            params.push(("channelId", self._channel_id.unwrap().to_string()));
+        }
 
     }
 
@@ -5421,8 +5441,18 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -5559,8 +5589,12 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        params.push(("id", self._id.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -5682,8 +5716,15 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -5825,8 +5866,18 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+        params.push(("part", self._part.to_string()));
+        if self._region_code.is_some() {
+            params.push(("regionCode", self._region_code.unwrap().to_string()));
+        }
+        if self._id.is_some() {
+            params.push(("id", self._id.unwrap().to_string()));
+        }
+        if self._hl.is_some() {
+            params.push(("hl", self._hl.unwrap().to_string()));
+        }
 
     }
 
@@ -5971,8 +6022,18 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -6136,8 +6197,30 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9);
+        params.push(("part", self._part.to_string()));
+        if self._page_token.is_some() {
+            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
+        if self._mine.is_some() {
+            params.push(("mine", self._mine.unwrap().to_string()));
+        }
+        if self._max_results.is_some() {
+            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        }
+        if self._id.is_some() {
+            params.push(("id", self._id.unwrap().to_string()));
+        }
+        if self._channel_id.is_some() {
+            params.push(("channelId", self._channel_id.unwrap().to_string()));
+        }
 
     }
 
@@ -6299,8 +6382,12 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        params.push(("id", self._id.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -6422,8 +6509,15 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -6551,8 +6645,12 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        params.push(("videoId", self._video_id.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -6716,8 +6814,39 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(12);
+        params.push(("part", self._part.to_string()));
+        if self._video_category_id.is_some() {
+            params.push(("videoCategoryId", self._video_category_id.unwrap().to_string()));
+        }
+        if self._region_code.is_some() {
+            params.push(("regionCode", self._region_code.unwrap().to_string()));
+        }
+        if self._page_token.is_some() {
+            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
+        if self._my_rating.is_some() {
+            params.push(("myRating", self._my_rating.unwrap().to_string()));
+        }
+        if self._max_results.is_some() {
+            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        }
+        if self._locale.is_some() {
+            params.push(("locale", self._locale.unwrap().to_string()));
+        }
+        if self._id.is_some() {
+            params.push(("id", self._id.unwrap().to_string()));
+        }
+        if self._hl.is_some() {
+            params.push(("hl", self._hl.unwrap().to_string()));
+        }
+        if self._chart.is_some() {
+            params.push(("chart", self._chart.unwrap().to_string()));
+        }
 
     }
 
@@ -6913,8 +7042,13 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+        params.push(("id", self._id.to_string()));
+        params.push(("rating", self._rating.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -7025,8 +7159,12 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        params.push(("id", self._id.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -7127,8 +7265,12 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        params.push(("id", self._id.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -7270,8 +7412,15 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -7471,8 +7620,27 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._stabilize.is_some() {
+            params.push(("stabilize", self._stabilize.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
+        if self._notify_subscribers.is_some() {
+            params.push(("notifySubscribers", self._notify_subscribers.unwrap().to_string()));
+        }
+        if self._auto_levels.is_some() {
+            params.push(("autoLevels", self._auto_levels.unwrap().to_string()));
+        }
 
     }
 
@@ -7695,8 +7863,12 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
 
     }
 
@@ -7843,8 +8015,39 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(12);
+        params.push(("part", self._part.to_string()));
+        if self._page_token.is_some() {
+            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        }
+        if self._order.is_some() {
+            params.push(("order", self._order.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
+        if self._my_subscribers.is_some() {
+            params.push(("mySubscribers", self._my_subscribers.unwrap().to_string()));
+        }
+        if self._mine.is_some() {
+            params.push(("mine", self._mine.unwrap().to_string()));
+        }
+        if self._max_results.is_some() {
+            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        }
+        if self._id.is_some() {
+            params.push(("id", self._id.unwrap().to_string()));
+        }
+        if self._for_channel_id.is_some() {
+            params.push(("forChannelId", self._for_channel_id.unwrap().to_string()));
+        }
+        if self._channel_id.is_some() {
+            params.push(("channelId", self._channel_id.unwrap().to_string()));
+        }
 
     }
 
@@ -8027,8 +8230,9 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2);
+        params.push(("id", self._id.to_string()));
 
     }
 
@@ -8188,8 +8392,96 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(31);
+        params.push(("part", self._part.to_string()));
+        if self._video_type.is_some() {
+            params.push(("videoType", self._video_type.unwrap().to_string()));
+        }
+        if self._video_syndicated.is_some() {
+            params.push(("videoSyndicated", self._video_syndicated.unwrap().to_string()));
+        }
+        if self._video_license.is_some() {
+            params.push(("videoLicense", self._video_license.unwrap().to_string()));
+        }
+        if self._video_embeddable.is_some() {
+            params.push(("videoEmbeddable", self._video_embeddable.unwrap().to_string()));
+        }
+        if self._video_duration.is_some() {
+            params.push(("videoDuration", self._video_duration.unwrap().to_string()));
+        }
+        if self._video_dimension.is_some() {
+            params.push(("videoDimension", self._video_dimension.unwrap().to_string()));
+        }
+        if self._video_definition.is_some() {
+            params.push(("videoDefinition", self._video_definition.unwrap().to_string()));
+        }
+        if self._video_category_id.is_some() {
+            params.push(("videoCategoryId", self._video_category_id.unwrap().to_string()));
+        }
+        if self._video_caption.is_some() {
+            params.push(("videoCaption", self._video_caption.unwrap().to_string()));
+        }
+        if self._type_.is_some() {
+            params.push(("type", self._type_.unwrap().to_string()));
+        }
+        if self._topic_id.is_some() {
+            params.push(("topicId", self._topic_id.unwrap().to_string()));
+        }
+        if self._safe_search.is_some() {
+            params.push(("safeSearch", self._safe_search.unwrap().to_string()));
+        }
+        if self._relevance_language.is_some() {
+            params.push(("relevanceLanguage", self._relevance_language.unwrap().to_string()));
+        }
+        if self._related_to_video_id.is_some() {
+            params.push(("relatedToVideoId", self._related_to_video_id.unwrap().to_string()));
+        }
+        if self._region_code.is_some() {
+            params.push(("regionCode", self._region_code.unwrap().to_string()));
+        }
+        if self._q.is_some() {
+            params.push(("q", self._q.unwrap().to_string()));
+        }
+        if self._published_before.is_some() {
+            params.push(("publishedBefore", self._published_before.unwrap().to_string()));
+        }
+        if self._published_after.is_some() {
+            params.push(("publishedAfter", self._published_after.unwrap().to_string()));
+        }
+        if self._page_token.is_some() {
+            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        }
+        if self._order.is_some() {
+            params.push(("order", self._order.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
+        if self._max_results.is_some() {
+            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        }
+        if self._location_radius.is_some() {
+            params.push(("locationRadius", self._location_radius.unwrap().to_string()));
+        }
+        if self._location.is_some() {
+            params.push(("location", self._location.unwrap().to_string()));
+        }
+        if self._for_mine.is_some() {
+            params.push(("forMine", self._for_mine.unwrap().to_string()));
+        }
+        if self._for_content_owner.is_some() {
+            params.push(("forContentOwner", self._for_content_owner.unwrap().to_string()));
+        }
+        if self._event_type.is_some() {
+            params.push(("eventType", self._event_type.unwrap().to_string()));
+        }
+        if self._channel_type.is_some() {
+            params.push(("channelType", self._channel_type.unwrap().to_string()));
+        }
+        if self._channel_id.is_some() {
+            params.push(("channelId", self._channel_id.unwrap().to_string()));
+        }
 
     }
 
@@ -8536,8 +8828,12 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        params.push(("part", self._part.to_string()));
+        if self._hl.is_some() {
+            params.push(("hl", self._hl.unwrap().to_string()));
+        }
 
     }
 
@@ -8665,8 +8961,18 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -8811,8 +9117,15 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+        params.push(("id", self._id.to_string()));
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -8949,8 +9262,27 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
+        params.push(("part", self._part.to_string()));
+        if self._page_token.is_some() {
+            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
+        if self._mine.is_some() {
+            params.push(("mine", self._mine.unwrap().to_string()));
+        }
+        if self._max_results.is_some() {
+            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        }
+        if self._id.is_some() {
+            params.push(("id", self._id.unwrap().to_string()));
+        }
 
     }
 
@@ -9126,8 +9458,18 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -9289,8 +9631,15 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -9449,8 +9798,36 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11);
+        params.push(("part", self._part.to_string()));
+        if self._page_token.is_some() {
+            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
+        if self._my_subscribers.is_some() {
+            params.push(("mySubscribers", self._my_subscribers.unwrap().to_string()));
+        }
+        if self._mine.is_some() {
+            params.push(("mine", self._mine.unwrap().to_string()));
+        }
+        if self._max_results.is_some() {
+            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        }
+        if self._managed_by_me.is_some() {
+            params.push(("managedByMe", self._managed_by_me.unwrap().to_string()));
+        }
+        if self._id.is_some() {
+            params.push(("id", self._id.unwrap().to_string()));
+        }
+        if self._for_username.is_some() {
+            params.push(("forUsername", self._for_username.unwrap().to_string()));
+        }
+        if self._category_id.is_some() {
+            params.push(("categoryId", self._category_id.unwrap().to_string()));
+        }
 
     }
 
@@ -9622,8 +9999,9 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2);
+        params.push(("id", self._id.to_string()));
 
     }
 
@@ -9739,8 +10117,27 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
+        params.push(("part", self._part.to_string()));
+        if self._video_id.is_some() {
+            params.push(("videoId", self._video_id.unwrap().to_string()));
+        }
+        if self._playlist_id.is_some() {
+            params.push(("playlistId", self._playlist_id.unwrap().to_string()));
+        }
+        if self._page_token.is_some() {
+            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
+        if self._max_results.is_some() {
+            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        }
+        if self._id.is_some() {
+            params.push(("id", self._id.unwrap().to_string()));
+        }
 
     }
 
@@ -9913,8 +10310,15 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -10062,8 +10466,12 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
 
     }
 
@@ -10190,8 +10598,12 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+        params.push(("channelId", self._channel_id.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -10322,8 +10734,12 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        params.push(("channelId", self._channel_id.to_string()));
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -10442,8 +10858,25 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
+        params.push(("id", self._id.to_string()));
+        params.push(("part", self._part.to_string()));
+        if self._walltime.is_some() {
+            params.push(("walltime", self._walltime.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
+        if self._offset_time_ms.is_some() {
+            params.push(("offsetTimeMs", self._offset_time_ms.unwrap().to_string()));
+        }
+        if self._display_slate.is_some() {
+            params.push(("displaySlate", self._display_slate.unwrap().to_string()));
+        }
 
     }
 
@@ -10625,8 +11058,18 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -10793,8 +11236,18 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -10951,8 +11404,19 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6);
+        params.push(("id", self._id.to_string()));
+        params.push(("part", self._part.to_string()));
+        if self._stream_id.is_some() {
+            params.push(("streamId", self._stream_id.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -11116,8 +11580,30 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9);
+        params.push(("part", self._part.to_string()));
+        if self._page_token.is_some() {
+            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
+        if self._mine.is_some() {
+            params.push(("mine", self._mine.unwrap().to_string()));
+        }
+        if self._max_results.is_some() {
+            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        }
+        if self._id.is_some() {
+            params.push(("id", self._id.unwrap().to_string()));
+        }
+        if self._broadcast_status.is_some() {
+            params.push(("broadcastStatus", self._broadcast_status.unwrap().to_string()));
+        }
 
     }
 
@@ -11279,8 +11765,15 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+        params.push(("id", self._id.to_string()));
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -11408,8 +11901,17 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6);
+        params.push(("broadcastStatus", self._broadcast_status.to_string()));
+        params.push(("id", self._id.to_string()));
+        params.push(("part", self._part.to_string()));
+        if self._on_behalf_of_content_owner_channel.is_some() {
+            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        }
+        if self._on_behalf_of_content_owner.is_some() {
+            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        }
 
     }
 
@@ -11566,8 +12068,18 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+        params.push(("part", self._part.to_string()));
+        if self._region_code.is_some() {
+            params.push(("regionCode", self._region_code.unwrap().to_string()));
+        }
+        if self._id.is_some() {
+            params.push(("id", self._id.unwrap().to_string()));
+        }
+        if self._hl.is_some() {
+            params.push(("hl", self._hl.unwrap().to_string()));
+        }
 
     }
 
@@ -11714,8 +12226,33 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10);
+        params.push(("part", self._part.to_string()));
+        if self._region_code.is_some() {
+            params.push(("regionCode", self._region_code.unwrap().to_string()));
+        }
+        if self._published_before.is_some() {
+            params.push(("publishedBefore", self._published_before.unwrap().to_string()));
+        }
+        if self._published_after.is_some() {
+            params.push(("publishedAfter", self._published_after.unwrap().to_string()));
+        }
+        if self._page_token.is_some() {
+            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        }
+        if self._mine.is_some() {
+            params.push(("mine", self._mine.unwrap().to_string()));
+        }
+        if self._max_results.is_some() {
+            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        }
+        if self._home.is_some() {
+            params.push(("home", self._home.unwrap().to_string()));
+        }
+        if self._channel_id.is_some() {
+            params.push(("channelId", self._channel_id.unwrap().to_string()));
+        }
 
     }
 
@@ -11896,8 +12433,12 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     pub fn doit(mut self) -> () {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+        if self._part.len() == 0 {
+            self._part = self._request.to_parts();
+        }
+        params.push(("part", self._part.to_string()));
 
     }
 

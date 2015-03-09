@@ -2,7 +2,7 @@
     from util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
                       rb_type, mb_type, singular, hub_type, to_fqan, indent_all_but_first_by,
                       method_params, activity_rust_type, mangle_ident, activity_input_type, get_word,
-                      split_camelcase_s, property, is_pod_property, TREF, method_io, IO_REQUEST, 
+                      split_camelcase_s, property, is_pod_property, TREF, IO_REQUEST, 
                       schema_to_required_property, rust_copy_value_s, is_required_property,
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
@@ -295,11 +295,55 @@ ${'.' + action_name | indent_by(13)}(${action_args});
     # end handle media params
 
     action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
+
+    field_params = [p for p in params if p.get('is_query_param', True)]
 %>
     /// Perform the operation you have build so far.
-    /// TODO: Build actual call
     ${action_fn} {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params)});
+        % for p in field_params:
+<%
+    pname = 'self.' + property(p.name)    # property identifier
+%>\
+        ## parts can also be derived from the request, but we do that only if it's not set
+        % if p.name == 'part' and request_value:
+        % if not is_required_property(p):
+        if ${pname}.is_none() {
+            ${pname} = Some(self.${property(REQUEST_VALUE_PROPERTY_NAME)}.to_parts());
+        }
+        % else:
+        if ${pname}.len() == 0 {
+            ${pname} = self.${property(REQUEST_VALUE_PROPERTY_NAME)}.to_parts();
+        }
+        % endif
+        % endif
+        % if not is_required_property(p):
+        if ${pname}.is_some() {
+            params.push(("${p.name}", ${pname}.unwrap().to_string()));
+        }
+        % else:
+        params.push(("${p.name}", ${pname}.to_string()));
+        % endif
+        % endfor
+        ## Additional params - may not overlap with optional params
+        ## let mut params: Vec<(String, String)> = Vec::with_capacity
+        ## // note: cloned() shouldn't be needed, see issue
+        ## // https://github.com/servo/rust-url/issues/81
+        ## let req = form_urlencoded::serialize(
+        ##           [("client_id", client_id),
+        ##            ("scope", scopes.into_iter()
+        ##                            .map(|s| s.as_slice())
+        ##                            .intersperse(" ")
+        ##                            .collect::<String>()
+        ##                            .as_slice())].iter().cloned());
 
+        ## match self.client.borrow_mut().post(FlowType::Device.as_slice())
+        ##        .header(ContentType("application/x-www-form-urlencoded".parse().unwrap()))
+        ##        .body(req.as_slice())
+        ##        .send() {
+        ##     Err(err) => {
+        ##         return RequestResult::Error(err);
+        ##     }
     }
 
     % for p in media_params:

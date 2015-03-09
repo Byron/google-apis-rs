@@ -418,7 +418,7 @@ def method_params(m, required=None, location=None):
 
 # return the given method's request or response schema (dict), or None.
 # optionally return only schemas with the given marker trait
-def method_io(schemas, c, m, type, marker=None):
+def method_request(schemas, c, m, type, marker=None):
     s = schemas.get(m.get('request', dict()).get(TREF))
     if s is None:
         return s
@@ -440,7 +440,7 @@ def rust_copy_value_s(n, tn, p):
 # convert a schema into a property (for use with rust type generation).
 # n = name of the property
 def schema_to_required_property(s, n):
-    return type(s)({'name': n, TREF: s.id, 'priority': REQUEST_PRIORITY})
+    return type(s)({'name': n, TREF: s.id, 'priority': REQUEST_PRIORITY, 'is_query_param': False})
 
 def is_required_property(p):
     return p.get('required', False) or p.get('priority', 0) > 0
@@ -495,7 +495,7 @@ def method_media_params(m):
 # Build all parameters used in a given method !
 # schemas, context, method(dict), 'request'|'response', request_prop_name -> (params, request_value|None)
 def build_all_params(schemas, c, m, n, npn):
-    request_value = method_io(schemas, c, m, n)
+    request_value = method_request(schemas, c, m, n)
     params = method_params(m)
     if request_value:
         params.insert(0, schema_to_required_property(request_value, npn))
@@ -506,6 +506,7 @@ def build_all_params(schemas, c, m, n, npn):
           'clone_value': '{}',
           'skip_example' : True,
           'priority': 0,
+          'is_query_param': False,
           'description': 
 """The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
 while executing the actual API request.
