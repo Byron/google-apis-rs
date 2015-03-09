@@ -1,6 +1,5 @@
 use std::marker::MarkerTrait;
 use std::io::{Read, Seek};
-use std::borrow::BorrowMut;
 
 use oauth2;
 use hyper;
@@ -52,7 +51,7 @@ struct JsonServerError {
 ///
 /// It contains methods to deal with all common issues, as well with the ones related to 
 /// uploading media
-pub trait Delegate: Clone {
+pub trait Delegate {
 
     /// Called whenever there is an HttpError, usually if there are network problems.
     /// 
@@ -61,3 +60,8 @@ pub trait Delegate: Clone {
         oauth2::Retry::Abort
     }
 }
+
+#[derive(Default)]
+pub struct DefaultDelegate;
+
+impl Delegate for DefaultDelegate {}
