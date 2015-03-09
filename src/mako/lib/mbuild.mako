@@ -6,7 +6,7 @@
                       schema_to_required_property, rust_copy_value_s, is_required_property,
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
-                      hub_type_params_s, method_media_params, enclose_in, mb_type_bounds)
+                      hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -281,7 +281,11 @@ ${'.' + action_name | indent_by(13)}(${action_args});
     where = ''
     qualifier = 'pub '
     add_args = ''
-    rtype = 'Result'
+    rtype = 'Result<()>'
+    response_schema = method_response(schemas, c, m)
+
+    if response_schema:
+        rtype = 'Result<%s>' % (response_schema.id)
 
     if media_params:
         stripped = lambda s: s.strip().strip(',')
@@ -299,10 +303,12 @@ ${'.' + action_name | indent_by(13)}(${action_args});
     action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
 
     field_params = [p for p in params if p.get('is_query_param', True)]
+
+    paddfields = 'self.' + ADD_PARAMS_PROP_NAME
 %>
     /// Perform the operation you have build so far.
     ${action_fn} {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params)});
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params)} + ${paddfields}.len());
         % for p in field_params:
 <%
     pname = 'self.' + property(p.name)    # property identifier
@@ -329,10 +335,19 @@ ${'.' + action_name | indent_by(13)}(${action_args});
         % endfor
         ## Additional params - may not overlap with optional params
         for &field in [${', '.join(enclose_in('"', (p.name for p in field_params)))}].iter() {
-            if self.${ADD_PARAMS_PROP_NAME}.contains_key(field) {
+            if ${paddfields}.contains_key(field) {
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in ${paddfields}.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        % if response_schema:
+        let response: ${response_schema.id} = Default::default();
+        % else:
+        let response = ();
+        % endif
         ## let mut params: Vec<(String, String)> = Vec::with_capacity
         ## // note: cloned() shouldn't be needed, see issue
         ## // https://github.com/servo/rust-url/issues/81
@@ -352,7 +367,7 @@ ${'.' + action_name | indent_by(13)}(${action_args});
         ##         return RequestResult::Error(err);
         ##     }
 
-        Result::Success
+        Result::Success(response)
     }
 
     % for p in media_params:

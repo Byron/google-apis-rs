@@ -68,7 +68,7 @@ impl Delegate for DefaultDelegate {}
 
 
 /// A universal result type used as return for all action method results.
-pub enum Result {
+pub enum Result<T = ()> {
     /// The http connection failed
     HttpError(hyper::HttpError),
 
@@ -76,5 +76,5 @@ pub enum Result {
     FieldClash(&'static str),
 
     /// It worked !
-    Success,
+    Success(T),
 }

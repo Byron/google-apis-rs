@@ -416,15 +416,22 @@ def method_params(m, required=None, location=None):
     # end for each parameter
     return sorted(res, key=lambda p: (p.priority, p.name), reverse=True)
 
-# return the given method's request or response schema (dict), or None.
-# optionally return only schemas with the given marker trait
-def method_request(schemas, c, m, type, marker=None):
-    s = schemas.get(m.get('request', dict()).get(TREF))
+def _method_io(type_name, schemas, c, m, marker=None):
+    s = schemas.get(m.get(type_name, dict()).get(TREF))
     if s is None:
         return s
     if s and marker and marker not in schema_markers(s, c):
         return None
     return s
+
+# return the given method's request or response schema (dict), or None.
+# optionally return only schemas with the given marker trait
+def method_request(schemas, c, m, marker=None):
+    return _method_io('request', schemas, c, m, marker)
+
+# As method request, but returns response instead
+def method_response(schemas, c, m, marker=None):
+    return _method_io('response', schemas, c, m, marker)
 
 # return string like 'n.clone()', but depending on the type name of tn (e.g. &str -> n.to_string())
 def rust_copy_value_s(n, tn, p):
@@ -495,7 +502,7 @@ def method_media_params(m):
 # Build all parameters used in a given method !
 # schemas, context, method(dict), 'request'|'response', request_prop_name -> (params, request_value|None)
 def build_all_params(schemas, c, m, n, npn):
-    request_value = method_request(schemas, c, m, n)
+    request_value = method_request(schemas, c, m)
     params = method_params(m)
     if request_value:
         params.insert(0, schema_to_required_property(request_value, npn))

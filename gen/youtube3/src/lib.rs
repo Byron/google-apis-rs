@@ -5005,8 +5005,8 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    pub fn doit(mut self) -> Result<I18nLanguageListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._hl.is_some() {
             params.push(("hl", self._hl.unwrap().to_string()));
@@ -5016,9 +5016,14 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: I18nLanguageListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -5132,8 +5137,8 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result where R: Read, RS: ReadSeek {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result<ChannelBannerResource> where R: Read, RS: ReadSeek {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
@@ -5142,9 +5147,14 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: ChannelBannerResource = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
     /// Upload media all at once.
@@ -5153,7 +5163,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// * *max size*: 6MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result<ChannelBannerResource>
                 where R: Read {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
@@ -5166,7 +5176,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// * *max size*: 6MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result<ChannelBannerResource>
                 where RS: ReadSeek {
         self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
@@ -5286,8 +5296,8 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6);
+    pub fn doit(mut self) -> Result<ChannelSectionListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -5306,9 +5316,14 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: ChannelSectionListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -5463,8 +5478,8 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+    pub fn doit(mut self) -> Result<ChannelSection> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -5480,9 +5495,14 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: ChannelSection = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -5618,8 +5638,8 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    pub fn doit(mut self) -> Result<()> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -5629,9 +5649,14 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response = ();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -5752,8 +5777,8 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+    pub fn doit(mut self) -> Result<ChannelSection> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -5766,9 +5791,14 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: ChannelSection = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -5909,8 +5939,8 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+    pub fn doit(mut self) -> Result<GuideCategoryListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
             params.push(("regionCode", self._region_code.unwrap().to_string()));
@@ -5926,9 +5956,14 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: GuideCategoryListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -6072,8 +6107,8 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+    pub fn doit(mut self) -> Result<Playlist> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -6089,9 +6124,14 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: Playlist = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -6254,8 +6294,8 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9);
+    pub fn doit(mut self) -> Result<PlaylistListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
             params.push(("pageToken", self._page_token.unwrap().to_string()));
@@ -6283,9 +6323,14 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: PlaylistListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -6446,8 +6491,8 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    pub fn doit(mut self) -> Result<()> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -6457,9 +6502,14 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response = ();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -6580,8 +6630,8 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+    pub fn doit(mut self) -> Result<Playlist> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -6594,9 +6644,14 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: Playlist = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -6723,8 +6778,8 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result where R: Read, RS: ReadSeek {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result<ThumbnailSetResponse> where R: Read, RS: ReadSeek {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("videoId", self._video_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -6734,9 +6789,14 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: ThumbnailSetResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
     /// Upload media all at once.
@@ -6745,7 +6805,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 2MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result<ThumbnailSetResponse>
                 where R: Read {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
@@ -6758,7 +6818,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 2MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result<ThumbnailSetResponse>
                 where RS: ReadSeek {
         self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
@@ -6899,8 +6959,8 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12);
+    pub fn doit(mut self) -> Result<VideoListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._video_category_id.is_some() {
             params.push(("videoCategoryId", self._video_category_id.unwrap().to_string()));
@@ -6937,9 +6997,14 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: VideoListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -7134,8 +7199,8 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+    pub fn doit(mut self) -> Result<()> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         params.push(("rating", self._rating.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
@@ -7146,9 +7211,14 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response = ();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -7258,8 +7328,8 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    pub fn doit(mut self) -> Result<VideoGetRatingResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -7269,9 +7339,14 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: VideoGetRatingResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -7371,8 +7446,8 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    pub fn doit(mut self) -> Result<()> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -7382,9 +7457,14 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response = ();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -7525,8 +7605,8 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+    pub fn doit(mut self) -> Result<Video> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -7539,9 +7619,14 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: Video = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -7740,8 +7825,8 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result where R: Read, RS: ReadSeek {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result<Video> where R: Read, RS: ReadSeek {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -7766,9 +7851,14 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: Video = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
     /// Upload media all at once.
@@ -7777,7 +7867,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *max size*: 64GB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream' and 'video/*'
-    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result<Video>
                 where R: Read {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
@@ -7790,7 +7880,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *max size*: 64GB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream' and 'video/*'
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result<Video>
                 where RS: ReadSeek {
         self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
@@ -7990,8 +8080,8 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    pub fn doit(mut self) -> Result<Subscription> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -8001,9 +8091,14 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: Subscription = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -8149,8 +8244,8 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12);
+    pub fn doit(mut self) -> Result<SubscriptionListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
             params.push(("pageToken", self._page_token.unwrap().to_string()));
@@ -8187,9 +8282,14 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: SubscriptionListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -8371,17 +8471,22 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2);
+    pub fn doit(mut self) -> Result<()> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response = ();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -8540,8 +8645,8 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(31);
+    pub fn doit(mut self) -> Result<SearchListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(31 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._video_type.is_some() {
             params.push(("videoType", self._video_type.unwrap().to_string()));
@@ -8635,9 +8740,14 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: SearchListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -8983,8 +9093,8 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    pub fn doit(mut self) -> Result<I18nRegionListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._hl.is_some() {
             params.push(("hl", self._hl.unwrap().to_string()));
@@ -8994,9 +9104,14 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: I18nRegionListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -9123,8 +9238,8 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+    pub fn doit(mut self) -> Result<LiveStream> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -9140,9 +9255,14 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: LiveStream = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -9286,8 +9406,8 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+    pub fn doit(mut self) -> Result<()> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner_channel.is_some() {
             params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
@@ -9300,9 +9420,14 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response = ();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -9438,8 +9563,8 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
+    pub fn doit(mut self) -> Result<LiveStreamListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
             params.push(("pageToken", self._page_token.unwrap().to_string()));
@@ -9464,9 +9589,14 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: LiveStreamListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -9641,8 +9771,8 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+    pub fn doit(mut self) -> Result<LiveStream> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -9658,9 +9788,14 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: LiveStream = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -9821,8 +9956,8 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+    pub fn doit(mut self) -> Result<Channel> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -9835,9 +9970,14 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: Channel = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -9995,8 +10135,8 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(11);
+    pub fn doit(mut self) -> Result<ChannelListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
             params.push(("pageToken", self._page_token.unwrap().to_string()));
@@ -10030,9 +10170,14 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: ChannelListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -10203,17 +10348,22 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2);
+    pub fn doit(mut self) -> Result<()> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response = ();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -10328,8 +10478,8 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
+    pub fn doit(mut self) -> Result<PlaylistItemListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._video_id.is_some() {
             params.push(("videoId", self._video_id.unwrap().to_string()));
@@ -10354,9 +10504,14 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: PlaylistItemListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -10528,8 +10683,8 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+    pub fn doit(mut self) -> Result<PlaylistItem> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -10542,9 +10697,14 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: PlaylistItem = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -10691,8 +10851,8 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    pub fn doit(mut self) -> Result<PlaylistItem> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -10702,9 +10862,14 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: PlaylistItem = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -10830,8 +10995,8 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result where R: Read, RS: ReadSeek {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result<()> where R: Read, RS: ReadSeek {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("channelId", self._channel_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -10841,9 +11006,14 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response = ();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
     /// Upload media all at once.
@@ -10852,7 +11022,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 10MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result<()>
                 where R: Read {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
@@ -10865,7 +11035,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 10MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result<()>
                 where RS: ReadSeek {
         self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
@@ -10973,8 +11143,8 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    pub fn doit(mut self) -> Result<()> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("channelId", self._channel_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -10984,9 +11154,14 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response = ();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -11104,8 +11279,8 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
+    pub fn doit(mut self) -> Result<LiveBroadcast> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
         if self._walltime.is_some() {
@@ -11128,9 +11303,14 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: LiveBroadcast = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -11311,8 +11491,8 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+    pub fn doit(mut self) -> Result<LiveBroadcast> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -11328,9 +11508,14 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: LiveBroadcast = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -11496,8 +11681,8 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+    pub fn doit(mut self) -> Result<LiveBroadcast> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -11513,9 +11698,14 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: LiveBroadcast = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -11671,8 +11861,8 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6);
+    pub fn doit(mut self) -> Result<LiveBroadcast> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
         if self._stream_id.is_some() {
@@ -11689,9 +11879,14 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: LiveBroadcast = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -11854,8 +12049,8 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9);
+    pub fn doit(mut self) -> Result<LiveBroadcastListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
             params.push(("pageToken", self._page_token.unwrap().to_string()));
@@ -11883,9 +12078,14 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: LiveBroadcastListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -12046,8 +12246,8 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
+    pub fn doit(mut self) -> Result<()> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner_channel.is_some() {
             params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
@@ -12060,9 +12260,14 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response = ();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -12189,8 +12394,8 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6);
+    pub fn doit(mut self) -> Result<LiveBroadcast> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("broadcastStatus", self._broadcast_status.to_string()));
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
@@ -12205,9 +12410,14 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: LiveBroadcast = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -12363,8 +12573,8 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
+    pub fn doit(mut self) -> Result<VideoCategoryListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
             params.push(("regionCode", self._region_code.unwrap().to_string()));
@@ -12380,9 +12590,14 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: VideoCategoryListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -12528,8 +12743,8 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(10);
+    pub fn doit(mut self) -> Result<ActivityListResponse> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
             params.push(("regionCode", self._region_code.unwrap().to_string()));
@@ -12560,9 +12775,14 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: ActivityListResponse = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
@@ -12742,8 +12962,8 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
+    pub fn doit(mut self) -> Result<Activity> {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -12753,9 +12973,14 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::FieldClash(field);
             }
         }
+        for (name, value) in self._additional_params.iter() {
+            params.push((name, value.clone()));
+        }
+
+        let response: Activity = Default::default();
 
 
-        Result::Success
+        Result::Success(response)
     }
 
 
