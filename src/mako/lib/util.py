@@ -42,12 +42,12 @@ DEL_METHOD = 'delete'
 NESTED_TYPE_MARKER = 'is_nested'
 SPACES_PER_TAB = 4
 
+DELEGATE_TYPE = 'Delegate'
 REQUEST_PRIORITY = 100
 REQUEST_MARKER_TRAIT = 'RequestValue'
 PART_MARKER_TRAIT = 'Part'
 NESTED_MARKER_TRAIT = 'NestedType'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
-DELEGATE_TYPE_PARAM = 'D'
 
 PROTOCOL_TYPE_INFO = {
     'simple' : {
@@ -303,6 +303,8 @@ def is_nested_type(s):
 # convert a rust-type to something that would be taken as input of a function
 # even though our storage type is different
 def activity_input_type(p):
+    if 'input_type' in p:
+        return p.input_type
     n = activity_rust_type(p, allow_optionals=False)
     if n == 'String':
         n = 'str'
@@ -426,6 +428,8 @@ def method_io(schemas, c, m, type, marker=None):
 
 # return string like 'n.clone()', but depending on the type name of tn (e.g. &str -> n.to_string())
 def rust_copy_value_s(n, tn, p):
+    if 'clone_value' in p:
+        return p.clone_value.format(n)
     nc = n + '.clone()'
     if tn == '&str':
         nc = n + '.to_string()'
@@ -497,7 +501,10 @@ def build_all_params(schemas, c, m, n, npn):
         params.insert(0, schema_to_required_property(request_value, npn))
     # add the delegate. It's a type parameter, which has to remain in sync with the type-parameters we actually build.
     dp = type(m)({ 'name': 'delegate',
-           TREF: DELEGATE_TYPE_PARAM, 
+           TREF: "&'a mut %s" % DELEGATE_TYPE, 
+          'input_type': "&'a mut %s" % DELEGATE_TYPE,
+          'clone_value': '{}',
+          'skip_example' : True,
           'priority': 0,
           'description': 
 """The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -588,9 +595,7 @@ def hub_type_bounds():
 
 # return list of type bounds required by method builder
 def mb_type_bounds():
-    return hub_type_bounds() + [DELEGATE_TYPE_PARAM + ': Delegate']
-
-DEFAULT_MB_TYPE_PARAMS = (DELEGATE_TYPE_PARAM, )
+    return hub_type_bounds()
 
 _rb_type_params = ("'a", ) + HUB_TYPE_PARAMETERS
 
@@ -601,11 +606,11 @@ def rb_type_params_s(resource, c):
 
 # type params for the given method builder, as string suitable for Rust code
 def mb_type_params_s(m):
-    return _to_type_params_s(_rb_type_params + DEFAULT_MB_TYPE_PARAMS)
+    return _to_type_params_s(_rb_type_params)
 
 # as rb_additional_type_params, but for an individual method, as seen from a resource builder !
 def mb_additional_type_params(m):
-    return DEFAULT_MB_TYPE_PARAMS
+    return []
 
 # return type name for a method on the given resource
 def mb_type(r, m):

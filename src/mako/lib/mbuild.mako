@@ -188,6 +188,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     trv = lambda spn, sp, sn=None: to_rust_type(sn, spn, sp, allow_optionals=False)
     # rvfrt = random value for rust type
     rvfrt = lambda spn, sp, sn=None: rnd_arg_val_for_type(trv(spn, sp, sn))
+
     rb_name = 'req'   # name of request binding
     required_args = request_value and ['&' + rb_name] or []
     for p in required_props:
@@ -251,6 +252,9 @@ ${rb_name}.${mangle_ident(spn)} = ${assignment}
 % endif
 let result = hub.${mangle_ident(resource)}().${mangle_ident(method)}(${required_args})\
 % for p in optional_props:
+% if p.get('skip_example', False):
+<% continue %>
+% endif
 
 <%block  filter="indent_by(13)">\
 .${mangle_ident(p.name)}(${rvfrt(p.name, p)})\

@@ -93,7 +93,7 @@ mod tests {
                                       <MemoryStorage as Default>::default(), None);
         let mut hub = YouTube::new(hyper::Client::new(), auth);
         let result = hub.channel_sections().insert()
-                     .delegate(&mut <DefaultDelegate as Default>::default())
+                     .delegate(&mut DefaultDelegate)
                      .doit();
     }
 }
