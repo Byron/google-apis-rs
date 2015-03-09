@@ -132,7 +132,8 @@ use std::default::Default;
 use std::io::{Read, Seek};
 use std::fs;
 
-pub use cmn::{Hub, ReadSeek, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
+pub use cmn::{Hub, ReadSeek, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue,
+              NestedType, Delegate, DefaultDelegate, Result};
 
 
 // ##############
@@ -5004,13 +5005,20 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         params.push(("part", self._part.to_string()));
         if self._hl.is_some() {
             params.push(("hl", self._hl.unwrap().to_string()));
         }
+        for &field in ["part", "hl"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -5124,12 +5132,19 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result where R: Read, RS: ReadSeek {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
     /// Upload media all at once.
@@ -5138,7 +5153,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// * *max size*: 6MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result
                 where R: Read {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
@@ -5151,7 +5166,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// * *max size*: 6MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result
                 where RS: ReadSeek {
         self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
@@ -5271,7 +5286,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6);
         params.push(("part", self._part.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
@@ -5286,7 +5301,14 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
         if self._channel_id.is_some() {
             params.push(("channelId", self._channel_id.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwner", "mine", "id", "channelId"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -5441,7 +5463,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -5453,7 +5475,14 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -5589,13 +5618,20 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["id", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -5716,7 +5752,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -5725,7 +5761,14 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -5866,7 +5909,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
@@ -5878,7 +5921,14 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         if self._hl.is_some() {
             params.push(("hl", self._hl.unwrap().to_string()));
         }
+        for &field in ["part", "regionCode", "id", "hl"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -6022,7 +6072,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -6034,7 +6084,14 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -6197,7 +6254,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(9);
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
@@ -6221,7 +6278,14 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         if self._channel_id.is_some() {
             params.push(("channelId", self._channel_id.unwrap().to_string()));
         }
+        for &field in ["part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "channelId"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -6382,13 +6446,20 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["id", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -6509,7 +6580,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -6518,7 +6589,14 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -6645,13 +6723,20 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result where R: Read, RS: ReadSeek {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         params.push(("videoId", self._video_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["videoId", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
     /// Upload media all at once.
@@ -6660,7 +6745,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 2MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result
                 where R: Read {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
@@ -6673,7 +6758,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 2MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result
                 where RS: ReadSeek {
         self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
@@ -6814,7 +6899,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(12);
         params.push(("part", self._part.to_string()));
         if self._video_category_id.is_some() {
@@ -6847,7 +6932,14 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         if self._chart.is_some() {
             params.push(("chart", self._chart.unwrap().to_string()));
         }
+        for &field in ["part", "videoCategoryId", "regionCode", "pageToken", "onBehalfOfContentOwner", "myRating", "maxResults", "locale", "id", "hl", "chart"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -7042,14 +7134,21 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
         params.push(("id", self._id.to_string()));
         params.push(("rating", self._rating.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["id", "rating", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -7159,13 +7258,20 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["id", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -7265,13 +7371,20 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["id", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -7412,7 +7525,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -7421,7 +7534,14 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -7620,7 +7740,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result where R: Read, RS: ReadSeek {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -7641,7 +7761,14 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         if self._auto_levels.is_some() {
             params.push(("autoLevels", self._auto_levels.unwrap().to_string()));
         }
+        for &field in ["part", "stabilize", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "notifySubscribers", "autoLevels"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
     /// Upload media all at once.
@@ -7650,7 +7777,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *max size*: 64GB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream' and 'video/*'
-    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result
                 where R: Read {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
@@ -7663,7 +7790,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *max size*: 64GB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream' and 'video/*'
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result
                 where RS: ReadSeek {
         self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
@@ -7863,13 +7990,20 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
+        for &field in ["part"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -8015,7 +8149,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(12);
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
@@ -8048,7 +8182,14 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
         if self._channel_id.is_some() {
             params.push(("channelId", self._channel_id.unwrap().to_string()));
         }
+        for &field in ["part", "pageToken", "order", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "id", "forChannelId", "channelId"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -8230,10 +8371,17 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2);
         params.push(("id", self._id.to_string()));
+        for &field in ["id"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -8392,7 +8540,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(31);
         params.push(("part", self._part.to_string()));
         if self._video_type.is_some() {
@@ -8482,7 +8630,14 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
         if self._channel_id.is_some() {
             params.push(("channelId", self._channel_id.unwrap().to_string()));
         }
+        for &field in ["part", "videoType", "videoSyndicated", "videoLicense", "videoEmbeddable", "videoDuration", "videoDimension", "videoDefinition", "videoCategoryId", "videoCaption", "type", "topicId", "safeSearch", "relevanceLanguage", "relatedToVideoId", "regionCode", "q", "publishedBefore", "publishedAfter", "pageToken", "order", "onBehalfOfContentOwner", "maxResults", "locationRadius", "location", "forMine", "forContentOwner", "eventType", "channelType", "channelId"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -8828,13 +8983,20 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         params.push(("part", self._part.to_string()));
         if self._hl.is_some() {
             params.push(("hl", self._hl.unwrap().to_string()));
         }
+        for &field in ["part", "hl"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -8961,7 +9123,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -8973,7 +9135,14 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -9117,7 +9286,7 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner_channel.is_some() {
@@ -9126,7 +9295,14 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["id", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -9262,7 +9438,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
@@ -9283,7 +9459,14 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         if self._id.is_some() {
             params.push(("id", self._id.unwrap().to_string()));
         }
+        for &field in ["part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -9458,7 +9641,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -9470,7 +9653,14 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -9631,7 +9821,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -9640,7 +9830,14 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -9798,7 +9995,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(11);
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
@@ -9828,7 +10025,14 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         if self._category_id.is_some() {
             params.push(("categoryId", self._category_id.unwrap().to_string()));
         }
+        for &field in ["part", "pageToken", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "managedByMe", "id", "forUsername", "categoryId"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -9999,10 +10203,17 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2);
         params.push(("id", self._id.to_string()));
+        for &field in ["id"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -10117,7 +10328,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
         params.push(("part", self._part.to_string()));
         if self._video_id.is_some() {
@@ -10138,7 +10349,14 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
         if self._id.is_some() {
             params.push(("id", self._id.unwrap().to_string()));
         }
+        for &field in ["part", "videoId", "playlistId", "pageToken", "onBehalfOfContentOwner", "maxResults", "id"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -10310,7 +10528,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -10319,7 +10537,14 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -10466,13 +10691,20 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
+        for &field in ["part"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -10598,13 +10830,20 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> () where R: Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result where R: Read, RS: ReadSeek {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
         params.push(("channelId", self._channel_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["channelId", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
     /// Upload media all at once.
@@ -10613,7 +10852,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 10MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> ()
+    pub fn upload<R>(mut self, stream: R, size: u64, mime_type: mime::Mime) -> Result
                 where R: Read {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
@@ -10626,7 +10865,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 10MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> ()
+    pub fn upload_resumable<RS>(mut self, resumeable_stream: RS, size: u64, mime_type: mime::Mime) -> Result
                 where RS: ReadSeek {
         self.doit(None::<(fs::File, u64, mime::Mime)>, Some((resumeable_stream, size, mime_type)), )
     }
@@ -10734,13 +10973,20 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         params.push(("channelId", self._channel_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["channelId", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -10858,7 +11104,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8);
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
@@ -10877,7 +11123,14 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
         if self._display_slate.is_some() {
             params.push(("displaySlate", self._display_slate.unwrap().to_string()));
         }
+        for &field in ["id", "part", "walltime", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "offsetTimeMs", "displaySlate"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -11058,7 +11311,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -11070,7 +11323,14 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -11236,7 +11496,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -11248,7 +11508,14 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -11404,7 +11671,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6);
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
@@ -11417,7 +11684,14 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["id", "part", "streamId", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -11580,7 +11854,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(9);
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
@@ -11604,7 +11878,14 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
         if self._broadcast_status.is_some() {
             params.push(("broadcastStatus", self._broadcast_status.unwrap().to_string()));
         }
+        for &field in ["part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "broadcastStatus"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -11765,7 +12046,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4);
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner_channel.is_some() {
@@ -11774,7 +12055,14 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["id", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -11901,7 +12189,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6);
         params.push(("broadcastStatus", self._broadcast_status.to_string()));
         params.push(("id", self._id.to_string()));
@@ -11912,7 +12200,14 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
+        for &field in ["broadcastStatus", "id", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -12068,7 +12363,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5);
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
@@ -12080,7 +12375,14 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         if self._hl.is_some() {
             params.push(("hl", self._hl.unwrap().to_string()));
         }
+        for &field in ["part", "regionCode", "id", "hl"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -12226,7 +12528,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(10);
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
@@ -12253,7 +12555,14 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         if self._channel_id.is_some() {
             params.push(("channelId", self._channel_id.unwrap().to_string()));
         }
+        for &field in ["part", "regionCode", "publishedBefore", "publishedAfter", "pageToken", "mine", "maxResults", "home", "channelId"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 
@@ -12433,13 +12742,20 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> () {
+    pub fn doit(mut self) -> Result {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3);
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
+        for &field in ["part"].iter() {
+            if self._additional_params.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
 
+
+        Result::Success
     }
 
 

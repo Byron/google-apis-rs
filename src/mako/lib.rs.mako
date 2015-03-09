@@ -37,7 +37,8 @@ use std::default::Default;
 use std::io::{Read, Seek};
 use std::fs;
 
-pub use cmn::{Hub, ReadSeek, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
+pub use cmn::{Hub, ReadSeek, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue,
+              NestedType, Delegate, DefaultDelegate, Result};
 
 
 // ##############

@@ -65,3 +65,16 @@ pub trait Delegate {
 pub struct DefaultDelegate;
 
 impl Delegate for DefaultDelegate {}
+
+
+/// A universal result type used as return for all action method results.
+pub enum Result {
+    /// The http connection failed
+    HttpError(hyper::HttpError),
+
+    /// An additional, free form field clashed with one of the built-in optional ones
+    FieldClash(&'static str),
+
+    /// It worked !
+    Success,
+}

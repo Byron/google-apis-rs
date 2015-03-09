@@ -22,6 +22,8 @@
         part_desc += ''.join('* *%s*\n' % part for part in parts)
         part_desc = part_desc[:-1]
         return part_desc
+
+    ADD_PARAMS_PROP_NAME = '_additional_params'
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -96,7 +98,7 @@ pub struct ${ThisType}
     % endif
 % endfor
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
-    _additional_params: HashMap<String, String>
+    ${ADD_PARAMS_PROP_NAME}: HashMap<String, String>
 }
 
 impl${mb_tparams} MethodBuilder for ${ThisType} {}
@@ -117,7 +119,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
     pub fn param(mut self, name: &str, value: &str) -> ${ThisType} {
-        self._additional_params.insert(name.to_string(), value.to_string());
+        self.${ADD_PARAMS_PROP_NAME}.insert(name.to_string(), value.to_string());
         self
     }
 }
@@ -279,7 +281,7 @@ ${'.' + action_name | indent_by(13)}(${action_args});
     where = ''
     qualifier = 'pub '
     add_args = ''
-    rtype = '()'
+    rtype = 'Result'
 
     if media_params:
         stripped = lambda s: s.strip().strip(',')
@@ -326,6 +328,11 @@ ${'.' + action_name | indent_by(13)}(${action_args});
         % endif
         % endfor
         ## Additional params - may not overlap with optional params
+        for &field in [${', '.join(enclose_in('"', (p.name for p in field_params)))}].iter() {
+            if self.${ADD_PARAMS_PROP_NAME}.contains_key(field) {
+                return Result::FieldClash(field);
+            }
+        }
         ## let mut params: Vec<(String, String)> = Vec::with_capacity
         ## // note: cloned() shouldn't be needed, see issue
         ## // https://github.com/servo/rust-url/issues/81
@@ -344,6 +351,8 @@ ${'.' + action_name | indent_by(13)}(${action_args});
         ##     Err(err) => {
         ##         return RequestResult::Error(err);
         ##     }
+
+        Result::Success
     }
 
     % for p in media_params:
