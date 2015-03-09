@@ -5,7 +5,8 @@
 <%namespace name="schema" file="lib/schema.mako"/>\
 <%  
     from util import (iter_nested_types, new_context, rust_comment, rust_doc_comment,
-                      rust_module_doc_comment, rb_type, hub_type, mangle_ident, hub_type_params_s)
+                      rust_module_doc_comment, rb_type, hub_type, mangle_ident, hub_type_params_s,
+                      hub_type_bounds, rb_type_params_s)
 
     nested_schemas = list(iter_nested_types(schemas))
     c = new_context(resources)
@@ -36,7 +37,7 @@ use std::default::Default;
 use std::io::{Read, Seek};
 use std::fs;
 
-pub use cmn::{Hub, ReadSeek, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType};
+pub use cmn::{Hub, ReadSeek, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue, NestedType, Delegate};
 
 
 // ##############
@@ -80,9 +81,7 @@ pub struct ${hub_type}${ht_params} {
 impl<'a, C, NC, A> Hub for ${hub_type}${ht_params} {}
 
 impl<'a, C, NC, A> ${hub_type}${ht_params}
-    where  NC: hyper::net::NetworkConnector,
-            C: BorrowMut<hyper::Client<NC>> + 'a,
-            A: oauth2::GetToken {
+    where  ${', '.join(hub_type_bounds())} {
 
     pub fn new(client: C, authenticator: A) -> ${hub_type}${ht_params} {
         ${hub_type} {
@@ -93,7 +92,7 @@ impl<'a, C, NC, A> ${hub_type}${ht_params}
     }
 
     % for resource in sorted(c.rta_map.keys()):
-    pub fn ${mangle_ident(resource)}(&'a self) -> ${rb_type(resource)}<'a, C, NC, A> {
+    pub fn ${mangle_ident(resource)}(&'a self) -> ${rb_type(resource)}${rb_type_params_s(resource, c)} {
         ${rb_type(resource)} { hub: &self }
     }
     % endfor

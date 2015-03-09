@@ -4,6 +4,9 @@ use std::marker::MarkerTrait;
 use std::io::{Read, Seek};
 use std::borrow::BorrowMut;
 
+use oauth2;
+use hyper;
+
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
 /// The hub allows to access all resource methods more easily.
@@ -43,4 +46,20 @@ impl<T: Seek + Read> ReadSeek for T {}
 struct JsonServerError {
     error: String,
     error_description: Option<String>
+}
+
+
+/// A trait specifying functionality to help controlling any request performed by the API.
+/// The trait has a conservative default implementation.
+///
+/// It contains methods to deal with all common issues, as well with the ones related to 
+/// uploading media
+pub trait Delegate: Clone {
+
+    /// Called whenever there is an HttpError, usually if there are network problems.
+    /// 
+    /// Return retry information.
+    fn connection_error(&mut self, hyper::HttpError) -> oauth2::Retry {
+        oauth2::Retry::Abort
+    }
 }

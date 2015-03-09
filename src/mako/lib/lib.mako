@@ -30,7 +30,7 @@ Handle the following *Resources* with ease ...
     md_resource = split_camelcase_s(r)
     sn = singular(canonical_type_name(r))
 
-    if rust_ddoc and sn in schemas:
+    if rust_doc and sn in schemas:
         md_resource = '[%s](struct.%s.html)' % (md_resource, singular(canonical_type_name(r)))
 %>\
 * ${md_resource} (${put_and(md_methods)})

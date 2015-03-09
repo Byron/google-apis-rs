@@ -4,7 +4,7 @@
                       to_fqan, indent_all_but_first_by, schema_markers, 
                       activity_input_type, TREF, method_io, IO_REQUEST, schema_to_required_property, 
                       rust_copy_value_s, is_required_property, organize_params, REQUEST_VALUE_PROPERTY_NAME,
-                      build_all_params, rb_type_params_s, hub_type_params_s, mb_type_params_s)
+                      build_all_params, rb_type_params_s, hub_type_params_s, mb_type_params_s, mb_additional_type_params)
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -15,7 +15,7 @@
 <%def name="new(resource, c)">\
 <% 
     hub_type_name = hub_type(util.canonical_name())
-    rb_params = rb_type_params_s()
+    rb_params = rb_type_params_s(resource, c)
     ThisType = rb_type(resource) + rb_params
 %>\
 /// A builder providing access to all methods supported on *${singular(resource)}* resources.
@@ -42,7 +42,7 @@ pub struct ${ThisType}
            C: 'a,
            A: 'a, {
 
-    hub: &'a ${hub_type_name}${hub_type_params_s()}
+    hub: &'a ${hub_type_name}${hub_type_params_s()},
 }
 
 impl${rb_params} ResourceMethodsBuilder for ${ThisType} {}
@@ -71,7 +71,7 @@ impl${rb_params} ${ThisType} {
     ///
     ${m.description | rust_doc_comment, indent_all_but_first_by(1)}
     % endif
-    pub fn ${mangle_ident(a)}(&self${method_args}) -> ${RType}${mb_tparams} {
+    pub fn ${mangle_ident(a)}<${', '.join(mb_additional_type_params(m))}>(&self${method_args}) -> ${RType}${mb_tparams} {
         ${RType} {
             hub: self.hub,
             % for p in required_props:

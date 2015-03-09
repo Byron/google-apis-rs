@@ -6,7 +6,7 @@
                       schema_to_required_property, rust_copy_value_s, is_required_property,
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
-                      hub_type_params_s, method_media_params, enclose_in)
+                      hub_type_params_s, method_media_params, enclose_in, mb_type_bounds)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -101,7 +101,7 @@ pub struct ${ThisType}
 
 impl${mb_tparams} MethodBuilder for ${ThisType} {}
 
-impl${mb_tparams} ${ThisType} {
+impl${mb_tparams} ${ThisType} where ${', '.join(mb_type_bounds())} {
 
 ${self._action_fn(resource, method, m, params, request_value, parts)}\
 

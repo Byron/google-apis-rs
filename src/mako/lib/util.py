@@ -47,6 +47,7 @@ REQUEST_MARKER_TRAIT = 'RequestValue'
 PART_MARKER_TRAIT = 'Part'
 NESTED_MARKER_TRAIT = 'NestedType'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
+DELEGATE_TYPE_PARAM = 'D'
 
 PROTOCOL_TYPE_INFO = {
     'simple' : {
@@ -487,12 +488,23 @@ def method_media_params(m):
 
     return res
 
+# Build all parameters used in a given method !
 # schemas, context, method(dict), 'request'|'response', request_prop_name -> (params, request_value|None)
 def build_all_params(schemas, c, m, n, npn):
     request_value = method_io(schemas, c, m, n)
     params = method_params(m)
     if request_value:
         params.insert(0, schema_to_required_property(request_value, npn))
+    # add the delegate. It's a type parameter, which has to remain in sync with the type-parameters we actually build.
+    dp = type(m)({ 'name': 'delegate',
+           TREF: DELEGATE_TYPE_PARAM, 
+          'priority': 0,
+          'description': 
+"""The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+while executing the actual API request.
+
+It should be used to handle progress information, and to implement a certain level of resilience."""})
+    params.append(dp)
     return params, request_value
 
 
@@ -568,13 +580,32 @@ def _to_type_params_s(p):
 def hub_type_params_s():
     return _to_type_params_s(HUB_TYPE_PARAMETERS)
 
+# return a list of where statements to server as bounds for the hub.
+def hub_type_bounds():
+    return ['NC: hyper::net::NetworkConnector',
+            "C: BorrowMut<hyper::Client<NC>> + 'a",
+            'A: oauth2::GetToken']
+
+# return list of type bounds required by method builder
+def mb_type_bounds():
+    return hub_type_bounds() + [DELEGATE_TYPE_PARAM + ': Delegate']
+
+DEFAULT_MB_TYPE_PARAMS = (DELEGATE_TYPE_PARAM, )
+
+_rb_type_params = ("'a", ) + HUB_TYPE_PARAMETERS
+
+
 # type parameters for a resource builder - keeps hub as borrow
-def rb_type_params_s():
-    return _to_type_params_s(("'a", ) + HUB_TYPE_PARAMETERS)
+def rb_type_params_s(resource, c):
+    return _to_type_params_s(_rb_type_params)
 
 # type params for the given method builder, as string suitable for Rust code
 def mb_type_params_s(m):
-    return _to_type_params_s(("'a", ) + HUB_TYPE_PARAMETERS)
+    return _to_type_params_s(_rb_type_params + DEFAULT_MB_TYPE_PARAMS)
+
+# as rb_additional_type_params, but for an individual method, as seen from a resource builder !
+def mb_additional_type_params(m):
+    return DEFAULT_MB_TYPE_PARAMS
 
 # return type name for a method on the given resource
 def mb_type(r, m):
