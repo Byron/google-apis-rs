@@ -11,7 +11,8 @@
 <%
     # fr == fattest resource, the fatter, the more important, right ?
     fr = None
-    fr = sorted(schemas.values(), key=lambda s: (len(c.sta_map.get(s.id, [])), len(s.get('properties', []))), reverse=True)[0]
+    if schemas:
+        fr = sorted(schemas.values(), key=lambda s: (len(c.sta_map.get(s.id, [])), len(s.get('properties', []))), reverse=True)[0]
 %>\
 # Features
 
@@ -62,6 +63,7 @@ Generally speaking, you can invoke *Activities* like this:
 let r = hub.resource().activity(...).${api.terms.action}()
 ```
 
+% if fr:
 Or specifically ...
 
 ```ignore
@@ -70,6 +72,7 @@ Or specifically ...
 let r = hub.${mangle_ident(resource)}().${mangle_ident(activity)}(...).${api.terms.action}()
 % endfor
 ```
+% endif
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
 supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 

@@ -10,20 +10,17 @@ directories:
   mako_src: src/mako
 api:
   blacklist:
-    - groupsmigration
-    - licensing
-    - groupssettings
-    - translate
+    - groupsmigration # no oauth2
+    - licensing # no oauth2
+    - translate # no oauth2
     - pagespeedonline # no oauth2
     - gan # no oauth2
-    - sqladmin # ERROR
-    - dataflow # ERROR
+    - dataflow # no oauth2
     - civicinfo # no oauth2
     - webmasters # no oauth2
     - doubleclickbidmanager # no oauth2
     - freebase # ERROR
     - spectrum # no oauth2
-    - analytics # ERROR
     - qpxexpress # no oauth2
     - discovery # no oauth2
     - identitytoolkit # no oauth2

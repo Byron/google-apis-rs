@@ -8,6 +8,8 @@ api:
     adexchangeseller:
     - v2.0
     admin:
+    - directory_v1
+    - email_migration_v2
     - reports_v1
     adsense:
     - v1.4

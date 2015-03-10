@@ -10,6 +10,7 @@
 % for version in versions:
 <%
 	import util
+	import os
 	gen_root = directories.output + '/' + an + util.to_api_version(version)
 	gen_root_stamp = gen_root + '/.timestamp'
 	api_name = util.library_name(an, version)
@@ -20,7 +21,10 @@
 	sds = [(directories.mako_src + '/' + i.source + '.mako', gen_root + '/' + i.get('output_dir', '') + '/' + i.source) 
 																								for i in api.templates]
 	api_json = directories.api_base + '/' + an + '/' + version + '/' + an + '-api.json'
+	api_json_overrides = os.path.dirname(api_json) + '/' + an + '-api_overrides.json'
 	api_json_inputs = api_json + " $(API_SHARED_INFO)"
+	if os.path.isfile(api_json_overrides):
+		api_json_inputs += ' ' + api_json_overrides
 	api_info.append((api_name, api_clean, api_cargo, gen_root))
 
 	space_join = lambda i: ' '.join(a[i] for a in api_info)

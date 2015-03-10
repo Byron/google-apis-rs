@@ -531,6 +531,8 @@ Context = collections.namedtuple('Context', ['sta_map', 'fqan_map', 'rta_map'])
 
 # return a newly build context from the given data
 def new_context(resources):
+    if not resources:
+        return Context(dict(), dict(), dict())
     # Returns (A, B) where
     # A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
     # B: { fqan -> activity_method_data }

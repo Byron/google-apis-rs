@@ -8,7 +8,9 @@
                       rust_module_doc_comment, rb_type, hub_type, mangle_ident, hub_type_params_s,
                       hub_type_bounds, rb_type_params_s)
 
-    nested_schemas = list(iter_nested_types(schemas))
+    nested_schemas = list()
+    if schemas:
+        nested_schemas = list(iter_nested_types(schemas))
     c = new_context(resources)
     hub_type = hub_type(util.canonical_name())
     ht_params = hub_type_params_s()
@@ -104,12 +106,14 @@ impl<'a, C, NC, A> ${hub_type}${ht_params}
 }
 
 
+% if schemas:
 // ############
 // SCHEMAS ###
 // ##########
 % for s in schemas.values():
 ${schema.new(s, c)}
 % endfor
+% endif
 
 % if nested_schemas:
 // ###################

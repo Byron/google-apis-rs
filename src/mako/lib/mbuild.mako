@@ -32,7 +32,7 @@
 <%def name="new(resource, method, c)">\
 <% 
     hub_type_name = hub_type(util.canonical_name())
-    m = c.fqan_map[to_fqan(name, resource, method)]
+    m = c.fqan_map[to_fqan(activity_root or name, resource, method)]
     # an identifier for a property. We prefix them to prevent clashes with the setters
     mb_tparams = mb_type_params_s(m)
     ThisType = mb_type(resource, method) + mb_tparams
