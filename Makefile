@@ -27,6 +27,8 @@ help:
 	$(info api-deps     -   generate a file to tell make what API file dependencies will be)
 	$(info regen-apis   -   clear out all generated apis, and regenerate them)
 	$(info help-api     -   show all api targets to build individually)
+	$(info clean-apis   -   delete all generated APIs)
+	$(info cargo        -   run cargo on all APIs, use ARGS="args ..." to specify cargo arguments)
 	$(info license      -   regenerate the main license file)
 
 $(PYTHON):
