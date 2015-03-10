@@ -3525,6 +3525,7 @@ impl<'a, C, NC, A> I18nLanguageMethodsBuilder<'a, C, NC, A> {
             _part: part.to_string(),
             _hl: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3586,6 +3587,7 @@ impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
             _request: request.clone(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3646,6 +3648,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
             _id: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3661,6 +3664,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3674,6 +3678,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3688,6 +3693,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
             _part: request.to_parts(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3747,6 +3753,7 @@ impl<'a, C, NC, A> GuideCategoryMethodsBuilder<'a, C, NC, A> {
             _id: Default::default(),
             _hl: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3806,6 +3813,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3825,6 +3833,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
             _id: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3838,6 +3847,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3852,6 +3862,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
             _part: request.to_parts(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3909,6 +3920,7 @@ impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
             _video_id: video_id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3975,6 +3987,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _hl: Default::default(),
             _chart: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -3989,6 +4002,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _rating: rating.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4002,6 +4016,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4015,6 +4030,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4029,6 +4045,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _part: request.to_parts(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4047,6 +4064,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _notify_subscribers: Default::default(),
             _auto_levels: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4104,6 +4122,7 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
             _request: request.clone(),
             _part: request.to_parts(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4126,6 +4145,7 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
             _for_channel_id: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4138,6 +4158,7 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
             hub: self.hub,
             _id: id.to_string(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4223,6 +4244,7 @@ impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
             _channel_type: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4280,6 +4302,7 @@ impl<'a, C, NC, A> I18nRegionMethodsBuilder<'a, C, NC, A> {
             _part: part.to_string(),
             _hl: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4339,6 +4362,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4353,6 +4377,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4371,6 +4396,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
             _max_results: Default::default(),
             _id: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4386,6 +4412,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4444,6 +4471,7 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
             _part: request.to_parts(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4465,6 +4493,7 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
             _for_username: Default::default(),
             _category_id: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4521,6 +4550,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
             hub: self.hub,
             _id: id.to_string(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4539,6 +4569,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
             _max_results: Default::default(),
             _id: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4553,6 +4584,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
             _part: request.to_parts(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4566,6 +4598,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
             _request: request.clone(),
             _part: request.to_parts(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4624,6 +4657,7 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
             _channel_id: channel_id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4637,6 +4671,7 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
             _channel_id: channel_id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4699,6 +4734,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _offset_time_ms: Default::default(),
             _display_slate: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4714,6 +4750,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4729,6 +4766,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4745,6 +4783,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4764,6 +4803,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _id: Default::default(),
             _broadcast_status: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4778,6 +4818,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4794,6 +4835,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4853,6 +4895,7 @@ impl<'a, C, NC, A> VideoCategoryMethodsBuilder<'a, C, NC, A> {
             _id: Default::default(),
             _hl: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4917,6 +4960,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
             _home: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4932,6 +4976,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
             _request: request.clone(),
             _part: request.to_parts(),
             _delegate: Default::default(),
+            _scope: Default::default(),
             _additional_params: Default::default()
         }
     }
@@ -4987,6 +5032,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_languages().list("part")
 ///              .hl("eos")
+///              .scope("Stet")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5000,6 +5046,7 @@ pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
     _part: String,
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5010,7 +5057,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<I18nLanguageListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._hl.is_some() {
             params.push(("hl", self._hl.unwrap().to_string()));
@@ -5072,6 +5119,21 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -5125,7 +5187,8 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_banners().insert(&req)
-///              .on_behalf_of_content_owner("Stet")
+///              .on_behalf_of_content_owner("dolor")
+///              .scope("sed")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -5139,6 +5202,7 @@ pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
     _request: ChannelBannerResource,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5149,7 +5213,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
     /// Perform the operation you have build so far.
     fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result<ChannelBannerResource> where R: Read, RS: ReadSeek {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
@@ -5235,6 +5299,21 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -5291,10 +5370,11 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().list("part")
-///              .on_behalf_of_content_owner("sed")
-///              .mine(false)
-///              .id("ipsum")
-///              .channel_id("eos")
+///              .on_behalf_of_content_owner("ipsum")
+///              .mine(true)
+///              .id("duo")
+///              .channel_id("sadipscing")
+///              .scope("dolor")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5311,6 +5391,7 @@ pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5321,7 +5402,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<ChannelSectionListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -5421,6 +5502,21 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -5483,8 +5579,9 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().insert(&req)
-///              .on_behalf_of_content_owner_channel("duo")
-///              .on_behalf_of_content_owner("sadipscing")
+///              .on_behalf_of_content_owner_channel("consetetur")
+///              .on_behalf_of_content_owner("ea")
+///              .scope("sit")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5500,6 +5597,7 @@ pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5510,7 +5608,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<ChannelSection> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -5611,6 +5709,21 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -5653,7 +5766,8 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().delete("id")
-///              .on_behalf_of_content_owner("consetetur")
+///              .on_behalf_of_content_owner("invidunt")
+///              .scope("et")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5667,6 +5781,7 @@ pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5677,7 +5792,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<()> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -5734,6 +5849,21 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
         self._delegate = Some(new_value);
+        self
+    }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
         self
     }
 
@@ -5798,7 +5928,8 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().update(&req)
-///              .on_behalf_of_content_owner("ea")
+///              .on_behalf_of_content_owner("sit")
+///              .scope("takimata")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5813,6 +5944,7 @@ pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5823,7 +5955,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<ChannelSection> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -5909,6 +6041,21 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -5964,9 +6111,10 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guide_categories().list("part")
-///              .region_code("sanctus")
-///              .id("invidunt")
-///              .hl("et")
+///              .region_code("consetetur")
+///              .id("elitr")
+///              .hl("sed")
+///              .scope("sea")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5982,6 +6130,7 @@ pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5992,7 +6141,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<GuideCategoryListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
             params.push(("regionCode", self._region_code.unwrap().to_string()));
@@ -6078,6 +6227,21 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -6140,8 +6304,9 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().insert(&req)
-///              .on_behalf_of_content_owner_channel("sit")
-///              .on_behalf_of_content_owner("takimata")
+///              .on_behalf_of_content_owner_channel("diam")
+///              .on_behalf_of_content_owner("clita")
+///              .scope("sed")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6157,6 +6322,7 @@ pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -6167,7 +6333,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<Playlist> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -6268,6 +6434,21 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -6325,13 +6506,14 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().list("part")
-///              .page_token("consetetur")
-///              .on_behalf_of_content_owner_channel("elitr")
-///              .on_behalf_of_content_owner("sed")
+///              .page_token("labore")
+///              .on_behalf_of_content_owner_channel("kasd")
+///              .on_behalf_of_content_owner("elitr")
 ///              .mine(true)
-///              .max_results(60)
-///              .id("clita")
-///              .channel_id("sed")
+///              .max_results(79)
+///              .id("kasd")
+///              .channel_id("ea")
+///              .scope("rebum.")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6351,6 +6533,7 @@ pub struct PlaylistListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -6361,7 +6544,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<PlaylistListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
             params.push(("pageToken", self._page_token.unwrap().to_string()));
@@ -6499,6 +6682,21 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> PlaylistListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -6541,7 +6739,8 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().delete("id")
-///              .on_behalf_of_content_owner("labore")
+///              .on_behalf_of_content_owner("sadipscing")
+///              .scope("nonumy")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6555,6 +6754,7 @@ pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -6565,7 +6765,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<()> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -6622,6 +6822,21 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
         self._delegate = Some(new_value);
+        self
+    }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
         self
     }
 
@@ -6686,7 +6901,8 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().update(&req)
-///              .on_behalf_of_content_owner("kasd")
+///              .on_behalf_of_content_owner("sed")
+///              .scope("et")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6701,6 +6917,7 @@ pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -6711,7 +6928,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<Playlist> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -6799,6 +7016,21 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -6842,7 +7074,8 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.thumbnails().set("videoId")
-///              .on_behalf_of_content_owner("kasd")
+///              .on_behalf_of_content_owner("diam")
+///              .scope("et")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -6856,6 +7089,7 @@ pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
     _video_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -6866,7 +7100,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
     /// Perform the operation you have build so far.
     fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result<ThumbnailSetResponse> where R: Read, RS: ReadSeek {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("videoId", self._video_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -6952,6 +7186,21 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -7018,16 +7267,17 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().list("part")
-///              .video_category_id("kasd")
-///              .region_code("ea")
-///              .page_token("rebum.")
-///              .on_behalf_of_content_owner("dolor")
-///              .my_rating("sadipscing")
-///              .max_results(10)
-///              .locale("sed")
-///              .id("et")
-///              .hl("gubergren")
-///              .chart("diam")
+///              .video_category_id("sed")
+///              .region_code("consetetur")
+///              .page_token("aliquyam")
+///              .on_behalf_of_content_owner("accusam")
+///              .my_rating("amet.")
+///              .max_results(87)
+///              .locale("erat")
+///              .id("amet")
+///              .hl("accusam")
+///              .chart("amet.")
+///              .scope("erat")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7050,6 +7300,7 @@ pub struct VideoListMethodBuilder<'a, C, NC, A>
     _hl: Option<String>,
     _chart: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -7060,7 +7311,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<VideoListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._video_category_id.is_some() {
             params.push(("videoCategoryId", self._video_category_id.unwrap().to_string()));
@@ -7240,6 +7491,21 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> VideoListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -7282,7 +7548,8 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().rate("id", "rating")
-///              .on_behalf_of_content_owner("sed")
+///              .on_behalf_of_content_owner("sit")
+///              .scope("ipsum")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7297,6 +7564,7 @@ pub struct VideoRateMethodBuilder<'a, C, NC, A>
     _rating: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -7307,7 +7575,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<()> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         params.push(("rating", self._rating.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
@@ -7377,6 +7645,21 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> VideoRateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -7419,7 +7702,8 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().get_rating("id")
-///              .on_behalf_of_content_owner("aliquyam")
+///              .on_behalf_of_content_owner("amet.")
+///              .scope("rebum.")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7433,6 +7717,7 @@ pub struct VideoGetRatingMethodBuilder<'a, C, NC, A>
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -7443,7 +7728,7 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<VideoGetRatingResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -7502,6 +7787,21 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> VideoGetRatingMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -7544,7 +7844,8 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().delete("id")
-///              .on_behalf_of_content_owner("amet.")
+///              .on_behalf_of_content_owner("voluptua.")
+///              .scope("dolor")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7558,6 +7859,7 @@ pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -7568,7 +7870,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<()> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -7625,6 +7927,21 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
         self._delegate = Some(new_value);
+        self
+    }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
         self
     }
 
@@ -7709,7 +8026,8 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().update(&req)
-///              .on_behalf_of_content_owner("clita")
+///              .on_behalf_of_content_owner("amet")
+///              .scope("dolore")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7724,6 +8042,7 @@ pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -7734,7 +8053,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<Video> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -7844,6 +8163,21 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -7928,11 +8262,12 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().insert(&req)
-///              .stabilize(true)
-///              .on_behalf_of_content_owner_channel("amet")
-///              .on_behalf_of_content_owner("accusam")
-///              .notify_subscribers(true)
+///              .stabilize(false)
+///              .on_behalf_of_content_owner_channel("dolores")
+///              .on_behalf_of_content_owner("diam")
+///              .notify_subscribers(false)
 ///              .auto_levels(false)
+///              .scope("elitr")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -7951,6 +8286,7 @@ pub struct VideoInsertMethodBuilder<'a, C, NC, A>
     _notify_subscribers: Option<bool>,
     _auto_levels: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -7961,7 +8297,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
     /// Perform the operation you have build so far.
     fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result<Video> where R: Read, RS: ReadSeek {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -8144,6 +8480,21 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> VideoInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -8206,6 +8557,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().insert(&req)
+///              .scope("At")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8219,6 +8571,7 @@ pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
     _request: Subscription,
     _part: String,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -8229,7 +8582,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<Subscription> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -8302,6 +8655,21 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -8358,16 +8726,17 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().list("part")
-///              .page_token("est")
-///              .order("sit")
-///              .on_behalf_of_content_owner_channel("ipsum")
-///              .on_behalf_of_content_owner("erat")
+///              .page_token("clita")
+///              .order("sanctus")
+///              .on_behalf_of_content_owner_channel("dolor")
+///              .on_behalf_of_content_owner("diam")
 ///              .my_subscribers(false)
 ///              .mine(true)
-///              .max_results(40)
-///              .id("voluptua.")
-///              .for_channel_id("dolor")
-///              .channel_id("amet")
+///              .max_results(11)
+///              .id("dolor")
+///              .for_channel_id("nonumy")
+///              .channel_id("sit")
+///              .scope("sed")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8390,6 +8759,7 @@ pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
     _for_channel_id: Option<String>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -8400,7 +8770,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<SubscriptionListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
             params.push(("pageToken", self._page_token.unwrap().to_string()));
@@ -8570,6 +8940,21 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -8612,6 +8997,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().delete("id")
+///              .scope("sed")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8624,6 +9010,7 @@ pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -8634,7 +9021,7 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<()> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8678,6 +9065,21 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
         self._delegate = Some(new_value);
+        self
+    }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
         self
     }
 
@@ -8735,35 +9137,36 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.search().list("part")
-///              .video_type("dolores")
-///              .video_syndicated("diam")
-///              .video_license("Lorem")
-///              .video_embeddable("kasd")
-///              .video_duration("elitr")
-///              .video_dimension("At")
-///              .video_definition("sit")
-///              .video_category_id("clita")
-///              .video_caption("sanctus")
-///              .type_("dolor")
-///              .topic_id("diam")
-///              .safe_search("voluptua.")
-///              .relevance_language("diam")
-///              .related_to_video_id("nonumy")
-///              .region_code("dolor")
-///              .q("nonumy")
-///              .published_before("sit")
-///              .published_after("sed")
-///              .page_token("ipsum")
-///              .order("sed")
-///              .on_behalf_of_content_owner("At")
-///              .max_results(17)
-///              .location_radius("ea")
-///              .location("ut")
+///              .video_type("dolore")
+///              .video_syndicated("ea")
+///              .video_license("ut")
+///              .video_embeddable("At")
+///              .video_duration("sit")
+///              .video_dimension("et")
+///              .video_definition("ipsum")
+///              .video_category_id("eos")
+///              .video_caption("amet.")
+///              .type_("ut")
+///              .topic_id("et")
+///              .safe_search("elitr")
+///              .relevance_language("est")
+///              .related_to_video_id("Lorem")
+///              .region_code("justo")
+///              .q("et")
+///              .published_before("ut")
+///              .published_after("et")
+///              .page_token("gubergren")
+///              .order("est")
+///              .on_behalf_of_content_owner("voluptua.")
+///              .max_results(78)
+///              .location_radius("invidunt")
+///              .location("dolore")
 ///              .for_mine(true)
 ///              .for_content_owner(true)
-///              .event_type("et")
-///              .channel_type("ipsum")
-///              .channel_id("eos")
+///              .event_type("invidunt")
+///              .channel_type("dolor")
+///              .channel_id("amet.")
+///              .scope("sit")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8805,6 +9208,7 @@ pub struct SearchListMethodBuilder<'a, C, NC, A>
     _channel_type: Option<String>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -8815,7 +9219,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<SearchListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(31 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(32 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._video_type.is_some() {
             params.push(("videoType", self._video_type.unwrap().to_string()));
@@ -9191,6 +9595,21 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> SearchListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -9246,7 +9665,8 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_regions().list("part")
-///              .hl("ut")
+///              .hl("accusam")
+///              .scope("tempor")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9260,6 +9680,7 @@ pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
     _part: String,
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -9270,7 +9691,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<I18nRegionListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._hl.is_some() {
             params.push(("hl", self._hl.unwrap().to_string()));
@@ -9332,6 +9753,21 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -9389,14 +9825,15 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("et".to_string());
+/// req.id = Some("sit".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().update(&req)
-///              .on_behalf_of_content_owner_channel("elitr")
-///              .on_behalf_of_content_owner("est")
+///              .on_behalf_of_content_owner_channel("est")
+///              .on_behalf_of_content_owner("diam")
+///              .scope("ipsum")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9412,6 +9849,7 @@ pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -9422,7 +9860,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<LiveStream> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -9529,6 +9967,21 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -9571,8 +10024,9 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().delete("id")
-///              .on_behalf_of_content_owner_channel("justo")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner_channel("Lorem")
+///              .on_behalf_of_content_owner("ipsum")
+///              .scope("et")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9587,6 +10041,7 @@ pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -9597,7 +10052,7 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<()> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner_channel.is_some() {
             params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
@@ -9671,6 +10126,21 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -9727,12 +10197,13 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().list("part")
-///              .page_token("et")
-///              .on_behalf_of_content_owner_channel("gubergren")
-///              .on_behalf_of_content_owner("est")
+///              .page_token("At")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("At")
 ///              .mine(true)
-///              .max_results(78)
-///              .id("invidunt")
+///              .max_results(82)
+///              .id("Lorem")
+///              .scope("sanctus")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9751,6 +10222,7 @@ pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
     _max_results: Option<u32>,
     _id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -9761,7 +10233,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<LiveStreamListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
             params.push(("pageToken", self._page_token.unwrap().to_string()));
@@ -9886,6 +10358,21 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -9943,14 +10430,15 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("dolore".to_string());
+/// req.id = Some("ipsum".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().insert(&req)
-///              .on_behalf_of_content_owner_channel("accusam")
-///              .on_behalf_of_content_owner("elitr")
+///              .on_behalf_of_content_owner_channel("justo")
+///              .on_behalf_of_content_owner("sit")
+///              .scope("dolor")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9966,6 +10454,7 @@ pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -9976,7 +10465,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<LiveStream> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -10081,6 +10570,21 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -10137,13 +10641,14 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // Values shown here are possibly random and not representative !
 /// let mut req: Channel = Default::default();
 /// req.invideo_promotion = Default::default(); // is InvideoPromotion
-/// req.id = Some("invidunt".to_string());
+/// req.id = Some("Stet".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().update(&req)
-///              .on_behalf_of_content_owner("dolor")
+///              .on_behalf_of_content_owner("et")
+///              .scope("amet.")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10158,6 +10663,7 @@ pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -10168,7 +10674,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<Channel> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -10254,6 +10760,21 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -10315,14 +10836,15 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().list("part")
 ///              .page_token("sit")
-///              .on_behalf_of_content_owner("justo")
-///              .my_subscribers(false)
+///              .on_behalf_of_content_owner("sit")
+///              .my_subscribers(true)
 ///              .mine(false)
-///              .max_results(49)
-///              .managed_by_me(true)
-///              .id("diam")
-///              .for_username("ipsum")
-///              .category_id("voluptua.")
+///              .max_results(67)
+///              .managed_by_me(false)
+///              .id("dolores")
+///              .for_username("eos")
+///              .category_id("ut")
+///              .scope("erat")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10344,6 +10866,7 @@ pub struct ChannelListMethodBuilder<'a, C, NC, A>
     _for_username: Option<String>,
     _category_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -10354,7 +10877,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<ChannelListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
             params.push(("pageToken", self._page_token.unwrap().to_string()));
@@ -10510,6 +11033,21 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> ChannelListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -10552,6 +11090,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().delete("id")
+///              .scope("invidunt")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10564,6 +11103,7 @@ pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -10574,7 +11114,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<()> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10618,6 +11158,21 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
         self._delegate = Some(new_value);
+        self
+    }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
         self
     }
 
@@ -10677,12 +11232,13 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().list("part")
-///              .video_id("et")
-///              .playlist_id("sadipscing")
-///              .page_token("At")
-///              .on_behalf_of_content_owner("et")
-///              .max_results(25)
-///              .id("sanctus")
+///              .video_id("justo")
+///              .playlist_id("clita")
+///              .page_token("clita")
+///              .on_behalf_of_content_owner("dolor")
+///              .max_results(75)
+///              .id("magna")
+///              .scope("sanctus")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10701,6 +11257,7 @@ pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
     _max_results: Option<u32>,
     _id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -10711,7 +11268,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<PlaylistItemListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._video_id.is_some() {
             params.push(("videoId", self._video_id.unwrap().to_string()));
@@ -10834,6 +11391,21 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -10898,7 +11470,8 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().insert(&req)
-///              .on_behalf_of_content_owner("duo")
+///              .on_behalf_of_content_owner("diam")
+///              .scope("clita")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10913,6 +11486,7 @@ pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -10923,7 +11497,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<PlaylistItem> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -11011,6 +11585,21 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -11075,6 +11664,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().update(&req)
+///              .scope("ipsum")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11088,6 +11678,7 @@ pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
     _request: PlaylistItem,
     _part: String,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -11098,7 +11689,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<PlaylistItem> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -11175,6 +11766,21 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -11225,6 +11831,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().set(&req, "channelId")
 ///              .on_behalf_of_content_owner("sanctus")
+///              .scope("et")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -11239,6 +11846,7 @@ pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
     _channel_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -11249,7 +11857,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
     /// Perform the operation you have build so far.
     fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> Result<()> where R: Read, RS: ReadSeek {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("channelId", self._channel_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -11344,6 +11952,21 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -11386,7 +12009,8 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().unset("channelId")
-///              .on_behalf_of_content_owner("justo")
+///              .on_behalf_of_content_owner("dolor")
+///              .scope("ea")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11400,6 +12024,7 @@ pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
     _channel_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -11410,7 +12035,7 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<()> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("channelId", self._channel_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -11467,6 +12092,21 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -11520,11 +12160,12 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().control("id", "part")
-///              .walltime("Stet")
+///              .walltime("clita")
 ///              .on_behalf_of_content_owner_channel("et")
-///              .on_behalf_of_content_owner("amet.")
-///              .offset_time_ms("ea")
-///              .display_slate(false)
+///              .on_behalf_of_content_owner("sanctus")
+///              .offset_time_ms("no")
+///              .display_slate(true)
+///              .scope("consetetur")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11543,6 +12184,7 @@ pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
     _offset_time_ms: Option<String>,
     _display_slate: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -11553,7 +12195,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<LiveBroadcast> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
         if self._walltime.is_some() {
@@ -11682,6 +12324,21 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -11739,14 +12396,15 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
-/// req.id = Some("sit".to_string());
+/// req.id = Some("justo".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().update(&req)
-///              .on_behalf_of_content_owner_channel("ipsum")
-///              .on_behalf_of_content_owner("est")
+///              .on_behalf_of_content_owner_channel("sit")
+///              .on_behalf_of_content_owner("et")
+///              .scope("amet")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11762,6 +12420,7 @@ pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -11772,7 +12431,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<LiveBroadcast> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -11879,6 +12538,21 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -11942,8 +12616,9 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().insert(&req)
-///              .on_behalf_of_content_owner_channel("diam")
-///              .on_behalf_of_content_owner("dolores")
+///              .on_behalf_of_content_owner_channel("ipsum")
+///              .on_behalf_of_content_owner("amet")
+///              .scope("sanctus")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11959,6 +12634,7 @@ pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -11969,7 +12645,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<LiveBroadcast> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -12074,6 +12750,21 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -12127,9 +12818,10 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().bind("id", "part")
-///              .stream_id("erat")
-///              .on_behalf_of_content_owner_channel("erat")
-///              .on_behalf_of_content_owner("invidunt")
+///              .stream_id("aliquyam")
+///              .on_behalf_of_content_owner_channel("accusam")
+///              .on_behalf_of_content_owner("labore")
+///              .scope("sit")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -12146,6 +12838,7 @@ pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -12156,7 +12849,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<LiveBroadcast> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
         if self._stream_id.is_some() {
@@ -12259,6 +12952,21 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -12315,13 +13023,14 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().list("part")
-///              .page_token("justo")
-///              .on_behalf_of_content_owner_channel("clita")
-///              .on_behalf_of_content_owner("clita")
+///              .page_token("sanctus")
+///              .on_behalf_of_content_owner_channel("eos")
+///              .on_behalf_of_content_owner("sadipscing")
 ///              .mine(true)
-///              .max_results(75)
-///              .id("magna")
-///              .broadcast_status("sanctus")
+///              .max_results(50)
+///              .id("et")
+///              .broadcast_status("eirmod")
+///              .scope("erat")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -12341,6 +13050,7 @@ pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _broadcast_status: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -12351,7 +13061,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<LiveBroadcastListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
             params.push(("pageToken", self._page_token.unwrap().to_string()));
@@ -12487,6 +13197,21 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -12529,8 +13254,9 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().delete("id")
-///              .on_behalf_of_content_owner_channel("clita")
-///              .on_behalf_of_content_owner("ipsum")
+///              .on_behalf_of_content_owner_channel("diam")
+///              .on_behalf_of_content_owner("sanctus")
+///              .scope("et")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -12545,6 +13271,7 @@ pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -12555,7 +13282,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<()> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner_channel.is_some() {
             params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
@@ -12629,6 +13356,21 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -12682,8 +13424,9 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().transition("broadcastStatus", "id", "part")
-///              .on_behalf_of_content_owner_channel("et")
-///              .on_behalf_of_content_owner("dolor")
+///              .on_behalf_of_content_owner_channel("accusam")
+///              .on_behalf_of_content_owner("elitr")
+///              .scope("At")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -12700,6 +13443,7 @@ pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -12710,7 +13454,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<LiveBroadcast> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("broadcastStatus", self._broadcast_status.to_string()));
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
@@ -12813,6 +13557,21 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -12868,9 +13627,10 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video_categories().list("part")
-///              .region_code("invidunt")
-///              .id("aliquyam")
-///              .hl("clita")
+///              .region_code("amet.")
+///              .id("eirmod")
+///              .hl("sed")
+///              .scope("ipsum")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -12886,6 +13646,7 @@ pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -12896,7 +13657,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<VideoCategoryListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
             params.push(("regionCode", self._region_code.unwrap().to_string()));
@@ -12980,6 +13741,21 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -13035,14 +13811,15 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().list("part")
-///              .region_code("sanctus")
-///              .published_before("no")
-///              .published_after("sit")
-///              .page_token("consetetur")
-///              .mine(false)
-///              .max_results(48)
+///              .region_code("kasd")
+///              .published_before("aliquyam")
+///              .published_after("et")
+///              .page_token("labore")
+///              .mine(true)
+///              .max_results(27)
 ///              .home(true)
-///              .channel_id("amet")
+///              .channel_id("et")
+///              .scope("rebum.")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13063,6 +13840,7 @@ pub struct ActivityListMethodBuilder<'a, C, NC, A>
     _home: Option<bool>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -13073,7 +13851,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<ActivityListResponse> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
             params.push(("regionCode", self._region_code.unwrap().to_string()));
@@ -13215,6 +13993,21 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         self._delegate = Some(new_value);
         self
     }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> ActivityListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
+        self
+    }
 
     /// Set any additional parameter of the query string used in the request.
     /// It should be used to set parameters which are not yet available through their own 
@@ -13276,6 +14069,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().insert(&req)
+///              .scope("et")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13289,6 +14083,7 @@ pub struct ActivityInsertMethodBuilder<'a, C, NC, A>
     _request: Activity,
     _part: String,
     _delegate: Option<&'a mut Delegate>,
+    _scope: Option<String>,
     _additional_params: HashMap<String, String>
 }
 
@@ -13299,7 +14094,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<Activity> {
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -13370,6 +14165,21 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
         self._delegate = Some(new_value);
+        self
+    }
+    /// Sets the *scope* property to the given value.
+    ///
+    /// 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
+    /// simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn scope(mut self, new_value: &str) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.to_string());
         self
     }
 
