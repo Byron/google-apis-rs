@@ -172,9 +172,13 @@ You can read the full text at the repository's [license file][repo-license].
 
 
 ## Builds the scope-enum for the API
+## It's possible there is no scope enum if there is no auth information
 ###############################################################################################
 ###############################################################################################
 <%def name="scope_enum()">\
+% if not auth or not auth.oauth2:
+<% return '' %>\
+% endif
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).

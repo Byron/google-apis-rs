@@ -64,6 +64,9 @@ impl${rb_params} ${ThisType} {
         method_args = ', ' + ', '.join('%s: %s' % (mangle_ident(p.name), activity_input_type(p)) for p in required_props)
 
     mb_tparams = mb_type_params_s(m)
+    # we would could have information about data requirements for each property in it's dict.
+    # for now, we just hardcode it, and treat the entries as way to easily change param names
+    assert len(api.properties) == 2, "Hardcoded for now, thanks to scope requirements"
 %>\
     
     % if 'description' in m:
@@ -84,7 +87,10 @@ impl${rb_params} ${ThisType} {
             % for p in optional_props:
             ${property(p.name)}: Default::default(),
             % endfor
-            % for custom_name in api.properties.values():
+            % for prop_key, custom_name in api.properties.iteritems():
+            % if prop_key == 'scopes' and (not auth or not auth.oauth2):
+            <% continue %>\
+            % endif
             ${custom_name}: Default::default(),
             % endfor
         }

@@ -97,8 +97,10 @@ pub struct ${ThisType}
 % endfor
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
     ${api.properties.params}: HashMap<String, String>,
+    % if auth and auth.oauth2:
 ## We need the scopes sorted, to not unnecessarily query new tokens
     ${api.properties.scopes}: BTreeMap<String, ()>
+    % endif
 }
 
 impl${mb_tparams} MethodBuilder for ${ThisType} {}
@@ -132,6 +134,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         self
     }
 
+    % if auth and auth.oauth2:
     /// Identifies the authorization scope for the method you are building.
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
@@ -148,6 +151,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         self.${api.properties.scopes}.insert(scope.as_slice().to_string(), ());
         self
     }
+    % endif
 }
 </%def>
 

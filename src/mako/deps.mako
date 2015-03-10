@@ -4,7 +4,7 @@
 
 <%api_info=[]%>\
 % for an, versions in api.list.iteritems():
-% if an in api.blacklist:
+% if an in api.get('blacklist', list()):
 <% continue %>\
 % endif
 % for version in versions:

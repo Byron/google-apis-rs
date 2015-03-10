@@ -9,24 +9,6 @@ directories:
   # all mako source files
   mako_src: src/mako
 api:
-  blacklist:
-    - groupsmigration # no oauth2
-    - licensing # no oauth2
-    - translate # no oauth2
-    - pagespeedonline # no oauth2
-    - gan # no oauth2
-    - dataflow # no oauth2
-    - civicinfo # no oauth2
-    - webmasters # no oauth2
-    - doubleclickbidmanager # no oauth2
-    - freebase # no oauth2
-    - spectrum # no oauth2
-    - qpxexpress # no oauth2
-    - discovery # no oauth2
-    - identitytoolkit # no oauth2
-    - audit # no oauth2
-    - webfonts # no oauth2
-    - customsearch # no oauth2
   base_path: "etc/api"
   terms:
     # how to actually do something with the API
