@@ -58,7 +58,7 @@ PROTOCOL_TYPE_INFO = {
         'description': """Upload media all at once.
 If the upload fails for whichever reason, all progress is lost.""",
         'default': 'fs::File',
-        'where': 'Read',
+        'where': 'io::Read',
         'suffix': '',
         'example_value': 'fs::File::open("file.ext").unwrap(), 148, "application/octet-stream".parse().unwrap()'
     },
@@ -238,6 +238,7 @@ def extract_parts(desc):
 # Return transformed string that could make a good type name
 def canonical_type_name(s):
     # can't use s.capitalize() as it will lower-case the remainder of the string
+    s = s.replace(' ', '')
     return s[:1].upper() + s[1:]
 
 def nested_type_name(sn, pn):
@@ -246,7 +247,7 @@ def nested_type_name(sn, pn):
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
     n = '_'.join(singular(w) for w in camel_to_under(n).split('.'))
-    if n == 'type':
+    if n in ('type', 'where', 'override', 'move'):
         return n + '_'
     return n
 
@@ -635,8 +636,11 @@ def mb_additional_type_params(m):
 def mb_type(r, m):
     return "%s%sMethodBuilder" % (singular(canonical_type_name(r)), dot_sep_to_canonical_type_name(m))
 
-def hub_type(canonicalName):
-    return canonical_type_name(canonicalName)
+def hub_type(schemas, canonicalName):
+    name = canonical_type_name(canonicalName)
+    if schemas and name in schemas:
+        name += 'Hub'
+    return name
 
 # return e + d[n] + e + ' ' or ''
 def get_word(d, n, e = ''):
@@ -661,16 +665,22 @@ def dot_sep_to_canonical_type_name(n):
 def scope_url_to_variant(name, url, fully_qualified=True):
     FULL = 'Full'
     fqvn = lambda n: fully_qualified and 'Scope::%s' % n or n
+    repl = lambda n: n.replace('-', '.').replace('_', '.')
+
+    if url.endswith('/'):
+        url = name[:-1]
     base = os.path.basename(url)
+
+    assert base, name
     # special case, which works for now ... https://mail.gmail.com
+    # NO can do ! Must play safe here ... 
     if not base.startswith(name):
-        return fqvn(FULL)
+        return fqvn(dot_sep_to_canonical_type_name(repl(base)))
     base = base[len(name):]
     base = base.strip('-').strip('.')
     if len(base) == 0:
         return fqvn(FULL)
-    base = base.replace('-', '.')
-    return fqvn(dot_sep_to_canonical_type_name(base))
+    return fqvn(dot_sep_to_canonical_type_name(repl(base)))
 
 
 # given a rust type-name (no optional, as from to_rust_type), you will get a suitable random default value

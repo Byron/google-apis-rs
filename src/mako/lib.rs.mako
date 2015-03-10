@@ -12,7 +12,7 @@
     if schemas:
         nested_schemas = list(iter_nested_types(schemas))
     c = new_context(resources)
-    hub_type = hub_type(util.canonical_name())
+    hub_type = hub_type(schemas, util.canonical_name())
     ht_params = hub_type_params_s()
 %>\
 <%block filter="rust_comment">\
@@ -37,7 +37,7 @@ use std::marker::PhantomData;
 use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::default::Default;
-use std::io::{Read, Seek};
+use std::io;
 use std::fs;
 use std::collections::BTreeMap;
 

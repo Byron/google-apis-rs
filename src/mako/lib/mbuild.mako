@@ -31,7 +31,7 @@
 ###############################################################################################
 <%def name="new(resource, method, c)">\
 <% 
-    hub_type_name = hub_type(util.canonical_name())
+    hub_type_name = hub_type(schemas,util.canonical_name())
     m = c.fqan_map[to_fqan(c.rtc_map[resource], resource, method)]
     # an identifier for a property. We prefix them to prevent clashes with the setters
     mb_tparams = mb_type_params_s(m)
@@ -212,7 +212,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 ###############################################################################################
 <%def name="usage(resource, method, m, params, request_value, parts)">\
 <%
-    hub_type_name = hub_type(util.canonical_name())
+    hub_type_name = hub_type(schemas, util.canonical_name())
     required_props, optional_props, part_prop = organize_params(params, request_value)
     is_string_value = lambda v: v.endswith('"')
 
