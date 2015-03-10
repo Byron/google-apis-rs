@@ -12,6 +12,7 @@ from mako.lookup import TemplateLookup
 from mako import exceptions
 
 
+# From https://github.com/Byron/bcore
 class DictObject(object):
 
     """An object which wraps a dictionary to allow object.key access.
@@ -240,10 +241,9 @@ def load_data(datafiles):
         else:
             raise ValueError("Invalid data-file '%s', must be .json, .yaml or .yml" % filename)
         assert data is not None
-        if not namespace:
-            mydata.update(data)
-        else:
-            mydata.update({namespace: data})
+        if namespace:
+            data = {namespace: data}
+        mydata = merge(mydata, data)
     return mydata
 
 
@@ -319,6 +319,21 @@ def cmdline(argv=None):
         except:
             _exit()
     # end for each input file
+
+# From http://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge
+def merge(a, b, path=None):
+    if path is None: path = []
+    for key in b:
+        if key in a:
+            if isinstance(a[key], dict) and isinstance(b[key], dict):
+                merge(a[key], b[key], path + [str(key)])
+            elif a[key] == b[key]:
+                pass # same leaf value
+            else:
+                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+        else:
+            a[key] = b[key]
+    return a
 
 
 if __name__ == "__main__":

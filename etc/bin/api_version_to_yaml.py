@@ -14,19 +14,19 @@ join = os.path.join
 if __name__ != '__main__':
     raise AssertionError("Not for import")
 
-if len(sys.argv) != 2:
-    sys.stderr.write("USAGE: <program> <api_path>, i.e. <program> etc/api\n")
+if len(sys.argv) != 4:
+    sys.stderr.write("USAGE: <program> <api_dir> <api-list.yaml> <dest.yaml>, i.e. <program> etc/api etc/api/api-list.yaml out.yaml\n")
     sys.exit(1)
 
 api_base = sys.argv[1]
 if not isdir(api_base):
     raise ValueError("Directory '%s' not accessible" % api_base)
 
-yaml_path = join(api_base, 'shared.yaml')
+yaml_path = sys.argv[2]
 if not isfile(yaml_path):
-    raise AssertionError("Didn't find yaml data at '%s'" % yaml_path)
+    raise ValueError("Didn't find yaml data at '%s'" % yaml_path)
 
-api_data = list(yaml.load_all(open(yaml_path, 'r')))[0]['api']['list']
+api_data = yaml.load(open(yaml_path, 'r'))['api']['list']
 for api_name in sorted(os.listdir(api_base)):
     api_path = join(api_base, api_name)
     if not isdir(api_path):
@@ -41,6 +41,10 @@ for api_name in sorted(os.listdir(api_base)):
     api_data[api_name] = list(sorted(versions))
 # end for each item in api-base
 
-yaml.dump(dict(api=dict(list=api_data)), sys.stdout, default_flow_style=False)
-
+fp = open(sys.argv[3], 'wb')
+fp.write("# DO NOT EDIT !!!\n")
+fp.write("# Created by '%s'\n" % ' '.join(sys.argv))
+fp.write("# DO NOT EDIT !!!\n")
+yaml.dump(dict(api=dict(list=api_data)), fp, default_flow_style=False)
+fp.close()
 
