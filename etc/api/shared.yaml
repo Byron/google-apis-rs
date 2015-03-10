@@ -25,7 +25,6 @@ api:
     - discovery # no oauth2
     - identitytoolkit # no oauth2
     - audit # no oauth2
-    - admin # ERROR
     - webfonts # no oauth2
     - customsearch # no oauth2
   base_path: "etc/api"

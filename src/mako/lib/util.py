@@ -527,12 +527,12 @@ It should be used to handle progress information, and to implement a certain lev
 ## -- End Activity Utilities -- @}
 
 
-Context = collections.namedtuple('Context', ['sta_map', 'fqan_map', 'rta_map'])
+Context = collections.namedtuple('Context', ['sta_map', 'fqan_map', 'rta_map', 'rtc_map'])
 
 # return a newly build context from the given data
 def new_context(resources):
     if not resources:
-        return Context(dict(), dict(), dict())
+        return Context(dict(), dict(), dict(), dict())
     # Returns (A, B) where
     # A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
     # B: { fqan -> activity_method_data }
@@ -564,7 +564,7 @@ def new_context(resources):
                 # delete: has no response or request
                 # getrating: response is a 'SomethingResult', which is still related to activities name
                 #            the latter is used to deduce the resource name
-                category, an, _ = activity_split(m.id)
+                _, an, _ = activity_split(m.id)
                 tn = activity_name_to_type_name(an)
                 info = res.setdefault(tn, dict())
                 if m.id not in info:
@@ -577,10 +577,12 @@ def new_context(resources):
 
     sta_map, fqan_map = build_activity_mappings(resources)
     rta_map = dict()
+    rtc_map = dict()
     for an in fqan_map:
         category, resource, activity = activity_split(an)
         rta_map.setdefault(resource, list()).append(activity)
-    return Context(sta_map, fqan_map, rta_map)
+        assert rtc_map.setdefault(resource, category) == category
+    return Context(sta_map, fqan_map, rta_map, rtc_map)
 
 # Expects v to be 'v\d+', throws otherwise
 def to_api_version(v):

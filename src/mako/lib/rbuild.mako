@@ -51,7 +51,7 @@ impl${rb_params} ResourceMethodsBuilder for ${ThisType} {}
 impl${rb_params} ${ThisType} {
     % for a in c.rta_map[resource]:
 <%
-    m = c.fqan_map[to_fqan(activity_root or name, resource, a)]
+    m = c.fqan_map[to_fqan(c.rtc_map[resource], resource, a)]
     RType = mb_type(resource, a)
 
     # skip part if we have a request resource. Only resources can have parts
