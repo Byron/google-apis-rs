@@ -37,6 +37,7 @@ use std::cell::RefCell;
 use std::default::Default;
 use std::io::{Read, Seek};
 use std::fs;
+use std::collections::BTreeMap;
 
 pub use cmn::{Hub, ReadSeek, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue,
               NestedType, Delegate, DefaultDelegate, Result};

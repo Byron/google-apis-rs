@@ -84,8 +84,9 @@ impl${rb_params} ${ThisType} {
             % for p in optional_props:
             ${property(p.name)}: Default::default(),
             % endfor
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
+            % for custom_name in api.properties.values():
+            ${custom_name}: Default::default(),
+            % endfor
         }
     }
     % endfor ## for each activity

@@ -22,9 +22,6 @@
         part_desc += ''.join('* *%s*\n' % part for part in parts)
         part_desc = part_desc[:-1]
         return part_desc
-
-    ADD_PARAMS_PROP_NAME = '_additional_params'
-    SCOPE_PROP_NAME = '_scopes'
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -99,8 +96,9 @@ pub struct ${ThisType}
     % endif
 % endfor
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
-    ${ADD_PARAMS_PROP_NAME}: HashMap<String, String>,
-    ${SCOPE_PROP_NAME}: Vec<Scope>
+    ${api.properties.params}: HashMap<String, String>,
+## We need the scopes sorted, to not unnecessarily query new tokens
+    ${api.properties.scopes}: BTreeMap<String, ()>
 }
 
 impl${mb_tparams} MethodBuilder for ${ThisType} {}
@@ -128,8 +126,9 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// * *${opn}* (${op.location}-${op.type}) - ${op.description}
     % endfor
     % endif
-    pub fn param(mut self, name: &str, value: &str) -> ${ThisType} {
-        self.${ADD_PARAMS_PROP_NAME}.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ${ThisType}
+                                                        where T: Str {
+        self.${api.properties.params}.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -137,12 +136,16 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> ${ThisType} {
-        self.${SCOPE_PROP_NAME}.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> ${ThisType} 
+                                                        where T: Str {
+        self.${api.properties.scopes}.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -329,7 +332,7 @@ ${'.' + action_name | indent_by(13)}(${action_args});
 
     field_params = [p for p in params if p.get('is_query_param', True)]
 
-    paddfields = 'self.' + ADD_PARAMS_PROP_NAME
+    paddfields = 'self.' + api.properties.params
 %>
     /// Perform the operation you have build so far.
     ${action_fn} {

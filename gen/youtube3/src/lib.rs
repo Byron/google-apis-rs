@@ -135,6 +135,7 @@ use std::cell::RefCell;
 use std::default::Default;
 use std::io::{Read, Seek};
 use std::fs;
+use std::collections::BTreeMap;
 
 pub use cmn::{Hub, ReadSeek, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue,
               NestedType, Delegate, DefaultDelegate, Result};
@@ -3565,8 +3566,8 @@ impl<'a, C, NC, A> I18nLanguageMethodsBuilder<'a, C, NC, A> {
             _part: part.to_string(),
             _hl: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -3627,8 +3628,8 @@ impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
             _request: request.clone(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -3688,8 +3689,8 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
             _id: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -3704,8 +3705,8 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -3718,8 +3719,8 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -3733,8 +3734,8 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
             _part: request.to_parts(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -3793,8 +3794,8 @@ impl<'a, C, NC, A> GuideCategoryMethodsBuilder<'a, C, NC, A> {
             _id: Default::default(),
             _hl: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -3853,8 +3854,8 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -3873,8 +3874,8 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
             _id: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -3887,8 +3888,8 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -3902,8 +3903,8 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
             _part: request.to_parts(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -3960,8 +3961,8 @@ impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
             _video_id: video_id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -4027,8 +4028,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _hl: Default::default(),
             _chart: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4042,8 +4043,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _rating: rating.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4056,8 +4057,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4070,8 +4071,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4085,8 +4086,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _part: request.to_parts(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4104,8 +4105,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _notify_subscribers: Default::default(),
             _auto_levels: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -4162,8 +4163,8 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
             _request: request.clone(),
             _part: request.to_parts(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4185,8 +4186,8 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
             _for_channel_id: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4198,8 +4199,8 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
             hub: self.hub,
             _id: id.to_string(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -4284,8 +4285,8 @@ impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
             _channel_type: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -4342,8 +4343,8 @@ impl<'a, C, NC, A> I18nRegionMethodsBuilder<'a, C, NC, A> {
             _part: part.to_string(),
             _hl: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -4402,8 +4403,8 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4417,8 +4418,8 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4436,8 +4437,8 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
             _max_results: Default::default(),
             _id: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4452,8 +4453,8 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -4511,8 +4512,8 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
             _part: request.to_parts(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4533,8 +4534,8 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
             _for_username: Default::default(),
             _category_id: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -4590,8 +4591,8 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
             hub: self.hub,
             _id: id.to_string(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4609,8 +4610,8 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
             _max_results: Default::default(),
             _id: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4624,8 +4625,8 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
             _part: request.to_parts(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4638,8 +4639,8 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
             _request: request.clone(),
             _part: request.to_parts(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -4697,8 +4698,8 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
             _channel_id: channel_id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4711,8 +4712,8 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
             _channel_id: channel_id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -4774,8 +4775,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _offset_time_ms: Default::default(),
             _display_slate: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4790,8 +4791,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4806,8 +4807,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4823,8 +4824,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4843,8 +4844,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _id: Default::default(),
             _broadcast_status: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4858,8 +4859,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -4875,8 +4876,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -4935,8 +4936,8 @@ impl<'a, C, NC, A> VideoCategoryMethodsBuilder<'a, C, NC, A> {
             _id: Default::default(),
             _hl: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -5000,8 +5001,8 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
             _home: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -5016,8 +5017,8 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
             _request: request.clone(),
             _part: request.to_parts(),
             _delegate: Default::default(),
-            _additional_params: Default::default(),
             _scopes: Default::default(),
+            _additional_params: Default::default(),
         }
     }
 }
@@ -5086,7 +5087,7 @@ pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nLanguageListMethodBuilder<'a, C, NC, A> {}
@@ -5175,8 +5176,9 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> I18nLanguageListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -5184,12 +5186,16 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> I18nLanguageListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -5249,7 +5255,7 @@ pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelBannerInsertMethodBuilder<'a, C, NC, A> {}
@@ -5362,8 +5368,9 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -5371,12 +5378,16 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -5445,7 +5456,7 @@ pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionListMethodBuilder<'a, C, NC, A> {}
@@ -5572,8 +5583,9 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -5581,12 +5593,16 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> ChannelSectionListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -5658,7 +5674,7 @@ pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionInsertMethodBuilder<'a, C, NC, A> {}
@@ -5786,8 +5802,9 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -5795,12 +5812,16 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -5849,7 +5870,7 @@ pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {}
@@ -5935,8 +5956,9 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -5944,12 +5966,16 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -6019,7 +6045,7 @@ pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {}
@@ -6132,8 +6158,9 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -6141,12 +6168,16 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -6212,7 +6243,7 @@ pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for GuideCategoryListMethodBuilder<'a, C, NC, A> {}
@@ -6325,8 +6356,9 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> GuideCategoryListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -6334,12 +6366,16 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> GuideCategoryListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -6411,7 +6447,7 @@ pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistInsertMethodBuilder<'a, C, NC, A> {}
@@ -6539,8 +6575,9 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistInsertMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -6548,12 +6585,16 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> PlaylistInsertMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -6629,7 +6670,7 @@ pub struct PlaylistListMethodBuilder<'a, C, NC, A>
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistListMethodBuilder<'a, C, NC, A> {}
@@ -6794,8 +6835,9 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> PlaylistListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -6803,12 +6845,16 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> PlaylistListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> PlaylistListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -6857,7 +6903,7 @@ pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistDeleteMethodBuilder<'a, C, NC, A> {}
@@ -6943,8 +6989,9 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistDeleteMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -6952,12 +6999,16 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -7027,7 +7078,7 @@ pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistUpdateMethodBuilder<'a, C, NC, A> {}
@@ -7142,8 +7193,9 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistUpdateMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -7151,12 +7203,16 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -7206,7 +7262,7 @@ pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ThumbnailSetMethodBuilder<'a, C, NC, A> {}
@@ -7319,8 +7375,9 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ThumbnailSetMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -7328,12 +7385,16 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> ThumbnailSetMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -7424,7 +7485,7 @@ pub struct VideoListMethodBuilder<'a, C, NC, A>
     _chart: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoListMethodBuilder<'a, C, NC, A> {}
@@ -7631,8 +7692,9 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> VideoListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> VideoListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -7640,12 +7702,16 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> VideoListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> VideoListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -7695,7 +7761,7 @@ pub struct VideoRateMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoRateMethodBuilder<'a, C, NC, A> {}
@@ -7792,8 +7858,9 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> VideoRateMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> VideoRateMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -7801,12 +7868,16 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> VideoRateMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> VideoRateMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -7855,7 +7926,7 @@ pub struct VideoGetRatingMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoGetRatingMethodBuilder<'a, C, NC, A> {}
@@ -7941,8 +8012,9 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> VideoGetRatingMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> VideoGetRatingMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -7950,12 +8022,16 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> VideoGetRatingMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> VideoGetRatingMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -8004,7 +8080,7 @@ pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoDeleteMethodBuilder<'a, C, NC, A> {}
@@ -8090,8 +8166,9 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> VideoDeleteMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -8099,12 +8176,16 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> VideoDeleteMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -8194,7 +8275,7 @@ pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoUpdateMethodBuilder<'a, C, NC, A> {}
@@ -8331,8 +8412,9 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> VideoUpdateMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -8340,12 +8422,16 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> VideoUpdateMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -8445,7 +8531,7 @@ pub struct VideoInsertMethodBuilder<'a, C, NC, A>
     _auto_levels: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoInsertMethodBuilder<'a, C, NC, A> {}
@@ -8655,8 +8741,9 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> VideoInsertMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> VideoInsertMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -8664,12 +8751,16 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> VideoInsertMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> VideoInsertMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -8737,7 +8828,7 @@ pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
     _part: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionInsertMethodBuilder<'a, C, NC, A> {}
@@ -8837,8 +8928,9 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -8846,12 +8938,16 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -8932,7 +9028,7 @@ pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionListMethodBuilder<'a, C, NC, A> {}
@@ -9129,8 +9225,9 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -9138,12 +9235,16 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> SubscriptionListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -9190,7 +9291,7 @@ pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for SubscriptionDeleteMethodBuilder<'a, C, NC, A> {}
@@ -9263,8 +9364,9 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -9272,12 +9374,16 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -9395,7 +9501,7 @@ pub struct SearchListMethodBuilder<'a, C, NC, A>
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for SearchListMethodBuilder<'a, C, NC, A> {}
@@ -9798,8 +9904,9 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> SearchListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> SearchListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -9807,12 +9914,16 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> SearchListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> SearchListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -9874,7 +9985,7 @@ pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for I18nRegionListMethodBuilder<'a, C, NC, A> {}
@@ -9963,8 +10074,9 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> I18nRegionListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -9972,12 +10084,16 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> I18nRegionListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -10050,7 +10166,7 @@ pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamUpdateMethodBuilder<'a, C, NC, A> {}
@@ -10184,8 +10300,9 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -10193,12 +10310,16 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -10249,7 +10370,7 @@ pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamDeleteMethodBuilder<'a, C, NC, A> {}
@@ -10350,8 +10471,9 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -10359,12 +10481,16 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -10437,7 +10563,7 @@ pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamListMethodBuilder<'a, C, NC, A> {}
@@ -10589,8 +10715,9 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -10598,12 +10725,16 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> LiveStreamListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -10676,7 +10807,7 @@ pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveStreamInsertMethodBuilder<'a, C, NC, A> {}
@@ -10808,8 +10939,9 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamInsertMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -10817,12 +10949,16 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -10892,7 +11028,7 @@ pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelUpdateMethodBuilder<'a, C, NC, A> {}
@@ -11005,8 +11141,9 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelUpdateMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -11014,12 +11151,16 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> ChannelUpdateMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -11102,7 +11243,7 @@ pub struct ChannelListMethodBuilder<'a, C, NC, A>
     _category_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ChannelListMethodBuilder<'a, C, NC, A> {}
@@ -11285,8 +11426,9 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> ChannelListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -11294,12 +11436,16 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> ChannelListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> ChannelListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -11346,7 +11492,7 @@ pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
     _id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {}
@@ -11419,8 +11565,9 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -11428,12 +11575,16 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -11507,7 +11658,7 @@ pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemListMethodBuilder<'a, C, NC, A> {}
@@ -11657,8 +11808,9 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -11666,12 +11818,16 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> PlaylistItemListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -11743,7 +11899,7 @@ pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemInsertMethodBuilder<'a, C, NC, A> {}
@@ -11858,8 +12014,9 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -11867,12 +12024,16 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -11942,7 +12103,7 @@ pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
     _part: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {}
@@ -12046,8 +12207,9 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -12055,12 +12217,16 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -12117,7 +12283,7 @@ pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for WatermarkSetMethodBuilder<'a, C, NC, A> {}
@@ -12239,8 +12405,9 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> WatermarkSetMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -12248,12 +12415,16 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> WatermarkSetMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -12302,7 +12473,7 @@ pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for WatermarkUnsetMethodBuilder<'a, C, NC, A> {}
@@ -12386,8 +12557,9 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> WatermarkUnsetMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -12395,12 +12567,16 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -12469,7 +12645,7 @@ pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
     _display_slate: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastControlMethodBuilder<'a, C, NC, A> {}
@@ -12625,8 +12801,9 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -12634,12 +12811,16 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -12712,7 +12893,7 @@ pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {}
@@ -12846,8 +13027,9 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -12855,12 +13037,16 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -12933,7 +13119,7 @@ pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {}
@@ -13065,8 +13251,9 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -13074,12 +13261,16 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -13144,7 +13335,7 @@ pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastBindMethodBuilder<'a, C, NC, A> {}
@@ -13274,8 +13465,9 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -13283,12 +13475,16 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -13363,7 +13559,7 @@ pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
     _broadcast_status: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastListMethodBuilder<'a, C, NC, A> {}
@@ -13526,8 +13722,9 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -13535,12 +13732,16 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -13591,7 +13792,7 @@ pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {}
@@ -13692,8 +13893,9 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -13701,12 +13903,16 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -13770,7 +13976,7 @@ pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {}
@@ -13900,8 +14106,9 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -13909,12 +14116,16 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -13980,7 +14191,7 @@ pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for VideoCategoryListMethodBuilder<'a, C, NC, A> {}
@@ -14091,8 +14302,9 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> VideoCategoryListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -14100,12 +14312,16 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> VideoCategoryListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -14181,7 +14397,7 @@ pub struct ActivityListMethodBuilder<'a, C, NC, A>
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ActivityListMethodBuilder<'a, C, NC, A> {}
@@ -14350,8 +14566,9 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> ActivityListMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityListMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -14359,12 +14576,16 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> ActivityListMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> ActivityListMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }
@@ -14431,7 +14652,7 @@ pub struct ActivityInsertMethodBuilder<'a, C, NC, A>
     _part: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: Vec<Scope>
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, NC, A> MethodBuilder for ActivityInsertMethodBuilder<'a, C, NC, A> {}
@@ -14531,8 +14752,9 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param(mut self, name: &str, value: &str) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
-        self._additional_params.insert(name.to_string(), value.to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityInsertMethodBuilder<'a, C, NC, A>
+                                                        where T: Str {
+        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
     }
 
@@ -14540,12 +14762,16 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
     /// automated algorithm which simply prefers read-only scopes over those who are not.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
     /// 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope(mut self, scope: Scope) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
-        self._scopes.push(scope);
+    pub fn scope<T>(mut self, scope: T) -> ActivityInsertMethodBuilder<'a, C, NC, A> 
+                                                        where T: Str {
+        self._scopes.insert(scope.as_slice().to_string(), ());
         self
     }
 }

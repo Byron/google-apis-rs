@@ -20,6 +20,11 @@ api:
     action: doit
     # when a resource is supposed to be uploaded
     upload_action: upload
+  properties:
+    # additional fields specified by the user
+    params: '_additional_params'
+    # custom scopes for authentication
+    scopes: '_scopes'
   templates:
   # all output directories are relative to the one set for the respective API
     - source: README.md
