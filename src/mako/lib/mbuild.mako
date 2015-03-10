@@ -24,6 +24,7 @@
         return part_desc
 
     ADD_PARAMS_PROP_NAME = '_additional_params'
+    SCOPE_PROP_NAME = '_scopes'
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -98,7 +99,8 @@ pub struct ${ThisType}
     % endif
 % endfor
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
-    ${ADD_PARAMS_PROP_NAME}: HashMap<String, String>
+    ${ADD_PARAMS_PROP_NAME}: HashMap<String, String>,
+    ${SCOPE_PROP_NAME}: Vec<Scope>
 }
 
 impl${mb_tparams} MethodBuilder for ${ThisType} {}
@@ -128,6 +130,19 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     % endif
     pub fn param(mut self, name: &str, value: &str) -> ${ThisType} {
         self.${ADD_PARAMS_PROP_NAME}.insert(name.to_string(), value.to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead of relying on the 
+    /// automated algorithm which simply prefers read-only scopes over those who are not.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope(mut self, scope: Scope) -> ${ThisType} {
+        self.${SCOPE_PROP_NAME}.push(scope);
         self
     }
 }

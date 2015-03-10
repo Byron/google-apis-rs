@@ -521,21 +521,6 @@ while executing the actual API request.
 
 It should be used to handle progress information, and to implement a certain level of resilience."""})
     params.append(dp)
-
-    sp = type(m)({'name': 'scope',
-                  'type': 'Array',
-                  TREF: 'Scope',
-                  'priority': 0,
-                  'is_query_param': False,
-                  'description': """Identifies the authorization scope for the method you are building.
-
-Use this method to actively specify which scope should be used, instead of relying on the automated algorithm which 
-simply prefers read-only scopes over those who are not.
-
-Usually there is more than one suitable scope to authorize an operation, some of which may
-encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-sufficient, a read-write scope will do as well.""" })
-    params.append(sp)
     return params, request_value
 
 
