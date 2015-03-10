@@ -23,21 +23,32 @@ if not isdir(api_base):
     raise ValueError("Directory '%s' not accessible" % api_base)
 
 yaml_path = sys.argv[2]
-if not isfile(yaml_path):
-    raise ValueError("Didn't find yaml data at '%s'" % yaml_path)
+if isfile(yaml_path):
+    api_data = yaml.load(open(yaml_path, 'r'))['api']['list']
+else:
+    api_data = dict()
 
-api_data = yaml.load(open(yaml_path, 'r'))['api']['list']
+    
 for api_name in sorted(os.listdir(api_base)):
     api_path = join(api_base, api_name)
     if not isdir(api_path):
         continue
-    last_version = list(sorted(v for v in os.listdir(api_path) if isdir(join(api_path, v))))
-    if not last_version:
+    all_versions = sorted((v for v in os.listdir(api_path) if isdir(join(api_path, v))), reverse=True)
+    if not all_versions:
         continue
 
-    versions = api_data.get('api_name', list())
+    last_version = None
+    for v in all_versions:
+        if 'beta' not in v and 'alpha' not in v:
+            last_version = v
+            break
+    # end for each version
+    if last_version is None:
+        last_version = all_versions[0]
+
+    versions = api_data.get(api_name, list())
     if last_version not in versions:
-        versions.append(last_version[0])
+        versions.append(last_version)
     api_data[api_name] = list(sorted(versions))
 # end for each item in api-base
 

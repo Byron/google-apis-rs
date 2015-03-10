@@ -1,22 +1,22 @@
 # DO NOT EDIT !!!
-# File created from 'etc/bin/api_version_to_yaml.py etc/api etc/api/api-list.yaml etc/api/api-list.yaml'
+# Created by 'etc/bin/api_version_to_yaml.py etc/api etc/api/api-list.yaml etc/api/api-list.yaml'
 # DO NOT EDIT !!!
 api:
   list:
     adexchangebuyer:
-    - v1.2
+    - v1.3
     adexchangeseller:
-    - v1
+    - v2.0
     admin:
-    - directory_v1
+    - reports_v1
     adsense:
-    - v1.2
+    - v1.4
     adsensehost:
     - v4.1
     analytics:
-    - v2.4
+    - v3
     androidpublisher:
-    - v1
+    - v2
     appsactivity:
     - v1
     appstate:
@@ -28,13 +28,13 @@ api:
     bigquery:
     - v2
     blogger:
-    - v2
+    - v3
     books:
     - v1
     calendar:
     - v3
     civicinfo:
-    - us_v1
+    - v2
     cloudlatencytest:
     - v2
     cloudmonitoring:
@@ -52,11 +52,11 @@ api:
     dataflow:
     - v1b4
     datastore:
-    - v1beta1
+    - v1beta2
     deploymentmanager:
     - v2beta1
     dfareporting:
-    - v1
+    - v2.0
     discovery:
     - v1
     dns:
@@ -66,11 +66,11 @@ api:
     doubleclicksearch:
     - v2
     drive:
-    - v1
+    - v2
     fitness:
     - v1
     freebase:
-    - v1
+    - v1sandbox
     games:
     - v1
     gamesconfiguration:
@@ -80,7 +80,7 @@ api:
     gan:
     - v1beta1
     genomics:
-    - v1beta
+    - v1beta2
     gmail:
     - v1
     groupsmigration:
@@ -94,43 +94,43 @@ api:
     manager:
     - v1beta2
     mapsengine:
-    - exp2
+    - v1
     mirror:
     - v1
     oauth2:
-    - v1
+    - v2
     pagespeedonline:
-    - v1
+    - v2
     plus:
     - v1
     plusdomains:
     - v1
     prediction:
-    - v1.2
+    - v1.6
     pubsub:
-    - v1beta1
+    - v1beta2
     qpxexpress:
     - v1
     replicapool:
-    - v1beta1
+    - v1beta2
     replicapoolupdater:
     - v1beta1
     reseller:
-    - v1
+    - v1sandbox
     resourceviews:
-    - v1beta1
+    - v1beta2
     siteverification:
     - v1
     spectrum:
     - v1explorer
     sqladmin:
-    - v1beta1
+    - v1beta4
     storage:
     - v1
     tagmanager:
     - v1
     taskqueue:
-    - v1beta1
+    - v1beta2
     tasks:
     - v1
     translate:

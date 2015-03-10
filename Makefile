@@ -61,7 +61,6 @@ regen-apis: clean-apis apis license
 clean: clean-apis
 	-rm -Rf $(VENV_DIR)
 	-rm $(API_DEPS)
-	-rm $(API_LIST)
 
 update-json:
 	etc/bin/update-json.sh $(GOOGLE_GO_APIS_REPO) etc/api
