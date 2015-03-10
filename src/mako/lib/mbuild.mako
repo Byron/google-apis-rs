@@ -118,6 +118,14 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
+    % if parameters:
+    /// 
+    /// # Additional Parameters
+    ///
+    % for opn, op in parameters.iteritems():
+    /// * *${opn}* (${op.location}-${op.type}) - ${op.description}
+    % endfor
+    % endif
     pub fn param(mut self, name: &str, value: &str) -> ${ThisType} {
         self.${ADD_PARAMS_PROP_NAME}.insert(name.to_string(), value.to_string());
         self
