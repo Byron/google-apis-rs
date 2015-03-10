@@ -372,8 +372,7 @@ def schema_markers(s, c):
 # return (name, method)
 def activity_split(fqan):
     t = fqan.split('.')
-    assert len(t) == 3
-    return t[1:]
+    return t[1], '.'.join(t[2:])
 
 # Shorthand to get a type from parameters of activities
 def activity_rust_type(p, allow_optionals=True):
@@ -535,10 +534,14 @@ def new_context(resources):
     # A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
     # B: { fqan -> activity_method_data }
     # fqan = fully qualified activity name
-    def build_activity_mappings(activities):
-        res = dict()
-        fqan = dict()
+    def build_activity_mappings(activities, res = None, fqan = None):
+        if res is None:
+            res = dict()
+        if fqan is None:
+            fqan = dict()
         for an, a in activities.iteritems():
+            if 'resources' in a:
+                build_activity_mappings(a.resources, res, fqan)
             if 'methods' not in a:
                 continue
             for mn, m in a.methods.iteritems():
@@ -648,7 +651,7 @@ def scope_url_to_variant(name, url, fully_qualified=True):
     FULL = 'Full'
     fqvn = lambda n: fully_qualified and 'Scope::%s' % n or n
     base = os.path.basename(url)
-    # special case, which works for now ... 
+    # special case, which works for now ... https://mail.gmail.com
     if not base.startswith(name):
         return fqvn(FULL)
     base = base[len(name):]

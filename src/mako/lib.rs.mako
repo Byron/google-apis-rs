@@ -111,6 +111,7 @@ impl<'a, C, NC, A> ${hub_type}${ht_params}
 ${schema.new(s, c)}
 % endfor
 
+% if nested_schemas:
 // ###################
 // NESTED SCHEMAS ###
 // #################
@@ -119,6 +120,7 @@ ${schema.new(s, c)}
 % for s in nested_schemas:
 ${schema.new(s, c)}
 % endfor
+% endif
 
 // ###################
 // MethodBuilders ###
