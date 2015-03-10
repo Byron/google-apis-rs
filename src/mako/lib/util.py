@@ -645,13 +645,16 @@ def property(n):
 # Convert a scope url to a nice enum variant identifier, ready for use in code
 # name = name of the api, without version
 def scope_url_to_variant(name, url, fully_qualified=True):
+    FULL = 'Full'
     fqvn = lambda n: fully_qualified and 'Scope::%s' % n or n
     base = os.path.basename(url)
-    assert base.startswith(name)
+    # special case, which works for now ... 
+    if not base.startswith(name):
+        return fqvn(FULL)
     base = base[len(name):]
     base = base.strip('-').strip('.')
     if len(base) == 0:
-        return fqvn('Full')
+        return fqvn(FULL)
     base = base.replace('-', '.')
     return fqvn(''.join(canonical_type_name(t) for t in base.split('.')))
 
