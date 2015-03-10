@@ -1,4 +1,5 @@
 import re
+import os
 from random import (randint, random, choice, seed)
 import collections
 
@@ -521,8 +522,9 @@ while executing the actual API request.
 It should be used to handle progress information, and to implement a certain level of resilience."""})
     params.append(dp)
 
-    sp = type(m)({'name': 'scope', 
-                  'type': 'string',
+    sp = type(m)({'name': 'scope',
+                  'type': 'Array',
+                  TREF: 'Scope',
                   'priority': 0,
                   'is_query_param': False,
                   'description': """Identifies the authorization scope for the method you are building.
@@ -654,6 +656,20 @@ def get_word(d, n, e = ''):
 # n = 'FooBar' -> _foo_bar
 def property(n):
     return '_' + mangle_ident(n)
+
+# Convert a scope url to a nice enum variant identifier, ready for use in code
+# name = name of the api, without version
+def scope_url_to_variant(name, url, fully_qualified=True):
+    fqvn = lambda n: fully_qualified and 'Scope::%s' % n or n
+    base = os.path.basename(url)
+    assert base.startswith(name)
+    base = base[len(name):]
+    base = base.strip('-').strip('.')
+    if len(base) == 0:
+        return fqvn('Full')
+    base = base.replace('-', '.')
+    return fqvn(''.join(canonical_type_name(t) for t in base.split('.')))
+
 
 # given a rust type-name (no optional, as from to_rust_type), you will get a suitable random default value
 # as string suitable to be passed as reference (or copy, where applicable)

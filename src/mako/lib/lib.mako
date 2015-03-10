@@ -1,6 +1,6 @@
 <%! from util import (activity_split, put_and, md_italic, split_camelcase_s, canonical_type_name, 
                       rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment, markdown_rust_block,
-                      unindent_first_by, mangle_ident, mb_type, singular)  %>\
+                      unindent_first_by, mangle_ident, mb_type, singular, scope_url_to_variant)  %>\
 <%namespace name="util" file="util.mako"/>\
 
 ## If rust-doc is True, examples will be made to work for rust doc tests. Otherwise they are set 
@@ -161,4 +161,50 @@ under the *${copyright.license_abbrev}* license.
 You can read the full text at the repository's [license file][repo-license].
 
 [repo-license]: ${cargo.repo_base_url + 'LICENSE.md'}
+</%def>
+
+
+## Builds the scope-enum for the API
+###############################################################################################
+###############################################################################################
+<%def name="scope_enum()">\
+/// Identifies the an OAuth2 authorization scope.
+/// A scope is needed when requesting an
+/// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
+pub enum Scope {
+% for url, scope in auth.oauth2.scopes.items():
+    ${scope.description | rust_doc_comment}
+    ${scope_url_to_variant(name, url, fully_qualified=False)},
+    % if not loop.last:
+
+    % endif
+% endfor
+}
+
+impl Str for Scope {
+    fn as_slice(&self) -> &str {
+        match *self {
+            % for url in auth.oauth2.scopes.keys():
+            ${scope_url_to_variant(name, url)} => "${url}",
+            % endfor
+        }
+    }
+}
+
+impl Default for Scope {
+    fn default() -> Scope {
+<%
+            default_url = None
+            shortest_url = None
+            for url in auth.oauth2.scopes.keys():
+                if not default_url and 'readonly' in url:
+                    default_url = url
+                if not shortest_url or len(shortest_url) > len(url):
+                    shortest_url = url
+            # end for each url
+            default_url = default_url or shortest_url
+%>\
+        ${scope_url_to_variant(name, default_url)}
+    }
+}
 </%def>

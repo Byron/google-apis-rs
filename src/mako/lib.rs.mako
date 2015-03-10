@@ -60,6 +60,8 @@ macro_rules! map(
      };
 );
 
+${lib.scope_enum()}
+
 
 // ########
 // HUB ###

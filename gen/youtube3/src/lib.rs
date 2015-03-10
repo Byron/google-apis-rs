@@ -158,6 +158,45 @@ macro_rules! map(
      };
 );
 
+/// Identifies the an OAuth2 authorization scope.
+/// A scope is needed when requesting an
+/// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
+pub enum Scope {
+    /// View private information of your YouTube channel relevant during the audit process with a YouTube partner
+    PartnerChannelAudit,
+
+    /// View your YouTube account
+    Readonly,
+
+    /// Manage your YouTube account
+    Full,
+
+    /// View and manage your assets and associated content on YouTube
+    Partner,
+
+    /// Manage your YouTube videos
+    Upload,
+}
+
+impl Str for Scope {
+    fn as_slice(&self) -> &str {
+        match *self {
+            Scope::PartnerChannelAudit => "https://www.googleapis.com/auth/youtubepartner-channel-audit",
+            Scope::Readonly => "https://www.googleapis.com/auth/youtube.readonly",
+            Scope::Full => "https://www.googleapis.com/auth/youtube",
+            Scope::Partner => "https://www.googleapis.com/auth/youtubepartner",
+            Scope::Upload => "https://www.googleapis.com/auth/youtube.upload",
+        }
+    }
+}
+
+impl Default for Scope {
+    fn default() -> Scope {
+        Scope::Readonly
+    }
+}
+
+
 
 // ########
 // HUB ###
@@ -5032,7 +5071,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_languages().list("part")
 ///              .hl("eos")
-///              .scope("Stet")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5046,7 +5085,7 @@ pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
     _part: String,
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5130,8 +5169,8 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -5197,8 +5236,8 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_banners().insert(&req)
-///              .on_behalf_of_content_owner("dolor")
-///              .scope("sed")
+///              .on_behalf_of_content_owner("Stet")
+///              .scope(&Default::default())
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -5212,7 +5251,7 @@ pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
     _request: ChannelBannerResource,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5320,8 +5359,8 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -5390,11 +5429,11 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().list("part")
-///              .on_behalf_of_content_owner("ipsum")
-///              .mine(true)
-///              .id("duo")
-///              .channel_id("sadipscing")
-///              .scope("dolor")
+///              .on_behalf_of_content_owner("sed")
+///              .mine(false)
+///              .id("ipsum")
+///              .channel_id("eos")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5411,7 +5450,7 @@ pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5533,8 +5572,8 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -5609,9 +5648,9 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().insert(&req)
-///              .on_behalf_of_content_owner_channel("consetetur")
-///              .on_behalf_of_content_owner("ea")
-///              .scope("sit")
+///              .on_behalf_of_content_owner_channel("duo")
+///              .on_behalf_of_content_owner("sadipscing")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5627,7 +5666,7 @@ pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5750,8 +5789,8 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -5806,8 +5845,8 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().delete("id")
-///              .on_behalf_of_content_owner("invidunt")
-///              .scope("et")
+///              .on_behalf_of_content_owner("consetetur")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5821,7 +5860,7 @@ pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -5902,8 +5941,8 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -5978,8 +6017,8 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_sections().update(&req)
-///              .on_behalf_of_content_owner("sit")
-///              .scope("takimata")
+///              .on_behalf_of_content_owner("ea")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5994,7 +6033,7 @@ pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -6102,8 +6141,8 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -6171,10 +6210,10 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guide_categories().list("part")
-///              .region_code("consetetur")
-///              .id("elitr")
-///              .hl("sed")
-///              .scope("sea")
+///              .region_code("sanctus")
+///              .id("invidunt")
+///              .hl("et")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6190,7 +6229,7 @@ pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -6298,8 +6337,8 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -6374,9 +6413,9 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().insert(&req)
-///              .on_behalf_of_content_owner_channel("diam")
-///              .on_behalf_of_content_owner("clita")
-///              .scope("sed")
+///              .on_behalf_of_content_owner_channel("sit")
+///              .on_behalf_of_content_owner("takimata")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6392,7 +6431,7 @@ pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -6515,8 +6554,8 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -6586,14 +6625,14 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().list("part")
-///              .page_token("labore")
-///              .on_behalf_of_content_owner_channel("kasd")
-///              .on_behalf_of_content_owner("elitr")
+///              .page_token("consetetur")
+///              .on_behalf_of_content_owner_channel("elitr")
+///              .on_behalf_of_content_owner("sed")
 ///              .mine(true)
-///              .max_results(79)
-///              .id("kasd")
-///              .channel_id("ea")
-///              .scope("rebum.")
+///              .max_results(60)
+///              .id("clita")
+///              .channel_id("sed")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6613,7 +6652,7 @@ pub struct PlaylistListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -6773,8 +6812,8 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> PlaylistListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> PlaylistListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -6829,8 +6868,8 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().delete("id")
-///              .on_behalf_of_content_owner("sadipscing")
-///              .scope("nonumy")
+///              .on_behalf_of_content_owner("labore")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6844,7 +6883,7 @@ pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -6925,8 +6964,8 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -7001,8 +7040,8 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlists().update(&req)
-///              .on_behalf_of_content_owner("sed")
-///              .scope("et")
+///              .on_behalf_of_content_owner("kasd")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7017,7 +7056,7 @@ pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -7127,8 +7166,8 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -7184,8 +7223,8 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.thumbnails().set("videoId")
-///              .on_behalf_of_content_owner("diam")
-///              .scope("et")
+///              .on_behalf_of_content_owner("kasd")
+///              .scope(&Default::default())
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -7199,7 +7238,7 @@ pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
     _video_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -7307,8 +7346,8 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -7387,17 +7426,17 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().list("part")
-///              .video_category_id("sed")
-///              .region_code("consetetur")
-///              .page_token("aliquyam")
-///              .on_behalf_of_content_owner("accusam")
-///              .my_rating("amet.")
-///              .max_results(87)
-///              .locale("erat")
-///              .id("amet")
-///              .hl("accusam")
-///              .chart("amet.")
-///              .scope("erat")
+///              .video_category_id("kasd")
+///              .region_code("ea")
+///              .page_token("rebum.")
+///              .on_behalf_of_content_owner("dolor")
+///              .my_rating("sadipscing")
+///              .max_results(10)
+///              .locale("sed")
+///              .id("et")
+///              .hl("gubergren")
+///              .chart("diam")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7420,7 +7459,7 @@ pub struct VideoListMethodBuilder<'a, C, NC, A>
     _hl: Option<String>,
     _chart: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -7622,8 +7661,8 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> VideoListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> VideoListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -7678,8 +7717,8 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().rate("id", "rating")
-///              .on_behalf_of_content_owner("sit")
-///              .scope("ipsum")
+///              .on_behalf_of_content_owner("sed")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7694,7 +7733,7 @@ pub struct VideoRateMethodBuilder<'a, C, NC, A>
     _rating: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -7786,8 +7825,8 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> VideoRateMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> VideoRateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -7842,8 +7881,8 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().get_rating("id")
-///              .on_behalf_of_content_owner("amet.")
-///              .scope("rebum.")
+///              .on_behalf_of_content_owner("aliquyam")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7857,7 +7896,7 @@ pub struct VideoGetRatingMethodBuilder<'a, C, NC, A>
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -7938,8 +7977,8 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> VideoGetRatingMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> VideoGetRatingMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -7994,8 +8033,8 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().delete("id")
-///              .on_behalf_of_content_owner("voluptua.")
-///              .scope("dolor")
+///              .on_behalf_of_content_owner("amet.")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8009,7 +8048,7 @@ pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -8090,8 +8129,8 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -8186,8 +8225,8 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().update(&req)
-///              .on_behalf_of_content_owner("amet")
-///              .scope("dolore")
+///              .on_behalf_of_content_owner("clita")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8202,7 +8241,7 @@ pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -8334,8 +8373,8 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -8432,12 +8471,12 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().insert(&req)
-///              .stabilize(false)
-///              .on_behalf_of_content_owner_channel("dolores")
-///              .on_behalf_of_content_owner("diam")
-///              .notify_subscribers(false)
+///              .stabilize(true)
+///              .on_behalf_of_content_owner_channel("amet")
+///              .on_behalf_of_content_owner("accusam")
+///              .notify_subscribers(true)
 ///              .auto_levels(false)
-///              .scope("elitr")
+///              .scope(&Default::default())
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -8456,7 +8495,7 @@ pub struct VideoInsertMethodBuilder<'a, C, NC, A>
     _notify_subscribers: Option<bool>,
     _auto_levels: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -8661,8 +8700,8 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> VideoInsertMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> VideoInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -8737,7 +8776,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().insert(&req)
-///              .scope("At")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8751,7 +8790,7 @@ pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
     _request: Subscription,
     _part: String,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -8846,8 +8885,8 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -8916,17 +8955,17 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().list("part")
-///              .page_token("clita")
-///              .order("sanctus")
-///              .on_behalf_of_content_owner_channel("dolor")
-///              .on_behalf_of_content_owner("diam")
+///              .page_token("est")
+///              .order("sit")
+///              .on_behalf_of_content_owner_channel("ipsum")
+///              .on_behalf_of_content_owner("erat")
 ///              .my_subscribers(false)
 ///              .mine(true)
-///              .max_results(11)
-///              .id("dolor")
-///              .for_channel_id("nonumy")
-///              .channel_id("sit")
-///              .scope("sed")
+///              .max_results(40)
+///              .id("voluptua.")
+///              .for_channel_id("dolor")
+///              .channel_id("amet")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8949,7 +8988,7 @@ pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
     _for_channel_id: Option<String>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -9141,8 +9180,8 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -9197,7 +9236,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().delete("id")
-///              .scope("sed")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9210,7 +9249,7 @@ pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -9278,8 +9317,8 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -9347,36 +9386,36 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.search().list("part")
-///              .video_type("dolore")
-///              .video_syndicated("ea")
-///              .video_license("ut")
-///              .video_embeddable("At")
-///              .video_duration("sit")
-///              .video_dimension("et")
-///              .video_definition("ipsum")
-///              .video_category_id("eos")
-///              .video_caption("amet.")
-///              .type_("ut")
-///              .topic_id("et")
-///              .safe_search("elitr")
-///              .relevance_language("est")
-///              .related_to_video_id("Lorem")
-///              .region_code("justo")
-///              .q("et")
-///              .published_before("ut")
-///              .published_after("et")
-///              .page_token("gubergren")
-///              .order("est")
-///              .on_behalf_of_content_owner("voluptua.")
-///              .max_results(78)
-///              .location_radius("invidunt")
-///              .location("dolore")
+///              .video_type("dolores")
+///              .video_syndicated("diam")
+///              .video_license("Lorem")
+///              .video_embeddable("kasd")
+///              .video_duration("elitr")
+///              .video_dimension("At")
+///              .video_definition("sit")
+///              .video_category_id("clita")
+///              .video_caption("sanctus")
+///              .type_("dolor")
+///              .topic_id("diam")
+///              .safe_search("voluptua.")
+///              .relevance_language("diam")
+///              .related_to_video_id("nonumy")
+///              .region_code("dolor")
+///              .q("nonumy")
+///              .published_before("sit")
+///              .published_after("sed")
+///              .page_token("ipsum")
+///              .order("sed")
+///              .on_behalf_of_content_owner("At")
+///              .max_results(17)
+///              .location_radius("ea")
+///              .location("ut")
 ///              .for_mine(true)
 ///              .for_content_owner(true)
-///              .event_type("invidunt")
-///              .channel_type("dolor")
-///              .channel_id("amet.")
-///              .scope("sit")
+///              .event_type("et")
+///              .channel_type("ipsum")
+///              .channel_id("eos")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9418,7 +9457,7 @@ pub struct SearchListMethodBuilder<'a, C, NC, A>
     _channel_type: Option<String>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -9816,8 +9855,8 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> SearchListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> SearchListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -9885,8 +9924,8 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_regions().list("part")
-///              .hl("accusam")
-///              .scope("tempor")
+///              .hl("ut")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9900,7 +9939,7 @@ pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
     _part: String,
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -9984,8 +10023,8 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -10055,15 +10094,15 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("sit".to_string());
+/// req.id = Some("et".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().update(&req)
-///              .on_behalf_of_content_owner_channel("est")
-///              .on_behalf_of_content_owner("diam")
-///              .scope("ipsum")
+///              .on_behalf_of_content_owner_channel("elitr")
+///              .on_behalf_of_content_owner("est")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10079,7 +10118,7 @@ pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -10208,8 +10247,8 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -10264,9 +10303,9 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().delete("id")
-///              .on_behalf_of_content_owner_channel("Lorem")
-///              .on_behalf_of_content_owner("ipsum")
-///              .scope("et")
+///              .on_behalf_of_content_owner_channel("justo")
+///              .on_behalf_of_content_owner("et")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10281,7 +10320,7 @@ pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -10377,8 +10416,8 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -10447,13 +10486,13 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().list("part")
-///              .page_token("At")
-///              .on_behalf_of_content_owner_channel("et")
-///              .on_behalf_of_content_owner("At")
+///              .page_token("et")
+///              .on_behalf_of_content_owner_channel("gubergren")
+///              .on_behalf_of_content_owner("est")
 ///              .mine(true)
-///              .max_results(82)
-///              .id("Lorem")
-///              .scope("sanctus")
+///              .max_results(78)
+///              .id("invidunt")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10472,7 +10511,7 @@ pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
     _max_results: Option<u32>,
     _id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -10619,8 +10658,8 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -10690,15 +10729,15 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("ipsum".to_string());
+/// req.id = Some("dolore".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().insert(&req)
-///              .on_behalf_of_content_owner_channel("justo")
-///              .on_behalf_of_content_owner("sit")
-///              .scope("dolor")
+///              .on_behalf_of_content_owner_channel("accusam")
+///              .on_behalf_of_content_owner("elitr")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10714,7 +10753,7 @@ pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -10841,8 +10880,8 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -10911,14 +10950,14 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // Values shown here are possibly random and not representative !
 /// let mut req: Channel = Default::default();
 /// req.invideo_promotion = Default::default(); // is InvideoPromotion
-/// req.id = Some("Stet".to_string());
+/// req.id = Some("invidunt".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().update(&req)
-///              .on_behalf_of_content_owner("et")
-///              .scope("amet.")
+///              .on_behalf_of_content_owner("dolor")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10933,7 +10972,7 @@ pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -11041,8 +11080,8 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -11116,15 +11155,15 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().list("part")
 ///              .page_token("sit")
-///              .on_behalf_of_content_owner("sit")
-///              .my_subscribers(true)
+///              .on_behalf_of_content_owner("justo")
+///              .my_subscribers(false)
 ///              .mine(false)
-///              .max_results(67)
-///              .managed_by_me(false)
-///              .id("dolores")
-///              .for_username("eos")
-///              .category_id("ut")
-///              .scope("erat")
+///              .max_results(49)
+///              .managed_by_me(true)
+///              .id("diam")
+///              .for_username("ipsum")
+///              .category_id("voluptua.")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11146,7 +11185,7 @@ pub struct ChannelListMethodBuilder<'a, C, NC, A>
     _for_username: Option<String>,
     _category_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -11324,8 +11363,8 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> ChannelListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> ChannelListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -11380,7 +11419,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().delete("id")
-///              .scope("invidunt")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11393,7 +11432,7 @@ pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
     _id: String,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -11461,8 +11500,8 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -11532,13 +11571,13 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().list("part")
-///              .video_id("justo")
-///              .playlist_id("clita")
-///              .page_token("clita")
-///              .on_behalf_of_content_owner("dolor")
-///              .max_results(75)
-///              .id("magna")
-///              .scope("sanctus")
+///              .video_id("et")
+///              .playlist_id("sadipscing")
+///              .page_token("At")
+///              .on_behalf_of_content_owner("et")
+///              .max_results(25)
+///              .id("sanctus")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11557,7 +11596,7 @@ pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
     _max_results: Option<u32>,
     _id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -11702,8 +11741,8 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -11780,8 +11819,8 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().insert(&req)
-///              .on_behalf_of_content_owner("diam")
-///              .scope("clita")
+///              .on_behalf_of_content_owner("duo")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11796,7 +11835,7 @@ pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
     _part: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -11906,8 +11945,8 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -11984,7 +12023,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().update(&req)
-///              .scope("ipsum")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11998,7 +12037,7 @@ pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
     _request: PlaylistItem,
     _part: String,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -12097,8 +12136,8 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -12161,7 +12200,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().set(&req, "channelId")
 ///              .on_behalf_of_content_owner("sanctus")
-///              .scope("et")
+///              .scope(&Default::default())
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -12176,7 +12215,7 @@ pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
     _channel_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -12293,8 +12332,8 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -12349,8 +12388,8 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().unset("channelId")
-///              .on_behalf_of_content_owner("dolor")
-///              .scope("ea")
+///              .on_behalf_of_content_owner("justo")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -12364,7 +12403,7 @@ pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
     _channel_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -12443,8 +12482,8 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -12510,12 +12549,12 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().control("id", "part")
-///              .walltime("clita")
+///              .walltime("Stet")
 ///              .on_behalf_of_content_owner_channel("et")
-///              .on_behalf_of_content_owner("sanctus")
-///              .offset_time_ms("no")
-///              .display_slate(true)
-///              .scope("consetetur")
+///              .on_behalf_of_content_owner("amet.")
+///              .offset_time_ms("ea")
+///              .display_slate(false)
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -12534,7 +12573,7 @@ pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
     _offset_time_ms: Option<String>,
     _display_slate: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -12685,8 +12724,8 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -12756,15 +12795,15 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
-/// req.id = Some("justo".to_string());
+/// req.id = Some("sit".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().update(&req)
-///              .on_behalf_of_content_owner_channel("sit")
-///              .on_behalf_of_content_owner("et")
-///              .scope("amet")
+///              .on_behalf_of_content_owner_channel("ipsum")
+///              .on_behalf_of_content_owner("est")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -12780,7 +12819,7 @@ pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -12909,8 +12948,8 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -12986,9 +13025,9 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().insert(&req)
-///              .on_behalf_of_content_owner_channel("ipsum")
-///              .on_behalf_of_content_owner("amet")
-///              .scope("sanctus")
+///              .on_behalf_of_content_owner_channel("diam")
+///              .on_behalf_of_content_owner("dolores")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13004,7 +13043,7 @@ pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -13131,8 +13170,8 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -13198,10 +13237,10 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().bind("id", "part")
-///              .stream_id("aliquyam")
-///              .on_behalf_of_content_owner_channel("accusam")
-///              .on_behalf_of_content_owner("labore")
-///              .scope("sit")
+///              .stream_id("erat")
+///              .on_behalf_of_content_owner_channel("erat")
+///              .on_behalf_of_content_owner("invidunt")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13218,7 +13257,7 @@ pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -13343,8 +13382,8 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -13413,14 +13452,14 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().list("part")
-///              .page_token("sanctus")
-///              .on_behalf_of_content_owner_channel("eos")
-///              .on_behalf_of_content_owner("sadipscing")
+///              .page_token("justo")
+///              .on_behalf_of_content_owner_channel("clita")
+///              .on_behalf_of_content_owner("clita")
 ///              .mine(true)
-///              .max_results(50)
-///              .id("et")
-///              .broadcast_status("eirmod")
-///              .scope("erat")
+///              .max_results(75)
+///              .id("magna")
+///              .broadcast_status("sanctus")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13440,7 +13479,7 @@ pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _broadcast_status: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -13598,8 +13637,8 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -13654,9 +13693,9 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().delete("id")
-///              .on_behalf_of_content_owner_channel("diam")
-///              .on_behalf_of_content_owner("sanctus")
-///              .scope("et")
+///              .on_behalf_of_content_owner_channel("clita")
+///              .on_behalf_of_content_owner("ipsum")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13671,7 +13710,7 @@ pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -13767,8 +13806,8 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -13834,9 +13873,9 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().transition("broadcastStatus", "id", "part")
-///              .on_behalf_of_content_owner_channel("accusam")
-///              .on_behalf_of_content_owner("elitr")
-///              .scope("At")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("dolor")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13853,7 +13892,7 @@ pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -13978,8 +14017,8 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -14047,10 +14086,10 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video_categories().list("part")
-///              .region_code("amet.")
-///              .id("eirmod")
-///              .hl("sed")
-///              .scope("ipsum")
+///              .region_code("invidunt")
+///              .id("aliquyam")
+///              .hl("clita")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -14066,7 +14105,7 @@ pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
     _id: Option<String>,
     _hl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -14172,8 +14211,8 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -14241,15 +14280,15 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().list("part")
-///              .region_code("kasd")
-///              .published_before("aliquyam")
-///              .published_after("et")
-///              .page_token("labore")
-///              .mine(true)
-///              .max_results(27)
+///              .region_code("sanctus")
+///              .published_before("no")
+///              .published_after("sit")
+///              .page_token("consetetur")
+///              .mine(false)
+///              .max_results(48)
 ///              .home(true)
-///              .channel_id("et")
-///              .scope("rebum.")
+///              .channel_id("amet")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -14270,7 +14309,7 @@ pub struct ActivityListMethodBuilder<'a, C, NC, A>
     _home: Option<bool>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -14434,8 +14473,8 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> ActivityListMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> ActivityListMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
@@ -14509,7 +14548,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().insert(&req)
-///              .scope("et")
+///              .scope(&Default::default())
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -14523,7 +14562,7 @@ pub struct ActivityInsertMethodBuilder<'a, C, NC, A>
     _request: Activity,
     _part: String,
     _delegate: Option<&'a mut Delegate>,
-    _scope: Option<String>,
+    _scope: Option<Scope>,
     _additional_params: HashMap<String, String>
 }
 
@@ -14618,8 +14657,8 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope(mut self, new_value: &str) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
-        self._scope = Some(new_value.to_string());
+    pub fn scope(mut self, new_value: &Scope) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
+        self._scope = Some(new_value.clone());
         self
     }
 
