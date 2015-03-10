@@ -19,7 +19,7 @@ api:
     - civicinfo # no oauth2
     - webmasters # no oauth2
     - doubleclickbidmanager # no oauth2
-    - freebase # ERROR
+    - freebase # no oauth2
     - spectrum # no oauth2
     - qpxexpress # no oauth2
     - discovery # no oauth2

@@ -12,7 +12,11 @@
     # fr == fattest resource, the fatter, the more important, right ?
     fr = None
     if schemas:
-        fr = sorted(schemas.values(), key=lambda s: (len(c.sta_map.get(s.id, [])), len(s.get('properties', []))), reverse=True)[0]
+        for candidate in sorted(schemas.values(), key=lambda s: (len(c.sta_map.get(s.id, [])), len(s.get('properties', []))), reverse=True):
+            if candidate.id in c.sta_map:
+                fr = candidate
+                break
+        # end for each candidate to check
 %>\
 # Features
 
