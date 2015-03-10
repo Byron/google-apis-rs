@@ -14,6 +14,8 @@ api:
       version: v3
     - name: drive
       version: v2
+    - name: gmail
+      version: v1
   base_path: "etc/api"
   terms:
     # how to actually do something with the API

@@ -579,7 +579,7 @@ def new_context(resources):
 # Expects v to be 'v\d+', throws otherwise
 def to_api_version(v):
     assert len(v) >= 2 and v[0] == 'v'
-    return v[1:]
+    return v[1:].replace('.', 'p')
 
 # build a full library name (non-canonical)
 def library_name(name, version):
