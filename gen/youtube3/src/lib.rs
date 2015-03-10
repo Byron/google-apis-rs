@@ -5072,7 +5072,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_language().list("part")
-///              .hl("eos")
+///              .hl("sit")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5435,10 +5435,10 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_section().list("part")
-///              .on_behalf_of_content_owner("sed")
-///              .mine(false)
-///              .id("ipsum")
-///              .channel_id("eos")
+///              .on_behalf_of_content_owner("et")
+///              .mine(true)
+///              .id("kasd")
+///              .channel_id("accusam")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5656,8 +5656,8 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_section().insert(&req)
-///              .on_behalf_of_content_owner_channel("duo")
-///              .on_behalf_of_content_owner("sadipscing")
+///              .on_behalf_of_content_owner_channel("takimata")
+///              .on_behalf_of_content_owner("justo")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -5855,7 +5855,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_section().delete("id")
-///              .on_behalf_of_content_owner("consetetur")
+///              .on_behalf_of_content_owner("erat")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6029,7 +6029,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel_section().update(&req)
-///              .on_behalf_of_content_owner("ea")
+///              .on_behalf_of_content_owner("labore")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6224,9 +6224,9 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guide_category().list("part")
-///              .region_code("sanctus")
-///              .id("invidunt")
-///              .hl("et")
+///              .region_code("nonumy")
+///              .id("dolores")
+///              .hl("gubergren")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6429,8 +6429,8 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist().insert(&req)
-///              .on_behalf_of_content_owner_channel("sit")
-///              .on_behalf_of_content_owner("takimata")
+///              .on_behalf_of_content_owner_channel("sadipscing")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6643,13 +6643,13 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist().list("part")
-///              .page_token("consetetur")
-///              .on_behalf_of_content_owner_channel("elitr")
-///              .on_behalf_of_content_owner("sed")
+///              .page_token("no")
+///              .on_behalf_of_content_owner_channel("justo")
+///              .on_behalf_of_content_owner("justo")
 ///              .mine(true)
-///              .max_result(60)
-///              .id("clita")
-///              .channel_id("sed")
+///              .max_result(84)
+///              .id("diam")
+///              .channel_id("ipsum")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -6888,7 +6888,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist().delete("id")
-///              .on_behalf_of_content_owner("labore")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7062,7 +7062,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist().update(&req)
-///              .on_behalf_of_content_owner("kasd")
+///              .on_behalf_of_content_owner("duo")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7247,7 +7247,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.thumbnail().set("videoId")
-///              .on_behalf_of_content_owner("kasd")
+///              .on_behalf_of_content_owner("sea")
 ///              .upload(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -7452,16 +7452,16 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video().list("part")
-///              .video_category_id("kasd")
-///              .region_code("ea")
-///              .page_token("rebum.")
+///              .video_category_id("eos")
+///              .region_code("erat")
+///              .page_token("sadipscing")
 ///              .on_behalf_of_content_owner("dolor")
-///              .my_rating("sadipscing")
-///              .max_result(10)
-///              .locale("sed")
-///              .id("et")
-///              .hl("gubergren")
-///              .chart("diam")
+///              .my_rating("eirmod")
+///              .max_result(58)
+///              .locale("amet")
+///              .id("no")
+///              .hl("labore")
+///              .chart("eirmod")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7745,7 +7745,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video().rate("id", "rating")
-///              .on_behalf_of_content_owner("sed")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -7911,7 +7911,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video().get_rating("id")
-///              .on_behalf_of_content_owner("aliquyam")
+///              .on_behalf_of_content_owner("Lorem")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8065,7 +8065,7 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video().delete("id")
-///              .on_behalf_of_content_owner("amet.")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8259,7 +8259,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video().update(&req)
-///              .on_behalf_of_content_owner("clita")
+///              .on_behalf_of_content_owner("duo")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8508,10 +8508,10 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video().insert(&req)
 ///              .stabilize(true)
-///              .on_behalf_of_content_owner_channel("amet")
-///              .on_behalf_of_content_owner("accusam")
+///              .on_behalf_of_content_owner_channel("eirmod")
+///              .on_behalf_of_content_owner("sanctus")
 ///              .notify_subscriber(true)
-///              .auto_level(false)
+///              .auto_level(true)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -8995,16 +8995,16 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscription().list("part")
-///              .page_token("est")
-///              .order("sit")
-///              .on_behalf_of_content_owner_channel("ipsum")
-///              .on_behalf_of_content_owner("erat")
-///              .my_subscriber(false)
+///              .page_token("consetetur")
+///              .order("ut")
+///              .on_behalf_of_content_owner_channel("ea")
+///              .on_behalf_of_content_owner("sed")
+///              .my_subscriber(true)
 ///              .mine(true)
-///              .max_result(40)
-///              .id("voluptua.")
-///              .for_channel_id("dolor")
-///              .channel_id("amet")
+///              .max_result(53)
+///              .id("et")
+///              .for_channel_id("consetetur")
+///              .channel_id("amet.")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9430,35 +9430,35 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.search().list("part")
-///              .video_type("dolores")
-///              .video_syndicated("diam")
-///              .video_license("Lorem")
-///              .video_embeddable("kasd")
-///              .video_duration("elitr")
-///              .video_dimension("At")
-///              .video_definition("sit")
-///              .video_category_id("clita")
-///              .video_caption("sanctus")
-///              .type_("dolor")
-///              .topic_id("diam")
-///              .safe_search("voluptua.")
-///              .relevance_language("diam")
-///              .related_to_video_id("nonumy")
-///              .region_code("dolor")
-///              .q("nonumy")
-///              .published_before("sit")
-///              .published_after("sed")
-///              .page_token("ipsum")
-///              .order("sed")
-///              .on_behalf_of_content_owner("At")
-///              .max_result(17)
-///              .location_radiu("ea")
-///              .location("ut")
+///              .video_type("gubergren")
+///              .video_syndicated("justo")
+///              .video_license("sit")
+///              .video_embeddable("vero")
+///              .video_duration("diam")
+///              .video_dimension("rebum.")
+///              .video_definition("consetetur")
+///              .video_category_id("sadipscing")
+///              .video_caption("vero")
+///              .type_("sadipscing")
+///              .topic_id("invidunt")
+///              .safe_search("consetetur")
+///              .relevance_language("dolore")
+///              .related_to_video_id("duo")
+///              .region_code("aliquyam")
+///              .q("Lorem")
+///              .published_before("et")
+///              .published_after("clita")
+///              .page_token("consetetur")
+///              .order("takimata")
+///              .on_behalf_of_content_owner("nonumy")
+///              .max_result(88)
+///              .location_radiu("sanctus")
+///              .location("takimata")
 ///              .for_mine(true)
-///              .for_content_owner(true)
-///              .event_type("et")
-///              .channel_type("ipsum")
-///              .channel_id("eos")
+///              .for_content_owner(false)
+///              .event_type("invidunt")
+///              .channel_type("ea")
+///              .channel_id("sadipscing")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9970,7 +9970,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_region().list("part")
-///              .hl("ut")
+///              .hl("dolore")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10142,14 +10142,14 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// req.statu = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("et".to_string());
+/// req.id = Some("nonumy".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_stream().update(&req)
-///              .on_behalf_of_content_owner_channel("elitr")
-///              .on_behalf_of_content_owner("est")
+///              .on_behalf_of_content_owner_channel("sed")
+///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10353,8 +10353,8 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_stream().delete("id")
-///              .on_behalf_of_content_owner_channel("justo")
-///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of_content_owner_channel("eirmod")
+///              .on_behalf_of_content_owner("consetetur")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10538,12 +10538,12 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_stream().list("part")
-///              .page_token("et")
-///              .on_behalf_of_content_owner_channel("gubergren")
-///              .on_behalf_of_content_owner("est")
-///              .mine(true)
-///              .max_result(78)
-///              .id("invidunt")
+///              .page_token("sed")
+///              .on_behalf_of_content_owner_channel("ea")
+///              .on_behalf_of_content_owner("gubergren")
+///              .mine(false)
+///              .max_result(77)
+///              .id("tempor")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -10783,14 +10783,14 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// req.statu = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("dolore".to_string());
+/// req.id = Some("sea".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_stream().insert(&req)
-///              .on_behalf_of_content_owner_channel("accusam")
-///              .on_behalf_of_content_owner("elitr")
+///              .on_behalf_of_content_owner_channel("labore")
+///              .on_behalf_of_content_owner("ipsum")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11006,13 +11006,13 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // Values shown here are possibly random and not representative !
 /// let mut req: Channel = Default::default();
 /// req.invideo_promotion = Default::default(); // is InvideoPromotion
-/// req.id = Some("invidunt".to_string());
+/// req.id = Some("aliquyam".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel().update(&req)
-///              .on_behalf_of_content_owner("dolor")
+///              .on_behalf_of_content_owner("dolores")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11212,15 +11212,15 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channel().list("part")
-///              .page_token("sit")
-///              .on_behalf_of_content_owner("justo")
+///              .page_token("diam")
+///              .on_behalf_of_content_owner("ut")
 ///              .my_subscriber(false)
-///              .mine(false)
-///              .max_result(49)
+///              .mine(true)
+///              .max_result(55)
 ///              .managed_by_me(true)
-///              .id("diam")
-///              .for_username("ipsum")
-///              .category_id("voluptua.")
+///              .id("clita")
+///              .for_username("diam")
+///              .category_id("justo")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11633,12 +11633,12 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_item().list("part")
-///              .video_id("et")
-///              .playlist_id("sadipscing")
-///              .page_token("At")
-///              .on_behalf_of_content_owner("et")
-///              .max_result(25)
-///              .id("sanctus")
+///              .video_id("invidunt")
+///              .playlist_id("ut")
+///              .page_token("dolores")
+///              .on_behalf_of_content_owner("eos")
+///              .max_result(23)
+///              .id("duo")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11883,7 +11883,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_item().insert(&req)
-///              .on_behalf_of_content_owner("duo")
+///              .on_behalf_of_content_owner("sed")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -12267,7 +12267,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermark().set(&req, "channelId")
-///              .on_behalf_of_content_owner("sanctus")
+///              .on_behalf_of_content_owner("ea")
 ///              .upload(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -12458,7 +12458,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermark().unset("channelId")
-///              .on_behalf_of_content_owner("justo")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -12621,10 +12621,10 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcast().control("id", "part")
-///              .walltime("Stet")
-///              .on_behalf_of_content_owner_channel("et")
-///              .on_behalf_of_content_owner("amet.")
-///              .offset_time_m("ea")
+///              .walltime("kasd")
+///              .on_behalf_of_content_owner_channel("invidunt")
+///              .on_behalf_of_content_owner("rebum.")
+///              .offset_time_m("Lorem")
 ///              .display_slate(false)
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -12869,14 +12869,14 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 /// req.statu = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
 /// req.content_detail = Default::default(); // is LiveBroadcastContentDetails
-/// req.id = Some("sit".to_string());
+/// req.id = Some("invidunt".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcast().update(&req)
-///              .on_behalf_of_content_owner_channel("ipsum")
-///              .on_behalf_of_content_owner("est")
+///              .on_behalf_of_content_owner_channel("eirmod")
+///              .on_behalf_of_content_owner("At")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13095,14 +13095,14 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 /// req.statu = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
 /// req.content_detail = Default::default(); // is LiveBroadcastContentDetails
-/// req.id = Some("et".to_string());
+/// req.id = Some("consetetur".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcast().insert(&req)
-///              .on_behalf_of_content_owner_channel("diam")
-///              .on_behalf_of_content_owner("dolores")
+///              .on_behalf_of_content_owner_channel("et")
+///              .on_behalf_of_content_owner("sed")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13315,9 +13315,9 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcast().bind("id", "part")
-///              .stream_id("erat")
-///              .on_behalf_of_content_owner_channel("erat")
-///              .on_behalf_of_content_owner("invidunt")
+///              .stream_id("elitr")
+///              .on_behalf_of_content_owner_channel("nonumy")
+///              .on_behalf_of_content_owner("rebum.")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13532,13 +13532,13 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcast().list("part")
-///              .page_token("justo")
-///              .on_behalf_of_content_owner_channel("clita")
-///              .on_behalf_of_content_owner("clita")
+///              .page_token("Lorem")
+///              .on_behalf_of_content_owner_channel("diam")
+///              .on_behalf_of_content_owner("ut")
 ///              .mine(true)
-///              .max_result(75)
-///              .id("magna")
-///              .broadcast_statu("sanctus")
+///              .max_result(50)
+///              .id("ipsum")
+///              .broadcast_statu("ut")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13775,8 +13775,8 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcast().delete("id")
-///              .on_behalf_of_content_owner_channel("clita")
-///              .on_behalf_of_content_owner("ipsum")
+///              .on_behalf_of_content_owner_channel("sea")
+///              .on_behalf_of_content_owner("ut")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13957,8 +13957,8 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcast().transition("broadcastStatus", "id", "part")
-///              .on_behalf_of_content_owner_channel("et")
-///              .on_behalf_of_content_owner("dolor")
+///              .on_behalf_of_content_owner_channel("dolor")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -14172,9 +14172,9 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video_category().list("part")
-///              .region_code("invidunt")
-///              .id("aliquyam")
-///              .hl("clita")
+///              .region_code("vero")
+///              .id("ut")
+///              .hl("sed")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -14368,14 +14368,14 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activity().list("part")
-///              .region_code("sanctus")
-///              .published_before("no")
-///              .published_after("sit")
-///              .page_token("consetetur")
+///              .region_code("ipsum")
+///              .published_before("justo")
+///              .published_after("dolore")
+///              .page_token("vero")
 ///              .mine(false)
-///              .max_result(48)
+///              .max_result(43)
 ///              .home(true)
-///              .channel_id("amet")
+///              .channel_id("nonumy")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }

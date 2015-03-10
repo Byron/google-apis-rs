@@ -3,7 +3,7 @@ import os
 from random import (randint, random, choice, seed)
 import collections
 
-seed(7337)
+seed(1337)
 
 re_linestart = re.compile('^', flags=re.MULTILINE)
 re_first_4_spaces = re.compile('^ {1,4}', flags=re.MULTILINE)
@@ -17,6 +17,7 @@ TYPE_MAP = {'boolean' : 'bool',
             'double'  : 'f64',
             'float'   : 'f32',
             'int32'   : 'i32',
+            'any'     : 'String', # TODO: Figure out how to handle it. It's 'interface' in Go ...
             'int64'   : 'i64',
             'uint64'  : 'u64',
             'array'   : 'Vec',
@@ -483,7 +484,7 @@ def method_media_params(m):
     res = list()
     for pn, proto in mu.protocols.iteritems():
         # the pi (proto-info) dict can be shown to the user
-        pi = {'multipart': proto.multipart and 'yes' or 'no', 'maxSize': mu.maxSize, 'validMimeTypes': mu.accept}
+        pi = {'multipart': proto.multipart and 'yes' or 'no', 'maxSize': mu.get('maxSize', '0kb'), 'validMimeTypes': mu.accept}
         try:
             ti = type(m)(PROTOCOL_TYPE_INFO[pn])
         except KeyError:
@@ -493,7 +494,7 @@ def method_media_params(m):
              'path': proto.path, 
              'type': ti,
              'description': ti.description,
-             'max_size': size_to_bytes(mu.maxSize)})
+             'max_size': size_to_bytes(mu.get('maxSize', '0kb'))})
         res.append(p)
     # end for each proto
 
@@ -581,8 +582,10 @@ def new_context(resources):
 
 # Expects v to be 'v\d+', throws otherwise
 def to_api_version(v):
-    assert len(v) >= 2 and v[0] == 'v'
-    return v[1:].replace('.', 'p')
+    assert len(v) >= 2
+    if v.startswith('v'):
+        v = v[1:]
+    return v.replace('.', 'p')
 
 # build a full library name (non-canonical)
 def library_name(name, version):

@@ -1,5 +1,6 @@
 .timestamp
 .pyenv
+gen/
 *.go
 *.pyc
 **target/

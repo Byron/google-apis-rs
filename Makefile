@@ -23,6 +23,7 @@ help:
 	$(info using template engine: '$(TPL)')
 	$(info )
 	$(info Targets)
+	$(info apis         -    make all APIs)
 	$(info cargo        -   run cargo on all APIs, use ARGS="args ..." to specify cargo arguments)
 	$(info regen-apis   -   clear out all generated apis, and regenerate them)
 	$(info clean-apis   -   delete all generated APIs)

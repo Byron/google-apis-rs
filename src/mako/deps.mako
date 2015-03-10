@@ -3,31 +3,36 @@
 # DO NOT EDIT !
 
 <%api_info=[]%>\
-% for a in api.list:
+% for an, versions in api.list.iteritems():
+% if an in api.blacklist:
+<% continue %>\
+% endif
+% for version in versions:
 <%
 	import util
-	gen_root = directories.output + '/' + a.name + util.to_api_version(a.version)
+	gen_root = directories.output + '/' + an + util.to_api_version(version)
 	gen_root_stamp = gen_root + '/.timestamp'
-	api_name = util.library_name(a.name, a.version)
+	api_name = util.library_name(an, version)
 	api_common = gen_root + '/src/cmn.rs'
 	api_clean = api_name + '-clean'
 	api_cargo = api_name + '-cargo'
 	# source, destination of individual output files
 	sds = [(directories.mako_src + '/' + i.source + '.mako', gen_root + '/' + i.get('output_dir', '') + '/' + i.source) 
 																								for i in api.templates]
-	api_json = directories.api_base + '/' + a.name + '/' + a.version + '/' + a.name + '-api.json'
+	api_json = directories.api_base + '/' + an + '/' + version + '/' + an + '-api.json'
 	api_json_inputs = api_json + " $(API_SHARED_INFO)"
 	api_info.append((api_name, api_clean, api_cargo, gen_root))
 
 	space_join = lambda i: ' '.join(a[i] for a in api_info)
 %>\
-${api_common}: $(RUST_SRC)/cmn.rs $(lastword $(MAKEFILE_LIST))
+${api_common}: $(RUST_SRC)/cmn.rs $(lastword $(MAKEFILE_LIST)) ${gen_root_stamp}
 	@ echo "// COPY OF '$<'"  > $@
 	@ echo "// DO NOT EDIT"  >> $@
 	@cat $< >> $@
 
 ${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_LIB_FILES) $(MAKO_RENDER)
-	PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.' --var OUTPUT_DIR=$@ -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
+	@echo Generating ${api_name}
+	@PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.' --var OUTPUT_DIR=$@ -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
 	@touch $@
 
 ${api_name}: ${gen_root_stamp} ${api_common}
@@ -37,6 +42,7 @@ ${api_cargo}: ${api_name}
 
 ${api_clean}:
 	-rm -Rf ${gen_root}
+% endfor
 % endfor
 
 .PHONY += $(.PHONY) help-api clean-apis apis ${space_join(0)} ${space_join(1)} ${space_join(2)}
