@@ -233,7 +233,16 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 
     media_params = method_media_params(m)
 
-    action_name = media_params and (api.terms.upload_action + media_params[-1].type.suffix) or api.terms.action
+    if media_params:
+        # index 0 == Simple (usually)
+        # index 1 == Resumable
+        # propose standard upload for smaller media. Also means we get to test different code-paths
+        index = -1
+        if media_params[-1].max_size < 100*1024*1024:
+            index = 0
+        action_name = api.terms.upload_action + media_params[index].type.suffix
+    else:
+        action_name = api.terms.action
     action_args = media_params and media_params[-1].type.example_value or ''
 
     random_value_warning = "Values shown here are possibly random and not representative !"

@@ -244,7 +244,7 @@ def nested_type_name(sn, pn):
 
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
-    n = camel_to_under(n)
+    n = '_'.join(singular(w) for w in camel_to_under(n).split('.'))
     if n == 'type':
         return n + '_'
     return n
@@ -626,7 +626,7 @@ def mb_additional_type_params(m):
 
 # return type name for a method on the given resource
 def mb_type(r, m):
-    return "%s%sMethodBuilder" % (singular(canonical_type_name(r)), canonical_type_name(m))
+    return "%s%sMethodBuilder" % (singular(canonical_type_name(r)), dot_sep_to_canonical_type_name(m))
 
 def hub_type(canonicalName):
     return canonical_type_name(canonicalName)
@@ -645,6 +645,10 @@ def get_word(d, n, e = ''):
 def property(n):
     return '_' + mangle_ident(n)
 
+# n = 'foo.bar.Baz' -> 'FooBarBaz'
+def dot_sep_to_canonical_type_name(n):
+    return ''.join(canonical_type_name(singular(t)) for t in n.split('.'))
+
 # Convert a scope url to a nice enum variant identifier, ready for use in code
 # name = name of the api, without version
 def scope_url_to_variant(name, url, fully_qualified=True):
@@ -659,7 +663,7 @@ def scope_url_to_variant(name, url, fully_qualified=True):
     if len(base) == 0:
         return fqvn(FULL)
     base = base.replace('-', '.')
-    return fqvn(''.join(canonical_type_name(t) for t in base.split('.')))
+    return fqvn(dot_sep_to_canonical_type_name(base))
 
 
 # given a rust type-name (no optional, as from to_rust_type), you will get a suitable random default value

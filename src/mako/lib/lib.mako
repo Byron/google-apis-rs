@@ -67,7 +67,7 @@ Or specifically ...
 ```ignore
 % for an, a in c.sta_map[fr.id].iteritems():
 <% resource, activity = activity_split(an) %>\
-let r = hub.${mangle_ident(resource)}().${activity}(...).${api.terms.action}()
+let r = hub.${mangle_ident(resource)}().${mangle_ident(activity)}(...).${api.terms.action}()
 % endfor
 ```
 

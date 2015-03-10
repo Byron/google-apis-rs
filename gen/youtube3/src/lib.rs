@@ -51,13 +51,13 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.live_broadcasts().control(...).doit()
-//! let r = hub.live_broadcasts().insert(...).doit()
-//! let r = hub.live_broadcasts().list(...).doit()
-//! let r = hub.live_broadcasts().transition(...).doit()
-//! let r = hub.live_broadcasts().update(...).doit()
-//! let r = hub.live_broadcasts().delete(...).doit()
-//! let r = hub.live_broadcasts().bind(...).doit()
+//! let r = hub.live_broadcast().control(...).doit()
+//! let r = hub.live_broadcast().insert(...).doit()
+//! let r = hub.live_broadcast().list(...).doit()
+//! let r = hub.live_broadcast().transition(...).doit()
+//! let r = hub.live_broadcast().update(...).doit()
+//! let r = hub.live_broadcast().delete(...).doit()
+//! let r = hub.live_broadcast().bind(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -254,55 +254,55 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
         }
     }
 
-    pub fn activities(&'a self) -> ActivityMethodsBuilder<'a, C, NC, A> {
+    pub fn activity(&'a self) -> ActivityMethodsBuilder<'a, C, NC, A> {
         ActivityMethodsBuilder { hub: &self }
     }
-    pub fn channel_banners(&'a self) -> ChannelBannerMethodsBuilder<'a, C, NC, A> {
+    pub fn channel_banner(&'a self) -> ChannelBannerMethodsBuilder<'a, C, NC, A> {
         ChannelBannerMethodsBuilder { hub: &self }
     }
-    pub fn channel_sections(&'a self) -> ChannelSectionMethodsBuilder<'a, C, NC, A> {
+    pub fn channel_section(&'a self) -> ChannelSectionMethodsBuilder<'a, C, NC, A> {
         ChannelSectionMethodsBuilder { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethodsBuilder<'a, C, NC, A> {
+    pub fn channel(&'a self) -> ChannelMethodsBuilder<'a, C, NC, A> {
         ChannelMethodsBuilder { hub: &self }
     }
-    pub fn guide_categories(&'a self) -> GuideCategoryMethodsBuilder<'a, C, NC, A> {
+    pub fn guide_category(&'a self) -> GuideCategoryMethodsBuilder<'a, C, NC, A> {
         GuideCategoryMethodsBuilder { hub: &self }
     }
-    pub fn i18n_languages(&'a self) -> I18nLanguageMethodsBuilder<'a, C, NC, A> {
+    pub fn i18n_language(&'a self) -> I18nLanguageMethodsBuilder<'a, C, NC, A> {
         I18nLanguageMethodsBuilder { hub: &self }
     }
-    pub fn i18n_regions(&'a self) -> I18nRegionMethodsBuilder<'a, C, NC, A> {
+    pub fn i18n_region(&'a self) -> I18nRegionMethodsBuilder<'a, C, NC, A> {
         I18nRegionMethodsBuilder { hub: &self }
     }
-    pub fn live_broadcasts(&'a self) -> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
+    pub fn live_broadcast(&'a self) -> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
         LiveBroadcastMethodsBuilder { hub: &self }
     }
-    pub fn live_streams(&'a self) -> LiveStreamMethodsBuilder<'a, C, NC, A> {
+    pub fn live_stream(&'a self) -> LiveStreamMethodsBuilder<'a, C, NC, A> {
         LiveStreamMethodsBuilder { hub: &self }
     }
-    pub fn playlist_items(&'a self) -> PlaylistItemMethodsBuilder<'a, C, NC, A> {
+    pub fn playlist_item(&'a self) -> PlaylistItemMethodsBuilder<'a, C, NC, A> {
         PlaylistItemMethodsBuilder { hub: &self }
     }
-    pub fn playlists(&'a self) -> PlaylistMethodsBuilder<'a, C, NC, A> {
+    pub fn playlist(&'a self) -> PlaylistMethodsBuilder<'a, C, NC, A> {
         PlaylistMethodsBuilder { hub: &self }
     }
     pub fn search(&'a self) -> SearchMethodsBuilder<'a, C, NC, A> {
         SearchMethodsBuilder { hub: &self }
     }
-    pub fn subscriptions(&'a self) -> SubscriptionMethodsBuilder<'a, C, NC, A> {
+    pub fn subscription(&'a self) -> SubscriptionMethodsBuilder<'a, C, NC, A> {
         SubscriptionMethodsBuilder { hub: &self }
     }
-    pub fn thumbnails(&'a self) -> ThumbnailMethodsBuilder<'a, C, NC, A> {
+    pub fn thumbnail(&'a self) -> ThumbnailMethodsBuilder<'a, C, NC, A> {
         ThumbnailMethodsBuilder { hub: &self }
     }
-    pub fn video_categories(&'a self) -> VideoCategoryMethodsBuilder<'a, C, NC, A> {
+    pub fn video_category(&'a self) -> VideoCategoryMethodsBuilder<'a, C, NC, A> {
         VideoCategoryMethodsBuilder { hub: &self }
     }
-    pub fn videos(&'a self) -> VideoMethodsBuilder<'a, C, NC, A> {
+    pub fn video(&'a self) -> VideoMethodsBuilder<'a, C, NC, A> {
         VideoMethodsBuilder { hub: &self }
     }
-    pub fn watermarks(&'a self) -> WatermarkMethodsBuilder<'a, C, NC, A> {
+    pub fn watermark(&'a self) -> WatermarkMethodsBuilder<'a, C, NC, A> {
         WatermarkMethodsBuilder { hub: &self }
     }
 }
@@ -318,7 +318,7 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoConversionPings {
 	/// Pings that the app shall fire for a video (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
-	pub pings: Vec<VideoConversionPing>,
+	pub ping: Vec<VideoConversionPing>,
 }
 
 impl Part for VideoConversionPings {}
@@ -345,7 +345,7 @@ pub struct SubscriptionListResponse {
 	/// The visitorId identifies the visitor.
 	pub visitor_id: Option<String>,
 	/// A list of subscriptions that match the request criteria.
-	pub items: Vec<Subscription>,
+	pub item: Vec<Subscription>,
 	/// no description provided
 	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
@@ -395,7 +395,7 @@ pub struct LiveBroadcastSnippet {
 	/// The date and time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
 	pub scheduled_end_time: Option<String>,
 	/// A map of thumbnail images associated with the broadcast. For each nested object in this object, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-	pub thumbnails: Option<ThumbnailDetails>,
+	pub thumbnail: Option<ThumbnailDetails>,
 }
 
 impl Part for LiveBroadcastSnippet {}
@@ -408,7 +408,7 @@ impl Part for LiveBroadcastSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetails {
 	/// The uploaded video file's combined (video and audio) bitrate in bits per second.
-	pub bitrate_bps: Option<String>,
+	pub bitrate_bp: Option<String>,
 	/// The uploaded video file's container format.
 	pub container: Option<String>,
 	/// Geographic coordinates that identify the place where the uploaded video was recorded. Coordinates are defined using WGS 84.
@@ -421,15 +421,15 @@ pub struct VideoFileDetails {
 /// - Time with timezone: YYYY-MM-DDTHH:MM:SS+HH:MM
 	pub creation_time: Option<String>,
 	/// The length of the uploaded video in milliseconds.
-	pub duration_ms: Option<String>,
+	pub duration_m: Option<String>,
 	/// The uploaded file's name. This field is present whether a video file or another type of file was uploaded.
 	pub file_name: Option<String>,
 	/// The uploaded file's size in bytes. This field is present whether a video file or another type of file was uploaded.
 	pub file_size: Option<String>,
 	/// A list of video streams contained in the uploaded video file. Each item in the list contains detailed metadata about a video stream.
-	pub video_streams: Vec<VideoFileDetailsVideoStream>,
+	pub video_stream: Vec<VideoFileDetailsVideoStream>,
 	/// A list of audio streams contained in the uploaded video file. Each item in the list contains detailed metadata about an audio stream.
-	pub audio_streams: Vec<VideoFileDetailsAudioStream>,
+	pub audio_stream: Vec<VideoFileDetailsAudioStream>,
 }
 
 impl Part for VideoFileDetails {}
@@ -475,11 +475,11 @@ impl Part for PlaylistLocalization {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct Playlist {
 	/// The status object contains status information for the playlist.
-	pub status: Option<PlaylistStatus>,
+	pub statu: Option<PlaylistStatus>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#playlist".
 	pub kind: Option<String>,
 	/// The contentDetails object contains information like video count.
-	pub content_details: Option<PlaylistContentDetails>,
+	pub content_detail: Option<PlaylistContentDetails>,
 	/// The snippet object contains basic details about the playlist, such as its title and description.
 	pub snippet: Option<PlaylistSnippet>,
 	/// The player object contains information that you would use to play the playlist in an embedded player.
@@ -489,7 +489,7 @@ pub struct Playlist {
 	/// The ID that YouTube uses to uniquely identify the playlist.
 	pub id: Option<String>,
 	/// Localizations for different languages
-	pub localizations: HashMap<String, PlaylistLocalization>,
+	pub localization: HashMap<String, PlaylistLocalization>,
 }
 
 impl RequestValue for Playlist {}
@@ -502,14 +502,14 @@ impl Playlist {
 	/// the parts you want to see in the server response.
 	fn to_parts(&self) -> String {
 		let mut r = String::new();
-		if self.status.is_some() { r = r + "status,"; }
+		if self.statu.is_some() { r = r + "status,"; }
 		if self.kind.is_some() { r = r + "kind,"; }
-		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.content_detail.is_some() { r = r + "contentDetails,"; }
 		if self.snippet.is_some() { r = r + "snippet,"; }
 		if self.player.is_some() { r = r + "player,"; }
 		if self.etag.is_some() { r = r + "etag,"; }
 		if self.id.is_some() { r = r + "id,"; }
-		if self.localizations.len() > 0 { r = r + "localizations,"; }
+		if self.localization.len() > 0 { r = r + "localizations,"; }
 		r.pop();
 		r
 	}
@@ -536,7 +536,7 @@ pub struct PlaylistItemListResponse {
 	/// The visitorId identifies the visitor.
 	pub visitor_id: Option<String>,
 	/// A list of playlist items that match the request criteria.
-	pub items: Vec<PlaylistItem>,
+	pub item: Vec<PlaylistItem>,
 	/// no description provided
 	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
@@ -572,11 +572,11 @@ impl Part for PropertyValue {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct InvideoTiming {
 	/// Defines the time at which the promotion will appear. Depending on the value of type the value of the offsetMs field will represent a time offset from the start or from the end of the video, expressed in milliseconds.
-	pub offset_ms: Option<String>,
+	pub offset_m: Option<String>,
 	/// Describes a timing type. If the value is offsetFromStart, then the offsetMs field represents an offset from the start of the video. If the value is offsetFromEnd, then the offsetMs field represents an offset from the end of the video.
 	pub type_: Option<String>,
 	/// Defines the duration in milliseconds for which the promotion should be displayed. If missing, the client should use the default.
-	pub duration_ms: Option<String>,
+	pub duration_m: Option<String>,
 }
 
 impl Part for InvideoTiming {}
@@ -591,7 +591,7 @@ pub struct PlaylistSnippet {
 	/// The playlist's description.
 	pub description: Option<String>,
 	/// Keyword tags associated with the playlist.
-	pub tags: Vec<String>,
+	pub tag: Vec<String>,
 	/// The ID that YouTube uses to uniquely identify the channel that published the playlist.
 	pub channel_id: Option<String>,
 	/// The date and time that the playlist was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
@@ -605,7 +605,7 @@ pub struct PlaylistSnippet {
 	/// Localized title and description, read-only.
 	pub localized: Option<PlaylistLocalization>,
 	/// A map of thumbnail images associated with the playlist. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-	pub thumbnails: Option<ThumbnailDetails>,
+	pub thumbnail: Option<ThumbnailDetails>,
 }
 
 impl Part for PlaylistSnippet {}
@@ -646,7 +646,7 @@ impl Part for ChannelAuditDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStream {
 	/// The status object contains information about live stream's status.
-	pub status: Option<LiveStreamStatus>,
+	pub statu: Option<LiveStreamStatus>,
 	/// The snippet object contains basic details about the stream, including its channel, title, and description.
 	pub snippet: Option<LiveStreamSnippet>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#liveStream".
@@ -654,7 +654,7 @@ pub struct LiveStream {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The content_details object contains information about the stream, including the closed captions ingestion URL.
-	pub content_details: Option<LiveStreamContentDetails>,
+	pub content_detail: Option<LiveStreamContentDetails>,
 	/// The cdn object defines the live stream's content delivery network (CDN) settings. These settings provide details about the manner in which you stream your content to YouTube.
 	pub cdn: Option<CdnSettings>,
 	/// The ID that YouTube assigns to uniquely identify the stream.
@@ -671,11 +671,11 @@ impl LiveStream {
 	/// the parts you want to see in the server response.
 	fn to_parts(&self) -> String {
 		let mut r = String::new();
-		if self.status.is_some() { r = r + "status,"; }
+		if self.statu.is_some() { r = r + "status,"; }
 		if self.snippet.is_some() { r = r + "snippet,"; }
 		if self.kind.is_some() { r = r + "kind,"; }
 		if self.etag.is_some() { r = r + "etag,"; }
-		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.content_detail.is_some() { r = r + "contentDetails,"; }
 		if self.cdn.is_some() { r = r + "cdn,"; }
 		if self.id.is_some() { r = r + "id,"; }
 		r.pop();
@@ -698,7 +698,7 @@ pub struct ThumbnailSetResponse {
 	/// Serialized EventId of the request which produced this response.
 	pub event_id: Option<String>,
 	/// A list of thumbnails.
-	pub items: Vec<ThumbnailDetails>,
+	pub item: Vec<ThumbnailDetails>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#thumbnailSetResponse".
 	pub kind: Option<String>,
 	/// Etag of this resource.
@@ -734,7 +734,7 @@ pub struct ChannelSettings {
 	/// Specifies the channel title.
 	pub title: Option<String>,
 	/// Whether user-submitted comments left on the channel page need to be approved by the channel owner to be publicly visible.
-	pub moderate_comments: Option<bool>,
+	pub moderate_comment: Option<bool>,
 	/// Whether the tab to browse the videos should be displayed.
 	pub show_browse_view: Option<bool>,
 	/// Title for the featured channels tab.
@@ -744,15 +744,15 @@ pub struct ChannelSettings {
 	/// The trailer of the channel, for users that are not subscribers.
 	pub unsubscribed_trailer: Option<String>,
 	/// The list of featured channels.
-	pub featured_channels_urls: Vec<String>,
+	pub featured_channels_url: Vec<String>,
 	/// A prominent color that can be rendered on this channel page.
 	pub profile_color: Option<String>,
 	/// Which content tab users should see when viewing the channel.
 	pub default_tab: Option<String>,
 	/// Lists keywords associated with the channel, comma-separated.
-	pub keywords: Option<String>,
+	pub keyword: Option<String>,
 	/// Whether related channels should be proposed.
-	pub show_related_channels: Option<bool>,
+	pub show_related_channel: Option<bool>,
 	/// The ID for a Google Analytics account to track and measure traffic to the channels.
 	pub tracking_analytics_account_id: Option<String>,
 }
@@ -813,7 +813,7 @@ pub struct VideoGetRatingResponse {
 	/// Serialized EventId of the request which produced this response.
 	pub event_id: Option<String>,
 	/// A list of ratings that match the request criteria.
-	pub items: Vec<VideoRating>,
+	pub item: Vec<VideoRating>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#videoGetRatingResponse".
 	pub kind: Option<String>,
 	/// Etag of this resource.
@@ -877,7 +877,7 @@ impl Part for I18nLanguageSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct SubscriptionSnippet {
 	/// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-	pub thumbnails: Option<ThumbnailDetails>,
+	pub thumbnail: Option<ThumbnailDetails>,
 	/// The subscription's title.
 	pub title: Option<String>,
 	/// The id object contains information about the channel that the user subscribed to.
@@ -902,9 +902,9 @@ impl Part for SubscriptionSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelSectionContentDetails {
 	/// The channel ids for type multiple_channels.
-	pub channels: Vec<String>,
+	pub channel: Vec<String>,
 	/// The playlist ids for type single_playlist and multiple_playlists. For singlePlaylist, only one playlistId is allowed.
-	pub playlists: Vec<String>,
+	pub playlist: Vec<String>,
 }
 
 impl Part for ChannelSectionContentDetails {}
@@ -925,7 +925,7 @@ pub struct I18nRegionListResponse {
 	/// Serialized EventId of the request which produced this response.
 	pub event_id: Option<String>,
 	/// A list of regions where YouTube is available. In this map, the i18n region ID is the map key, and its value is the corresponding i18nRegion resource.
-	pub items: Vec<I18nRegion>,
+	pub item: Vec<I18nRegion>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nRegionListResponse".
 	pub kind: Option<String>,
 	/// Etag of this resource.
@@ -958,7 +958,7 @@ pub struct LiveStreamListResponse {
 	/// The visitorId identifies the visitor.
 	pub visitor_id: Option<String>,
 	/// A list of live streams that match the request criteria.
-	pub items: Vec<LiveStream>,
+	pub item: Vec<LiveStream>,
 	/// no description provided
 	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
@@ -1004,7 +1004,7 @@ pub struct ChannelBrandingSettings {
 	/// Branding properties for the channel view.
 	pub channel: Option<ChannelSettings>,
 	/// Additional experimental branding properties.
-	pub hints: Vec<PropertyValue>,
+	pub hint: Vec<PropertyValue>,
 }
 
 impl Part for ChannelBrandingSettings {}
@@ -1031,7 +1031,7 @@ pub struct PlaylistListResponse {
 	/// The visitorId identifies the visitor.
 	pub visitor_id: Option<String>,
 	/// A list of playlists that match the request criteria.
-	pub items: Vec<Playlist>,
+	pub item: Vec<Playlist>,
 	/// no description provided
 	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
@@ -1066,7 +1066,7 @@ pub struct InvideoBranding {
 	/// no description provided
 	pub timing: Option<InvideoTiming>,
 	/// no description provided
-	pub image_bytes: Option<String>,
+	pub image_byte: Option<String>,
 }
 
 impl RequestValue for InvideoBranding {}
@@ -1081,7 +1081,7 @@ impl InvideoBranding {
 		if self.position.is_some() { r = r + "position,"; }
 		if self.image_url.is_some() { r = r + "imageUrl,"; }
 		if self.timing.is_some() { r = r + "timing,"; }
-		if self.image_bytes.is_some() { r = r + "imageBytes,"; }
+		if self.image_byte.is_some() { r = r + "imageBytes,"; }
 		r.pop();
 		r
 	}
@@ -1094,7 +1094,7 @@ impl InvideoBranding {
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItemStatus {
 	/// This resource's privacy status.
-	pub privacy_status: Option<String>,
+	pub privacy_statu: Option<String>,
 }
 
 impl Part for PlaylistItemStatus {}
@@ -1124,7 +1124,7 @@ pub struct InvideoPromotion {
 	/// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.
 	pub default_timing: Option<InvideoTiming>,
 	/// List of promoted items in decreasing priority.
-	pub items: Vec<PromotedItem>,
+	pub item: Vec<PromotedItem>,
 	/// Indicates whether the channel's promotional campaign uses "smart timing." This feature attempts to show promotions at a point in the video when they are more likely to be clicked and less likely to disrupt the viewing experience. This feature also picks up a single promotion to show on each video.
 	pub use_smart_timing: Option<bool>,
 	/// The spatial position within the video where the promoted item will be displayed.
@@ -1159,7 +1159,7 @@ impl Part for InvideoPromotion {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistItem {
 	/// The status object contains information about the playlist item's privacy status.
-	pub status: Option<PlaylistItemStatus>,
+	pub statu: Option<PlaylistItemStatus>,
 	/// The snippet object contains basic details about the playlist item, such as its title and position in the playlist.
 	pub snippet: Option<PlaylistItemSnippet>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistItem".
@@ -1167,7 +1167,7 @@ pub struct PlaylistItem {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The contentDetails object is included in the resource if the included item is a YouTube video. The object contains additional information about the video.
-	pub content_details: Option<PlaylistItemContentDetails>,
+	pub content_detail: Option<PlaylistItemContentDetails>,
 	/// The ID that YouTube uses to uniquely identify the playlist item.
 	pub id: Option<String>,
 }
@@ -1182,11 +1182,11 @@ impl PlaylistItem {
 	/// the parts you want to see in the server response.
 	fn to_parts(&self) -> String {
 		let mut r = String::new();
-		if self.status.is_some() { r = r + "status,"; }
+		if self.statu.is_some() { r = r + "status,"; }
 		if self.snippet.is_some() { r = r + "snippet,"; }
 		if self.kind.is_some() { r = r + "kind,"; }
 		if self.etag.is_some() { r = r + "etag,"; }
-		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.content_detail.is_some() { r = r + "contentDetails,"; }
 		if self.id.is_some() { r = r + "id,"; }
 		r.pop();
 		r
@@ -1214,7 +1214,7 @@ pub struct GuideCategoryListResponse {
 	/// The visitorId identifies the visitor.
 	pub visitor_id: Option<String>,
 	/// A list of categories that can be associated with YouTube channels. In this map, the category ID is the map key, and its value is the corresponding guideCategory resource.
-	pub items: Vec<GuideCategory>,
+	pub item: Vec<GuideCategory>,
 	/// no description provided
 	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
@@ -1275,7 +1275,7 @@ impl Part for ChannelSectionSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentDetails {
 	/// no description provided
-	pub related_playlists: HashMap<String, ChannelContentDetailsRelatedPlaylists>,
+	pub related_playlist: HashMap<String, ChannelContentDetailsRelatedPlaylists>,
 	/// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.
 	pub google_plus_user_id: Option<String>,
 }
@@ -1325,7 +1325,7 @@ pub struct ThumbnailDetails {
 	/// The medium quality image for this resource.
 	pub medium: Option<Thumbnail>,
 	/// The maximum resolution quality image for this resource.
-	pub maxres: Option<Thumbnail>,
+	pub maxre: Option<Thumbnail>,
 	/// The standard quality image for this resource.
 	pub standard: Option<Thumbnail>,
 }
@@ -1340,7 +1340,7 @@ impl Part for ThumbnailDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoMonetizationDetails {
 	/// The value of access indicates whether the video can be monetized or not.
-	pub access: Option<AccessPolicy>,
+	pub acces: Option<AccessPolicy>,
 }
 
 impl Part for VideoMonetizationDetails {}
@@ -1400,7 +1400,7 @@ impl Part for ActivityContentDetailsSubscription {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelConversionPings {
 	/// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
-	pub pings: Vec<ChannelConversionPing>,
+	pub ping: Vec<ChannelConversionPing>,
 }
 
 impl Part for ChannelConversionPings {}
@@ -1490,7 +1490,7 @@ pub struct VideoProcessingDetails {
 	/// This value indicates whether video editing suggestions, which might improve video quality or the playback experience, are available for the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
 	pub editor_suggestions_availability: Option<String>,
 	/// The video's processing status. This value indicates whether YouTube was able to process the video or if the video is still being processed.
-	pub processing_status: Option<String>,
+	pub processing_statu: Option<String>,
 	/// This value indicates whether the video processing engine has generated suggestions that might improve YouTube's ability to process the the video, warnings that explain video processing problems, or errors that cause video processing problems. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
 	pub processing_issues_availability: Option<String>,
 	/// The reason that YouTube failed to process the video. This property will only have a value if the processingStatus property's value is failed.
@@ -1498,7 +1498,7 @@ pub struct VideoProcessingDetails {
 	/// This value indicates whether thumbnail images have been generated for the video.
 	pub thumbnails_availability: Option<String>,
 	/// The processingProgress object contains information about the progress YouTube has made in processing the video. The values are really only relevant if the video's processing status is processing.
-	pub processing_progress: Option<VideoProcessingDetailsProcessingProgress>,
+	pub processing_progres: Option<VideoProcessingDetailsProcessingProgress>,
 	/// This value indicates whether keyword (tag) suggestions are available for the video. Tags can be added to a video's metadata to make it easier for other users to find the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
 	pub tag_suggestions_availability: Option<String>,
 }
@@ -1513,11 +1513,11 @@ impl Part for VideoProcessingDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcastStatus {
 	/// The broadcast's recording status.
-	pub recording_status: Option<String>,
+	pub recording_statu: Option<String>,
 	/// The broadcast's privacy status. Note that the broadcast represents exactly one YouTube video, so the privacy settings are identical to those supported for videos. In addition, you can set this field by modifying the broadcast resource or by setting the privacyStatus field of the corresponding video resource.
-	pub privacy_status: Option<String>,
+	pub privacy_statu: Option<String>,
 	/// The broadcast's status. The status can be updated using the API's liveBroadcasts.transition method.
-	pub life_cycle_status: Option<String>,
+	pub life_cycle_statu: Option<String>,
 	/// Priority of the live broadcast event (internal state).
 	pub live_broadcast_priority: Option<String>,
 }
@@ -1560,45 +1560,45 @@ impl Part for SubscriptionContentDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct Video {
 	/// The status object contains information about the video's uploading, processing, and privacy statuses.
-	pub status: Option<VideoStatus>,
+	pub statu: Option<VideoStatus>,
 	/// The topicDetails object encapsulates information about Freebase topics associated with the video.
-	pub topic_details: Option<VideoTopicDetails>,
+	pub topic_detail: Option<VideoTopicDetails>,
 	/// The monetizationDetails object encapsulates information about the monetization status of the video.
-	pub monetization_details: Option<VideoMonetizationDetails>,
+	pub monetization_detail: Option<VideoMonetizationDetails>,
 	/// The suggestions object encapsulates suggestions that identify opportunities to improve the video quality or the metadata for the uploaded video. This data can only be retrieved by the video owner.
-	pub suggestions: Option<VideoSuggestions>,
+	pub suggestion: Option<VideoSuggestions>,
 	/// Age restriction details related to a video.
 	pub age_gating: Option<VideoAgeGating>,
 	/// The fileDetails object encapsulates information about the video file that was uploaded to YouTube, including the file's resolution, duration, audio and video codecs, stream bitrates, and more. This data can only be retrieved by the video owner.
-	pub file_details: Option<VideoFileDetails>,
+	pub file_detail: Option<VideoFileDetails>,
 	/// The player object contains information that you would use to play the video in an embedded player.
 	pub player: Option<VideoPlayer>,
 	/// The ID that YouTube uses to uniquely identify the video.
 	pub id: Option<String>,
 	/// List with all localizations.
-	pub localizations: HashMap<String, VideoLocalization>,
+	pub localization: HashMap<String, VideoLocalization>,
 	/// The liveStreamingDetails object contains metadata about a live video broadcast. The object will only be present in a video resource if the video is an upcoming, live, or completed live broadcast.
-	pub live_streaming_details: Option<VideoLiveStreamingDetails>,
+	pub live_streaming_detail: Option<VideoLiveStreamingDetails>,
 	/// The processingProgress object encapsulates information about YouTube's progress in processing the uploaded video file. The properties in the object identify the current processing status and an estimate of the time remaining until YouTube finishes processing the video. This part also indicates whether different types of data or content, such as file details or thumbnail images, are available for the video.
 /// 
 /// The processingProgress object is designed to be polled so that the video uploaded can track the progress that YouTube has made in processing the uploaded video file. This data can only be retrieved by the video owner.
-	pub processing_details: Option<VideoProcessingDetails>,
+	pub processing_detail: Option<VideoProcessingDetails>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#video".
 	pub kind: Option<String>,
 	/// The statistics object contains statistics about the video.
-	pub statistics: Option<VideoStatistics>,
+	pub statistic: Option<VideoStatistics>,
 	/// The contentDetails object contains information about the video content, including the length of the video and its aspect ratio.
-	pub content_details: Option<VideoContentDetails>,
+	pub content_detail: Option<VideoContentDetails>,
 	/// The conversionPings object encapsulates information about url pings that need to be respected by the App in different video contexts.
-	pub conversion_pings: Option<VideoConversionPings>,
+	pub conversion_ping: Option<VideoConversionPings>,
 	/// The snippet object contains basic details about the video, such as its title, description, and category.
 	pub snippet: Option<VideoSnippet>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The projectDetails object contains information about the project specific video metadata.
-	pub project_details: Option<VideoProjectDetails>,
+	pub project_detail: Option<VideoProjectDetails>,
 	/// The recordingDetails object encapsulates information about the location, date and address where the video was recorded.
-	pub recording_details: Option<VideoRecordingDetails>,
+	pub recording_detail: Option<VideoRecordingDetails>,
 }
 
 impl RequestValue for Video {}
@@ -1611,25 +1611,25 @@ impl Video {
 	/// the parts you want to see in the server response.
 	fn to_parts(&self) -> String {
 		let mut r = String::new();
-		if self.status.is_some() { r = r + "status,"; }
-		if self.topic_details.is_some() { r = r + "topicDetails,"; }
-		if self.monetization_details.is_some() { r = r + "monetizationDetails,"; }
-		if self.suggestions.is_some() { r = r + "suggestions,"; }
+		if self.statu.is_some() { r = r + "status,"; }
+		if self.topic_detail.is_some() { r = r + "topicDetails,"; }
+		if self.monetization_detail.is_some() { r = r + "monetizationDetails,"; }
+		if self.suggestion.is_some() { r = r + "suggestions,"; }
 		if self.age_gating.is_some() { r = r + "ageGating,"; }
-		if self.file_details.is_some() { r = r + "fileDetails,"; }
+		if self.file_detail.is_some() { r = r + "fileDetails,"; }
 		if self.player.is_some() { r = r + "player,"; }
 		if self.id.is_some() { r = r + "id,"; }
-		if self.localizations.len() > 0 { r = r + "localizations,"; }
-		if self.live_streaming_details.is_some() { r = r + "liveStreamingDetails,"; }
-		if self.processing_details.is_some() { r = r + "processingDetails,"; }
+		if self.localization.len() > 0 { r = r + "localizations,"; }
+		if self.live_streaming_detail.is_some() { r = r + "liveStreamingDetails,"; }
+		if self.processing_detail.is_some() { r = r + "processingDetails,"; }
 		if self.kind.is_some() { r = r + "kind,"; }
-		if self.statistics.is_some() { r = r + "statistics,"; }
-		if self.content_details.is_some() { r = r + "contentDetails,"; }
-		if self.conversion_pings.is_some() { r = r + "conversionPings,"; }
+		if self.statistic.is_some() { r = r + "statistics,"; }
+		if self.content_detail.is_some() { r = r + "contentDetails,"; }
+		if self.conversion_ping.is_some() { r = r + "conversionPings,"; }
 		if self.snippet.is_some() { r = r + "snippet,"; }
 		if self.etag.is_some() { r = r + "etag,"; }
-		if self.project_details.is_some() { r = r + "projectDetails,"; }
-		if self.recording_details.is_some() { r = r + "recordingDetails,"; }
+		if self.project_detail.is_some() { r = r + "projectDetails,"; }
+		if self.recording_detail.is_some() { r = r + "recordingDetails,"; }
 		r.pop();
 		r
 	}
@@ -1691,7 +1691,7 @@ pub struct ChannelSnippet {
 	/// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
 	pub published_at: Option<String>,
 	/// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-	pub thumbnails: Option<ThumbnailDetails>,
+	pub thumbnail: Option<ThumbnailDetails>,
 	/// The channel's title.
 	pub title: Option<String>,
 	/// Localized title and description, read-only.
@@ -1805,7 +1805,7 @@ pub struct Subscription {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The contentDetails object contains basic statistics about the subscription.
-	pub content_details: Option<SubscriptionContentDetails>,
+	pub content_detail: Option<SubscriptionContentDetails>,
 	/// The subscriberSnippet object contains basic details about the sbuscriber.
 	pub subscriber_snippet: Option<SubscriptionSubscriberSnippet>,
 	/// The ID that YouTube uses to uniquely identify the subscription.
@@ -1825,7 +1825,7 @@ impl Subscription {
 		if self.snippet.is_some() { r = r + "snippet,"; }
 		if self.kind.is_some() { r = r + "kind,"; }
 		if self.etag.is_some() { r = r + "etag,"; }
-		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.content_detail.is_some() { r = r + "contentDetails,"; }
 		if self.subscriber_snippet.is_some() { r = r + "subscriberSnippet,"; }
 		if self.id.is_some() { r = r + "id,"; }
 		r.pop();
@@ -1917,7 +1917,7 @@ pub struct VideoSnippet {
 	/// The video's description.
 	pub description: Option<String>,
 	/// A list of keyword tags associated with the video. Tags may contain spaces. This field is only visible to the video's uploader.
-	pub tags: Vec<String>,
+	pub tag: Vec<String>,
 	/// The ID that YouTube uses to uniquely identify the channel that the video was uploaded to.
 	pub channel_id: Option<String>,
 	/// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
@@ -1927,7 +1927,7 @@ pub struct VideoSnippet {
 	/// The language of the videos's default snippet.
 	pub default_language: Option<String>,
 	/// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-	pub thumbnails: Option<ThumbnailDetails>,
+	pub thumbnail: Option<ThumbnailDetails>,
 	/// The video's title.
 	pub title: Option<String>,
 	/// The YouTube video category associated with the video.
@@ -1948,7 +1948,7 @@ impl Part for VideoSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoProjectDetails {
 	/// A list of project tags associated with the video during the upload.
-	pub tags: Vec<String>,
+	pub tag: Vec<String>,
 }
 
 impl Part for VideoProjectDetails {}
@@ -1987,7 +1987,7 @@ pub struct LiveBroadcastContentDetails {
 	/// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.
 	pub enable_embed: Option<bool>,
 	/// This setting indicates whether closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API.
-	pub enable_closed_captions: Option<bool>,
+	pub enable_closed_caption: Option<bool>,
 	/// This setting indicates whether YouTube should enable content encryption for the broadcast.
 	pub enable_content_encryption: Option<bool>,
 	/// Automatically start recording after the event goes live. The default value for this property is true.
@@ -2020,13 +2020,13 @@ pub struct VideoStatus {
 	/// This value indicates if the video can be embedded on another website.
 	pub embeddable: Option<bool>,
 	/// The video's privacy status.
-	pub privacy_status: Option<String>,
+	pub privacy_statu: Option<String>,
 	/// The date and time when the video is scheduled to publish. It can be set only if the privacy status of the video is private. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
 	pub publish_at: Option<String>,
 	/// This value indicates if the extended video statistics on the watch page can be viewed by everyone. Note that the view count, likes, etc will still be visible if this is disabled.
 	pub public_stats_viewable: Option<bool>,
 	/// The status of the uploaded video.
-	pub upload_status: Option<String>,
+	pub upload_statu: Option<String>,
 	/// This value explains why YouTube rejected an uploaded video. This property is only present if the uploadStatus property indicates that the upload was rejected.
 	pub rejection_reason: Option<String>,
 	/// This value explains why a video failed to upload. This property is only present if the uploadStatus property indicates that the upload failed.
@@ -2070,7 +2070,7 @@ pub struct ChannelSectionListResponse {
 	/// Serialized EventId of the request which produced this response.
 	pub event_id: Option<String>,
 	/// A list of ChannelSections that match the request criteria.
-	pub items: Vec<ChannelSection>,
+	pub item: Vec<ChannelSection>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#channelSectionListResponse".
 	pub kind: Option<String>,
 	/// Etag of this resource.
@@ -2089,7 +2089,7 @@ impl ResponseResult for ChannelSectionListResponse {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct MonitorStreamInfo {
 	/// If you have set the enableMonitorStream property to true, then this property determines the length of the live broadcast delay.
-	pub broadcast_stream_delay_ms: Option<u32>,
+	pub broadcast_stream_delay_m: Option<u32>,
 	/// HTML code that embeds a player that plays the monitor stream.
 	pub embed_html: Option<String>,
 	/// This value determines whether the monitor stream is enabled for the broadcast. If the monitor stream is enabled, then YouTube will broadcast the event content on a special stream intended only for the broadcaster's consumption. The broadcaster can use the stream to review the event content and also to identify the optimal times to insert cuepoints.
@@ -2118,7 +2118,7 @@ pub struct I18nLanguageListResponse {
 	/// Serialized EventId of the request which produced this response.
 	pub event_id: Option<String>,
 	/// A list of supported i18n languages. In this map, the i18n language ID is the map key, and its value is the corresponding i18nLanguage resource.
-	pub items: Vec<I18nLanguage>,
+	pub item: Vec<I18nLanguage>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nLanguageListResponse".
 	pub kind: Option<String>,
 	/// Etag of this resource.
@@ -2166,7 +2166,7 @@ impl Part for LocalizedProperty {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveBroadcast {
 	/// The status object contains information about the event's status.
-	pub status: Option<LiveBroadcastStatus>,
+	pub statu: Option<LiveBroadcastStatus>,
 	/// The snippet object contains basic details about the event, including its title, description, start time, and end time.
 	pub snippet: Option<LiveBroadcastSnippet>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#liveBroadcast".
@@ -2174,7 +2174,7 @@ pub struct LiveBroadcast {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The contentDetails object contains information about the event's video content, such as whether the content can be shown in an embedded video player or if it will be archived and therefore available for viewing after the event has concluded.
-	pub content_details: Option<LiveBroadcastContentDetails>,
+	pub content_detail: Option<LiveBroadcastContentDetails>,
 	/// The ID that YouTube assigns to uniquely identify the broadcast.
 	pub id: Option<String>,
 }
@@ -2189,11 +2189,11 @@ impl LiveBroadcast {
 	/// the parts you want to see in the server response.
 	fn to_parts(&self) -> String {
 		let mut r = String::new();
-		if self.status.is_some() { r = r + "status,"; }
+		if self.statu.is_some() { r = r + "status,"; }
 		if self.snippet.is_some() { r = r + "snippet,"; }
 		if self.kind.is_some() { r = r + "kind,"; }
 		if self.etag.is_some() { r = r + "etag,"; }
-		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.content_detail.is_some() { r = r + "contentDetails,"; }
 		if self.id.is_some() { r = r + "id,"; }
 		r.pop();
 		r
@@ -2207,21 +2207,21 @@ impl LiveBroadcast {
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetailsVideoStream {
 	/// The video stream's bitrate, in bits per second.
-	pub bitrate_bps: Option<String>,
+	pub bitrate_bp: Option<String>,
 	/// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.
 	pub vendor: Option<String>,
 	/// The video codec that the stream uses.
 	pub codec: Option<String>,
 	/// The encoded video content's width in pixels. You can calculate the video's encoding aspect ratio as width_pixels / height_pixels.
-	pub width_pixels: Option<u32>,
+	pub width_pixel: Option<u32>,
 	/// The encoded video content's height in pixels.
-	pub height_pixels: Option<u32>,
+	pub height_pixel: Option<u32>,
 	/// The video content's display aspect ratio, which specifies the aspect ratio in which the video should be displayed.
 	pub aspect_ratio: Option<f64>,
 	/// The amount that YouTube needs to rotate the original source content to properly display the video.
 	pub rotation: Option<String>,
 	/// The video stream's frame rate, in frames per second.
-	pub frame_rate_fps: Option<f64>,
+	pub frame_rate_fp: Option<f64>,
 }
 
 impl Part for VideoFileDetailsVideoStream {}
@@ -2264,33 +2264,33 @@ impl Resource for Thumbnail {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct Channel {
 	/// The status object encapsulates information about the privacy status of the channel.
-	pub status: Option<ChannelStatus>,
+	pub statu: Option<ChannelStatus>,
 	/// The invideoPromotion object encapsulates information about promotion campaign associated with the channel.
 	pub invideo_promotion: Option<InvideoPromotion>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#channel".
 	pub kind: Option<String>,
 	/// The statistics object encapsulates statistics for the channel.
-	pub statistics: Option<ChannelStatistics>,
+	pub statistic: Option<ChannelStatistics>,
 	/// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.
-	pub content_owner_details: Option<ChannelContentOwnerDetails>,
+	pub content_owner_detail: Option<ChannelContentOwnerDetails>,
 	/// The topicDetails object encapsulates information about Freebase topics associated with the channel.
-	pub topic_details: Option<ChannelTopicDetails>,
+	pub topic_detail: Option<ChannelTopicDetails>,
 	/// The contentDetails object encapsulates information about the channel's content.
-	pub content_details: Option<ChannelContentDetails>,
+	pub content_detail: Option<ChannelContentDetails>,
 	/// The brandingSettings object encapsulates information about the branding of the channel.
-	pub branding_settings: Option<ChannelBrandingSettings>,
+	pub branding_setting: Option<ChannelBrandingSettings>,
 	/// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.
-	pub conversion_pings: Option<ChannelConversionPings>,
+	pub conversion_ping: Option<ChannelConversionPings>,
 	/// The snippet object contains basic details about the channel, such as its title, description, and thumbnail images.
 	pub snippet: Option<ChannelSnippet>,
 	/// The auditionDetails object encapsulates channel data that is relevant for YouTube Partners during the audition process.
-	pub audit_details: Option<ChannelAuditDetails>,
+	pub audit_detail: Option<ChannelAuditDetails>,
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The ID that YouTube uses to uniquely identify the channel.
 	pub id: Option<String>,
 	/// Localizations for different languages
-	pub localizations: HashMap<String, ChannelLocalization>,
+	pub localization: HashMap<String, ChannelLocalization>,
 }
 
 impl RequestValue for Channel {}
@@ -2303,20 +2303,20 @@ impl Channel {
 	/// the parts you want to see in the server response.
 	fn to_parts(&self) -> String {
 		let mut r = String::new();
-		if self.status.is_some() { r = r + "status,"; }
+		if self.statu.is_some() { r = r + "status,"; }
 		if self.invideo_promotion.is_some() { r = r + "invideoPromotion,"; }
 		if self.kind.is_some() { r = r + "kind,"; }
-		if self.statistics.is_some() { r = r + "statistics,"; }
-		if self.content_owner_details.is_some() { r = r + "contentOwnerDetails,"; }
-		if self.topic_details.is_some() { r = r + "topicDetails,"; }
-		if self.content_details.is_some() { r = r + "contentDetails,"; }
-		if self.branding_settings.is_some() { r = r + "brandingSettings,"; }
-		if self.conversion_pings.is_some() { r = r + "conversionPings,"; }
+		if self.statistic.is_some() { r = r + "statistics,"; }
+		if self.content_owner_detail.is_some() { r = r + "contentOwnerDetails,"; }
+		if self.topic_detail.is_some() { r = r + "topicDetails,"; }
+		if self.content_detail.is_some() { r = r + "contentDetails,"; }
+		if self.branding_setting.is_some() { r = r + "brandingSettings,"; }
+		if self.conversion_ping.is_some() { r = r + "conversionPings,"; }
 		if self.snippet.is_some() { r = r + "snippet,"; }
-		if self.audit_details.is_some() { r = r + "auditDetails,"; }
+		if self.audit_detail.is_some() { r = r + "auditDetails,"; }
 		if self.etag.is_some() { r = r + "etag,"; }
 		if self.id.is_some() { r = r + "id,"; }
-		if self.localizations.len() > 0 { r = r + "localizations,"; }
+		if self.localization.len() > 0 { r = r + "localizations,"; }
 		r.pop();
 		r
 	}
@@ -2438,7 +2438,7 @@ pub struct VideoCategoryListResponse {
 	/// The visitorId identifies the visitor.
 	pub visitor_id: Option<String>,
 	/// A list of video categories that can be associated with YouTube videos. In this map, the video category ID is the map key, and its value is the corresponding videoCategory resource.
-	pub items: Vec<VideoCategory>,
+	pub item: Vec<VideoCategory>,
 	/// no description provided
 	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
@@ -2459,7 +2459,7 @@ impl ResponseResult for VideoCategoryListResponse {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ActivitySnippet {
 	/// A map of thumbnail images associated with the resource that is primarily associated with the activity. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-	pub thumbnails: Option<ThumbnailDetails>,
+	pub thumbnail: Option<ThumbnailDetails>,
 	/// The title of the resource primarily associated with the activity.
 	pub title: Option<String>,
 	/// The ID that YouTube uses to uniquely identify the channel associated with the activity.
@@ -2486,7 +2486,7 @@ impl Part for ActivitySnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoProcessingDetailsProcessingProgress {
 	/// An estimate of the amount of time, in millseconds, that YouTube needs to finish processing the video.
-	pub time_left_ms: Option<String>,
+	pub time_left_m: Option<String>,
 	/// The number of parts of the video that YouTube has already processed. You can estimate the percentage of the video that YouTube has already processed by calculating:
 /// 100 * parts_processed / parts_total
 /// 
@@ -2520,7 +2520,7 @@ pub struct SearchListResponse {
 	/// The visitorId identifies the visitor.
 	pub visitor_id: Option<String>,
 	/// A list of results that match the search criteria.
-	pub items: Vec<SearchResult>,
+	pub item: Vec<SearchResult>,
 	/// no description provided
 	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
@@ -2541,7 +2541,7 @@ impl ResponseResult for SearchListResponse {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelTopicDetails {
 	/// A list of Freebase topic IDs associated with the channel. You can retrieve information about each topic using the Freebase Topic API.
-	pub topic_ids: Vec<String>,
+	pub topic_id: Vec<String>,
 }
 
 impl Part for ChannelTopicDetails {}
@@ -2568,7 +2568,7 @@ pub struct VideoListResponse {
 	/// The visitorId identifies the visitor.
 	pub visitor_id: Option<String>,
 	/// A list of videos that match the request criteria.
-	pub items: Vec<Video>,
+	pub item: Vec<Video>,
 	/// no description provided
 	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
@@ -2602,7 +2602,7 @@ impl Part for LanguageTag {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct PlaylistStatus {
 	/// The playlist's privacy status.
-	pub privacy_status: Option<String>,
+	pub privacy_statu: Option<String>,
 }
 
 impl Part for PlaylistStatus {}
@@ -2661,11 +2661,11 @@ impl Part for LiveStreamSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelStatus {
 	/// Privacy status of the channel.
-	pub privacy_status: Option<String>,
+	pub privacy_statu: Option<String>,
 	/// If true, then the user is linked to either a YouTube username or G+ account. Otherwise, the user doesn't have a public YouTube identity.
 	pub is_linked: Option<bool>,
 	/// The long uploads status of this channel. See
-	pub long_uploads_status: Option<String>,
+	pub long_uploads_statu: Option<String>,
 }
 
 impl Part for ChannelStatus {}
@@ -2692,7 +2692,7 @@ pub struct ChannelListResponse {
 	/// The visitorId identifies the visitor.
 	pub visitor_id: Option<String>,
 	/// A list of channels that match the request criteria.
-	pub items: Vec<Channel>,
+	pub item: Vec<Channel>,
 	/// no description provided
 	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
@@ -2728,11 +2728,11 @@ pub struct ChannelSection {
 	/// Etag of this resource.
 	pub etag: Option<String>,
 	/// The contentDetails object contains details about the channel section content, such as a list of playlists or channels featured in the section.
-	pub content_details: Option<ChannelSectionContentDetails>,
+	pub content_detail: Option<ChannelSectionContentDetails>,
 	/// The ID that YouTube uses to uniquely identify the channel section.
 	pub id: Option<String>,
 	/// Localizations for different languages
-	pub localizations: HashMap<String, ChannelSectionLocalization>,
+	pub localization: HashMap<String, ChannelSectionLocalization>,
 }
 
 impl RequestValue for ChannelSection {}
@@ -2748,9 +2748,9 @@ impl ChannelSection {
 		if self.snippet.is_some() { r = r + "snippet,"; }
 		if self.kind.is_some() { r = r + "kind,"; }
 		if self.etag.is_some() { r = r + "etag,"; }
-		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.content_detail.is_some() { r = r + "contentDetails,"; }
 		if self.id.is_some() { r = r + "id,"; }
-		if self.localizations.len() > 0 { r = r + "localizations,"; }
+		if self.localization.len() > 0 { r = r + "localizations,"; }
 		r.pop();
 		r
 	}
@@ -2777,7 +2777,7 @@ pub struct LiveBroadcastListResponse {
 	/// The visitorId identifies the visitor.
 	pub visitor_id: Option<String>,
 	/// A list of broadcasts that match the request criteria.
-	pub items: Vec<LiveBroadcast>,
+	pub item: Vec<LiveBroadcast>,
 	/// no description provided
 	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
@@ -2798,7 +2798,7 @@ impl ResponseResult for LiveBroadcastListResponse {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct LiveStreamStatus {
 	/// no description provided
-	pub stream_status: Option<String>,
+	pub stream_statu: Option<String>,
 }
 
 impl Part for LiveStreamStatus {}
@@ -2813,7 +2813,7 @@ pub struct VideoLiveStreamingDetails {
 	/// The time that the broadcast is scheduled to begin. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
 	pub scheduled_start_time: Option<String>,
 	/// The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.
-	pub concurrent_viewers: Option<String>,
+	pub concurrent_viewer: Option<String>,
 	/// The time that the broadcast actually started. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast begins.
 	pub actual_start_time: Option<String>,
 	/// The time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. If the value is empty or the property is not present, then the broadcast is scheduled to continue indefinitely.
@@ -2850,7 +2850,7 @@ pub struct ContentRating {
 	/// Rating system for Peru - Peru Rating System
 	pub pefilm_rating: Option<String>,
 	/// no description provided
-	pub djctq_rating_reasons: Vec<String>,
+	pub djctq_rating_reason: Vec<String>,
 	/// Rating system for Argentina - Instituto Nacional de Cine y Artes Audiovisuales
 	pub incaa_rating: Option<String>,
 	/// Rating system for Israel - Israel Rating System
@@ -2985,7 +2985,7 @@ pub struct ActivityListResponse {
 	/// The visitorId identifies the visitor.
 	pub visitor_id: Option<String>,
 	/// A list of activities, or events, that match the request criteria.
-	pub items: Vec<Activity>,
+	pub item: Vec<Activity>,
 	/// no description provided
 	pub token_pagination: Option<TokenPagination>,
 	/// Etag of this resource.
@@ -3014,7 +3014,7 @@ pub struct Activity {
 	/// The snippet object contains basic details about the activity, including the activity's type and group ID.
 	pub snippet: Option<ActivitySnippet>,
 	/// The contentDetails object contains information about the content associated with the activity. For example, if the snippet.type value is videoRated, then the contentDetails object's content identifies the rated video.
-	pub content_details: Option<ActivityContentDetails>,
+	pub content_detail: Option<ActivityContentDetails>,
 	/// Identifies what kind of resource this is. Value: the fixed string "youtube#activity".
 	pub kind: Option<String>,
 	/// Etag of this resource.
@@ -3033,7 +3033,7 @@ impl Activity {
 	fn to_parts(&self) -> String {
 		let mut r = String::new();
 		if self.snippet.is_some() { r = r + "snippet,"; }
-		if self.content_details.is_some() { r = r + "contentDetails,"; }
+		if self.content_detail.is_some() { r = r + "contentDetails,"; }
 		if self.kind.is_some() { r = r + "kind,"; }
 		if self.etag.is_some() { r = r + "etag,"; }
 		if self.id.is_some() { r = r + "id,"; }
@@ -3053,7 +3053,7 @@ pub struct SubscriptionSubscriberSnippet {
 	/// The description of the subscriber.
 	pub description: Option<String>,
 	/// Thumbnails for this subscriber.
-	pub thumbnails: Option<ThumbnailDetails>,
+	pub thumbnail: Option<ThumbnailDetails>,
 	/// The title of the subscriber.
 	pub title: Option<String>,
 }
@@ -3222,7 +3222,7 @@ impl Part for LocalizedString {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoFileDetailsAudioStream {
 	/// The audio stream's bitrate, in bits per second.
-	pub bitrate_bps: Option<String>,
+	pub bitrate_bp: Option<String>,
 	/// The audio codec that the stream uses.
 	pub codec: Option<String>,
 	/// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.
@@ -3241,9 +3241,9 @@ impl Part for VideoFileDetailsAudioStream {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoTopicDetails {
 	/// A list of Freebase topic IDs that are centrally associated with the video. These are topics that are centrally featured in the video, and it can be said that the video is mainly about each of these. You can retrieve information about each topic using the Freebase Topic API.
-	pub topic_ids: Vec<String>,
+	pub topic_id: Vec<String>,
 	/// Similar to topic_id, except that these topics are merely relevant to the video. These are topics that may be mentioned in, or appear in the video. You can retrieve information about each topic using Freebase Topic API.
-	pub relevant_topic_ids: Vec<String>,
+	pub relevant_topic_id: Vec<String>,
 }
 
 impl Part for VideoTopicDetails {}
@@ -3256,7 +3256,7 @@ impl Part for VideoTopicDetails {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct IngestionInfo {
 	/// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.
-	pub backup_ingestion_address: Option<String>,
+	pub backup_ingestion_addres: Option<String>,
 	/// The HTTP or RTMP stream name that YouTube assigns to the video stream.
 	pub stream_name: Option<String>,
 	/// The primary ingestion URL that you should use to stream video to YouTube. You must stream video to this URL.
@@ -3264,7 +3264,7 @@ pub struct IngestionInfo {
 /// Depending on which application or tool you use to encode your video stream, you may need to enter the stream URL and stream name separately or you may need to concatenate them in the following format:
 /// 
 /// STREAM_URL/STREAM_NAME
-	pub ingestion_address: Option<String>,
+	pub ingestion_addres: Option<String>,
 }
 
 impl Part for IngestionInfo {}
@@ -3327,7 +3327,7 @@ pub struct PlaylistItemSnippet {
 	/// The order in which the item appears in the playlist. The value uses a zero-based index, so the first item has a position of 0, the second item has a position of 1, and so forth.
 	pub position: Option<u32>,
 	/// A map of thumbnail images associated with the playlist item. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-	pub thumbnails: Option<ThumbnailDetails>,
+	pub thumbnail: Option<ThumbnailDetails>,
 }
 
 impl Part for PlaylistItemSnippet {}
@@ -3366,7 +3366,7 @@ impl Part for PlaylistPlayer {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoSuggestionsTagSuggestion {
 	/// A set of video categories for which the tag is relevant. You can use this information to display appropriate tag suggestions based on the video category that the video uploader associates with the video. By default, tag suggestions are relevant for all categories if there are no restricts defined for the keyword.
-	pub category_restricts: Vec<String>,
+	pub category_restrict: Vec<String>,
 	/// The keyword tag suggested for the video.
 	pub tag: Option<String>,
 }
@@ -3381,15 +3381,15 @@ impl Part for VideoSuggestionsTagSuggestion {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct VideoSuggestions {
 	/// A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video's current processing status, eventually, that status will almost certainly be failed.
-	pub processing_errors: Vec<String>,
+	pub processing_error: Vec<String>,
 	/// A list of keyword tags that could be added to the video's metadata to increase the likelihood that users will locate your video when searching or browsing on YouTube.
-	pub tag_suggestions: Vec<VideoSuggestionsTagSuggestion>,
+	pub tag_suggestion: Vec<VideoSuggestionsTagSuggestion>,
 	/// A list of video editing operations that might improve the video quality or playback experience of the uploaded video.
-	pub editor_suggestions: Vec<String>,
+	pub editor_suggestion: Vec<String>,
 	/// A list of reasons why YouTube may have difficulty transcoding the uploaded video or that might result in an erroneous transcoding. These warnings are generated before YouTube actually processes the uploaded video file. In addition, they identify issues that are unlikely to cause the video processing to fail but that might cause problems such as sync issues, video artifacts, or a missing audio track.
-	pub processing_warnings: Vec<String>,
+	pub processing_warning: Vec<String>,
 	/// A list of suggestions that may improve YouTube's ability to process the video.
-	pub processing_hints: Vec<String>,
+	pub processing_hint: Vec<String>,
 }
 
 impl Part for VideoSuggestions {}
@@ -3404,7 +3404,7 @@ pub struct SearchResultSnippet {
 	/// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.
 	pub live_broadcast_content: Option<String>,
 	/// A map of thumbnail images associated with the search result. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
-	pub thumbnails: Option<ThumbnailDetails>,
+	pub thumbnail: Option<ThumbnailDetails>,
 	/// The title of the search result.
 	pub title: Option<String>,
 	/// A description of the search result.
@@ -3479,7 +3479,7 @@ pub struct PageInfo {
 	/// The number of results included in the API response.
 	pub results_per_page: Option<i32>,
 	/// The total number of results in the result set.
-	pub total_results: Option<i32>,
+	pub total_result: Option<i32>,
 }
 
 impl Part for PageInfo {}
@@ -3496,13 +3496,13 @@ impl Part for PageInfo {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentDetailsRelatedPlaylists {
 	/// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.
-	pub uploads: Option<String>,
+	pub upload: Option<String>,
 	/// The ID of the playlist that contains the channel"s watch history. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
 	pub watch_history: Option<String>,
 	/// The ID of the playlist that contains the channel"s liked videos. Use the   playlistItems.insert and  playlistItems.delete to add or remove items from that list.
-	pub likes: Option<String>,
+	pub like: Option<String>,
 	/// The ID of the playlist that contains the channel"s favorite videos. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
-	pub favorites: Option<String>,
+	pub favorite: Option<String>,
 	/// The ID of the playlist that contains the channel"s watch later playlist. Use the playlistItems.insert and  playlistItems.delete to add or remove items from that list.
 	pub watch_later: Option<String>,
 }
@@ -3542,7 +3542,7 @@ impl Part for ChannelContentDetailsRelatedPlaylists {}
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
 /// // to build up your call.
-/// let rb = hub.i18n_languages();
+/// let rb = hub.i18n_language();
 /// # }
 /// ```
 pub struct I18nLanguageMethodsBuilder<'a, C, NC, A>
@@ -3600,7 +3600,7 @@ impl<'a, C, NC, A> I18nLanguageMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `insert(...)`
 /// // to build up your call.
-/// let rb = hub.channel_banners();
+/// let rb = hub.channel_banner();
 /// # }
 /// ```
 pub struct ChannelBannerMethodsBuilder<'a, C, NC, A>
@@ -3662,7 +3662,7 @@ impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.channel_sections();
+/// let rb = hub.channel_section();
 /// # }
 /// ```
 pub struct ChannelSectionMethodsBuilder<'a, C, NC, A>
@@ -3768,7 +3768,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
 /// // to build up your call.
-/// let rb = hub.guide_categories();
+/// let rb = hub.guide_category();
 /// # }
 /// ```
 pub struct GuideCategoryMethodsBuilder<'a, C, NC, A>
@@ -3828,7 +3828,7 @@ impl<'a, C, NC, A> GuideCategoryMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.playlists();
+/// let rb = hub.playlist();
 /// # }
 /// ```
 pub struct PlaylistMethodsBuilder<'a, C, NC, A>
@@ -3870,7 +3870,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _mine: Default::default(),
-            _max_results: Default::default(),
+            _max_result: Default::default(),
             _id: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
@@ -3937,7 +3937,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `set(...)`
 /// // to build up your call.
-/// let rb = hub.thumbnails();
+/// let rb = hub.thumbnail();
 /// # }
 /// ```
 pub struct ThumbnailMethodsBuilder<'a, C, NC, A>
@@ -3995,7 +3995,7 @@ impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `get_rating(...)`, `insert(...)`, `list(...)`, `rate(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.videos();
+/// let rb = hub.video();
 /// # }
 /// ```
 pub struct VideoMethodsBuilder<'a, C, NC, A>
@@ -4022,7 +4022,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _page_token: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _my_rating: Default::default(),
-            _max_results: Default::default(),
+            _max_result: Default::default(),
             _locale: Default::default(),
             _id: Default::default(),
             _hl: Default::default(),
@@ -4102,8 +4102,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
             _stabilize: Default::default(),
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
-            _notify_subscribers: Default::default(),
-            _auto_levels: Default::default(),
+            _notify_subscriber: Default::default(),
+            _auto_level: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4139,7 +4139,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
-/// let rb = hub.subscriptions();
+/// let rb = hub.subscription();
 /// # }
 /// ```
 pub struct SubscriptionMethodsBuilder<'a, C, NC, A>
@@ -4179,9 +4179,9 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
             _order: Default::default(),
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
-            _my_subscribers: Default::default(),
+            _my_subscriber: Default::default(),
             _mine: Default::default(),
-            _max_results: Default::default(),
+            _max_result: Default::default(),
             _id: Default::default(),
             _for_channel_id: Default::default(),
             _channel_id: Default::default(),
@@ -4276,8 +4276,8 @@ impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
             _page_token: Default::default(),
             _order: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
-            _max_results: Default::default(),
-            _location_radius: Default::default(),
+            _max_result: Default::default(),
+            _location_radiu: Default::default(),
             _location: Default::default(),
             _for_mine: Default::default(),
             _for_content_owner: Default::default(),
@@ -4319,7 +4319,7 @@ impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
 /// // to build up your call.
-/// let rb = hub.i18n_regions();
+/// let rb = hub.i18n_region();
 /// # }
 /// ```
 pub struct I18nRegionMethodsBuilder<'a, C, NC, A>
@@ -4377,7 +4377,7 @@ impl<'a, C, NC, A> I18nRegionMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.live_streams();
+/// let rb = hub.live_stream();
 /// # }
 /// ```
 pub struct LiveStreamMethodsBuilder<'a, C, NC, A>
@@ -4434,7 +4434,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _mine: Default::default(),
-            _max_results: Default::default(),
+            _max_result: Default::default(),
             _id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -4487,7 +4487,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.channels();
+/// let rb = hub.channel();
 /// # }
 /// ```
 pub struct ChannelMethodsBuilder<'a, C, NC, A>
@@ -4526,9 +4526,9 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
             _part: part.to_string(),
             _page_token: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
-            _my_subscribers: Default::default(),
+            _my_subscriber: Default::default(),
             _mine: Default::default(),
-            _max_results: Default::default(),
+            _max_result: Default::default(),
             _managed_by_me: Default::default(),
             _id: Default::default(),
             _for_username: Default::default(),
@@ -4568,7 +4568,7 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.playlist_items();
+/// let rb = hub.playlist_item();
 /// # }
 /// ```
 pub struct PlaylistItemMethodsBuilder<'a, C, NC, A>
@@ -4607,7 +4607,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
             _playlist_id: Default::default(),
             _page_token: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
-            _max_results: Default::default(),
+            _max_result: Default::default(),
             _id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -4673,7 +4673,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `set(...)` and `unset(...)`
 /// // to build up your call.
-/// let rb = hub.watermarks();
+/// let rb = hub.watermark();
 /// # }
 /// ```
 pub struct WatermarkMethodsBuilder<'a, C, NC, A>
@@ -4746,7 +4746,7 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `bind(...)`, `control(...)`, `delete(...)`, `insert(...)`, `list(...)`, `transition(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.live_broadcasts();
+/// let rb = hub.live_broadcast();
 /// # }
 /// ```
 pub struct LiveBroadcastMethodsBuilder<'a, C, NC, A>
@@ -4772,7 +4772,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _walltime: Default::default(),
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
-            _offset_time_ms: Default::default(),
+            _offset_time_m: Default::default(),
             _display_slate: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -4840,9 +4840,9 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
             _on_behalf_of_content_owner_channel: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _mine: Default::default(),
-            _max_results: Default::default(),
+            _max_result: Default::default(),
             _id: Default::default(),
-            _broadcast_status: Default::default(),
+            _broadcast_statu: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4867,10 +4867,10 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.    
-    pub fn transition<>(&self, broadcast_status: &str, id: &str, part: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+    pub fn transition<>(&self, broadcast_statu: &str, id: &str, part: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
         LiveBroadcastTransitionMethodBuilder {
             hub: self.hub,
-            _broadcast_status: broadcast_status.to_string(),
+            _broadcast_statu: broadcast_statu.to_string(),
             _id: id.to_string(),
             _part: part.to_string(),
             _on_behalf_of_content_owner_channel: Default::default(),
@@ -4910,7 +4910,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `list(...)`
 /// // to build up your call.
-/// let rb = hub.video_categories();
+/// let rb = hub.video_category();
 /// # }
 /// ```
 pub struct VideoCategoryMethodsBuilder<'a, C, NC, A>
@@ -4970,7 +4970,7 @@ impl<'a, C, NC, A> VideoCategoryMethodsBuilder<'a, C, NC, A> {
 /// // Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
 /// // like `insert(...)` and `list(...)`
 /// // to build up your call.
-/// let rb = hub.activities();
+/// let rb = hub.activity();
 /// # }
 /// ```
 pub struct ActivityMethodsBuilder<'a, C, NC, A>
@@ -4997,7 +4997,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
             _published_after: Default::default(),
             _page_token: Default::default(),
             _mine: Default::default(),
-            _max_results: Default::default(),
+            _max_result: Default::default(),
             _home: Default::default(),
             _channel_id: Default::default(),
             _delegate: Default::default(),
@@ -5071,7 +5071,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.i18n_languages().list("part")
+/// let result = hub.i18n_language().list("part")
 ///              .hl("eos")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -5237,11 +5237,11 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// let mut req: ChannelBannerResource = Default::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
+/// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.channel_banners().insert(&req)
+/// let result = hub.channel_banner().insert(&req)
 ///              .on_behalf_of_content_owner("Stet")
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
+///              .upload(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -5434,7 +5434,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.channel_sections().list("part")
+/// let result = hub.channel_section().list("part")
 ///              .on_behalf_of_content_owner("sed")
 ///              .mine(false)
 ///              .id("ipsum")
@@ -5650,12 +5650,12 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // Values shown here are possibly random and not representative !
 /// let mut req: ChannelSection = Default::default();
 /// req.snippet = Default::default(); // is ChannelSectionSnippet
-/// req.content_details = Default::default(); // is ChannelSectionContentDetails
+/// req.content_detail = Default::default(); // is ChannelSectionContentDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.channel_sections().insert(&req)
+/// let result = hub.channel_section().insert(&req)
 ///              .on_behalf_of_content_owner_channel("duo")
 ///              .on_behalf_of_content_owner("sadipscing")
 ///              .doit();
@@ -5854,7 +5854,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.channel_sections().delete("id")
+/// let result = hub.channel_section().delete("id")
 ///              .on_behalf_of_content_owner("consetetur")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -6023,12 +6023,12 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // Values shown here are possibly random and not representative !
 /// let mut req: ChannelSection = Default::default();
 /// req.snippet = Default::default(); // is ChannelSectionSnippet
-/// req.content_details = Default::default(); // is ChannelSectionContentDetails
+/// req.content_detail = Default::default(); // is ChannelSectionContentDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.channel_sections().update(&req)
+/// let result = hub.channel_section().update(&req)
 ///              .on_behalf_of_content_owner("ea")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -6223,7 +6223,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.guide_categories().list("part")
+/// let result = hub.guide_category().list("part")
 ///              .region_code("sanctus")
 ///              .id("invidunt")
 ///              .hl("et")
@@ -6422,13 +6422,13 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req: Playlist = Default::default();
-/// req.status = Default::default(); // is PlaylistStatus
+/// req.statu = Default::default(); // is PlaylistStatus
 /// req.snippet = Default::default(); // is PlaylistSnippet
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlists().insert(&req)
+/// let result = hub.playlist().insert(&req)
 ///              .on_behalf_of_content_owner_channel("sit")
 ///              .on_behalf_of_content_owner("takimata")
 ///              .doit();
@@ -6642,12 +6642,12 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlists().list("part")
+/// let result = hub.playlist().list("part")
 ///              .page_token("consetetur")
 ///              .on_behalf_of_content_owner_channel("elitr")
 ///              .on_behalf_of_content_owner("sed")
 ///              .mine(true)
-///              .max_results(60)
+///              .max_result(60)
 ///              .id("clita")
 ///              .channel_id("sed")
 ///              .doit();
@@ -6665,7 +6665,7 @@ pub struct PlaylistListMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _mine: Option<bool>,
-    _max_results: Option<u32>,
+    _max_result: Option<u32>,
     _id: Option<String>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -6694,8 +6694,8 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         if self._mine.is_some() {
             params.push(("mine", self._mine.unwrap().to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if self._max_result.is_some() {
+            params.push(("maxResults", self._max_result.unwrap().to_string()));
         }
         if self._id.is_some() {
             params.push(("id", self._id.unwrap().to_string()));
@@ -6787,8 +6787,8 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> PlaylistListMethodBuilder<'a, C, NC, A> {
-        self._max_results = Some(new_value);
+    pub fn max_result(mut self, new_value: u32) -> PlaylistListMethodBuilder<'a, C, NC, A> {
+        self._max_result = Some(new_value);
         self
     }
     /// Sets the *id* query property to the given value.
@@ -6887,7 +6887,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlists().delete("id")
+/// let result = hub.playlist().delete("id")
 ///              .on_behalf_of_content_owner("labore")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -7055,13 +7055,13 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req: Playlist = Default::default();
-/// req.status = Default::default(); // is PlaylistStatus
+/// req.statu = Default::default(); // is PlaylistStatus
 /// req.snippet = Default::default(); // is PlaylistSnippet
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlists().update(&req)
+/// let result = hub.playlist().update(&req)
 ///              .on_behalf_of_content_owner("kasd")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -7244,11 +7244,11 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = YouTube::new(hyper::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
+/// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.thumbnails().set("videoId")
+/// let result = hub.thumbnail().set("videoId")
 ///              .on_behalf_of_content_owner("kasd")
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
+///              .upload(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -7451,13 +7451,13 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.videos().list("part")
+/// let result = hub.video().list("part")
 ///              .video_category_id("kasd")
 ///              .region_code("ea")
 ///              .page_token("rebum.")
 ///              .on_behalf_of_content_owner("dolor")
 ///              .my_rating("sadipscing")
-///              .max_results(10)
+///              .max_result(10)
 ///              .locale("sed")
 ///              .id("et")
 ///              .hl("gubergren")
@@ -7478,7 +7478,7 @@ pub struct VideoListMethodBuilder<'a, C, NC, A>
     _page_token: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _my_rating: Option<String>,
-    _max_results: Option<u32>,
+    _max_result: Option<u32>,
     _locale: Option<String>,
     _id: Option<String>,
     _hl: Option<String>,
@@ -7512,8 +7512,8 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         if self._my_rating.is_some() {
             params.push(("myRating", self._my_rating.unwrap().to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if self._max_result.is_some() {
+            params.push(("maxResults", self._max_result.unwrap().to_string()));
         }
         if self._locale.is_some() {
             params.push(("locale", self._locale.unwrap().to_string()));
@@ -7628,8 +7628,8 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     /// 
     /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
-    pub fn max_results(mut self, new_value: u32) -> VideoListMethodBuilder<'a, C, NC, A> {
-        self._max_results = Some(new_value);
+    pub fn max_result(mut self, new_value: u32) -> VideoListMethodBuilder<'a, C, NC, A> {
+        self._max_result = Some(new_value);
         self
     }
     /// Sets the *locale* query property to the given value.
@@ -7744,7 +7744,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.videos().rate("id", "rating")
+/// let result = hub.video().rate("id", "rating")
 ///              .on_behalf_of_content_owner("sed")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -7910,7 +7910,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.videos().get_rating("id")
+/// let result = hub.video().get_rating("id")
 ///              .on_behalf_of_content_owner("aliquyam")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -8064,7 +8064,7 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.videos().delete("id")
+/// let result = hub.video().delete("id")
 ///              .on_behalf_of_content_owner("amet.")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -8242,23 +8242,23 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req: Video = Default::default();
-/// req.status = Default::default(); // is VideoStatus
-/// req.topic_details = Default::default(); // is VideoTopicDetails
-/// req.suggestions = Default::default(); // is VideoSuggestions
-/// req.file_details = Default::default(); // is VideoFileDetails
+/// req.statu = Default::default(); // is VideoStatus
+/// req.topic_detail = Default::default(); // is VideoTopicDetails
+/// req.suggestion = Default::default(); // is VideoSuggestions
+/// req.file_detail = Default::default(); // is VideoFileDetails
 /// req.player = Default::default(); // is VideoPlayer
-/// req.localizations = Default::default(); // is HashMap<String, VideoLocalization>
-/// req.live_streaming_details = Default::default(); // is VideoLiveStreamingDetails
-/// req.processing_details = Default::default(); // is VideoProcessingDetails
-/// req.statistics = Default::default(); // is VideoStatistics
-/// req.content_details = Default::default(); // is VideoContentDetails
+/// req.localization = Default::default(); // is HashMap<String, VideoLocalization>
+/// req.live_streaming_detail = Default::default(); // is VideoLiveStreamingDetails
+/// req.processing_detail = Default::default(); // is VideoProcessingDetails
+/// req.statistic = Default::default(); // is VideoStatistics
+/// req.content_detail = Default::default(); // is VideoContentDetails
 /// req.snippet = Default::default(); // is VideoSnippet
-/// req.recording_details = Default::default(); // is VideoRecordingDetails
+/// req.recording_detail = Default::default(); // is VideoRecordingDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.videos().update(&req)
+/// let result = hub.video().update(&req)
 ///              .on_behalf_of_content_owner("clita")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -8490,28 +8490,28 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req: Video = Default::default();
-/// req.status = Default::default(); // is VideoStatus
-/// req.topic_details = Default::default(); // is VideoTopicDetails
-/// req.suggestions = Default::default(); // is VideoSuggestions
-/// req.file_details = Default::default(); // is VideoFileDetails
+/// req.statu = Default::default(); // is VideoStatus
+/// req.topic_detail = Default::default(); // is VideoTopicDetails
+/// req.suggestion = Default::default(); // is VideoSuggestions
+/// req.file_detail = Default::default(); // is VideoFileDetails
 /// req.player = Default::default(); // is VideoPlayer
-/// req.localizations = Default::default(); // is HashMap<String, VideoLocalization>
-/// req.live_streaming_details = Default::default(); // is VideoLiveStreamingDetails
-/// req.processing_details = Default::default(); // is VideoProcessingDetails
-/// req.statistics = Default::default(); // is VideoStatistics
-/// req.content_details = Default::default(); // is VideoContentDetails
+/// req.localization = Default::default(); // is HashMap<String, VideoLocalization>
+/// req.live_streaming_detail = Default::default(); // is VideoLiveStreamingDetails
+/// req.processing_detail = Default::default(); // is VideoProcessingDetails
+/// req.statistic = Default::default(); // is VideoStatistics
+/// req.content_detail = Default::default(); // is VideoContentDetails
 /// req.snippet = Default::default(); // is VideoSnippet
-/// req.recording_details = Default::default(); // is VideoRecordingDetails
+/// req.recording_detail = Default::default(); // is VideoRecordingDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.videos().insert(&req)
+/// let result = hub.video().insert(&req)
 ///              .stabilize(true)
 ///              .on_behalf_of_content_owner_channel("amet")
 ///              .on_behalf_of_content_owner("accusam")
-///              .notify_subscribers(true)
-///              .auto_levels(false)
+///              .notify_subscriber(true)
+///              .auto_level(false)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
@@ -8527,8 +8527,8 @@ pub struct VideoInsertMethodBuilder<'a, C, NC, A>
     _stabilize: Option<bool>,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _notify_subscribers: Option<bool>,
-    _auto_levels: Option<bool>,
+    _notify_subscriber: Option<bool>,
+    _auto_level: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8555,11 +8555,11 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
-        if self._notify_subscribers.is_some() {
-            params.push(("notifySubscribers", self._notify_subscribers.unwrap().to_string()));
+        if self._notify_subscriber.is_some() {
+            params.push(("notifySubscribers", self._notify_subscriber.unwrap().to_string()));
         }
-        if self._auto_levels.is_some() {
-            params.push(("autoLevels", self._auto_levels.unwrap().to_string()));
+        if self._auto_level.is_some() {
+            params.push(("autoLevels", self._auto_level.unwrap().to_string()));
         }
         for &field in ["part", "stabilize", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "notifySubscribers", "autoLevels"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8701,16 +8701,16 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The notifySubscribers parameter indicates whether YouTube should send notification to subscribers about the inserted video.    
-    pub fn notify_subscribers(mut self, new_value: bool) -> VideoInsertMethodBuilder<'a, C, NC, A> {
-        self._notify_subscribers = Some(new_value);
+    pub fn notify_subscriber(mut self, new_value: bool) -> VideoInsertMethodBuilder<'a, C, NC, A> {
+        self._notify_subscriber = Some(new_value);
         self
     }
     /// Sets the *auto levels* query property to the given value.
     ///
     /// 
     /// The autoLevels parameter indicates whether YouTube should automatically enhance the video's lighting and color.    
-    pub fn auto_levels(mut self, new_value: bool) -> VideoInsertMethodBuilder<'a, C, NC, A> {
-        self._auto_levels = Some(new_value);
+    pub fn auto_level(mut self, new_value: bool) -> VideoInsertMethodBuilder<'a, C, NC, A> {
+        self._auto_level = Some(new_value);
         self
     }
     /// Sets the *delegate* property to the given value.
@@ -8808,12 +8808,12 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // Values shown here are possibly random and not representative !
 /// let mut req: Subscription = Default::default();
 /// req.snippet = Default::default(); // is SubscriptionSnippet
-/// req.content_details = Default::default(); // is SubscriptionContentDetails
+/// req.content_detail = Default::default(); // is SubscriptionContentDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.subscriptions().insert(&req)
+/// let result = hub.subscription().insert(&req)
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -8994,14 +8994,14 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.subscriptions().list("part")
+/// let result = hub.subscription().list("part")
 ///              .page_token("est")
 ///              .order("sit")
 ///              .on_behalf_of_content_owner_channel("ipsum")
 ///              .on_behalf_of_content_owner("erat")
-///              .my_subscribers(false)
+///              .my_subscriber(false)
 ///              .mine(true)
-///              .max_results(40)
+///              .max_result(40)
 ///              .id("voluptua.")
 ///              .for_channel_id("dolor")
 ///              .channel_id("amet")
@@ -9020,9 +9020,9 @@ pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
     _order: Option<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _my_subscribers: Option<bool>,
+    _my_subscriber: Option<bool>,
     _mine: Option<bool>,
-    _max_results: Option<u32>,
+    _max_result: Option<u32>,
     _id: Option<String>,
     _for_channel_id: Option<String>,
     _channel_id: Option<String>,
@@ -9052,14 +9052,14 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
-        if self._my_subscribers.is_some() {
-            params.push(("mySubscribers", self._my_subscribers.unwrap().to_string()));
+        if self._my_subscriber.is_some() {
+            params.push(("mySubscribers", self._my_subscriber.unwrap().to_string()));
         }
         if self._mine.is_some() {
             params.push(("mine", self._mine.unwrap().to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if self._max_result.is_some() {
+            params.push(("maxResults", self._max_result.unwrap().to_string()));
         }
         if self._id.is_some() {
             params.push(("id", self._id.unwrap().to_string()));
@@ -9153,8 +9153,8 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user.    
-    pub fn my_subscribers(mut self, new_value: bool) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
-        self._my_subscribers = Some(new_value);
+    pub fn my_subscriber(mut self, new_value: bool) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._my_subscriber = Some(new_value);
         self
     }
     /// Sets the *mine* query property to the given value.
@@ -9169,8 +9169,8 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
-        self._max_results = Some(new_value);
+    pub fn max_result(mut self, new_value: u32) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
+        self._max_result = Some(new_value);
         self
     }
     /// Sets the *id* query property to the given value.
@@ -9277,7 +9277,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.subscriptions().delete("id")
+/// let result = hub.subscription().delete("id")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -9451,8 +9451,8 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 ///              .page_token("ipsum")
 ///              .order("sed")
 ///              .on_behalf_of_content_owner("At")
-///              .max_results(17)
-///              .location_radius("ea")
+///              .max_result(17)
+///              .location_radiu("ea")
 ///              .location("ut")
 ///              .for_mine(true)
 ///              .for_content_owner(true)
@@ -9491,8 +9491,8 @@ pub struct SearchListMethodBuilder<'a, C, NC, A>
     _page_token: Option<String>,
     _order: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _max_results: Option<u32>,
-    _location_radius: Option<String>,
+    _max_result: Option<u32>,
+    _location_radiu: Option<String>,
     _location: Option<String>,
     _for_mine: Option<bool>,
     _for_content_owner: Option<bool>,
@@ -9576,11 +9576,11 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if self._max_result.is_some() {
+            params.push(("maxResults", self._max_result.unwrap().to_string()));
         }
-        if self._location_radius.is_some() {
-            params.push(("locationRadius", self._location_radius.unwrap().to_string()));
+        if self._location_radiu.is_some() {
+            params.push(("locationRadius", self._location_radiu.unwrap().to_string()));
         }
         if self._location.is_some() {
             params.push(("location", self._location.unwrap().to_string()));
@@ -9814,16 +9814,16 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> SearchListMethodBuilder<'a, C, NC, A> {
-        self._max_results = Some(new_value);
+    pub fn max_result(mut self, new_value: u32) -> SearchListMethodBuilder<'a, C, NC, A> {
+        self._max_result = Some(new_value);
         self
     }
     /// Sets the *location radius* query property to the given value.
     ///
     /// 
     /// The locationRadius, in conjunction with the location parameter, defines a geographic area. If the geographic coordinates associated with a video fall within that area, then the video may be included in search results. This parameter value must be a floating point number followed by a measurement unit. Valid measurement units are m, km, ft, and mi. For example, valid parameter values include 1500m, 5km, 10000ft, and 0.75mi. The API does not support locationRadius parameter values larger than 1000 kilometers.    
-    pub fn location_radius(mut self, new_value: &str) -> SearchListMethodBuilder<'a, C, NC, A> {
-        self._location_radius = Some(new_value.to_string());
+    pub fn location_radiu(mut self, new_value: &str) -> SearchListMethodBuilder<'a, C, NC, A> {
+        self._location_radiu = Some(new_value.to_string());
         self
     }
     /// Sets the *location* query property to the given value.
@@ -9969,7 +9969,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.i18n_regions().list("part")
+/// let result = hub.i18n_region().list("part")
 ///              .hl("ut")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -10139,7 +10139,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req: LiveStream = Default::default();
-/// req.status = Default::default(); // is LiveStreamStatus
+/// req.statu = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
 /// req.id = Some("et".to_string());
@@ -10147,7 +10147,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_streams().update(&req)
+/// let result = hub.live_stream().update(&req)
 ///              .on_behalf_of_content_owner_channel("elitr")
 ///              .on_behalf_of_content_owner("est")
 ///              .doit();
@@ -10352,7 +10352,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_streams().delete("id")
+/// let result = hub.live_stream().delete("id")
 ///              .on_behalf_of_content_owner_channel("justo")
 ///              .on_behalf_of_content_owner("et")
 ///              .doit();
@@ -10537,12 +10537,12 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_streams().list("part")
+/// let result = hub.live_stream().list("part")
 ///              .page_token("et")
 ///              .on_behalf_of_content_owner_channel("gubergren")
 ///              .on_behalf_of_content_owner("est")
 ///              .mine(true)
-///              .max_results(78)
+///              .max_result(78)
 ///              .id("invidunt")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -10559,7 +10559,7 @@ pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _mine: Option<bool>,
-    _max_results: Option<u32>,
+    _max_result: Option<u32>,
     _id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -10587,8 +10587,8 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         if self._mine.is_some() {
             params.push(("mine", self._mine.unwrap().to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if self._max_result.is_some() {
+            params.push(("maxResults", self._max_result.unwrap().to_string()));
         }
         if self._id.is_some() {
             params.push(("id", self._id.unwrap().to_string()));
@@ -10675,8 +10675,8 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set. Acceptable values are 0 to 50, inclusive. The default value is 5.    
-    pub fn max_results(mut self, new_value: u32) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
-        self._max_results = Some(new_value);
+    pub fn max_result(mut self, new_value: u32) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
+        self._max_result = Some(new_value);
         self
     }
     /// Sets the *id* query property to the given value.
@@ -10780,7 +10780,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req: LiveStream = Default::default();
-/// req.status = Default::default(); // is LiveStreamStatus
+/// req.statu = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
 /// req.id = Some("dolore".to_string());
@@ -10788,7 +10788,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_streams().insert(&req)
+/// let result = hub.live_stream().insert(&req)
 ///              .on_behalf_of_content_owner_channel("accusam")
 ///              .on_behalf_of_content_owner("elitr")
 ///              .doit();
@@ -11011,7 +11011,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.channels().update(&req)
+/// let result = hub.channel().update(&req)
 ///              .on_behalf_of_content_owner("dolor")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -11211,12 +11211,12 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.channels().list("part")
+/// let result = hub.channel().list("part")
 ///              .page_token("sit")
 ///              .on_behalf_of_content_owner("justo")
-///              .my_subscribers(false)
+///              .my_subscriber(false)
 ///              .mine(false)
-///              .max_results(49)
+///              .max_result(49)
 ///              .managed_by_me(true)
 ///              .id("diam")
 ///              .for_username("ipsum")
@@ -11234,9 +11234,9 @@ pub struct ChannelListMethodBuilder<'a, C, NC, A>
     _part: String,
     _page_token: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _my_subscribers: Option<bool>,
+    _my_subscriber: Option<bool>,
     _mine: Option<bool>,
-    _max_results: Option<u32>,
+    _max_result: Option<u32>,
     _managed_by_me: Option<bool>,
     _id: Option<String>,
     _for_username: Option<String>,
@@ -11261,14 +11261,14 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
-        if self._my_subscribers.is_some() {
-            params.push(("mySubscribers", self._my_subscribers.unwrap().to_string()));
+        if self._my_subscriber.is_some() {
+            params.push(("mySubscribers", self._my_subscriber.unwrap().to_string()));
         }
         if self._mine.is_some() {
             params.push(("mine", self._mine.unwrap().to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if self._max_result.is_some() {
+            params.push(("maxResults", self._max_result.unwrap().to_string()));
         }
         if self._managed_by_me.is_some() {
             params.push(("managedByMe", self._managed_by_me.unwrap().to_string()));
@@ -11346,8 +11346,8 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// Set this parameter's value to true to retrieve a list of channels that subscribed to the authenticated user's channel.    
-    pub fn my_subscribers(mut self, new_value: bool) -> ChannelListMethodBuilder<'a, C, NC, A> {
-        self._my_subscribers = Some(new_value);
+    pub fn my_subscriber(mut self, new_value: bool) -> ChannelListMethodBuilder<'a, C, NC, A> {
+        self._my_subscriber = Some(new_value);
         self
     }
     /// Sets the *mine* query property to the given value.
@@ -11362,8 +11362,8 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> ChannelListMethodBuilder<'a, C, NC, A> {
-        self._max_results = Some(new_value);
+    pub fn max_result(mut self, new_value: u32) -> ChannelListMethodBuilder<'a, C, NC, A> {
+        self._max_result = Some(new_value);
         self
     }
     /// Sets the *managed by me* query property to the given value.
@@ -11478,7 +11478,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlist_items().delete("id")
+/// let result = hub.playlist_item().delete("id")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -11632,12 +11632,12 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlist_items().list("part")
+/// let result = hub.playlist_item().list("part")
 ///              .video_id("et")
 ///              .playlist_id("sadipscing")
 ///              .page_token("At")
 ///              .on_behalf_of_content_owner("et")
-///              .max_results(25)
+///              .max_result(25)
 ///              .id("sanctus")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -11654,7 +11654,7 @@ pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
     _playlist_id: Option<String>,
     _page_token: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _max_results: Option<u32>,
+    _max_result: Option<u32>,
     _id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -11682,8 +11682,8 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if self._max_result.is_some() {
+            params.push(("maxResults", self._max_result.unwrap().to_string()));
         }
         if self._id.is_some() {
             params.push(("id", self._id.unwrap().to_string()));
@@ -11768,8 +11768,8 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
-        self._max_results = Some(new_value);
+    pub fn max_result(mut self, new_value: u32) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
+        self._max_result = Some(new_value);
         self
     }
     /// Sets the *id* query property to the given value.
@@ -11875,14 +11875,14 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req: PlaylistItem = Default::default();
-/// req.status = Default::default(); // is PlaylistItemStatus
+/// req.statu = Default::default(); // is PlaylistItemStatus
 /// req.snippet = Default::default(); // is PlaylistItemSnippet
-/// req.content_details = Default::default(); // is PlaylistItemContentDetails
+/// req.content_detail = Default::default(); // is PlaylistItemContentDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlist_items().insert(&req)
+/// let result = hub.playlist_item().insert(&req)
 ///              .on_behalf_of_content_owner("duo")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -12081,14 +12081,14 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req: PlaylistItem = Default::default();
-/// req.status = Default::default(); // is PlaylistItemStatus
+/// req.statu = Default::default(); // is PlaylistItemStatus
 /// req.snippet = Default::default(); // is PlaylistItemSnippet
-/// req.content_details = Default::default(); // is PlaylistItemContentDetails
+/// req.content_detail = Default::default(); // is PlaylistItemContentDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.playlist_items().update(&req)
+/// let result = hub.playlist_item().update(&req)
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -12264,11 +12264,11 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 /// let mut req: InvideoBranding = Default::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `upload_resumable(...)`.
+/// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.watermarks().set(&req, "channelId")
+/// let result = hub.watermark().set(&req, "channelId")
 ///              .on_behalf_of_content_owner("sanctus")
-///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
+///              .upload(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
 /// // TODO: show how to handle the result !
 /// # }
 /// ```
@@ -12457,7 +12457,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.watermarks().unset("channelId")
+/// let result = hub.watermark().unset("channelId")
 ///              .on_behalf_of_content_owner("justo")
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -12620,11 +12620,11 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().control("id", "part")
+/// let result = hub.live_broadcast().control("id", "part")
 ///              .walltime("Stet")
 ///              .on_behalf_of_content_owner_channel("et")
 ///              .on_behalf_of_content_owner("amet.")
-///              .offset_time_ms("ea")
+///              .offset_time_m("ea")
 ///              .display_slate(false)
 ///              .doit();
 /// // TODO: show how to handle the result !
@@ -12641,7 +12641,7 @@ pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
     _walltime: Option<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
-    _offset_time_ms: Option<String>,
+    _offset_time_m: Option<String>,
     _display_slate: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -12667,8 +12667,8 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
         }
-        if self._offset_time_ms.is_some() {
-            params.push(("offsetTimeMs", self._offset_time_ms.unwrap().to_string()));
+        if self._offset_time_m.is_some() {
+            params.push(("offsetTimeMs", self._offset_time_m.unwrap().to_string()));
         }
         if self._display_slate.is_some() {
             params.push(("displaySlate", self._display_slate.unwrap().to_string()));
@@ -12761,8 +12761,8 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
     /// If you do not specify a value for this parameter, then YouTube performs the action as soon as possible. See the Getting started guide for more details.
     /// 
     /// Important: You should only specify a value for this parameter if your broadcast stream is delayed.
-    pub fn offset_time_ms(mut self, new_value: &str) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
-        self._offset_time_ms = Some(new_value.to_string());
+    pub fn offset_time_m(mut self, new_value: &str) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+        self._offset_time_m = Some(new_value.to_string());
         self
     }
     /// Sets the *display slate* query property to the given value.
@@ -12866,15 +12866,15 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req: LiveBroadcast = Default::default();
-/// req.status = Default::default(); // is LiveBroadcastStatus
+/// req.statu = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
-/// req.content_details = Default::default(); // is LiveBroadcastContentDetails
+/// req.content_detail = Default::default(); // is LiveBroadcastContentDetails
 /// req.id = Some("sit".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().update(&req)
+/// let result = hub.live_broadcast().update(&req)
 ///              .on_behalf_of_content_owner_channel("ipsum")
 ///              .on_behalf_of_content_owner("est")
 ///              .doit();
@@ -13092,15 +13092,15 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req: LiveBroadcast = Default::default();
-/// req.status = Default::default(); // is LiveBroadcastStatus
+/// req.statu = Default::default(); // is LiveBroadcastStatus
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
-/// req.content_details = Default::default(); // is LiveBroadcastContentDetails
+/// req.content_detail = Default::default(); // is LiveBroadcastContentDetails
 /// req.id = Some("et".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().insert(&req)
+/// let result = hub.live_broadcast().insert(&req)
 ///              .on_behalf_of_content_owner_channel("diam")
 ///              .on_behalf_of_content_owner("dolores")
 ///              .doit();
@@ -13314,7 +13314,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().bind("id", "part")
+/// let result = hub.live_broadcast().bind("id", "part")
 ///              .stream_id("erat")
 ///              .on_behalf_of_content_owner_channel("erat")
 ///              .on_behalf_of_content_owner("invidunt")
@@ -13531,14 +13531,14 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().list("part")
+/// let result = hub.live_broadcast().list("part")
 ///              .page_token("justo")
 ///              .on_behalf_of_content_owner_channel("clita")
 ///              .on_behalf_of_content_owner("clita")
 ///              .mine(true)
-///              .max_results(75)
+///              .max_result(75)
 ///              .id("magna")
-///              .broadcast_status("sanctus")
+///              .broadcast_statu("sanctus")
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
@@ -13554,9 +13554,9 @@ pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _mine: Option<bool>,
-    _max_results: Option<u32>,
+    _max_result: Option<u32>,
     _id: Option<String>,
-    _broadcast_status: Option<String>,
+    _broadcast_statu: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13583,14 +13583,14 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
         if self._mine.is_some() {
             params.push(("mine", self._mine.unwrap().to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if self._max_result.is_some() {
+            params.push(("maxResults", self._max_result.unwrap().to_string()));
         }
         if self._id.is_some() {
             params.push(("id", self._id.unwrap().to_string()));
         }
-        if self._broadcast_status.is_some() {
-            params.push(("broadcastStatus", self._broadcast_status.unwrap().to_string()));
+        if self._broadcast_statu.is_some() {
+            params.push(("broadcastStatus", self._broadcast_statu.unwrap().to_string()));
         }
         for &field in ["part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "broadcastStatus"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13674,8 +13674,8 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-        self._max_results = Some(new_value);
+    pub fn max_result(mut self, new_value: u32) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._max_result = Some(new_value);
         self
     }
     /// Sets the *id* query property to the given value.
@@ -13690,8 +13690,8 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
     ///
     /// 
     /// The broadcastStatus parameter filters the API response to only include broadcasts with the specified status.    
-    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
-        self._broadcast_status = Some(new_value.to_string());
+    pub fn broadcast_statu(mut self, new_value: &str) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+        self._broadcast_statu = Some(new_value.to_string());
         self
     }
     /// Sets the *delegate* property to the given value.
@@ -13774,7 +13774,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().delete("id")
+/// let result = hub.live_broadcast().delete("id")
 ///              .on_behalf_of_content_owner_channel("clita")
 ///              .on_behalf_of_content_owner("ipsum")
 ///              .doit();
@@ -13956,7 +13956,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.live_broadcasts().transition("broadcastStatus", "id", "part")
+/// let result = hub.live_broadcast().transition("broadcastStatus", "id", "part")
 ///              .on_behalf_of_content_owner_channel("et")
 ///              .on_behalf_of_content_owner("dolor")
 ///              .doit();
@@ -13969,7 +13969,7 @@ pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
            A: 'a, {
 
     hub: &'a YouTube<C, NC, A>,
-    _broadcast_status: String,
+    _broadcast_statu: String,
     _id: String,
     _part: String,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -13987,7 +13987,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<LiveBroadcast> {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
-        params.push(("broadcastStatus", self._broadcast_status.to_string()));
+        params.push(("broadcastStatus", self._broadcast_statu.to_string()));
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
         if self._on_behalf_of_content_owner_channel.is_some() {
@@ -14025,8 +14025,8 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
     /// we provide this method for API completeness.
     /// 
     /// The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to.    
-    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
-        self._broadcast_status = new_value.to_string();
+    pub fn broadcast_statu(mut self, new_value: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+        self._broadcast_statu = new_value.to_string();
         self
     }
     /// Sets the *id* query property to the given value.
@@ -14171,7 +14171,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.video_categories().list("part")
+/// let result = hub.video_category().list("part")
 ///              .region_code("invidunt")
 ///              .id("aliquyam")
 ///              .hl("clita")
@@ -14367,13 +14367,13 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.activities().list("part")
+/// let result = hub.activity().list("part")
 ///              .region_code("sanctus")
 ///              .published_before("no")
 ///              .published_after("sit")
 ///              .page_token("consetetur")
 ///              .mine(false)
-///              .max_results(48)
+///              .max_result(48)
 ///              .home(true)
 ///              .channel_id("amet")
 ///              .doit();
@@ -14392,7 +14392,7 @@ pub struct ActivityListMethodBuilder<'a, C, NC, A>
     _published_after: Option<String>,
     _page_token: Option<String>,
     _mine: Option<bool>,
-    _max_results: Option<u32>,
+    _max_result: Option<u32>,
     _home: Option<bool>,
     _channel_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -14424,8 +14424,8 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         if self._mine.is_some() {
             params.push(("mine", self._mine.unwrap().to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if self._max_result.is_some() {
+            params.push(("maxResults", self._max_result.unwrap().to_string()));
         }
         if self._home.is_some() {
             params.push(("home", self._home.unwrap().to_string()));
@@ -14518,8 +14518,8 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> ActivityListMethodBuilder<'a, C, NC, A> {
-        self._max_results = Some(new_value);
+    pub fn max_result(mut self, new_value: u32) -> ActivityListMethodBuilder<'a, C, NC, A> {
+        self._max_result = Some(new_value);
         self
     }
     /// Sets the *home* query property to the given value.
@@ -14632,12 +14632,12 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // Values shown here are possibly random and not representative !
 /// let mut req: Activity = Default::default();
 /// req.snippet = Default::default(); // is ActivitySnippet
-/// req.content_details = Default::default(); // is ActivityContentDetails
+/// req.content_detail = Default::default(); // is ActivityContentDetails
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.activities().insert(&req)
+/// let result = hub.activity().insert(&req)
 ///              .doit();
 /// // TODO: show how to handle the result !
 /// # }
