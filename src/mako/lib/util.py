@@ -350,7 +350,7 @@ def schema_markers(s, c):
     else:
         # it should have at least one activity that matches it's type to qualify for the Resource trait
         for fqan, iot in activities.iteritems():
-            if activity_name_to_type_name(activity_split(fqan)[0]).lower() == s.id.lower():
+            if activity_name_to_type_name(activity_split(fqan)[1]).lower() == s.id.lower():
                 res.add('Resource')
             if IO_RESPONSE in iot:
                 res.add('ResponseResult')
@@ -370,10 +370,10 @@ def schema_markers(s, c):
 # -------------------------
 ## @name Activity Utilities
 # @{
-# return (name, method)
+# return (category, name, method)
 def activity_split(fqan):
     t = fqan.split('.')
-    return t[1], '.'.join(t[2:])
+    return t[0], t[1], '.'.join(t[2:])
 
 # Shorthand to get a type from parameters of activities
 def activity_rust_type(p, allow_optionals=True):
@@ -387,7 +387,7 @@ def to_fqan(name, resource, method):
 def activity_name_to_type_name(an):
     return canonical_type_name(an)[:-1]
 
-# yields (resource, activity, activity_data)
+# yields (category, resource, activity, activity_data)
 def iter_acitivities(c):
     return ((activity_split(an) + [a]) for an, a in c.fqan_map.iteritems())
 
@@ -564,7 +564,7 @@ def new_context(resources):
                 # delete: has no response or request
                 # getrating: response is a 'SomethingResult', which is still related to activities name
                 #            the latter is used to deduce the resource name
-                an, _ = activity_split(m.id)
+                category, an, _ = activity_split(m.id)
                 tn = activity_name_to_type_name(an)
                 info = res.setdefault(tn, dict())
                 if m.id not in info:
@@ -578,7 +578,7 @@ def new_context(resources):
     sta_map, fqan_map = build_activity_mappings(resources)
     rta_map = dict()
     for an in fqan_map:
-        resource, activity = activity_split(an)
+        category, resource, activity = activity_split(an)
         rta_map.setdefault(resource, list()).append(activity)
     return Context(sta_map, fqan_map, rta_map)
 

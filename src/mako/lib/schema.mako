@@ -66,7 +66,7 @@ ${s.get('description', 'There is no detailed description.')}
 This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 The list links the activity name, along with information about where it is used (one of ${put_and(enclose_in('*', IO_TYPES))}).
 
-${''.join("* [%s](struct.%s.html) (%s)\n" % (activity_split(a)[1], mb_type(*activity_split(a)[:2]), iot and '|'.join(iot) or 'none') 
+${''.join("* [%s](struct.%s.html) (%s)\n" % (activity_split(a)[2], mb_type(*activity_split(a)[1:3]), iot and '|'.join(iot) or 'none') 
 													for a, iot in c.sta_map[s.id].iteritems())}
 % else:
 
