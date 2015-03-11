@@ -138,7 +138,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
     pub fn doit(mut self) -> () {
         let mut params: Vec<(&str, String)> = Vec::with_capacity(1);
         if self._part.is_none() {
-            self._parts = "parts from request value".to_string();
+            self._part = Some("parts from request value".to_string());
         }
         if self._delegate.is_some() {
             self._delegate.as_mut().unwrap().connection_error(hyper::HttpError::HttpStatusError);
