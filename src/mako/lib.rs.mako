@@ -11,7 +11,7 @@
     nested_schemas = list()
     if schemas:
         nested_schemas = list(iter_nested_types(schemas))
-    c = new_context(resources)
+    c = new_context(schemas, resources)
     hub_type = hub_type(schemas, util.canonical_name())
     ht_params = hub_type_params_s()
 %>\

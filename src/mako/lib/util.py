@@ -263,12 +263,18 @@ def mangle_ident(n):
 def _is_map_prop(p):
     return 'additionalProperties' in p
 
+def _assure_unique_type_name(schemas, tn):
+    if tn in schemas:
+        tn += 'Internal'
+        assert tn not in schemas
+    return tn
+
 # map a json type to an rust type
 # sn = schema name
 # pn = property name
 # t = type dict
 # NOTE: In case you don't understand how this algorithm really works ... me neither - THE AUTHOR
-def to_rust_type(sn, pn, t, allow_optionals=True):
+def to_rust_type(schemas, sn, pn, t, allow_optionals=True):
     def nested_type(nt):
         if 'items' in nt:
             nt = nt.items
@@ -277,8 +283,8 @@ def to_rust_type(sn, pn, t, allow_optionals=True):
         else:
             assert(is_nested_type_property(nt))
             # It's a nested type - we take it literally like $ref, but generate a name for the type ourselves
-            return nested_type_name(sn, pn)
-        return to_rust_type(sn, pn, nt, allow_optionals=False)
+            return _assure_unique_type_name(schemas, nested_type_name(sn, pn))
+        return to_rust_type(schemas, sn, pn, nt, allow_optionals=False)
 
     def wrap_type(tn):
         if allow_optionals:
@@ -323,10 +329,10 @@ def is_nested_type(s):
 
 # convert a rust-type to something that would be taken as input of a function
 # even though our storage type is different
-def activity_input_type(p):
+def activity_input_type(schemas, p):
     if 'input_type' in p:
         return p.input_type
-    n = activity_rust_type(p, allow_optionals=False)
+    n = activity_rust_type(schemas, p, allow_optionals=False)
     if n == 'String':
         n = 'str'
     # pods are copied anyway
@@ -370,6 +376,7 @@ def iter_nested_types(schemas):
         if 'properties' not in s:
             continue
         for np in iter_nested_properties(s.id, s.properties):
+            np.id = _assure_unique_type_name(schemas, np.id)
             yield np
     # end for aech schma
 
@@ -409,8 +416,8 @@ def activity_split(fqan):
     return t[0], t[1], '.'.join(t[2:])
 
 # Shorthand to get a type from parameters of activities
-def activity_rust_type(p, allow_optionals=True):
-    return to_rust_type(None, p.name, p, allow_optionals=allow_optionals)
+def activity_rust_type(schemas, p, allow_optionals=True):
+    return to_rust_type(schemas, None, p.name, p, allow_optionals=allow_optionals)
 
 # the inverse of activity-split, but needs to know the 'name' of the API
 def to_fqan(name, resource, method):
@@ -563,7 +570,7 @@ It should be used to handle progress information, and to implement a certain lev
 Context = collections.namedtuple('Context', ['sta_map', 'fqan_map', 'rta_map', 'rtc_map'])
 
 # return a newly build context from the given data
-def new_context(resources):
+def new_context(schemas, resources):
     if not resources:
         return Context(dict(), dict(), dict(), dict())
     # Returns (A, B) where
@@ -587,7 +594,7 @@ def new_context(resources):
                     t = m.get(in_out_type_name, None)
                     if t is None:
                         continue
-                    tn = to_rust_type(None, None, t, allow_optionals=False)
+                    tn = to_rust_type(schemas, None, None, t, allow_optionals=False)
                     info = res.setdefault(tn, dict())
                     io_info = info.setdefault(m.id, [])
                     io_info.append(in_out_type_name)

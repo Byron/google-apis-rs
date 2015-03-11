@@ -61,13 +61,13 @@ impl${rb_params} ${ThisType} {
 
     method_args = ''
     if required_props:
-        method_args = ', ' + ', '.join('%s: %s' % (mangle_ident(p.name), activity_input_type(p)) for p in required_props)
+        method_args = ', ' + ', '.join('%s: %s' % (mangle_ident(p.name), activity_input_type(schemas, p)) for p in required_props)
 
     mb_tparams = mb_type_params_s(m)
     # we would could have information about data requirements for each property in it's dict.
     # for now, we just hardcode it, and treat the entries as way to easily change param names
     assert len(api.properties) == 2, "Hardcoded for now, thanks to scope requirements"
-    
+
     type_params = ''
     if mb_additional_type_params(m):
         type_params = '<%s>' % ', '.join(mb_additional_type_params(m))
@@ -82,7 +82,7 @@ impl${rb_params} ${ThisType} {
         ${RType} {
             hub: self.hub,
             % for p in required_props:
-            ${property(p.name)}: ${rust_copy_value_s(mangle_ident(p.name), activity_input_type(p), p)},
+            ${property(p.name)}: ${rust_copy_value_s(mangle_ident(p.name), activity_input_type(schemas, p), p)},
             % endfor
             ## auto-generate parts from request resources
             % if part_prop and request_value:

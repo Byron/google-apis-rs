@@ -5199,7 +5199,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> I18nLanguageListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> I18nLanguageListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -5391,7 +5391,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -5606,7 +5606,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> ChannelSectionListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -5825,7 +5825,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -5979,7 +5979,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -6181,7 +6181,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -6379,7 +6379,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> GuideCategoryListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GuideCategoryListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -6598,7 +6598,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> PlaylistInsertMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistInsertMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -6858,7 +6858,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> PlaylistListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -7012,7 +7012,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -7216,7 +7216,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -7398,7 +7398,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> ThumbnailSetMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ThumbnailSetMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -7715,7 +7715,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> VideoListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -7881,7 +7881,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> VideoRateMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoRateMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -8035,7 +8035,7 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> VideoGetRatingMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoGetRatingMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -8189,7 +8189,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> VideoDeleteMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoDeleteMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -8435,7 +8435,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> VideoUpdateMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoUpdateMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -8764,7 +8764,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> VideoInsertMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoInsertMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -8951,7 +8951,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -9248,7 +9248,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> SubscriptionListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -9387,7 +9387,7 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -9927,7 +9927,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> SearchListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SearchListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -10097,7 +10097,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> I18nRegionListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> I18nRegionListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -10323,7 +10323,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -10494,7 +10494,7 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -10738,7 +10738,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> LiveStreamListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -10962,7 +10962,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -11164,7 +11164,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> ChannelUpdateMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelUpdateMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -11449,7 +11449,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> ChannelListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -11588,7 +11588,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -11831,7 +11831,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> PlaylistItemListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -12037,7 +12037,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -12230,7 +12230,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -12428,7 +12428,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> WatermarkSetMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WatermarkSetMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -12580,7 +12580,7 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -12824,7 +12824,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -13050,7 +13050,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -13274,7 +13274,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -13488,7 +13488,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -13745,7 +13745,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -13916,7 +13916,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -14129,7 +14129,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -14325,7 +14325,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> VideoCategoryListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoCategoryListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -14589,7 +14589,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> ActivityListMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ActivityListMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -14775,7 +14775,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> ActivityInsertMethodBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ActivityInsertMethodBuilder<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self

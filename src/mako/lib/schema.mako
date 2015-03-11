@@ -11,7 +11,7 @@ pub struct ${s.id}\
  {
 % for pn, p in properties.iteritems():
 	${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
-	pub ${mangle_ident(pn)}: ${to_rust_type(s.id, pn, p)},
+	pub ${mangle_ident(pn)}: ${to_rust_type(schemas, s.id, pn, p)},
 % endfor
 }
 % else: ## it's an empty struct, i.e. struct Foo;
@@ -35,7 +35,7 @@ ${doc(s, c)}\
 ${_new_object(s, s.get('properties'), c)}\
 % elif s.type == 'array':
 % if s.items.get('type') != 'object':
-pub struct ${s.id}(${to_rust_type(s.id, NESTED_TYPE_SUFFIX, s)});
+pub struct ${s.id}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s)});
 % else:
 ${_new_object(s, s.items.get('properties'), c)}\
 % endif ## array item != 'object'
@@ -57,7 +57,7 @@ impl ${s.id} {
 		% for pn, p in s.properties.iteritems():
 <%
 			mn = 'self.' + mangle_ident(pn)
-			rt = to_rust_type(s.id, pn, p)
+			rt = to_rust_type(schemas, s.id, pn, p)
 			check = 'is_some()'
 			if rt.startswith('Vec') or rt.startswith('HashMap'):
 				check = 'len() > 0'
@@ -92,6 +92,6 @@ This type is not used in any activity, and only used as *part* of another schema
 % if s.type != 'object':
 
 ## for some reason, it's not shown in rustdoc ... 
-The contained type is `${to_rust_type(s.id, s.id, s)}`.
+The contained type is `${to_rust_type(schemas, s.id, s.id, s)}`.
 %endif
 </%def>

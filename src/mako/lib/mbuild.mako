@@ -90,9 +90,9 @@ pub struct ${ThisType}
 % for p in params:
     ${property(p.name)}:\
     % if is_required_property(p):
- ${activity_rust_type(p, allow_optionals=False)},
+ ${activity_rust_type(schemas, p, allow_optionals=False)},
     % else:
- ${activity_rust_type(p)},
+ ${activity_rust_type(schemas, p)},
     % endif
 % endfor
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
@@ -161,7 +161,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 ###############################################################################################
 <%def name="_setter_fn(resource, method, m, p, part_prop, ThisType, c)">\
 <%
-    InType = activity_input_type(p)
+    InType = activity_input_type(schemas, p)
 
     def show_part_info(m, p):
         if p.name != 'part':
@@ -217,7 +217,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     is_string_value = lambda v: v.endswith('"')
 
     # to rust value
-    trv = lambda spn, sp, sn=None: to_rust_type(sn, spn, sp, allow_optionals=False)
+    trv = lambda spn, sp, sn=None: to_rust_type(schemas, sn, spn, sp, allow_optionals=False)
     # rvfrt = random value for rust type
     rvfrt = lambda spn, sp, sn=None: rnd_arg_val_for_type(trv(spn, sp, sn))
 
