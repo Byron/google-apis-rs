@@ -340,10 +340,14 @@ def iter_nested_types(schemas):
                 ns.id = nested_type_name(prefix, pn)
                 ns[NESTED_TYPE_MARKER] = True
 
+                # To allow us recursing arrays, we simply put items one level up
+                if 'items' in p:
+                    ns.update((k, deepcopy(v)) for k, v in p.items.iteritems())
+
                 yield ns
-                
-                for np in iter_nested_properties(prefix + canonical_type_name(pn), ns.properties):
-                    yield np
+                if 'properties' in ns:
+                    for np in iter_nested_properties(prefix + canonical_type_name(pn), ns.properties):
+                        yield np
             elif _is_map_prop(p):
                 # it's a hash, check its type
                 for np in iter_nested_properties(prefix, {pn: p.additionalProperties}):
