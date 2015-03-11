@@ -319,19 +319,6 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
 // ##########
 /// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct VideoConversionPings {
-    /// Pings that the app shall fire for a video (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.    
-    pub pings: Vec<VideoConversionPing>,
-}
-
-impl Part for VideoConversionPings {}
-
-
-/// There is no detailed description.
-/// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
@@ -340,7 +327,7 @@ impl Part for VideoConversionPings {}
 /// * [list](struct.SubscriptionListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct SubscriptionListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -365,47 +352,41 @@ pub struct SubscriptionListResponse {
 impl ResponseResult for SubscriptionListResponse {}
 
 
-/// Information about a resource that received a positive (like) rating.
+/// The auditDetails object encapsulates channel data that is relevant for YouTube Partners during the audit process.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct ActivityContentDetailsLike {
-    /// The resourceId object contains information that identifies the rated resource.    
-    pub resource_id: Option<ResourceId>,
+pub struct ChannelAuditDetails {
+    /// Whether or not the channel has any copyright strikes.    
+    pub copyright_strikes_good_standing: Option<bool>,
+    /// Whether or not the channel respects the community guidelines.    
+    pub community_guidelines_good_standing: Option<bool>,
+    /// Whether or not the channel has any unresolved claims.    
+    pub content_id_claims_good_standing: Option<bool>,
+    /// Describes the general state of the channel. This field will always show if there are any issues whatsoever with the channel. Currently this field represents the result of the logical and operation over the community guidelines good standing, the copyright strikes good standing and the content ID claims good standing, but this may change in the future.    
+    pub overall_good_standing: Option<bool>,
 }
 
-impl Part for ActivityContentDetailsLike {}
+impl Part for ChannelAuditDetails {}
+impl RequestValue for ChannelAuditDetails {}
+impl ResponseResult for ChannelAuditDetails {}
+impl cmn::Resource for ChannelAuditDetails {}
 
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct LiveBroadcastSnippet {
-    /// The date and time that the broadcast actually ended. This information is only available once the broadcast's state is complete. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-    pub actual_end_time: Option<String>,
-    /// The broadcast's description. As with the title, you can set this field by modifying the broadcast resource or by setting the description field of the corresponding video resource.    
-    pub description: Option<String>,
-    /// The broadcast's title. Note that the broadcast represents exactly one YouTube video. You can set this field by modifying the broadcast resource or by setting the title field of the corresponding video resource.    
-    pub title: Option<String>,
-    /// The ID that YouTube uses to uniquely identify the channel that is publishing the broadcast.    
-    pub channel_id: Option<String>,
-    /// The date and time that the broadcast was added to YouTube's live broadcast schedule. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-    pub published_at: Option<String>,
-    /// The date and time that the broadcast is scheduled to start. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-    pub scheduled_start_time: Option<String>,
-    /// The date and time that the broadcast actually started. This information is only available once the broadcast's state is live. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-    pub actual_start_time: Option<String>,
-    /// The date and time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-    pub scheduled_end_time: Option<String>,
-    /// A map of thumbnail images associated with the broadcast. For each nested object in this object, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
+impl ChannelAuditDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.copyright_strikes_good_standing.is_some() { r = r + "copyrightStrikesGoodStanding,"; }
+        if self.community_guidelines_good_standing.is_some() { r = r + "communityGuidelinesGoodStanding,"; }
+        if self.content_id_claims_good_standing.is_some() { r = r + "contentIdClaimsGoodStanding,"; }
+        if self.overall_good_standing.is_some() { r = r + "overallGoodStanding,"; }
+        r.pop();
+        r
+    }
 }
-
-impl Part for LiveBroadcastSnippet {}
-
 
 /// Describes original video file properties, including technical details about audio and video streams, but also metadata information like content length, digitization time, or geotagging information.
 /// 
@@ -439,7 +420,30 @@ pub struct VideoFileDetails {
 }
 
 impl Part for VideoFileDetails {}
+impl RequestValue for VideoFileDetails {}
+impl ResponseResult for VideoFileDetails {}
+impl cmn::Resource for VideoFileDetails {}
 
+impl VideoFileDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.bitrate_bps.is_some() { r = r + "bitrateBps,"; }
+        if self.container.is_some() { r = r + "container,"; }
+        if self.recording_location.is_some() { r = r + "recordingLocation,"; }
+        if self.file_type.is_some() { r = r + "fileType,"; }
+        if self.creation_time.is_some() { r = r + "creationTime,"; }
+        if self.duration_ms.is_some() { r = r + "durationMs,"; }
+        if self.file_name.is_some() { r = r + "fileName,"; }
+        if self.file_size.is_some() { r = r + "fileSize,"; }
+        if self.video_streams.len() > 0 { r = r + "videoStreams,"; }
+        if self.audio_streams.len() > 0 { r = r + "audioStreams,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Playlist localization setting
 /// 
@@ -454,68 +458,44 @@ pub struct PlaylistLocalization {
 }
 
 impl Part for PlaylistLocalization {}
+impl RequestValue for PlaylistLocalization {}
+impl ResponseResult for PlaylistLocalization {}
+impl cmn::Resource for PlaylistLocalization {}
 
-
-/// A playlist resource represents a YouTube playlist. A playlist is a collection of videos that can be viewed sequentially and shared with other users. A playlist can contain up to 200 videos, and YouTube does not limit the number of playlists that each user creates. By default, playlists are publicly visible to other users, but playlists can be public or private.
-/// 
-/// YouTube also uses playlists to identify special collections of videos for a channel, such as:  
-/// - uploaded videos 
-/// - favorite videos 
-/// - positively rated (liked) videos 
-/// - watch history 
-/// - watch later  To be more specific, these lists are associated with a channel, which is a collection of a person, group, or company's videos, playlists, and other YouTube information. You can retrieve the playlist IDs for each of these lists from the  channel resource for a given channel.
-/// 
-/// You can then use the   playlistItems.list method to retrieve any of those lists. You can also add or remove items from those lists by calling the   playlistItems.insert and   playlistItems.delete methods.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert](struct.PlaylistInsertMethodBuilder.html) (request|response)
-/// * [delete](struct.PlaylistDeleteMethodBuilder.html) (none)
-/// * [list](struct.PlaylistListMethodBuilder.html) (none)
-/// * [update](struct.PlaylistUpdateMethodBuilder.html) (request|response)
-/// 
-/// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct Playlist {
-    /// The status object contains status information for the playlist.    
-    pub status: Option<PlaylistStatus>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlist".    
-    pub kind: Option<String>,
-    /// The contentDetails object contains information like video count.    
-    pub content_details: Option<PlaylistContentDetails>,
-    /// The snippet object contains basic details about the playlist, such as its title and description.    
-    pub snippet: Option<PlaylistSnippet>,
-    /// The player object contains information that you would use to play the playlist in an embedded player.    
-    pub player: Option<PlaylistPlayer>,
-    /// Etag of this resource.    
-    pub etag: Option<String>,
-    /// The ID that YouTube uses to uniquely identify the playlist.    
-    pub id: Option<String>,
-    /// Localizations for different languages    
-    pub localizations: HashMap<String, PlaylistLocalization>,
-}
-
-impl RequestValue for Playlist {}
-impl ResponseResult for Playlist {}
-impl cmn::Resource for Playlist {}
-
-impl Playlist {
+impl PlaylistLocalization {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        if self.status.is_some() { r = r + "status,"; }
-        if self.kind.is_some() { r = r + "kind,"; }
-        if self.content_details.is_some() { r = r + "contentDetails,"; }
-        if self.snippet.is_some() { r = r + "snippet,"; }
-        if self.player.is_some() { r = r + "player,"; }
-        if self.etag.is_some() { r = r + "etag,"; }
-        if self.id.is_some() { r = r + "id,"; }
-        if self.localizations.len() > 0 { r = r + "localizations,"; }
+        if self.description.is_some() { r = r + "description,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        r.pop();
+        r
+    }
+}
+
+/// Information about a resource that received a comment.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+pub struct ActivityContentDetailsComment {
+    /// The resourceId object contains information that identifies the resource associated with the comment.    
+    pub resource_id: Option<ResourceId>,
+}
+
+impl Part for ActivityContentDetailsComment {}
+impl RequestValue for ActivityContentDetailsComment {}
+impl ResponseResult for ActivityContentDetailsComment {}
+
+impl ActivityContentDetailsComment {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.resource_id.is_some() { r = r + "resourceId,"; }
         r.pop();
         r
     }
@@ -531,7 +511,7 @@ impl Playlist {
 /// * [list](struct.PlaylistItemListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct PlaylistItemListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -569,7 +549,22 @@ pub struct PropertyValue {
 }
 
 impl Part for PropertyValue {}
+impl RequestValue for PropertyValue {}
+impl ResponseResult for PropertyValue {}
+impl cmn::Resource for PropertyValue {}
 
+impl PropertyValue {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.property.is_some() { r = r + "property,"; }
+        if self.value.is_some() { r = r + "value,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Describes a temporal position of a visual widget inside a video.
 /// 
@@ -586,7 +581,23 @@ pub struct InvideoTiming {
 }
 
 impl Part for InvideoTiming {}
+impl RequestValue for InvideoTiming {}
+impl ResponseResult for InvideoTiming {}
+impl cmn::Resource for InvideoTiming {}
 
+impl InvideoTiming {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.offset_ms.is_some() { r = r + "offsetMs,"; }
+        if self.type_.is_some() { r = r + "type,"; }
+        if self.duration_ms.is_some() { r = r + "durationMs,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Basic details about a playlist, including title, description and thumbnails.
 /// 
@@ -596,16 +607,16 @@ impl Part for InvideoTiming {}
 pub struct PlaylistSnippet {
     /// The playlist's description.    
     pub description: Option<String>,
-    /// Keyword tags associated with the playlist.    
-    pub tags: Vec<String>,
+    /// The playlist's title.    
+    pub title: Option<String>,
     /// The ID that YouTube uses to uniquely identify the channel that published the playlist.    
     pub channel_id: Option<String>,
     /// The date and time that the playlist was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     pub published_at: Option<String>,
+    /// Keyword tags associated with the playlist.    
+    pub tags: Vec<String>,
     /// The channel title of the channel that the video belongs to.    
     pub channel_title: Option<String>,
-    /// The playlist's title.    
-    pub title: Option<String>,
     /// The language of the playlist's default title and description.    
     pub default_language: Option<String>,
     /// Localized title and description, read-only.    
@@ -615,26 +626,55 @@ pub struct PlaylistSnippet {
 }
 
 impl Part for PlaylistSnippet {}
+impl RequestValue for PlaylistSnippet {}
+impl ResponseResult for PlaylistSnippet {}
+impl cmn::Resource for PlaylistSnippet {}
 
+impl PlaylistSnippet {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.description.is_some() { r = r + "description,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        if self.channel_id.is_some() { r = r + "channelId,"; }
+        if self.published_at.is_some() { r = r + "publishedAt,"; }
+        if self.tags.len() > 0 { r = r + "tags,"; }
+        if self.channel_title.is_some() { r = r + "channelTitle,"; }
+        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
+        if self.localized.is_some() { r = r + "localized,"; }
+        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
+        r.pop();
+        r
+    }
+}
 
-/// The auditDetails object encapsulates channel data that is relevant for YouTube Partners during the audit process.
+/// Information about a resource that received a positive (like) rating.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct ChannelAuditDetails {
-    /// Whether or not the channel has any copyright strikes.    
-    pub copyright_strikes_good_standing: Option<bool>,
-    /// Whether or not the channel respects the community guidelines.    
-    pub community_guidelines_good_standing: Option<bool>,
-    /// Whether or not the channel has any unresolved claims.    
-    pub content_id_claims_good_standing: Option<bool>,
-    /// Describes the general state of the channel. This field will always show if there are any issues whatsoever with the channel. Currently this field represents the result of the logical and operation over the community guidelines good standing, the copyright strikes good standing and the content ID claims good standing, but this may change in the future.    
-    pub overall_good_standing: Option<bool>,
+pub struct ActivityContentDetailsLike {
+    /// The resourceId object contains information that identifies the rated resource.    
+    pub resource_id: Option<ResourceId>,
 }
 
-impl Part for ChannelAuditDetails {}
+impl Part for ActivityContentDetailsLike {}
+impl RequestValue for ActivityContentDetailsLike {}
+impl ResponseResult for ActivityContentDetailsLike {}
 
+impl ActivityContentDetailsLike {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.resource_id.is_some() { r = r + "resourceId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A live stream describes a live ingestion point.
 /// 
@@ -699,7 +739,7 @@ impl LiveStream {
 /// * [set](struct.ThumbnailSetMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct ThumbnailSetResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -727,7 +767,20 @@ pub struct ActivityContentDetailsUpload {
 }
 
 impl Part for ActivityContentDetailsUpload {}
+impl RequestValue for ActivityContentDetailsUpload {}
+impl ResponseResult for ActivityContentDetailsUpload {}
 
+impl ActivityContentDetailsUpload {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.video_id.is_some() { r = r + "videoId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Branding properties for the channel view.
 /// 
@@ -764,28 +817,96 @@ pub struct ChannelSettings {
 }
 
 impl Part for ChannelSettings {}
+impl RequestValue for ChannelSettings {}
+impl ResponseResult for ChannelSettings {}
+impl cmn::Resource for ChannelSettings {}
+
+impl ChannelSettings {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.description.is_some() { r = r + "description,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        if self.moderate_comments.is_some() { r = r + "moderateComments,"; }
+        if self.show_browse_view.is_some() { r = r + "showBrowseView,"; }
+        if self.featured_channels_title.is_some() { r = r + "featuredChannelsTitle,"; }
+        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
+        if self.unsubscribed_trailer.is_some() { r = r + "unsubscribedTrailer,"; }
+        if self.featured_channels_urls.len() > 0 { r = r + "featuredChannelsUrls,"; }
+        if self.profile_color.is_some() { r = r + "profileColor,"; }
+        if self.default_tab.is_some() { r = r + "defaultTab,"; }
+        if self.keywords.is_some() { r = r + "keywords,"; }
+        if self.show_related_channels.is_some() { r = r + "showRelatedChannels,"; }
+        if self.tracking_analytics_account_id.is_some() { r = r + "trackingAnalyticsAccountId,"; }
+        r.pop();
+        r
+    }
+}
+
+/// Basic details about a search result, including title, description and thumbnails of the item referenced by the search result.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, RustcDecodable)]
+pub struct SearchResultSnippet {
+    /// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.    
+    pub live_broadcast_content: Option<String>,
+    /// A description of the search result.    
+    pub description: Option<String>,
+    /// The title of the search result.    
+    pub title: Option<String>,
+    /// A map of thumbnail images associated with the search result. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    pub thumbnails: Option<ThumbnailDetails>,
+    /// The value that YouTube uses to uniquely identify the channel that published the resource that the search result identifies.    
+    pub channel_id: Option<String>,
+    /// The creation date and time of the resource that the search result identifies. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    pub published_at: Option<String>,
+    /// The title of the channel that published the resource that the search result identifies.    
+    pub channel_title: Option<String>,
+}
+
+impl Part for SearchResultSnippet {}
+impl ResponseResult for SearchResultSnippet {}
 
 
-/// Statistics about the video, such as the number of times the video was viewed or liked.
+/// Describes information necessary for ingesting an RTMP or an HTTP stream.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct VideoStatistics {
-    /// The number of comments for the video.    
-    pub comment_count: Option<i64>,
-    /// The number of times the video has been viewed.    
-    pub view_count: Option<i64>,
-    /// The number of users who currently have the video marked as a favorite video.    
-    pub favorite_count: Option<i64>,
-    /// The number of users who have indicated that they disliked the video by giving it a negative rating.    
-    pub dislike_count: Option<i64>,
-    /// The number of users who have indicated that they liked the video by giving it a positive rating.    
-    pub like_count: Option<i64>,
+pub struct IngestionInfo {
+    /// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.    
+    pub backup_ingestion_address: Option<String>,
+    /// The HTTP or RTMP stream name that YouTube assigns to the video stream.    
+    pub stream_name: Option<String>,
+    /// The primary ingestion URL that you should use to stream video to YouTube. You must stream video to this URL.
+    /// 
+    /// Depending on which application or tool you use to encode your video stream, you may need to enter the stream URL and stream name separately or you may need to concatenate them in the following format:
+    /// 
+    /// STREAM_URL/STREAM_NAME
+    pub ingestion_address: Option<String>,
 }
 
-impl Part for VideoStatistics {}
+impl Part for IngestionInfo {}
+impl RequestValue for IngestionInfo {}
+impl ResponseResult for IngestionInfo {}
+impl cmn::Resource for IngestionInfo {}
 
+impl IngestionInfo {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.backup_ingestion_address.is_some() { r = r + "backupIngestionAddress,"; }
+        if self.stream_name.is_some() { r = r + "streamName,"; }
+        if self.ingestion_address.is_some() { r = r + "ingestionAddress,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Brief description of the live stream cdn settings.
 /// 
@@ -802,7 +923,23 @@ pub struct CdnSettings {
 }
 
 impl Part for CdnSettings {}
+impl RequestValue for CdnSettings {}
+impl ResponseResult for CdnSettings {}
+impl cmn::Resource for CdnSettings {}
 
+impl CdnSettings {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.format.is_some() { r = r + "format,"; }
+        if self.ingestion_info.is_some() { r = r + "ingestionInfo,"; }
+        if self.ingestion_type.is_some() { r = r + "ingestionType,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -814,7 +951,7 @@ impl Part for CdnSettings {}
 /// * [getRating](struct.VideoGetRatingMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct VideoGetRatingResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -835,7 +972,7 @@ impl ResponseResult for VideoGetRatingResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct VideoCategorySnippet {
     /// no description provided    
     pub assignable: Option<bool>,
@@ -846,6 +983,7 @@ pub struct VideoCategorySnippet {
 }
 
 impl Part for VideoCategorySnippet {}
+impl ResponseResult for VideoCategorySnippet {}
 
 
 /// Details about a resource which was added to a channel.
@@ -859,22 +997,71 @@ pub struct ActivityContentDetailsChannelItem {
 }
 
 impl Part for ActivityContentDetailsChannelItem {}
+impl RequestValue for ActivityContentDetailsChannelItem {}
+impl ResponseResult for ActivityContentDetailsChannelItem {}
 
+impl ActivityContentDetailsChannelItem {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.resource_id.is_some() { r = r + "resourceId,"; }
+        r.pop();
+        r
+    }
+}
 
-/// Basic details about an i18n language, such as language code and human-readable name.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct I18nLanguageSnippet {
-    /// The human-readable name of the language in the language itself.    
-    pub name: Option<String>,
-    /// A short BCP-47 code that uniquely identifies a language.    
-    pub hl: Option<String>,
+pub struct LiveBroadcastSnippet {
+    /// The date and time that the broadcast actually ended. This information is only available once the broadcast's state is complete. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    pub actual_end_time: Option<String>,
+    /// The broadcast's description. As with the title, you can set this field by modifying the broadcast resource or by setting the description field of the corresponding video resource.    
+    pub description: Option<String>,
+    /// The broadcast's title. Note that the broadcast represents exactly one YouTube video. You can set this field by modifying the broadcast resource or by setting the title field of the corresponding video resource.    
+    pub title: Option<String>,
+    /// The ID that YouTube uses to uniquely identify the channel that is publishing the broadcast.    
+    pub channel_id: Option<String>,
+    /// The date and time that the broadcast was added to YouTube's live broadcast schedule. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    pub published_at: Option<String>,
+    /// The date and time that the broadcast is scheduled to start. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    pub scheduled_start_time: Option<String>,
+    /// The date and time that the broadcast actually started. This information is only available once the broadcast's state is live. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    pub actual_start_time: Option<String>,
+    /// The date and time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    pub scheduled_end_time: Option<String>,
+    /// A map of thumbnail images associated with the broadcast. For each nested object in this object, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    pub thumbnails: Option<ThumbnailDetails>,
 }
 
-impl Part for I18nLanguageSnippet {}
+impl Part for LiveBroadcastSnippet {}
+impl RequestValue for LiveBroadcastSnippet {}
+impl ResponseResult for LiveBroadcastSnippet {}
+impl cmn::Resource for LiveBroadcastSnippet {}
 
+impl LiveBroadcastSnippet {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.actual_end_time.is_some() { r = r + "actualEndTime,"; }
+        if self.description.is_some() { r = r + "description,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        if self.channel_id.is_some() { r = r + "channelId,"; }
+        if self.published_at.is_some() { r = r + "publishedAt,"; }
+        if self.scheduled_start_time.is_some() { r = r + "scheduledStartTime,"; }
+        if self.actual_start_time.is_some() { r = r + "actualStartTime,"; }
+        if self.scheduled_end_time.is_some() { r = r + "scheduledEndTime,"; }
+        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Basic details about a subscription, including title, description and thumbnails of the subscribed item.
 /// 
@@ -882,14 +1069,14 @@ impl Part for I18nLanguageSnippet {}
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
 pub struct SubscriptionSnippet {
-    /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
+    /// The subscription's details.    
+    pub description: Option<String>,
     /// The subscription's title.    
     pub title: Option<String>,
     /// The id object contains information about the channel that the user subscribed to.    
     pub resource_id: Option<ResourceId>,
-    /// The subscription's details.    
-    pub description: Option<String>,
+    /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    pub thumbnails: Option<ThumbnailDetails>,
     /// The ID that YouTube uses to uniquely identify the subscriber's channel.    
     pub channel_id: Option<String>,
     /// The date and time that the subscription was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
@@ -899,7 +1086,27 @@ pub struct SubscriptionSnippet {
 }
 
 impl Part for SubscriptionSnippet {}
+impl RequestValue for SubscriptionSnippet {}
+impl ResponseResult for SubscriptionSnippet {}
+impl cmn::Resource for SubscriptionSnippet {}
 
+impl SubscriptionSnippet {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.description.is_some() { r = r + "description,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        if self.resource_id.is_some() { r = r + "resourceId,"; }
+        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
+        if self.channel_id.is_some() { r = r + "channelId,"; }
+        if self.published_at.is_some() { r = r + "publishedAt,"; }
+        if self.channel_title.is_some() { r = r + "channelTitle,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Details about a channelsection, including playlists and channels.
 /// 
@@ -914,7 +1121,22 @@ pub struct ChannelSectionContentDetails {
 }
 
 impl Part for ChannelSectionContentDetails {}
+impl RequestValue for ChannelSectionContentDetails {}
+impl ResponseResult for ChannelSectionContentDetails {}
+impl cmn::Resource for ChannelSectionContentDetails {}
 
+impl ChannelSectionContentDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.channels.len() > 0 { r = r + "channels,"; }
+        if self.playlists.len() > 0 { r = r + "playlists,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -926,7 +1148,7 @@ impl Part for ChannelSectionContentDetails {}
 /// * [list](struct.I18nRegionListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct I18nRegionListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -953,7 +1175,7 @@ impl ResponseResult for I18nRegionListResponse {}
 /// * [list](struct.LiveStreamListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct LiveStreamListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -978,77 +1200,56 @@ pub struct LiveStreamListResponse {
 impl ResponseResult for LiveStreamListResponse {}
 
 
-/// Describes a single promoted item.
+/// Detailed settings of a stream.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct PromotedItem {
-    /// The temporal position within the video where the promoted item will be displayed. If present, it overrides the default timing.    
-    pub timing: Option<InvideoTiming>,
-    /// If true, the content owner's name will be used when displaying the promotion. This field can only be set when the update is made on behalf of the content owner.    
-    pub promoted_by_content_owner: Option<bool>,
-    /// A custom message to display for this promotion. This field is currently ignored unless the promoted item is a website.    
-    pub custom_message: Option<String>,
-    /// Identifies the promoted item.    
-    pub id: Option<PromotedItemId>,
+pub struct LiveStreamContentDetails {
+    /// Indicates whether the stream is reusable, which means that it can be bound to multiple broadcasts. It is common for broadcasters to reuse the same stream for many different broadcasts if those broadcasts occur at different times.
+    /// 
+    /// If you set this value to false, then the stream will not be reusable, which means that it can only be bound to one broadcast. Non-reusable streams differ from reusable streams in the following ways:  
+    /// - A non-reusable stream can only be bound to one broadcast. 
+    /// - A non-reusable stream might be deleted by an automated process after the broadcast ends. 
+    /// - The  liveStreams.list method does not list non-reusable streams if you call the method and set the mine parameter to true. The only way to use that method to retrieve the resource for a non-reusable stream is to use the id parameter to identify the stream.
+    pub is_reusable: Option<bool>,
+    /// The ingestion URL where the closed captions of this stream are sent.    
+    pub closed_captions_ingestion_url: Option<String>,
 }
 
-impl Part for PromotedItem {}
+impl Part for LiveStreamContentDetails {}
+impl RequestValue for LiveStreamContentDetails {}
+impl ResponseResult for LiveStreamContentDetails {}
+impl cmn::Resource for LiveStreamContentDetails {}
 
+impl LiveStreamContentDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.is_reusable.is_some() { r = r + "isReusable,"; }
+        if self.closed_captions_ingestion_url.is_some() { r = r + "closedCaptionsIngestionUrl,"; }
+        r.pop();
+        r
+    }
+}
 
-/// Branding properties of a YouTube channel.
+/// Basic details about an i18n language, such as language code and human-readable name.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct ChannelBrandingSettings {
-    /// Branding properties for branding images.    
-    pub image: Option<ImageSettings>,
-    /// Branding properties for the watch page.    
-    pub watch: Option<WatchSettings>,
-    /// Branding properties for the channel view.    
-    pub channel: Option<ChannelSettings>,
-    /// Additional experimental branding properties.    
-    pub hints: Vec<PropertyValue>,
+#[derive(Default, Clone, RustcDecodable)]
+pub struct I18nLanguageSnippet {
+    /// The human-readable name of the language in the language itself.    
+    pub name: Option<String>,
+    /// A short BCP-47 code that uniquely identifies a language.    
+    pub hl: Option<String>,
 }
 
-impl Part for ChannelBrandingSettings {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list](struct.PlaylistListMethodBuilder.html) (response)
-/// 
-/// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct PlaylistListResponse {
-    /// Serialized EventId of the request which produced this response.    
-    pub event_id: Option<String>,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
-    pub next_page_token: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistListResponse".    
-    pub kind: Option<String>,
-    /// The visitorId identifies the visitor.    
-    pub visitor_id: Option<String>,
-    /// A list of playlists that match the request criteria.    
-    pub items: Vec<Playlist>,
-    /// no description provided    
-    pub token_pagination: Option<TokenPagination>,
-    /// Etag of this resource.    
-    pub etag: Option<String>,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
-    pub prev_page_token: Option<String>,
-    /// no description provided    
-    pub page_info: Option<PageInfo>,
-}
-
-impl ResponseResult for PlaylistListResponse {}
+impl Part for I18nLanguageSnippet {}
+impl ResponseResult for I18nLanguageSnippet {}
+impl cmn::Resource for I18nLanguageSnippet {}
 
 
 /// There is no detailed description.
@@ -1061,7 +1262,7 @@ impl ResponseResult for PlaylistListResponse {}
 /// * [set](struct.WatermarkSetMethodBuilder.html) (request)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcEncodable)]
 pub struct InvideoBranding {
     /// no description provided    
     pub target_channel_id: Option<String>,
@@ -1104,7 +1305,21 @@ pub struct PlaylistItemStatus {
 }
 
 impl Part for PlaylistItemStatus {}
+impl RequestValue for PlaylistItemStatus {}
+impl ResponseResult for PlaylistItemStatus {}
+impl cmn::Resource for PlaylistItemStatus {}
 
+impl PlaylistItemStatus {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.privacy_status.is_some() { r = r + "privacyStatus,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
 /// 
@@ -1119,26 +1334,49 @@ pub struct ChannelConversionPing {
 }
 
 impl Part for ChannelConversionPing {}
+impl RequestValue for ChannelConversionPing {}
+impl ResponseResult for ChannelConversionPing {}
+impl cmn::Resource for ChannelConversionPing {}
 
+impl ChannelConversionPing {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.context.is_some() { r = r + "context,"; }
+        if self.conversion_url.is_some() { r = r + "conversionUrl,"; }
+        r.pop();
+        r
+    }
+}
 
-/// Describes an invideo promotion campaign consisting of multiple promoted items. A campaign belongs to a single channel_id.
+/// Project specific details about the content of a YouTube Video.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct InvideoPromotion {
-    /// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.    
-    pub default_timing: Option<InvideoTiming>,
-    /// List of promoted items in decreasing priority.    
-    pub items: Vec<PromotedItem>,
-    /// Indicates whether the channel's promotional campaign uses "smart timing." This feature attempts to show promotions at a point in the video when they are more likely to be clicked and less likely to disrupt the viewing experience. This feature also picks up a single promotion to show on each video.    
-    pub use_smart_timing: Option<bool>,
-    /// The spatial position within the video where the promoted item will be displayed.    
-    pub position: Option<InvideoPosition>,
+pub struct VideoProjectDetails {
+    /// A list of project tags associated with the video during the upload.    
+    pub tags: Vec<String>,
 }
 
-impl Part for InvideoPromotion {}
+impl Part for VideoProjectDetails {}
+impl RequestValue for VideoProjectDetails {}
+impl ResponseResult for VideoProjectDetails {}
+impl cmn::Resource for VideoProjectDetails {}
 
+impl VideoProjectDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.tags.len() > 0 { r = r + "tags,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A playlistItem resource identifies another resource, such as a video, that is included in a playlist. In addition, the playlistItem  resource contains details about the included resource that pertain specifically to how that resource is used in that playlist.
 /// 
@@ -1209,7 +1447,7 @@ impl PlaylistItem {
 /// * [list](struct.GuideCategoryListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct GuideCategoryListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -1247,7 +1485,22 @@ pub struct VideoLocalization {
 }
 
 impl Part for VideoLocalization {}
+impl RequestValue for VideoLocalization {}
+impl ResponseResult for VideoLocalization {}
+impl cmn::Resource for VideoLocalization {}
 
+impl VideoLocalization {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.description.is_some() { r = r + "description,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Basic details about a channel section, including title, style and position.
 /// 
@@ -1272,7 +1525,27 @@ pub struct ChannelSectionSnippet {
 }
 
 impl Part for ChannelSectionSnippet {}
+impl RequestValue for ChannelSectionSnippet {}
+impl ResponseResult for ChannelSectionSnippet {}
+impl cmn::Resource for ChannelSectionSnippet {}
 
+impl ChannelSectionSnippet {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.style.is_some() { r = r + "style,"; }
+        if self.localized.is_some() { r = r + "localized,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        if self.position.is_some() { r = r + "position,"; }
+        if self.channel_id.is_some() { r = r + "channelId,"; }
+        if self.type_.is_some() { r = r + "type,"; }
+        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Details about the content of a channel.
 /// 
@@ -1287,35 +1560,58 @@ pub struct ChannelContentDetails {
 }
 
 impl Part for ChannelContentDetails {}
+impl RequestValue for ChannelContentDetails {}
+impl ResponseResult for ChannelContentDetails {}
+impl cmn::Resource for ChannelContentDetails {}
 
+impl ChannelContentDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.related_playlists.is_some() { r = r + "relatedPlaylists,"; }
+        if self.google_plus_user_id.is_some() { r = r + "googlePlusUserId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Stub token pagination template to suppress results.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct TokenPagination;
 
 impl Part for TokenPagination {}
+impl ResponseResult for TokenPagination {}
 
 
-/// There is no detailed description.
+/// A i18nRegion resource identifies a region where YouTube is available.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct PlaylistItemContentDetails {
-    /// A user-generated note for this item.    
-    pub note: Option<String>,
-    /// The time, measured in seconds from the start of the video, when the video should start playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) The default value is 0.    
-    pub start_at: Option<String>,
-    /// The time, measured in seconds from the start of the video, when the video should stop playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) By default, assume that the video.endTime is the end of the video.    
-    pub end_at: Option<String>,
-    /// The ID that YouTube uses to uniquely identify a video. To retrieve the video resource, set the id query parameter to this value in your API request.    
-    pub video_id: Option<String>,
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list](struct.I18nRegionListMethodBuilder.html) (none)
+/// 
+/// 
+#[derive(Default, Clone, RustcDecodable)]
+pub struct I18nRegion {
+    /// The snippet object contains basic details about the i18n region, such as region code and human-readable name.    
+    pub snippet: Option<I18nRegionSnippet>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nRegion".    
+    pub kind: Option<String>,
+    /// Etag of this resource.    
+    pub etag: Option<String>,
+    /// The ID that YouTube uses to uniquely identify the i18n region.    
+    pub id: Option<String>,
 }
 
-impl Part for PlaylistItemContentDetails {}
+impl ResponseResult for I18nRegion {}
+impl cmn::Resource for I18nRegion {}
 
 
 /// Internal representation of thumbnails for a YouTube resource.
@@ -1337,7 +1633,25 @@ pub struct ThumbnailDetails {
 }
 
 impl Part for ThumbnailDetails {}
+impl RequestValue for ThumbnailDetails {}
+impl ResponseResult for ThumbnailDetails {}
+impl cmn::Resource for ThumbnailDetails {}
 
+impl ThumbnailDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.default.is_some() { r = r + "default,"; }
+        if self.high.is_some() { r = r + "high,"; }
+        if self.medium.is_some() { r = r + "medium,"; }
+        if self.maxres.is_some() { r = r + "maxres,"; }
+        if self.standard.is_some() { r = r + "standard,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Details about monetization of a YouTube Video.
 /// 
@@ -1350,7 +1664,21 @@ pub struct VideoMonetizationDetails {
 }
 
 impl Part for VideoMonetizationDetails {}
+impl RequestValue for VideoMonetizationDetails {}
+impl ResponseResult for VideoMonetizationDetails {}
+impl cmn::Resource for VideoMonetizationDetails {}
 
+impl VideoMonetizationDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.access.is_some() { r = r + "access,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Information that identifies the recommended resource.
 /// 
@@ -1367,7 +1695,22 @@ pub struct ActivityContentDetailsRecommendation {
 }
 
 impl Part for ActivityContentDetailsRecommendation {}
+impl RequestValue for ActivityContentDetailsRecommendation {}
+impl ResponseResult for ActivityContentDetailsRecommendation {}
 
+impl ActivityContentDetailsRecommendation {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.resource_id.is_some() { r = r + "resourceId,"; }
+        if self.reason.is_some() { r = r + "reason,"; }
+        if self.seed_resource_id.is_some() { r = r + "seedResourceId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Recording information associated with the video.
 /// 
@@ -1384,7 +1727,23 @@ pub struct VideoRecordingDetails {
 }
 
 impl Part for VideoRecordingDetails {}
+impl RequestValue for VideoRecordingDetails {}
+impl ResponseResult for VideoRecordingDetails {}
+impl cmn::Resource for VideoRecordingDetails {}
 
+impl VideoRecordingDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.recording_date.is_some() { r = r + "recordingDate,"; }
+        if self.location_description.is_some() { r = r + "locationDescription,"; }
+        if self.location.is_some() { r = r + "location,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Information about a channel that a user subscribed to.
 /// 
@@ -1397,7 +1756,20 @@ pub struct ActivityContentDetailsSubscription {
 }
 
 impl Part for ActivityContentDetailsSubscription {}
+impl RequestValue for ActivityContentDetailsSubscription {}
+impl ResponseResult for ActivityContentDetailsSubscription {}
 
+impl ActivityContentDetailsSubscription {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.resource_id.is_some() { r = r + "resourceId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.
 /// 
@@ -1410,7 +1782,21 @@ pub struct ChannelConversionPings {
 }
 
 impl Part for ChannelConversionPings {}
+impl RequestValue for ChannelConversionPings {}
+impl ResponseResult for ChannelConversionPings {}
+impl cmn::Resource for ChannelConversionPings {}
 
+impl ChannelConversionPings {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.pings.len() > 0 { r = r + "pings,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Details about the content of an activity: the video that was shared, the channel that was subscribed to, etc.
 /// 
@@ -1443,32 +1829,101 @@ pub struct ActivityContentDetails {
 }
 
 impl Part for ActivityContentDetails {}
+impl RequestValue for ActivityContentDetails {}
+impl ResponseResult for ActivityContentDetails {}
 
+impl ActivityContentDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.comment.is_some() { r = r + "comment,"; }
+        if self.playlist_item.is_some() { r = r + "playlistItem,"; }
+        if self.like.is_some() { r = r + "like,"; }
+        if self.promoted_item.is_some() { r = r + "promotedItem,"; }
+        if self.recommendation.is_some() { r = r + "recommendation,"; }
+        if self.favorite.is_some() { r = r + "favorite,"; }
+        if self.upload.is_some() { r = r + "upload,"; }
+        if self.social.is_some() { r = r + "social,"; }
+        if self.channel_item.is_some() { r = r + "channelItem,"; }
+        if self.bulletin.is_some() { r = r + "bulletin,"; }
+        if self.subscription.is_some() { r = r + "subscription,"; }
+        r.pop();
+        r
+    }
+}
 
-/// A i18nRegion resource identifies a region where YouTube is available.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.I18nRegionListMethodBuilder.html) (none)
+/// * [list](struct.PlaylistListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct I18nRegion {
-    /// The snippet object contains basic details about the i18n region, such as region code and human-readable name.    
-    pub snippet: Option<I18nRegionSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nRegion".    
+#[derive(Default, Clone, RustcDecodable)]
+pub struct PlaylistListResponse {
+    /// Serialized EventId of the request which produced this response.    
+    pub event_id: Option<String>,
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    pub next_page_token: Option<String>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistListResponse".    
     pub kind: Option<String>,
+    /// The visitorId identifies the visitor.    
+    pub visitor_id: Option<String>,
+    /// A list of playlists that match the request criteria.    
+    pub items: Vec<Playlist>,
+    /// no description provided    
+    pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
-    /// The ID that YouTube uses to uniquely identify the i18n region.    
-    pub id: Option<String>,
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    pub prev_page_token: Option<String>,
+    /// no description provided    
+    pub page_info: Option<PageInfo>,
 }
 
-impl cmn::Resource for I18nRegion {}
+impl ResponseResult for PlaylistListResponse {}
 
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+pub struct PlaylistItemContentDetails {
+    /// A user-generated note for this item.    
+    pub note: Option<String>,
+    /// The time, measured in seconds from the start of the video, when the video should start playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) The default value is 0.    
+    pub start_at: Option<String>,
+    /// The time, measured in seconds from the start of the video, when the video should stop playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) By default, assume that the video.endTime is the end of the video.    
+    pub end_at: Option<String>,
+    /// The ID that YouTube uses to uniquely identify a video. To retrieve the video resource, set the id query parameter to this value in your API request.    
+    pub video_id: Option<String>,
+}
+
+impl Part for PlaylistItemContentDetails {}
+impl RequestValue for PlaylistItemContentDetails {}
+impl ResponseResult for PlaylistItemContentDetails {}
+impl cmn::Resource for PlaylistItemContentDetails {}
+
+impl PlaylistItemContentDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.note.is_some() { r = r + "note,"; }
+        if self.start_at.is_some() { r = r + "startAt,"; }
+        if self.end_at.is_some() { r = r + "endAt,"; }
+        if self.video_id.is_some() { r = r + "videoId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.
 /// 
@@ -1483,7 +1938,22 @@ pub struct ChannelContentOwnerDetails {
 }
 
 impl Part for ChannelContentOwnerDetails {}
+impl RequestValue for ChannelContentOwnerDetails {}
+impl ResponseResult for ChannelContentOwnerDetails {}
+impl cmn::Resource for ChannelContentOwnerDetails {}
 
+impl ChannelContentOwnerDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.content_owner.is_some() { r = r + "contentOwner,"; }
+        if self.time_linked.is_some() { r = r + "timeLinked,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Describes processing status and progress and availability of some other Video resource parts.
 /// 
@@ -1510,7 +1980,28 @@ pub struct VideoProcessingDetails {
 }
 
 impl Part for VideoProcessingDetails {}
+impl RequestValue for VideoProcessingDetails {}
+impl ResponseResult for VideoProcessingDetails {}
+impl cmn::Resource for VideoProcessingDetails {}
 
+impl VideoProcessingDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.file_details_availability.is_some() { r = r + "fileDetailsAvailability,"; }
+        if self.editor_suggestions_availability.is_some() { r = r + "editorSuggestionsAvailability,"; }
+        if self.processing_status.is_some() { r = r + "processingStatus,"; }
+        if self.processing_issues_availability.is_some() { r = r + "processingIssuesAvailability,"; }
+        if self.processing_failure_reason.is_some() { r = r + "processingFailureReason,"; }
+        if self.thumbnails_availability.is_some() { r = r + "thumbnailsAvailability,"; }
+        if self.processing_progress.is_some() { r = r + "processingProgress,"; }
+        if self.tag_suggestions_availability.is_some() { r = r + "tagSuggestionsAvailability,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -1529,7 +2020,24 @@ pub struct LiveBroadcastStatus {
 }
 
 impl Part for LiveBroadcastStatus {}
+impl RequestValue for LiveBroadcastStatus {}
+impl ResponseResult for LiveBroadcastStatus {}
+impl cmn::Resource for LiveBroadcastStatus {}
 
+impl LiveBroadcastStatus {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.recording_status.is_some() { r = r + "recordingStatus,"; }
+        if self.privacy_status.is_some() { r = r + "privacyStatus,"; }
+        if self.life_cycle_status.is_some() { r = r + "lifeCycleStatus,"; }
+        if self.live_broadcast_priority.is_some() { r = r + "liveBroadcastPriority,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Details about the content to witch a subscription refers.
 /// 
@@ -1546,7 +2054,23 @@ pub struct SubscriptionContentDetails {
 }
 
 impl Part for SubscriptionContentDetails {}
+impl RequestValue for SubscriptionContentDetails {}
+impl ResponseResult for SubscriptionContentDetails {}
+impl cmn::Resource for SubscriptionContentDetails {}
 
+impl SubscriptionContentDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.new_item_count.is_some() { r = r + "newItemCount,"; }
+        if self.activity_type.is_some() { r = r + "activityType,"; }
+        if self.total_item_count.is_some() { r = r + "totalItemCount,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A video resource represents a YouTube video.
 /// 
@@ -1585,24 +2109,24 @@ pub struct Video {
     pub localizations: HashMap<String, VideoLocalization>,
     /// The liveStreamingDetails object contains metadata about a live video broadcast. The object will only be present in a video resource if the video is an upcoming, live, or completed live broadcast.    
     pub live_streaming_details: Option<VideoLiveStreamingDetails>,
-    /// The processingProgress object encapsulates information about YouTube's progress in processing the uploaded video file. The properties in the object identify the current processing status and an estimate of the time remaining until YouTube finishes processing the video. This part also indicates whether different types of data or content, such as file details or thumbnail images, are available for the video.
-    /// 
-    /// The processingProgress object is designed to be polled so that the video uploaded can track the progress that YouTube has made in processing the uploaded video file. This data can only be retrieved by the video owner.
-    pub processing_details: Option<VideoProcessingDetails>,
+    /// The snippet object contains basic details about the video, such as its title, description, and category.    
+    pub snippet: Option<VideoSnippet>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#video".    
     pub kind: Option<String>,
     /// The statistics object contains statistics about the video.    
     pub statistics: Option<VideoStatistics>,
-    /// The contentDetails object contains information about the video content, including the length of the video and its aspect ratio.    
-    pub content_details: Option<VideoContentDetails>,
-    /// The conversionPings object encapsulates information about url pings that need to be respected by the App in different video contexts.    
-    pub conversion_pings: Option<VideoConversionPings>,
-    /// The snippet object contains basic details about the video, such as its title, description, and category.    
-    pub snippet: Option<VideoSnippet>,
-    /// Etag of this resource.    
-    pub etag: Option<String>,
     /// The projectDetails object contains information about the project specific video metadata.    
     pub project_details: Option<VideoProjectDetails>,
+    /// The conversionPings object encapsulates information about url pings that need to be respected by the App in different video contexts.    
+    pub conversion_pings: Option<VideoConversionPings>,
+    /// The processingProgress object encapsulates information about YouTube's progress in processing the uploaded video file. The properties in the object identify the current processing status and an estimate of the time remaining until YouTube finishes processing the video. This part also indicates whether different types of data or content, such as file details or thumbnail images, are available for the video.
+    /// 
+    /// The processingProgress object is designed to be polled so that the video uploaded can track the progress that YouTube has made in processing the uploaded video file. This data can only be retrieved by the video owner.
+    pub processing_details: Option<VideoProcessingDetails>,
+    /// Etag of this resource.    
+    pub etag: Option<String>,
+    /// The contentDetails object contains information about the video content, including the length of the video and its aspect ratio.    
+    pub content_details: Option<VideoContentDetails>,
     /// The recordingDetails object encapsulates information about the location, date and address where the video was recorded.    
     pub recording_details: Option<VideoRecordingDetails>,
 }
@@ -1627,14 +2151,14 @@ impl Video {
         if self.id.is_some() { r = r + "id,"; }
         if self.localizations.len() > 0 { r = r + "localizations,"; }
         if self.live_streaming_details.is_some() { r = r + "liveStreamingDetails,"; }
-        if self.processing_details.is_some() { r = r + "processingDetails,"; }
+        if self.snippet.is_some() { r = r + "snippet,"; }
         if self.kind.is_some() { r = r + "kind,"; }
         if self.statistics.is_some() { r = r + "statistics,"; }
-        if self.content_details.is_some() { r = r + "contentDetails,"; }
-        if self.conversion_pings.is_some() { r = r + "conversionPings,"; }
-        if self.snippet.is_some() { r = r + "snippet,"; }
-        if self.etag.is_some() { r = r + "etag,"; }
         if self.project_details.is_some() { r = r + "projectDetails,"; }
+        if self.conversion_pings.is_some() { r = r + "conversionPings,"; }
+        if self.processing_details.is_some() { r = r + "processingDetails,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.content_details.is_some() { r = r + "contentDetails,"; }
         if self.recording_details.is_some() { r = r + "recordingDetails,"; }
         r.pop();
         r
@@ -1656,24 +2180,59 @@ pub struct GeoPoint {
 }
 
 impl Part for GeoPoint {}
+impl RequestValue for GeoPoint {}
+impl ResponseResult for GeoPoint {}
+impl cmn::Resource for GeoPoint {}
 
+impl GeoPoint {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.latitude.is_some() { r = r + "latitude,"; }
+        if self.altitude.is_some() { r = r + "altitude,"; }
+        if self.longitude.is_some() { r = r + "longitude,"; }
+        r.pop();
+        r
+    }
+}
 
-/// There is no detailed description.
+/// Branding properties of a YouTube channel.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct VideoAgeGating {
-    /// Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won't be present.    
-    pub restricted: Option<bool>,
-    /// Indicates whether or not the video has alcoholic beverage content. Only users of legal purchasing age in a particular country, as identified by ICAP, can view the content.    
-    pub alcohol_content: Option<bool>,
-    /// Video game rating, if any.    
-    pub video_game_rating: Option<String>,
+pub struct ChannelBrandingSettings {
+    /// Branding properties for branding images.    
+    pub image: Option<ImageSettings>,
+    /// Branding properties for the watch page.    
+    pub watch: Option<WatchSettings>,
+    /// Branding properties for the channel view.    
+    pub channel: Option<ChannelSettings>,
+    /// Additional experimental branding properties.    
+    pub hints: Vec<PropertyValue>,
 }
 
-impl Part for VideoAgeGating {}
+impl Part for ChannelBrandingSettings {}
+impl RequestValue for ChannelBrandingSettings {}
+impl ResponseResult for ChannelBrandingSettings {}
+impl cmn::Resource for ChannelBrandingSettings {}
 
+impl ChannelBrandingSettings {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.image.is_some() { r = r + "image,"; }
+        if self.watch.is_some() { r = r + "watch,"; }
+        if self.channel.is_some() { r = r + "channel,"; }
+        if self.hints.len() > 0 { r = r + "hints,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Player to be used for a video playback.
 /// 
@@ -1686,7 +2245,21 @@ pub struct VideoPlayer {
 }
 
 impl Part for VideoPlayer {}
+impl RequestValue for VideoPlayer {}
+impl ResponseResult for VideoPlayer {}
+impl cmn::Resource for VideoPlayer {}
 
+impl VideoPlayer {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.embed_html.is_some() { r = r + "embedHtml,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Basic details about a channel, including title, description and thumbnails.
 /// 
@@ -1696,20 +2269,39 @@ impl Part for VideoPlayer {}
 pub struct ChannelSnippet {
     /// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     pub published_at: Option<String>,
-    /// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
+    /// The description of the channel.    
+    pub description: Option<String>,
     /// The channel's title.    
     pub title: Option<String>,
     /// Localized title and description, read-only.    
     pub localized: Option<ChannelLocalization>,
     /// The language of the channel's default title and description.    
     pub default_language: Option<String>,
-    /// The description of the channel.    
-    pub description: Option<String>,
+    /// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    pub thumbnails: Option<ThumbnailDetails>,
 }
 
 impl Part for ChannelSnippet {}
+impl RequestValue for ChannelSnippet {}
+impl ResponseResult for ChannelSnippet {}
+impl cmn::Resource for ChannelSnippet {}
 
+impl ChannelSnippet {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.published_at.is_some() { r = r + "publishedAt,"; }
+        if self.description.is_some() { r = r + "description,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        if self.localized.is_some() { r = r + "localized,"; }
+        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
+        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Branding properties for the watch.
 /// 
@@ -1726,7 +2318,23 @@ pub struct WatchSettings {
 }
 
 impl Part for WatchSettings {}
+impl RequestValue for WatchSettings {}
+impl ResponseResult for WatchSettings {}
+impl cmn::Resource for WatchSettings {}
 
+impl WatchSettings {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.text_color.is_some() { r = r + "textColor,"; }
+        if self.featured_playlist_id.is_some() { r = r + "featuredPlaylistId,"; }
+        if self.background_color.is_some() { r = r + "backgroundColor,"; }
+        r.pop();
+        r
+    }
+}
 
 /// ChannelSection localization setting
 /// 
@@ -1739,7 +2347,21 @@ pub struct ChannelSectionLocalization {
 }
 
 impl Part for ChannelSectionLocalization {}
+impl RequestValue for ChannelSectionLocalization {}
+impl ResponseResult for ChannelSectionLocalization {}
+impl cmn::Resource for ChannelSectionLocalization {}
 
+impl ChannelSectionLocalization {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.title.is_some() { r = r + "title,"; }
+        r.pop();
+        r
+    }
+}
 
 /// DEPRECATED Region restriction of the video.
 /// 
@@ -1754,22 +2376,70 @@ pub struct VideoContentDetailsRegionRestriction {
 }
 
 impl Part for VideoContentDetailsRegionRestriction {}
+impl RequestValue for VideoContentDetailsRegionRestriction {}
+impl ResponseResult for VideoContentDetailsRegionRestriction {}
+impl cmn::Resource for VideoContentDetailsRegionRestriction {}
 
+impl VideoContentDetailsRegionRestriction {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.allowed.len() > 0 { r = r + "allowed,"; }
+        if self.blocked.len() > 0 { r = r + "blocked,"; }
+        r.pop();
+        r
+    }
+}
 
-/// There is no detailed description.
+/// Details about the content of a YouTube Video.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct VideoRating {
-    /// no description provided    
-    pub rating: Option<String>,
-    /// no description provided    
-    pub video_id: Option<String>,
+pub struct VideoContentDetails {
+    /// The value of definition indicates whether the video is available in high definition or only in standard definition.    
+    pub definition: Option<String>,
+    /// The countryRestriction object contains information about the countries where a video is (or is not) viewable.    
+    pub country_restriction: Option<AccessPolicy>,
+    /// Specifies the ratings that the video received under various rating schemes.    
+    pub content_rating: Option<ContentRating>,
+    /// The value of captions indicates whether the video has captions or not.    
+    pub caption: Option<String>,
+    /// The regionRestriction object contains information about the countries where a video is (or is not) viewable. The object will contain either the contentDetails.regionRestriction.allowed property or the contentDetails.regionRestriction.blocked property.    
+    pub region_restriction: Option<VideoContentDetailsRegionRestriction>,
+    /// The length of the video. The tag value is an ISO 8601 duration in the format PT#M#S, in which the letters PT indicate that the value specifies a period of time, and the letters M and S refer to length in minutes and seconds, respectively. The # characters preceding the M and S letters are both integers that specify the number of minutes (or seconds) of the video. For example, a value of PT15M51S indicates that the video is 15 minutes and 51 seconds long.    
+    pub duration: Option<String>,
+    /// The value of is_license_content indicates whether the video is licensed content.    
+    pub licensed_content: Option<bool>,
+    /// The value of dimension indicates whether the video is available in 3D or in 2D.    
+    pub dimension: Option<String>,
 }
 
-impl Part for VideoRating {}
+impl Part for VideoContentDetails {}
+impl RequestValue for VideoContentDetails {}
+impl ResponseResult for VideoContentDetails {}
+impl cmn::Resource for VideoContentDetails {}
 
+impl VideoContentDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.definition.is_some() { r = r + "definition,"; }
+        if self.country_restriction.is_some() { r = r + "countryRestriction,"; }
+        if self.content_rating.is_some() { r = r + "contentRating,"; }
+        if self.caption.is_some() { r = r + "caption,"; }
+        if self.region_restriction.is_some() { r = r + "regionRestriction,"; }
+        if self.duration.is_some() { r = r + "duration,"; }
+        if self.licensed_content.is_some() { r = r + "licensedContent,"; }
+        if self.dimension.is_some() { r = r + "dimension,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Describes a single promoted item id. It is a union of various possible types.
 /// 
@@ -1788,7 +2458,24 @@ pub struct PromotedItemId {
 }
 
 impl Part for PromotedItemId {}
+impl RequestValue for PromotedItemId {}
+impl ResponseResult for PromotedItemId {}
+impl cmn::Resource for PromotedItemId {}
 
+impl PromotedItemId {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.website_url.is_some() { r = r + "websiteUrl,"; }
+        if self.recently_uploaded_by.is_some() { r = r + "recentlyUploadedBy,"; }
+        if self.type_.is_some() { r = r + "type,"; }
+        if self.video_id.is_some() { r = r + "videoId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A subscription resource contains information about a YouTube user subscription. A subscription notifies a user when new videos are added to a channel or when another user takes one of several actions on YouTube, such as uploading a video, rating a video, or commenting on a video.
 /// 
@@ -1843,7 +2530,7 @@ impl Subscription {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct I18nRegionSnippet {
     /// The region code as a 2-letter ISO country code.    
     pub gl: Option<String>,
@@ -1852,6 +2539,8 @@ pub struct I18nRegionSnippet {
 }
 
 impl Part for I18nRegionSnippet {}
+impl ResponseResult for I18nRegionSnippet {}
+impl cmn::Resource for I18nRegionSnippet {}
 
 
 /// Information about a new playlist item.
@@ -1869,7 +2558,22 @@ pub struct ActivityContentDetailsPlaylistItem {
 }
 
 impl Part for ActivityContentDetailsPlaylistItem {}
+impl RequestValue for ActivityContentDetailsPlaylistItem {}
+impl ResponseResult for ActivityContentDetailsPlaylistItem {}
 
+impl ActivityContentDetailsPlaylistItem {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.resource_id.is_some() { r = r + "resourceId,"; }
+        if self.playlist_id.is_some() { r = r + "playlistId,"; }
+        if self.playlist_item_id.is_some() { r = r + "playlistItemId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Describes the spatial position of a visual widget inside a video. It is a union of various position types, out of which only will be set one.
 /// 
@@ -1884,26 +2588,93 @@ pub struct InvideoPosition {
 }
 
 impl Part for InvideoPosition {}
+impl RequestValue for InvideoPosition {}
+impl ResponseResult for InvideoPosition {}
+impl cmn::Resource for InvideoPosition {}
 
-
-/// Information about a resource that received a comment.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct ActivityContentDetailsComment {
-    /// The resourceId object contains information that identifies the resource associated with the comment.    
-    pub resource_id: Option<ResourceId>,
+impl InvideoPosition {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.corner_position.is_some() { r = r + "cornerPosition,"; }
+        if self.type_.is_some() { r = r + "type,"; }
+        r.pop();
+        r
+    }
 }
 
-impl Part for ActivityContentDetailsComment {}
+/// A playlist resource represents a YouTube playlist. A playlist is a collection of videos that can be viewed sequentially and shared with other users. A playlist can contain up to 200 videos, and YouTube does not limit the number of playlists that each user creates. By default, playlists are publicly visible to other users, but playlists can be public or private.
+/// 
+/// YouTube also uses playlists to identify special collections of videos for a channel, such as:  
+/// - uploaded videos 
+/// - favorite videos 
+/// - positively rated (liked) videos 
+/// - watch history 
+/// - watch later  To be more specific, these lists are associated with a channel, which is a collection of a person, group, or company's videos, playlists, and other YouTube information. You can retrieve the playlist IDs for each of these lists from the  channel resource for a given channel.
+/// 
+/// You can then use the   playlistItems.list method to retrieve any of those lists. You can also add or remove items from those lists by calling the   playlistItems.insert and   playlistItems.delete methods.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert](struct.PlaylistInsertMethodBuilder.html) (request|response)
+/// * [delete](struct.PlaylistDeleteMethodBuilder.html) (none)
+/// * [list](struct.PlaylistListMethodBuilder.html) (none)
+/// * [update](struct.PlaylistUpdateMethodBuilder.html) (request|response)
+/// 
+/// 
+#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+pub struct Playlist {
+    /// The status object contains status information for the playlist.    
+    pub status: Option<PlaylistStatus>,
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlist".    
+    pub kind: Option<String>,
+    /// The contentDetails object contains information like video count.    
+    pub content_details: Option<PlaylistContentDetails>,
+    /// The snippet object contains basic details about the playlist, such as its title and description.    
+    pub snippet: Option<PlaylistSnippet>,
+    /// The player object contains information that you would use to play the playlist in an embedded player.    
+    pub player: Option<PlaylistPlayer>,
+    /// Etag of this resource.    
+    pub etag: Option<String>,
+    /// The ID that YouTube uses to uniquely identify the playlist.    
+    pub id: Option<String>,
+    /// Localizations for different languages    
+    pub localizations: HashMap<String, PlaylistLocalization>,
+}
 
+impl RequestValue for Playlist {}
+impl ResponseResult for Playlist {}
+impl cmn::Resource for Playlist {}
+
+impl Playlist {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.status.is_some() { r = r + "status,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.content_details.is_some() { r = r + "contentDetails,"; }
+        if self.snippet.is_some() { r = r + "snippet,"; }
+        if self.player.is_some() { r = r + "player,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.id.is_some() { r = r + "id,"; }
+        if self.localizations.len() > 0 { r = r + "localizations,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Basic details about a guide category.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct GuideCategorySnippet {
     /// no description provided    
     pub channel_id: Option<String>,
@@ -1912,6 +2683,7 @@ pub struct GuideCategorySnippet {
 }
 
 impl Part for GuideCategorySnippet {}
+impl ResponseResult for GuideCategorySnippet {}
 
 
 /// Basic details about a video, including title, description, uploader, thumbnails and category.
@@ -1926,12 +2698,12 @@ pub struct VideoSnippet {
     pub tags: Vec<String>,
     /// The ID that YouTube uses to uniquely identify the channel that the video was uploaded to.    
     pub channel_id: Option<String>,
-    /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-    pub published_at: Option<String>,
-    /// Indicates if the video is an upcoming/active live broadcast. Or it's "none" if the video is not an upcoming/active live broadcast.    
-    pub live_broadcast_content: Option<String>,
     /// The language of the videos's default snippet.    
     pub default_language: Option<String>,
+    /// Indicates if the video is an upcoming/active live broadcast. Or it's "none" if the video is not an upcoming/active live broadcast.    
+    pub live_broadcast_content: Option<String>,
+    /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    pub published_at: Option<String>,
     /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
     pub thumbnails: Option<ThumbnailDetails>,
     /// The video's title.    
@@ -1945,40 +2717,103 @@ pub struct VideoSnippet {
 }
 
 impl Part for VideoSnippet {}
+impl RequestValue for VideoSnippet {}
+impl ResponseResult for VideoSnippet {}
+impl cmn::Resource for VideoSnippet {}
 
+impl VideoSnippet {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.description.is_some() { r = r + "description,"; }
+        if self.tags.len() > 0 { r = r + "tags,"; }
+        if self.channel_id.is_some() { r = r + "channelId,"; }
+        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
+        if self.live_broadcast_content.is_some() { r = r + "liveBroadcastContent,"; }
+        if self.published_at.is_some() { r = r + "publishedAt,"; }
+        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        if self.category_id.is_some() { r = r + "categoryId,"; }
+        if self.localized.is_some() { r = r + "localized,"; }
+        if self.channel_title.is_some() { r = r + "channelTitle,"; }
+        r.pop();
+        r
+    }
+}
 
-/// Project specific details about the content of a YouTube Video.
+/// Describes an invideo promotion campaign consisting of multiple promoted items. A campaign belongs to a single channel_id.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct VideoProjectDetails {
-    /// A list of project tags associated with the video during the upload.    
-    pub tags: Vec<String>,
+pub struct InvideoPromotion {
+    /// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.    
+    pub default_timing: Option<InvideoTiming>,
+    /// List of promoted items in decreasing priority.    
+    pub items: Vec<PromotedItem>,
+    /// Indicates whether the channel's promotional campaign uses "smart timing." This feature attempts to show promotions at a point in the video when they are more likely to be clicked and less likely to disrupt the viewing experience. This feature also picks up a single promotion to show on each video.    
+    pub use_smart_timing: Option<bool>,
+    /// The spatial position within the video where the promoted item will be displayed.    
+    pub position: Option<InvideoPosition>,
 }
 
-impl Part for VideoProjectDetails {}
+impl Part for InvideoPromotion {}
+impl RequestValue for InvideoPromotion {}
+impl ResponseResult for InvideoPromotion {}
+impl cmn::Resource for InvideoPromotion {}
 
+impl InvideoPromotion {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.default_timing.is_some() { r = r + "defaultTiming,"; }
+        if self.items.len() > 0 { r = r + "items,"; }
+        if self.use_smart_timing.is_some() { r = r + "useSmartTiming,"; }
+        if self.position.is_some() { r = r + "position,"; }
+        r.pop();
+        r
+    }
+}
 
-/// Detailed settings of a stream.
+/// Describes a single promoted item.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct LiveStreamContentDetails {
-    /// Indicates whether the stream is reusable, which means that it can be bound to multiple broadcasts. It is common for broadcasters to reuse the same stream for many different broadcasts if those broadcasts occur at different times.
-    /// 
-    /// If you set this value to false, then the stream will not be reusable, which means that it can only be bound to one broadcast. Non-reusable streams differ from reusable streams in the following ways:  
-    /// - A non-reusable stream can only be bound to one broadcast. 
-    /// - A non-reusable stream might be deleted by an automated process after the broadcast ends. 
-    /// - The  liveStreams.list method does not list non-reusable streams if you call the method and set the mine parameter to true. The only way to use that method to retrieve the resource for a non-reusable stream is to use the id parameter to identify the stream.
-    pub is_reusable: Option<bool>,
-    /// The ingestion URL where the closed captions of this stream are sent.    
-    pub closed_captions_ingestion_url: Option<String>,
+pub struct PromotedItem {
+    /// The temporal position within the video where the promoted item will be displayed. If present, it overrides the default timing.    
+    pub timing: Option<InvideoTiming>,
+    /// If true, the content owner's name will be used when displaying the promotion. This field can only be set when the update is made on behalf of the content owner.    
+    pub promoted_by_content_owner: Option<bool>,
+    /// A custom message to display for this promotion. This field is currently ignored unless the promoted item is a website.    
+    pub custom_message: Option<String>,
+    /// Identifies the promoted item.    
+    pub id: Option<PromotedItemId>,
 }
 
-impl Part for LiveStreamContentDetails {}
+impl Part for PromotedItem {}
+impl RequestValue for PromotedItem {}
+impl ResponseResult for PromotedItem {}
+impl cmn::Resource for PromotedItem {}
 
+impl PromotedItem {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.timing.is_some() { r = r + "timing,"; }
+        if self.promoted_by_content_owner.is_some() { r = r + "promotedByContentOwner,"; }
+        if self.custom_message.is_some() { r = r + "customMessage,"; }
+        if self.id.is_some() { r = r + "id,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Detailed settings of a broadcast.
 /// 
@@ -2013,7 +2848,28 @@ pub struct LiveBroadcastContentDetails {
 }
 
 impl Part for LiveBroadcastContentDetails {}
+impl RequestValue for LiveBroadcastContentDetails {}
+impl ResponseResult for LiveBroadcastContentDetails {}
+impl cmn::Resource for LiveBroadcastContentDetails {}
 
+impl LiveBroadcastContentDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.start_with_slate.is_some() { r = r + "startWithSlate,"; }
+        if self.bound_stream_id.is_some() { r = r + "boundStreamId,"; }
+        if self.enable_embed.is_some() { r = r + "enableEmbed,"; }
+        if self.enable_closed_captions.is_some() { r = r + "enableClosedCaptions,"; }
+        if self.enable_content_encryption.is_some() { r = r + "enableContentEncryption,"; }
+        if self.record_from_start.is_some() { r = r + "recordFromStart,"; }
+        if self.enable_dvr.is_some() { r = r + "enableDvr,"; }
+        if self.monitor_stream.is_some() { r = r + "monitorStream,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Basic details about a video category, such as its localized title.
 /// 
@@ -2040,13 +2896,34 @@ pub struct VideoStatus {
 }
 
 impl Part for VideoStatus {}
+impl RequestValue for VideoStatus {}
+impl ResponseResult for VideoStatus {}
+impl cmn::Resource for VideoStatus {}
 
+impl VideoStatus {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.license.is_some() { r = r + "license,"; }
+        if self.embeddable.is_some() { r = r + "embeddable,"; }
+        if self.privacy_status.is_some() { r = r + "privacyStatus,"; }
+        if self.publish_at.is_some() { r = r + "publishAt,"; }
+        if self.public_stats_viewable.is_some() { r = r + "publicStatsViewable,"; }
+        if self.upload_status.is_some() { r = r + "uploadStatus,"; }
+        if self.rejection_reason.is_some() { r = r + "rejectionReason,"; }
+        if self.failure_reason.is_some() { r = r + "failureReason,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A guideCategory resource identifies a category that YouTube algorithmically assigns based on a channel's content or other indicators, such as the channel's popularity. The list is similar to video categories, with the difference being that a video's uploader can assign a video category but only YouTube can assign a channel category.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct GuideCategory {
     /// The snippet object contains basic details about the category, such as its title.    
     pub snippet: Option<GuideCategorySnippet>,
@@ -2059,6 +2936,7 @@ pub struct GuideCategory {
 }
 
 impl Part for GuideCategory {}
+impl ResponseResult for GuideCategory {}
 
 
 /// There is no detailed description.
@@ -2071,7 +2949,7 @@ impl Part for GuideCategory {}
 /// * [list](struct.ChannelSectionListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct ChannelSectionListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -2107,7 +2985,23 @@ pub struct MonitorStreamInfo {
 }
 
 impl Part for MonitorStreamInfo {}
+impl RequestValue for MonitorStreamInfo {}
+impl ResponseResult for MonitorStreamInfo {}
+impl cmn::Resource for MonitorStreamInfo {}
 
+impl MonitorStreamInfo {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.broadcast_stream_delay_ms.is_some() { r = r + "broadcastStreamDelayMs,"; }
+        if self.embed_html.is_some() { r = r + "embedHtml,"; }
+        if self.enable_monitor_stream.is_some() { r = r + "enableMonitorStream,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -2119,7 +3013,7 @@ impl Part for MonitorStreamInfo {}
 /// * [list](struct.I18nLanguageListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct I18nLanguageListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -2151,7 +3045,23 @@ pub struct LocalizedProperty {
 }
 
 impl Part for LocalizedProperty {}
+impl RequestValue for LocalizedProperty {}
+impl ResponseResult for LocalizedProperty {}
+impl cmn::Resource for LocalizedProperty {}
 
+impl LocalizedProperty {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.default.is_some() { r = r + "default,"; }
+        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
+        if self.localized.len() > 0 { r = r + "localized,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A liveBroadcast resource represents an event that will be streamed, via live video, on YouTube.
 /// 
@@ -2231,7 +3141,28 @@ pub struct VideoFileDetailsVideoStream {
 }
 
 impl Part for VideoFileDetailsVideoStream {}
+impl RequestValue for VideoFileDetailsVideoStream {}
+impl ResponseResult for VideoFileDetailsVideoStream {}
+impl cmn::Resource for VideoFileDetailsVideoStream {}
 
+impl VideoFileDetailsVideoStream {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.bitrate_bps.is_some() { r = r + "bitrateBps,"; }
+        if self.vendor.is_some() { r = r + "vendor,"; }
+        if self.codec.is_some() { r = r + "codec,"; }
+        if self.width_pixels.is_some() { r = r + "widthPixels,"; }
+        if self.height_pixels.is_some() { r = r + "heightPixels,"; }
+        if self.aspect_ratio.is_some() { r = r + "aspectRatio,"; }
+        if self.rotation.is_some() { r = r + "rotation,"; }
+        if self.frame_rate_fps.is_some() { r = r + "frameRateFps,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A thumbnail is an image representing a YouTube resource.
 /// 
@@ -2253,8 +3184,24 @@ pub struct Thumbnail {
     pub height: Option<u32>,
 }
 
+impl Part for Thumbnail {}
+impl RequestValue for Thumbnail {}
+impl ResponseResult for Thumbnail {}
 impl cmn::Resource for Thumbnail {}
 
+impl Thumbnail {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.url.is_some() { r = r + "url,"; }
+        if self.width.is_some() { r = r + "width,"; }
+        if self.height.is_some() { r = r + "height,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A channel resource contains information about a YouTube channel.
 /// 
@@ -2347,7 +3294,25 @@ pub struct ChannelStatistics {
 }
 
 impl Part for ChannelStatistics {}
+impl RequestValue for ChannelStatistics {}
+impl ResponseResult for ChannelStatistics {}
+impl cmn::Resource for ChannelStatistics {}
 
+impl ChannelStatistics {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.comment_count.is_some() { r = r + "commentCount,"; }
+        if self.subscriber_count.is_some() { r = r + "subscriberCount,"; }
+        if self.video_count.is_some() { r = r + "videoCount,"; }
+        if self.hidden_subscriber_count.is_some() { r = r + "hiddenSubscriberCount,"; }
+        if self.view_count.is_some() { r = r + "viewCount,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Details about a social network post.
 /// 
@@ -2368,7 +3333,24 @@ pub struct ActivityContentDetailsSocial {
 }
 
 impl Part for ActivityContentDetailsSocial {}
+impl RequestValue for ActivityContentDetailsSocial {}
+impl ResponseResult for ActivityContentDetailsSocial {}
 
+impl ActivityContentDetailsSocial {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.resource_id.is_some() { r = r + "resourceId,"; }
+        if self.image_url.is_some() { r = r + "imageUrl,"; }
+        if self.type_.is_some() { r = r + "type,"; }
+        if self.reference_url.is_some() { r = r + "referenceUrl,"; }
+        if self.author.is_some() { r = r + "author,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Channel localization setting
 /// 
@@ -2383,7 +3365,22 @@ pub struct ChannelLocalization {
 }
 
 impl Part for ChannelLocalization {}
+impl RequestValue for ChannelLocalization {}
+impl ResponseResult for ChannelLocalization {}
+impl cmn::Resource for ChannelLocalization {}
 
+impl ChannelLocalization {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.description.is_some() { r = r + "description,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A resource id is a generic reference that points to another YouTube resource.
 /// 
@@ -2402,13 +3399,30 @@ pub struct ResourceId {
 }
 
 impl Part for ResourceId {}
+impl RequestValue for ResourceId {}
+impl ResponseResult for ResourceId {}
+impl cmn::Resource for ResourceId {}
 
+impl ResourceId {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.channel_id.is_some() { r = r + "channelId,"; }
+        if self.playlist_id.is_some() { r = r + "playlistId,"; }
+        if self.video_id.is_some() { r = r + "videoId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A search result contains information about a YouTube video, channel, or playlist that matches the search parameters specified in an API request. While a search result points to a uniquely identifiable resource, like a video, it does not have its own persistent data.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct SearchResult {
     /// The snippet object contains basic details about a search result, such as its title or description. For example, if the search result is a video, then the title will be the video's title and the description will be the video's description.    
     pub snippet: Option<SearchResultSnippet>,
@@ -2421,6 +3435,7 @@ pub struct SearchResult {
 }
 
 impl Part for SearchResult {}
+impl ResponseResult for SearchResult {}
 
 
 /// There is no detailed description.
@@ -2433,7 +3448,7 @@ impl Part for SearchResult {}
 /// * [list](struct.VideoCategoryListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct VideoCategoryListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -2483,7 +3498,27 @@ pub struct ActivitySnippet {
 }
 
 impl Part for ActivitySnippet {}
+impl RequestValue for ActivitySnippet {}
+impl ResponseResult for ActivitySnippet {}
 
+impl ActivitySnippet {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        if self.channel_id.is_some() { r = r + "channelId,"; }
+        if self.published_at.is_some() { r = r + "publishedAt,"; }
+        if self.channel_title.is_some() { r = r + "channelTitle,"; }
+        if self.type_.is_some() { r = r + "type,"; }
+        if self.group_id.is_some() { r = r + "groupId,"; }
+        if self.description.is_some() { r = r + "description,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Video processing progress and completion time estimate.
 /// 
@@ -2503,7 +3538,23 @@ pub struct VideoProcessingDetailsProcessingProgress {
 }
 
 impl Part for VideoProcessingDetailsProcessingProgress {}
+impl RequestValue for VideoProcessingDetailsProcessingProgress {}
+impl ResponseResult for VideoProcessingDetailsProcessingProgress {}
+impl cmn::Resource for VideoProcessingDetailsProcessingProgress {}
 
+impl VideoProcessingDetailsProcessingProgress {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.time_left_ms.is_some() { r = r + "timeLeftMs,"; }
+        if self.parts_processed.is_some() { r = r + "partsProcessed,"; }
+        if self.parts_total.is_some() { r = r + "partsTotal,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -2515,7 +3566,7 @@ impl Part for VideoProcessingDetailsProcessingProgress {}
 /// * [list](struct.SearchListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct SearchListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -2551,7 +3602,21 @@ pub struct ChannelTopicDetails {
 }
 
 impl Part for ChannelTopicDetails {}
+impl RequestValue for ChannelTopicDetails {}
+impl ResponseResult for ChannelTopicDetails {}
+impl cmn::Resource for ChannelTopicDetails {}
 
+impl ChannelTopicDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.topic_ids.len() > 0 { r = r + "topicIds,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -2563,7 +3628,7 @@ impl Part for ChannelTopicDetails {}
 /// * [list](struct.VideoListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct VideoListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -2599,7 +3664,21 @@ pub struct LanguageTag {
 }
 
 impl Part for LanguageTag {}
+impl RequestValue for LanguageTag {}
+impl ResponseResult for LanguageTag {}
+impl cmn::Resource for LanguageTag {}
 
+impl LanguageTag {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.value.is_some() { r = r + "value,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -2612,33 +3691,36 @@ pub struct PlaylistStatus {
 }
 
 impl Part for PlaylistStatus {}
+impl RequestValue for PlaylistStatus {}
+impl ResponseResult for PlaylistStatus {}
+impl cmn::Resource for PlaylistStatus {}
 
+impl PlaylistStatus {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.privacy_status.is_some() { r = r + "privacyStatus,"; }
+        r.pop();
+        r
+    }
+}
 
-/// Details about the content of a YouTube Video.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct VideoContentDetails {
-    /// The value of definition indicates whether the video is available in high definition or only in standard definition.    
-    pub definition: Option<String>,
-    /// The countryRestriction object contains information about the countries where a video is (or is not) viewable.    
-    pub country_restriction: Option<AccessPolicy>,
-    /// Specifies the ratings that the video received under various rating schemes.    
-    pub content_rating: Option<ContentRating>,
-    /// The value of captions indicates whether the video has captions or not.    
-    pub caption: Option<String>,
-    /// The regionRestriction object contains information about the countries where a video is (or is not) viewable. The object will contain either the contentDetails.regionRestriction.allowed property or the contentDetails.regionRestriction.blocked property.    
-    pub region_restriction: Option<VideoContentDetailsRegionRestriction>,
-    /// The length of the video. The tag value is an ISO 8601 duration in the format PT#M#S, in which the letters PT indicate that the value specifies a period of time, and the letters M and S refer to length in minutes and seconds, respectively. The # characters preceding the M and S letters are both integers that specify the number of minutes (or seconds) of the video. For example, a value of PT15M51S indicates that the video is 15 minutes and 51 seconds long.    
-    pub duration: Option<String>,
-    /// The value of is_license_content indicates whether the video is licensed content.    
-    pub licensed_content: Option<bool>,
-    /// The value of dimension indicates whether the video is available in 3D or in 2D.    
-    pub dimension: Option<String>,
+#[derive(Default, Clone, RustcDecodable)]
+pub struct VideoRating {
+    /// no description provided    
+    pub rating: Option<String>,
+    /// no description provided    
+    pub video_id: Option<String>,
 }
 
-impl Part for VideoContentDetails {}
+impl Part for VideoRating {}
+impl ResponseResult for VideoRating {}
 
 
 /// There is no detailed description.
@@ -2658,7 +3740,24 @@ pub struct LiveStreamSnippet {
 }
 
 impl Part for LiveStreamSnippet {}
+impl RequestValue for LiveStreamSnippet {}
+impl ResponseResult for LiveStreamSnippet {}
+impl cmn::Resource for LiveStreamSnippet {}
 
+impl LiveStreamSnippet {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.channel_id.is_some() { r = r + "channelId,"; }
+        if self.description.is_some() { r = r + "description,"; }
+        if self.published_at.is_some() { r = r + "publishedAt,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        r.pop();
+        r
+    }
+}
 
 /// JSON template for the status part of a channel.
 /// 
@@ -2675,7 +3774,23 @@ pub struct ChannelStatus {
 }
 
 impl Part for ChannelStatus {}
+impl RequestValue for ChannelStatus {}
+impl ResponseResult for ChannelStatus {}
+impl cmn::Resource for ChannelStatus {}
 
+impl ChannelStatus {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.privacy_status.is_some() { r = r + "privacyStatus,"; }
+        if self.is_linked.is_some() { r = r + "isLinked,"; }
+        if self.long_uploads_status.is_some() { r = r + "longUploadsStatus,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -2687,7 +3802,7 @@ impl Part for ChannelStatus {}
 /// * [list](struct.ChannelListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct ChannelListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -2772,7 +3887,7 @@ impl ChannelSection {
 /// * [list](struct.LiveBroadcastListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct LiveBroadcastListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -2808,7 +3923,21 @@ pub struct LiveStreamStatus {
 }
 
 impl Part for LiveStreamStatus {}
+impl RequestValue for LiveStreamStatus {}
+impl ResponseResult for LiveStreamStatus {}
+impl cmn::Resource for LiveStreamStatus {}
 
+impl LiveStreamStatus {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.stream_status.is_some() { r = r + "streamStatus,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Details about the live streaming metadata.
 /// 
@@ -2816,20 +3945,38 @@ impl Part for LiveStreamStatus {}
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
 pub struct VideoLiveStreamingDetails {
-    /// The time that the broadcast is scheduled to begin. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-    pub scheduled_start_time: Option<String>,
     /// The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.    
     pub concurrent_viewers: Option<String>,
-    /// The time that the broadcast actually started. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast begins.    
-    pub actual_start_time: Option<String>,
+    /// The time that the broadcast is scheduled to begin. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    pub scheduled_start_time: Option<String>,
     /// The time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. If the value is empty or the property is not present, then the broadcast is scheduled to continue indefinitely.    
     pub scheduled_end_time: Option<String>,
+    /// The time that the broadcast actually started. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast begins.    
+    pub actual_start_time: Option<String>,
     /// The time that the broadcast actually ended. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast is over.    
     pub actual_end_time: Option<String>,
 }
 
 impl Part for VideoLiveStreamingDetails {}
+impl RequestValue for VideoLiveStreamingDetails {}
+impl ResponseResult for VideoLiveStreamingDetails {}
+impl cmn::Resource for VideoLiveStreamingDetails {}
 
+impl VideoLiveStreamingDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.concurrent_viewers.is_some() { r = r + "concurrentViewers,"; }
+        if self.scheduled_start_time.is_some() { r = r + "scheduledStartTime,"; }
+        if self.scheduled_end_time.is_some() { r = r + "scheduledEndTime,"; }
+        if self.actual_start_time.is_some() { r = r + "actualStartTime,"; }
+        if self.actual_end_time.is_some() { r = r + "actualEndTime,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 65
 /// 
@@ -2869,8 +4016,6 @@ pub struct ContentRating {
     pub kmrb_rating: Option<String>,
     /// Rating system in Brazil - Department of Justice, Rating, Titles and Qualification    
     pub djctq_rating: Option<String>,
-    /// Rating system for Indonesia - Lembaga Sensor Film    
-    pub lsf_rating: Option<String>,
     /// Rating system for Hong kong - Office for Film, Newspaper and Article Administration    
     pub fco_rating: Option<String>,
     /// Rating system for Norway - Medietilsynet    
@@ -2883,8 +4028,8 @@ pub struct ContentRating {
     pub rte_rating: Option<String>,
     /// Rating system in France - French Minister of Culture    
     pub fmoc_rating: Option<String>,
-    /// Rating system for Sweden - Statens medier�d (National Media Council)    
-    pub smsa_rating: Option<String>,
+    /// Rating system in Japan - Eiga Rinri Kanri Iinkai    
+    pub eirin_rating: Option<String>,
     /// Rating system for Portugal - Comiss�o de Classifica��o de Espect�culos    
     pub cce_rating: Option<String>,
     /// Rating system for Latvia - National Film Center of Latvia    
@@ -2945,16 +4090,18 @@ pub struct ContentRating {
     pub eefilm_rating: Option<String>,
     /// Rating system for Czech republic - Czech republic Rating System    
     pub czfilm_rating: Option<String>,
-    /// Rating system for Kenya - Kenya Film Classification Board    
-    pub kfcb_rating: Option<String>,
+    /// Rating system for Indonesia - Lembaga Sensor Film    
+    pub lsf_rating: Option<String>,
     /// Rating system in Russia    
     pub russia_rating: Option<String>,
+    /// Rating system for Kenya - Kenya Film Classification Board    
+    pub kfcb_rating: Option<String>,
     /// Rating system for Philippines - MOVIE AND TELEVISION REVIEW AND CLASSIFICATION BOARD    
     pub mtrcb_rating: Option<String>,
     /// Rating system for Chile - Asociaci�n Nacional de Televisi�n    
     pub anatel_rating: Option<String>,
-    /// Rating system in Japan - Eiga Rinri Kanri Iinkai    
-    pub eirin_rating: Option<String>,
+    /// Rating system for Sweden - Statens medier�d (National Media Council)    
+    pub smsa_rating: Option<String>,
     /// Rating system for Romania - CONSILIUL NATIONAL AL AUDIOVIZUALULUI - CNA    
     pub cna_rating: Option<String>,
     /// Rating system in Spain - Instituto de Cinematografia y de las Artes Audiovisuales    
@@ -2968,7 +4115,84 @@ pub struct ContentRating {
 }
 
 impl Part for ContentRating {}
+impl RequestValue for ContentRating {}
+impl ResponseResult for ContentRating {}
+impl cmn::Resource for ContentRating {}
 
+impl ContentRating {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.yt_rating.is_some() { r = r + "ytRating,"; }
+        if self.catvfr_rating.is_some() { r = r + "catvfrRating,"; }
+        if self.cbfc_rating.is_some() { r = r + "cbfcRating,"; }
+        if self.bfvc_rating.is_some() { r = r + "bfvcRating,"; }
+        if self.bmukk_rating.is_some() { r = r + "bmukkRating,"; }
+        if self.chfilm_rating.is_some() { r = r + "chfilmRating,"; }
+        if self.moctw_rating.is_some() { r = r + "moctwRating,"; }
+        if self.catv_rating.is_some() { r = r + "catvRating,"; }
+        if self.pefilm_rating.is_some() { r = r + "pefilmRating,"; }
+        if self.djctq_rating_reasons.len() > 0 { r = r + "djctqRatingReasons,"; }
+        if self.incaa_rating.is_some() { r = r + "incaaRating,"; }
+        if self.ilfilm_rating.is_some() { r = r + "ilfilmRating,"; }
+        if self.cscf_rating.is_some() { r = r + "cscfRating,"; }
+        if self.fsk_rating.is_some() { r = r + "fskRating,"; }
+        if self.kmrb_rating.is_some() { r = r + "kmrbRating,"; }
+        if self.djctq_rating.is_some() { r = r + "djctqRating,"; }
+        if self.fco_rating.is_some() { r = r + "fcoRating,"; }
+        if self.medietilsynet_rating.is_some() { r = r + "medietilsynetRating,"; }
+        if self.grfilm_rating.is_some() { r = r + "grfilmRating,"; }
+        if self.ccc_rating.is_some() { r = r + "cccRating,"; }
+        if self.rte_rating.is_some() { r = r + "rteRating,"; }
+        if self.fmoc_rating.is_some() { r = r + "fmocRating,"; }
+        if self.eirin_rating.is_some() { r = r + "eirinRating,"; }
+        if self.cce_rating.is_some() { r = r + "cceRating,"; }
+        if self.nkclv_rating.is_some() { r = r + "nkclvRating,"; }
+        if self.fpb_rating.is_some() { r = r + "fpbRating,"; }
+        if self.smais_rating.is_some() { r = r + "smaisRating,"; }
+        if self.chvrs_rating.is_some() { r = r + "chvrsRating,"; }
+        if self.agcom_rating.is_some() { r = r + "agcomRating,"; }
+        if self.moc_rating.is_some() { r = r + "mocRating,"; }
+        if self.rcnof_rating.is_some() { r = r + "rcnofRating,"; }
+        if self.fcbm_rating.is_some() { r = r + "fcbmRating,"; }
+        if self.kijkwijzer_rating.is_some() { r = r + "kijkwijzerRating,"; }
+        if self.mda_rating.is_some() { r = r + "mdaRating,"; }
+        if self.nfvcb_rating.is_some() { r = r + "nfvcbRating,"; }
+        if self.resorteviolencia_rating.is_some() { r = r + "resorteviolenciaRating,"; }
+        if self.csa_rating.is_some() { r = r + "csaRating,"; }
+        if self.oflc_rating.is_some() { r = r + "oflcRating,"; }
+        if self.tvpg_rating.is_some() { r = r + "tvpgRating,"; }
+        if self.nfrc_rating.is_some() { r = r + "nfrcRating,"; }
+        if self.mccaa_rating.is_some() { r = r + "mccaaRating,"; }
+        if self.rtc_rating.is_some() { r = r + "rtcRating,"; }
+        if self.mibac_rating.is_some() { r = r + "mibacRating,"; }
+        if self.bbfc_rating.is_some() { r = r + "bbfcRating,"; }
+        if self.egfilm_rating.is_some() { r = r + "egfilmRating,"; }
+        if self.cicf_rating.is_some() { r = r + "cicfRating,"; }
+        if self.nbcpl_rating.is_some() { r = r + "nbcplRating,"; }
+        if self.nbc_rating.is_some() { r = r + "nbcRating,"; }
+        if self.mpaa_rating.is_some() { r = r + "mpaaRating,"; }
+        if self.ifco_rating.is_some() { r = r + "ifcoRating,"; }
+        if self.acb_rating.is_some() { r = r + "acbRating,"; }
+        if self.eefilm_rating.is_some() { r = r + "eefilmRating,"; }
+        if self.czfilm_rating.is_some() { r = r + "czfilmRating,"; }
+        if self.lsf_rating.is_some() { r = r + "lsfRating,"; }
+        if self.russia_rating.is_some() { r = r + "russiaRating,"; }
+        if self.kfcb_rating.is_some() { r = r + "kfcbRating,"; }
+        if self.mtrcb_rating.is_some() { r = r + "mtrcbRating,"; }
+        if self.anatel_rating.is_some() { r = r + "anatelRating,"; }
+        if self.smsa_rating.is_some() { r = r + "smsaRating,"; }
+        if self.cna_rating.is_some() { r = r + "cnaRating,"; }
+        if self.icaa_rating.is_some() { r = r + "icaaRating,"; }
+        if self.mccyp_rating.is_some() { r = r + "mccypRating,"; }
+        if self.skfilm_rating.is_some() { r = r + "skfilmRating,"; }
+        if self.meku_rating.is_some() { r = r + "mekuRating,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -2980,7 +4204,7 @@ impl Part for ContentRating {}
 /// * [list](struct.ActivityListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct ActivityListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -3065,7 +4289,24 @@ pub struct SubscriptionSubscriberSnippet {
 }
 
 impl Part for SubscriptionSubscriberSnippet {}
+impl RequestValue for SubscriptionSubscriberSnippet {}
+impl ResponseResult for SubscriptionSubscriberSnippet {}
+impl cmn::Resource for SubscriptionSubscriberSnippet {}
 
+impl SubscriptionSubscriberSnippet {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.channel_id.is_some() { r = r + "channelId,"; }
+        if self.description.is_some() { r = r + "description,"; }
+        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Branding properties for images associated with the channel.
 /// 
@@ -3075,8 +4316,6 @@ impl Part for SubscriptionSubscriberSnippet {}
 pub struct ImageSettings {
     /// Banner image. TV size medium resolution (1280x720).    
     pub banner_tv_medium_image_url: Option<String>,
-    /// Banner image. Tablet size low resolution (1138x188).    
-    pub banner_tablet_low_image_url: Option<String>,
     /// The image map script for the large banner image.    
     pub large_branded_banner_image_imap_script: Option<LocalizedProperty>,
     /// Banner image. Mobile size (640x175).    
@@ -3085,8 +4324,8 @@ pub struct ImageSettings {
     pub small_branded_banner_image_url: Option<LocalizedProperty>,
     /// Banner image. Tablet size high resolution (2276x377).    
     pub banner_tablet_hd_image_url: Option<String>,
-    /// Banner image. TV size high resolution (1920x1080).    
-    pub banner_tv_high_image_url: Option<String>,
+    /// Banner image. Tablet size low resolution (1138x188).    
+    pub banner_tablet_low_image_url: Option<String>,
     /// Banner image. Mobile size medium/high resolution (960x263).    
     pub banner_mobile_medium_hd_image_url: Option<String>,
     /// The URL for a 1px by 1px tracking pixel that can be used to collect statistics for views of the channel or video pages.    
@@ -3105,12 +4344,14 @@ pub struct ImageSettings {
     pub banner_tablet_extra_hd_image_url: Option<String>,
     /// The URL for the 854px by 70px image that appears below the video player in the expanded video view of the video watch page.    
     pub large_branded_banner_image_url: Option<LocalizedProperty>,
-    /// Banner image. Desktop size (1060x175).    
-    pub banner_image_url: Option<String>,
+    /// Banner image. TV size high resolution (1920x1080).    
+    pub banner_tv_high_image_url: Option<String>,
     /// The URL for the background image shown on the video watch page. The image should be 1200px by 615px, with a maximum file size of 128k.    
     pub background_image_url: Option<LocalizedProperty>,
     /// The image map script for the small banner image.    
     pub small_branded_banner_image_imap_script: Option<LocalizedProperty>,
+    /// Banner image. Desktop size (1060x175).    
+    pub banner_image_url: Option<String>,
     /// Banner image. Mobile size high resolution (1280x360).    
     pub banner_mobile_hd_image_url: Option<String>,
     /// This is used only in update requests; if it's set, we use this URL to generate all of the above banner URLs.    
@@ -3120,7 +4361,42 @@ pub struct ImageSettings {
 }
 
 impl Part for ImageSettings {}
+impl RequestValue for ImageSettings {}
+impl ResponseResult for ImageSettings {}
+impl cmn::Resource for ImageSettings {}
 
+impl ImageSettings {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.banner_tv_medium_image_url.is_some() { r = r + "bannerTvMediumImageUrl,"; }
+        if self.large_branded_banner_image_imap_script.is_some() { r = r + "largeBrandedBannerImageImapScript,"; }
+        if self.banner_mobile_image_url.is_some() { r = r + "bannerMobileImageUrl,"; }
+        if self.small_branded_banner_image_url.is_some() { r = r + "smallBrandedBannerImageUrl,"; }
+        if self.banner_tablet_hd_image_url.is_some() { r = r + "bannerTabletHdImageUrl,"; }
+        if self.banner_tablet_low_image_url.is_some() { r = r + "bannerTabletLowImageUrl,"; }
+        if self.banner_mobile_medium_hd_image_url.is_some() { r = r + "bannerMobileMediumHdImageUrl,"; }
+        if self.tracking_image_url.is_some() { r = r + "trackingImageUrl,"; }
+        if self.banner_mobile_extra_hd_image_url.is_some() { r = r + "bannerMobileExtraHdImageUrl,"; }
+        if self.banner_tablet_image_url.is_some() { r = r + "bannerTabletImageUrl,"; }
+        if self.banner_mobile_low_image_url.is_some() { r = r + "bannerMobileLowImageUrl,"; }
+        if self.banner_tv_image_url.is_some() { r = r + "bannerTvImageUrl,"; }
+        if self.banner_tv_low_image_url.is_some() { r = r + "bannerTvLowImageUrl,"; }
+        if self.banner_tablet_extra_hd_image_url.is_some() { r = r + "bannerTabletExtraHdImageUrl,"; }
+        if self.large_branded_banner_image_url.is_some() { r = r + "largeBrandedBannerImageUrl,"; }
+        if self.banner_tv_high_image_url.is_some() { r = r + "bannerTvHighImageUrl,"; }
+        if self.background_image_url.is_some() { r = r + "backgroundImageUrl,"; }
+        if self.small_branded_banner_image_imap_script.is_some() { r = r + "smallBrandedBannerImageImapScript,"; }
+        if self.banner_image_url.is_some() { r = r + "bannerImageUrl,"; }
+        if self.banner_mobile_hd_image_url.is_some() { r = r + "bannerMobileHdImageUrl,"; }
+        if self.banner_external_url.is_some() { r = r + "bannerExternalUrl,"; }
+        if self.watch_icon_image_url.is_some() { r = r + "watchIconImageUrl,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Details about a resource which is being promoted.
 /// 
@@ -3151,22 +4427,56 @@ pub struct ActivityContentDetailsPromotedItem {
 }
 
 impl Part for ActivityContentDetailsPromotedItem {}
+impl RequestValue for ActivityContentDetailsPromotedItem {}
+impl ResponseResult for ActivityContentDetailsPromotedItem {}
 
+impl ActivityContentDetailsPromotedItem {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.cta_type.is_some() { r = r + "ctaType,"; }
+        if self.ad_tag.is_some() { r = r + "adTag,"; }
+        if self.destination_url.is_some() { r = r + "destinationUrl,"; }
+        if self.forecasting_url.len() > 0 { r = r + "forecastingUrl,"; }
+        if self.impression_url.len() > 0 { r = r + "impressionUrl,"; }
+        if self.creative_view_url.is_some() { r = r + "creativeViewUrl,"; }
+        if self.video_id.is_some() { r = r + "videoId,"; }
+        if self.description_text.is_some() { r = r + "descriptionText,"; }
+        if self.custom_cta_button_text.is_some() { r = r + "customCtaButtonText,"; }
+        if self.click_tracking_url.is_some() { r = r + "clickTrackingUrl,"; }
+        r.pop();
+        r
+    }
+}
 
-/// Rights management policy for YouTube resources.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct AccessPolicy {
-    /// A list of region codes that identify countries where the default policy do not apply.    
-    pub exception: Vec<String>,
-    /// The value of allowed indicates whether the access to the policy is allowed or denied by default.    
-    pub allowed: Option<bool>,
+pub struct VideoConversionPings {
+    /// Pings that the app shall fire for a video (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.    
+    pub pings: Vec<VideoConversionPing>,
 }
 
-impl Part for AccessPolicy {}
+impl Part for VideoConversionPings {}
+impl RequestValue for VideoConversionPings {}
+impl ResponseResult for VideoConversionPings {}
+impl cmn::Resource for VideoConversionPings {}
 
+impl VideoConversionPings {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.pings.len() > 0 { r = r + "pings,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Details about a channel bulletin post.
 /// 
@@ -3179,7 +4489,20 @@ pub struct ActivityContentDetailsBulletin {
 }
 
 impl Part for ActivityContentDetailsBulletin {}
+impl RequestValue for ActivityContentDetailsBulletin {}
+impl ResponseResult for ActivityContentDetailsBulletin {}
 
+impl ActivityContentDetailsBulletin {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.resource_id.is_some() { r = r + "resourceId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// An i18nLanguage resource identifies a UI language currently supported by YouTube.
 /// 
@@ -3191,7 +4514,7 @@ impl Part for ActivityContentDetailsBulletin {}
 /// * [list](struct.I18nLanguageListMethodBuilder.html) (none)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct I18nLanguage {
     /// The snippet object contains basic details about the i18n language, such as language code and human-readable name.    
     pub snippet: Option<I18nLanguageSnippet>,
@@ -3203,6 +4526,7 @@ pub struct I18nLanguage {
     pub id: Option<String>,
 }
 
+impl ResponseResult for I18nLanguage {}
 impl cmn::Resource for I18nLanguage {}
 
 
@@ -3219,7 +4543,22 @@ pub struct LocalizedString {
 }
 
 impl Part for LocalizedString {}
+impl RequestValue for LocalizedString {}
+impl ResponseResult for LocalizedString {}
+impl cmn::Resource for LocalizedString {}
 
+impl LocalizedString {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.language.is_some() { r = r + "language,"; }
+        if self.value.is_some() { r = r + "value,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Information about an audio stream.
 /// 
@@ -3238,7 +4577,57 @@ pub struct VideoFileDetailsAudioStream {
 }
 
 impl Part for VideoFileDetailsAudioStream {}
+impl RequestValue for VideoFileDetailsAudioStream {}
+impl ResponseResult for VideoFileDetailsAudioStream {}
+impl cmn::Resource for VideoFileDetailsAudioStream {}
 
+impl VideoFileDetailsAudioStream {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.bitrate_bps.is_some() { r = r + "bitrateBps,"; }
+        if self.codec.is_some() { r = r + "codec,"; }
+        if self.vendor.is_some() { r = r + "vendor,"; }
+        if self.channel_count.is_some() { r = r + "channelCount,"; }
+        r.pop();
+        r
+    }
+}
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+pub struct VideoAgeGating {
+    /// Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won't be present.    
+    pub restricted: Option<bool>,
+    /// Indicates whether or not the video has alcoholic beverage content. Only users of legal purchasing age in a particular country, as identified by ICAP, can view the content.    
+    pub alcohol_content: Option<bool>,
+    /// Video game rating, if any.    
+    pub video_game_rating: Option<String>,
+}
+
+impl Part for VideoAgeGating {}
+impl RequestValue for VideoAgeGating {}
+impl ResponseResult for VideoAgeGating {}
+impl cmn::Resource for VideoAgeGating {}
+
+impl VideoAgeGating {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.restricted.is_some() { r = r + "restricted,"; }
+        if self.alcohol_content.is_some() { r = r + "alcoholContent,"; }
+        if self.video_game_rating.is_some() { r = r + "videoGameRating,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Freebase topic information related to the video.
 /// 
@@ -3253,28 +4642,61 @@ pub struct VideoTopicDetails {
 }
 
 impl Part for VideoTopicDetails {}
+impl RequestValue for VideoTopicDetails {}
+impl ResponseResult for VideoTopicDetails {}
+impl cmn::Resource for VideoTopicDetails {}
 
+impl VideoTopicDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.topic_ids.len() > 0 { r = r + "topicIds,"; }
+        if self.relevant_topic_ids.len() > 0 { r = r + "relevantTopicIds,"; }
+        r.pop();
+        r
+    }
+}
 
-/// Describes information necessary for ingesting an RTMP or an HTTP stream.
+/// Statistics about the video, such as the number of times the video was viewed or liked.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct IngestionInfo {
-    /// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.    
-    pub backup_ingestion_address: Option<String>,
-    /// The HTTP or RTMP stream name that YouTube assigns to the video stream.    
-    pub stream_name: Option<String>,
-    /// The primary ingestion URL that you should use to stream video to YouTube. You must stream video to this URL.
-    /// 
-    /// Depending on which application or tool you use to encode your video stream, you may need to enter the stream URL and stream name separately or you may need to concatenate them in the following format:
-    /// 
-    /// STREAM_URL/STREAM_NAME
-    pub ingestion_address: Option<String>,
+pub struct VideoStatistics {
+    /// The number of comments for the video.    
+    pub comment_count: Option<i64>,
+    /// The number of times the video has been viewed.    
+    pub view_count: Option<i64>,
+    /// The number of users who currently have the video marked as a favorite video.    
+    pub favorite_count: Option<i64>,
+    /// The number of users who have indicated that they disliked the video by giving it a negative rating.    
+    pub dislike_count: Option<i64>,
+    /// The number of users who have indicated that they liked the video by giving it a positive rating.    
+    pub like_count: Option<i64>,
 }
 
-impl Part for IngestionInfo {}
+impl Part for VideoStatistics {}
+impl RequestValue for VideoStatistics {}
+impl ResponseResult for VideoStatistics {}
+impl cmn::Resource for VideoStatistics {}
 
+impl VideoStatistics {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.comment_count.is_some() { r = r + "commentCount,"; }
+        if self.view_count.is_some() { r = r + "viewCount,"; }
+        if self.favorite_count.is_some() { r = r + "favoriteCount,"; }
+        if self.dislike_count.is_some() { r = r + "dislikeCount,"; }
+        if self.like_count.is_some() { r = r + "likeCount,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -3289,13 +4711,28 @@ pub struct VideoConversionPing {
 }
 
 impl Part for VideoConversionPing {}
+impl RequestValue for VideoConversionPing {}
+impl ResponseResult for VideoConversionPing {}
+impl cmn::Resource for VideoConversionPing {}
 
+impl VideoConversionPing {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.context.is_some() { r = r + "context,"; }
+        if self.conversion_url.is_some() { r = r + "conversionUrl,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A videoCategory resource identifies a category that has been or could be associated with uploaded videos.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct VideoCategory {
     /// The snippet object contains basic details about the video category, including its title.    
     pub snippet: Option<VideoCategorySnippet>,
@@ -3308,6 +4745,7 @@ pub struct VideoCategory {
 }
 
 impl Part for VideoCategory {}
+impl ResponseResult for VideoCategory {}
 
 
 /// Basic details about a playlist, including title, description and thumbnails.
@@ -3337,7 +4775,29 @@ pub struct PlaylistItemSnippet {
 }
 
 impl Part for PlaylistItemSnippet {}
+impl RequestValue for PlaylistItemSnippet {}
+impl ResponseResult for PlaylistItemSnippet {}
+impl cmn::Resource for PlaylistItemSnippet {}
 
+impl PlaylistItemSnippet {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.channel_id.is_some() { r = r + "channelId,"; }
+        if self.description.is_some() { r = r + "description,"; }
+        if self.title.is_some() { r = r + "title,"; }
+        if self.resource_id.is_some() { r = r + "resourceId,"; }
+        if self.playlist_id.is_some() { r = r + "playlistId,"; }
+        if self.published_at.is_some() { r = r + "publishedAt,"; }
+        if self.channel_title.is_some() { r = r + "channelTitle,"; }
+        if self.position.is_some() { r = r + "position,"; }
+        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Information about a video that was marked as a favorite video.
 /// 
@@ -3350,7 +4810,20 @@ pub struct ActivityContentDetailsFavorite {
 }
 
 impl Part for ActivityContentDetailsFavorite {}
+impl RequestValue for ActivityContentDetailsFavorite {}
+impl ResponseResult for ActivityContentDetailsFavorite {}
 
+impl ActivityContentDetailsFavorite {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.resource_id.is_some() { r = r + "resourceId,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -3363,7 +4836,21 @@ pub struct PlaylistPlayer {
 }
 
 impl Part for PlaylistPlayer {}
+impl RequestValue for PlaylistPlayer {}
+impl ResponseResult for PlaylistPlayer {}
+impl cmn::Resource for PlaylistPlayer {}
 
+impl PlaylistPlayer {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.embed_html.is_some() { r = r + "embedHtml,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A single tag suggestion with it's relevance information.
 /// 
@@ -3378,7 +4865,22 @@ pub struct VideoSuggestionsTagSuggestion {
 }
 
 impl Part for VideoSuggestionsTagSuggestion {}
+impl RequestValue for VideoSuggestionsTagSuggestion {}
+impl ResponseResult for VideoSuggestionsTagSuggestion {}
+impl cmn::Resource for VideoSuggestionsTagSuggestion {}
 
+impl VideoSuggestionsTagSuggestion {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.category_restricts.len() > 0 { r = r + "categoryRestricts,"; }
+        if self.tag.is_some() { r = r + "tag,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Specifies suggestions on how to improve video content, including encoding hints, tag suggestions, and editor suggestions.
 /// 
@@ -3399,32 +4901,55 @@ pub struct VideoSuggestions {
 }
 
 impl Part for VideoSuggestions {}
+impl RequestValue for VideoSuggestions {}
+impl ResponseResult for VideoSuggestions {}
+impl cmn::Resource for VideoSuggestions {}
 
+impl VideoSuggestions {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.processing_errors.len() > 0 { r = r + "processingErrors,"; }
+        if self.tag_suggestions.len() > 0 { r = r + "tagSuggestions,"; }
+        if self.editor_suggestions.len() > 0 { r = r + "editorSuggestions,"; }
+        if self.processing_warnings.len() > 0 { r = r + "processingWarnings,"; }
+        if self.processing_hints.len() > 0 { r = r + "processingHints,"; }
+        r.pop();
+        r
+    }
+}
 
-/// Basic details about a search result, including title, description and thumbnails of the item referenced by the search result.
+/// Rights management policy for YouTube resources.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, RustcEncodable, RustcDecodable)]
-pub struct SearchResultSnippet {
-    /// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.    
-    pub live_broadcast_content: Option<String>,
-    /// A map of thumbnail images associated with the search result. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
-    /// The title of the search result.    
-    pub title: Option<String>,
-    /// A description of the search result.    
-    pub description: Option<String>,
-    /// The value that YouTube uses to uniquely identify the channel that published the resource that the search result identifies.    
-    pub channel_id: Option<String>,
-    /// The creation date and time of the resource that the search result identifies. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-    pub published_at: Option<String>,
-    /// The title of the channel that published the resource that the search result identifies.    
-    pub channel_title: Option<String>,
+pub struct AccessPolicy {
+    /// A list of region codes that identify countries where the default policy do not apply.    
+    pub exception: Vec<String>,
+    /// The value of allowed indicates whether the access to the policy is allowed or denied by default.    
+    pub allowed: Option<bool>,
 }
 
-impl Part for SearchResultSnippet {}
+impl Part for AccessPolicy {}
+impl RequestValue for AccessPolicy {}
+impl ResponseResult for AccessPolicy {}
+impl cmn::Resource for AccessPolicy {}
 
+impl AccessPolicy {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.exception.len() > 0 { r = r + "exception,"; }
+        if self.allowed.is_some() { r = r + "allowed,"; }
+        r.pop();
+        r
+    }
+}
 
 /// A channel banner returned as the response to a channel_banner.insert call.
 /// 
@@ -3474,13 +4999,27 @@ pub struct PlaylistContentDetails {
 }
 
 impl Part for PlaylistContentDetails {}
+impl RequestValue for PlaylistContentDetails {}
+impl ResponseResult for PlaylistContentDetails {}
+impl cmn::Resource for PlaylistContentDetails {}
 
+impl PlaylistContentDetails {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.item_count.is_some() { r = r + "itemCount,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Paging details for lists of resources, including total number of items available and number of resources returned in a single page.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, RustcDecodable)]
 pub struct PageInfo {
     /// The number of results included in the API response.    
     pub results_per_page: Option<i32>,
@@ -3489,24 +5028,21 @@ pub struct PageInfo {
 }
 
 impl Part for PageInfo {}
+impl ResponseResult for PageInfo {}
 
 
-
-// ###################
-// NESTED SCHEMAS ###
-// #################
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone)]
 pub struct ChannelContentDetailsRelatedPlaylists {
+    /// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.    
+    pub uploads: Option<String>,
     /// The ID of the playlist that contains the channel"s watch history. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
     pub watch_history: Option<String>,
     /// The ID of the playlist that contains the channel"s liked videos. Use the   playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
     pub likes: Option<String>,
-    /// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.    
-    pub uploads: Option<String>,
     /// The ID of the playlist that contains the channel"s favorite videos. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
     pub favorites: Option<String>,
     /// The ID of the playlist that contains the channel"s watch later playlist. Use the playlistItems.insert and  playlistItems.delete to add or remove items from that list.    

@@ -32,6 +32,7 @@ ${struct};
 <% 
     markers = schema_markers(s, c)
     traits = ['Default', 'Clone']
+    
     if REQUEST_MARKER_TRAIT in markers:
         traits.append('RustcEncodable')
     if RESPONSE_MARKER_TRAIT in markers:
@@ -70,7 +71,7 @@ impl Default for ${s.id} {
 impl ${marker_trait} for ${s.id} {}
 % endfor
 
-% if REQUEST_MARKER_TRAIT in markers:
+% if REQUEST_MARKER_TRAIT in markers and 'properties' in s:
 impl ${s.id} {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
