@@ -67,6 +67,10 @@ impl${rb_params} ${ThisType} {
     # we would could have information about data requirements for each property in it's dict.
     # for now, we just hardcode it, and treat the entries as way to easily change param names
     assert len(api.properties) == 2, "Hardcoded for now, thanks to scope requirements"
+    
+    type_params = ''
+    if mb_additional_type_params(m):
+        type_params = '<%s>' % ', '.join(mb_additional_type_params(m))
 %>\
     
     % if 'description' in m:
@@ -74,7 +78,7 @@ impl${rb_params} ${ThisType} {
     ///
     ${m.description | rust_doc_comment, indent_all_but_first_by(1)}
     % endif
-    pub fn ${mangle_ident(a)}<${', '.join(mb_additional_type_params(m))}>(&self${method_args}) -> ${RType}${mb_tparams} {
+    pub fn ${mangle_ident(a)}${type_params}(&self${method_args}) -> ${RType}${mb_tparams} {
         ${RType} {
             hub: self.hub,
             % for p in required_props:

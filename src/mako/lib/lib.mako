@@ -27,7 +27,7 @@ Handle the following *Resources* with ease ...
     md_methods = list()
     for method in sorted(c.rta_map[r]):
         if rust_doc:
-            md_methods.append("[*%s*](struct.%s.html)" % (method, mb_type(r, method)))
+            md_methods.append("[*%s*](struct.%s.html)" % (' '.join(n.lower() for n in reversed(method.split('.'))), mb_type(r, method)))
         else:
             # TODO: link to final destination, possibly just have one for all ...
             md_methods.append("*%s*" % method)

@@ -254,7 +254,7 @@ def nested_type_name(sn, pn):
 
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
-    n = camel_to_under(n).replace('-', '.').replace('.', '').replace('$', '')
+    n = camel_to_under(n).replace('-', '.').replace('.', '_').replace('$', '')
     if n in RESERVED_WORDS:
         return n + '_'
     return n
