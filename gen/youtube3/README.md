@@ -54,13 +54,13 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.live_broadcast().control(...).doit()
-let r = hub.live_broadcast().insert(...).doit()
-let r = hub.live_broadcast().list(...).doit()
-let r = hub.live_broadcast().transition(...).doit()
-let r = hub.live_broadcast().update(...).doit()
-let r = hub.live_broadcast().delete(...).doit()
-let r = hub.live_broadcast().bind(...).doit()
+let r = hub.live_broadcasts().control(...).doit()
+let r = hub.live_broadcasts().insert(...).doit()
+let r = hub.live_broadcasts().list(...).doit()
+let r = hub.live_broadcasts().transition(...).doit()
+let r = hub.live_broadcasts().update(...).doit()
+let r = hub.live_broadcasts().delete(...).doit()
+let r = hub.live_broadcasts().bind(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 

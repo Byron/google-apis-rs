@@ -341,7 +341,7 @@ ${'.' + action_name | indent_by(13)}(${action_args});
         add_args = ', ' + stripped(add_args)
     # end handle media params
 
-    action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(self%s)' % add_args) + ' -> ' + rtype + where
+    action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
 
     field_params = [p for p in params if p.get('is_query_param', True)]
 

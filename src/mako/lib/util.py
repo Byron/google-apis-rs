@@ -254,18 +254,22 @@ def nested_type_name(sn, pn):
 
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
-    n = camel_to_under(n).replace('-', '.').replace('.', '')
+    n = camel_to_under(n).replace('-', '.').replace('.', '').replace('$', '')
     if n in RESERVED_WORDS:
         return n + '_'
     return n
+
+def _is_map_prop(p):
+    return 'additionalProperties' in p
 
 # map a json type to an rust type
 # sn = schema name
 # pn = property name
 # t = type dict
+# NOTE: In case you don't understand how this algorithm really works ... me neither - THE AUTHOR
 def to_rust_type(sn, pn, t, allow_optionals=True):
     def nested_type(nt):
-        if nt.get('items', None) is not None:
+        if 'items' in nt:
             nt = nt.items
         elif nt.get('additionalProperties'):
             nt = nt.additionalProperties
@@ -288,7 +292,10 @@ def to_rust_type(sn, pn, t, allow_optionals=True):
             rust_type = "%s<%s>" % (rust_type, nested_type(t))
             is_pod = False
         elif t.type == 'object':
-            rust_type = "%s<String, %s>" % (rust_type, nested_type(t))
+            if _is_map_prop(t):
+                rust_type = "%s<String, %s>" % (rust_type, nested_type(t))
+            else:
+                rust_type = nested_type(t)
             is_pod = False
         elif t.type == 'string' and 'Count' in pn:
             rust_type = 'i64'
@@ -327,6 +334,7 @@ def is_pod_property(p):
     return 'format' in p or p.get('type','') == 'boolean'
 
 # return an iterator yielding fake-schemas that identify a nested type
+# NOTE: In case you don't understand how this algorithm really works ... me neither - THE AUTHOR
 def iter_nested_types(schemas):
     def iter_nested_properties(prefix, properties):
         for pn, p in properties.iteritems():
@@ -339,7 +347,11 @@ def iter_nested_types(schemas):
                 yield ns
                 for np in iter_nested_properties(prefix + canonical_type_name(pn), ns.properties):
                     yield np
-                # can be recursive ... 
+            elif _is_map_prop(p):
+                # it's a hash, check its type
+                for np in iter_nested_properties(prefix, {pn: p.additionalProperties}):
+                    yield np
+            # end handle prop itself
         # end for ach property
     for s in schemas.values():
         if 'properties' not in s:
