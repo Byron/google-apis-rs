@@ -120,11 +120,11 @@
 //! 
 #![feature(core,io)]
 // DEBUG !! TODO: Remove this
-#![allow(dead_code, unused_mut)]
+#![allow(dead_code)]
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
-// unused imports in fully featured APIs
-#![allow(unused_imports)]
+// unused imports in fully featured APIs. Same with unused_mut ... .
+#![allow(unused_imports, unused_mut)]
 
 
 extern crate hyper;
@@ -1281,7 +1281,7 @@ impl Part for ChannelSectionSnippet {}
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ChannelContentDetails {
 	/// no description provided    
-	pub related_playlists: ChannelContentDetailsRelatedPlaylists,
+	pub related_playlists: Option<ChannelContentDetailsRelatedPlaylists>,
 	/// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.    
 	pub google_plus_user_id: Option<String>,
 }

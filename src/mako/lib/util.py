@@ -279,31 +279,28 @@ def to_rust_type(sn, pn, t, allow_optionals=True):
             return nested_type_name(sn, pn)
         return to_rust_type(sn, pn, nt, allow_optionals=False)
 
+    def wrap_type(tn):
+        if allow_optionals:
+            tn = "Option<%s>" % tn
+        return tn
+
     # unconditionally handle $ref types, which should point to another schema.
     if TREF in t:
-        tn = t[TREF]
-        if allow_optionals:
-            return "Option<%s>" % tn
-        return tn
+        return wrap_type(t[TREF])
     try:
-        is_pod = True
         rust_type = TYPE_MAP[t.type]
         if t.type == 'array':
-            rust_type = "%s<%s>" % (rust_type, nested_type(t))
-            is_pod = False
+            return "%s<%s>" % (rust_type, nested_type(t))
         elif t.type == 'object':
             if _is_map_prop(t):
-                rust_type = "%s<String, %s>" % (rust_type, nested_type(t))
+                return "%s<String, %s>" % (rust_type, nested_type(t))
             else:
-                rust_type = nested_type(t)
-            is_pod = False
+                return wrap_type(nested_type(t))
         elif t.type == 'string' and 'Count' in pn:
             rust_type = 'i64'
         elif rust_type == USE_FORMAT:
             rust_type = TYPE_MAP[t.format]
-        if is_pod and allow_optionals:
-            return "Option<%s>" % rust_type
-        return rust_type
+        return wrap_type(rust_type)
     except KeyError as err:
         raise AssertionError("%s: Property type '%s' unknown - add new type mapping: %s" % (str(err), t.type, str(t)))
     except AttributeError as err:
