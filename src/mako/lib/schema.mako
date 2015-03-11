@@ -32,15 +32,14 @@ ${struct};
 <% 
     markers = schema_markers(s, c)
     traits = ['Default', 'Clone']
-    # Note: it would be great if we could put just the traits we need.
-    # to do that, we have to transitively determine what is used in responses or requests.
-    # Even though a type is not directly used as response, it might be used in a type that is.
-    # Therefore, we just put all traits, unless there are special cases.
-    traits.extend(('RustcEncodable', 'RustcDecodable'))
+    if REQUEST_MARKER_TRAIT in markers:
+        traits.append('RustcEncodable')
+    if RESPONSE_MARKER_TRAIT in markers:
+        traits.append('RustcDecodable')
+    
     ## waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
     if s.type == 'any':
         traits.remove('Default')
-        traits.remove('RustcDecodable')
 %>\
 <%block filter="rust_doc_comment">\
 ${doc(s, c)}\
@@ -57,6 +56,7 @@ ${_new_object(s, s.items.get('properties'), c)}\
 % elif s.type == 'any':
 ## waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
 pub struct ${s.id}(rustc_serialize::json::Json);
+
 impl Default for ${s.id} {
     fn default() -> ${s.id} {
         ${s.id}(rustc_serialize::json::Json::Null)

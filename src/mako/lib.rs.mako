@@ -4,15 +4,12 @@
 <%namespace name="mbuild" file="lib/mbuild.mako"/>\
 <%namespace name="schema" file="lib/schema.mako"/>\
 <%  
-    from util import (iter_nested_types, new_context, rust_comment, rust_doc_comment,
+    from util import (new_context, rust_comment, rust_doc_comment,
                       rust_module_doc_comment, rb_type, hub_type, mangle_ident, hub_type_params_s,
                       hub_type_bounds, rb_type_params_s)
 
-    nested_schemas = list()
-    if schemas:
-        nested_schemas = list(iter_nested_types(schemas))
     c = new_context(schemas, resources)
-    hub_type = hub_type(schemas, util.canonical_name())
+    hub_type = hub_type(c.schemas, util.canonical_name())
     ht_params = hub_type_params_s()
 %>\
 <%block filter="rust_comment">\
@@ -112,22 +109,11 @@ impl<'a, C, NC, A> ${hub_type}${ht_params}
 }
 
 
-% if schemas:
+% if c.schemas:
 // ############
 // SCHEMAS ###
 // ##########
-% for s in schemas.values():
-${schema.new(s, c)}
-% endfor
-% endif
-
-% if nested_schemas:
-// ###################
-// NESTED SCHEMAS ###
-// #################
-## some schemas are only used once and basically internal types.
-## We have to find them and process them as normal types
-% for s in nested_schemas:
+% for s in c.schemas.values():
 ${schema.new(s, c)}
 % endfor
 % endif

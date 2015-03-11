@@ -49,7 +49,6 @@ IO_TYPES = (IO_REQUEST, IO_RESPONSE)
 INS_METHOD = 'insert'
 DEL_METHOD = 'delete'
 
-NESTED_TYPE_MARKER = 'is_nested'
 SPACES_PER_TAB = 4
 
 NESTED_TYPE_SUFFIX = 'item'
@@ -271,7 +270,6 @@ def _is_map_prop(p):
 def _assure_unique_type_name(schemas, tn):
     if tn in schemas:
         tn += 'Internal'
-        assert tn not in schemas
     return tn
 
 # map a json type to an rust type
@@ -330,7 +328,7 @@ def is_nested_type_property(t):
 
 # Return True if the schema is nested
 def is_nested_type(s):
-    return NESTED_TYPE_MARKER in s
+    return len(s.parents) > 0
 
 # convert a rust-type to something that would be taken as input of a function
 # even though our storage type is different
@@ -348,64 +346,31 @@ def activity_input_type(schemas, p):
 def is_pod_property(p):
     return 'format' in p or p.get('type','') == 'boolean'
 
-# return an iterator yielding fake-schemas that identify a nested type
-# NOTE: In case you don't understand how this algorithm really works ... me neither - THE AUTHOR
-def iter_nested_types(schemas):
-    # 'type' in t and t.type == 'object' and 'properties' in t or ('items' in t and 'properties' in t.items)
-    def iter_nested_properties(prefix, properties):
-        for pn, p in properties.iteritems():
-            if is_nested_type_property(p):
-                ns = deepcopy(p)
-                ns.id = nested_type_name(prefix, pn)
-                ns[NESTED_TYPE_MARKER] = True
-
-                # To allow us recursing arrays, we simply put items one level up
-                if 'items' in p:
-                    ns.update((k, deepcopy(v)) for k, v in p.items.iteritems())
-
-                yield ns
-                if 'properties' in ns:
-                    for np in iter_nested_properties(prefix + canonical_type_name(pn), ns.properties):
-                        yield np
-            elif _is_map_prop(p):
-                # it's a hash, check its type
-                # TODO: does this code run ? Why is there a plain prefix
-                for np in iter_nested_properties(prefix, {pn: p.additionalProperties}):
-                    yield np
-            elif 'items' in p:
-                for np in iter_nested_properties(prefix, {pn: p.items}):
-                    yield np
-            # end handle prop itself
-        # end for ach property
-    for s in schemas.values():
-        if 'properties' not in s:
-            continue
-        for np in iter_nested_properties(s.id, s.properties):
-            np.id = _assure_unique_type_name(schemas, np.id)
-            yield np
-    # end for aech schma
-
 # Return sorted type names of all markers applicable to the given schema
+# This list is transitive. Thus, if the schema is used as child of someone with a trait, it 
+# inherits this trait
 def schema_markers(s, c):
     res = set()
+    ids = s['parents'] + [s.id]
+    for sid in ids:
+        activities = c.sta_map.get(sid, dict())
+        if len(activities) == 0:
+            res.add(PART_MARKER_TRAIT)
+        else:
+            # it should have at least one activity that matches it's type to qualify for the Resource trait
+            for fqan, iot in activities.iteritems():
+                if activity_name_to_type_name(activity_split(fqan)[1]).lower() == sid.lower():
+                    res.add('cmn::Resource')
+                if IO_RESPONSE in iot:
+                    res.add(RESPONSE_MARKER_TRAIT)
+                if IO_REQUEST in iot:
+                    res.add(REQUEST_MARKER_TRAIT)
+            # end for each activity
+        # end handle activites
 
-    activities = c.sta_map.get(s.id, dict())
-    if len(activities) == 0:
-        res.add(PART_MARKER_TRAIT)
-    else:
-        # it should have at least one activity that matches it's type to qualify for the Resource trait
-        for fqan, iot in activities.iteritems():
-            if activity_name_to_type_name(activity_split(fqan)[1]).lower() == s.id.lower():
-                res.add('cmn::Resource')
-            if IO_RESPONSE in iot:
-                res.add(RESPONSE_MARKER_TRAIT)
-            if IO_REQUEST in iot:
-                res.add(REQUEST_MARKER_TRAIT)
-        # end for each activity
-    # end handle activites
-
-    if is_nested_type(s):
-        res.add(NESTED_MARKER_TRAIT)
+        if is_nested_type(s):
+            res.add(NESTED_MARKER_TRAIT)
+    # end for each parent ... transitively
 
     return sorted(res)
 
@@ -572,12 +537,10 @@ It should be used to handle progress information, and to implement a certain lev
 ## -- End Activity Utilities -- @}
 
 
-Context = collections.namedtuple('Context', ['sta_map', 'fqan_map', 'rta_map', 'rtc_map'])
+Context = collections.namedtuple('Context', ['sta_map', 'fqan_map', 'rta_map', 'rtc_map', 'schemas'])
 
 # return a newly build context from the given data
 def new_context(schemas, resources):
-    if not resources:
-        return Context(dict(), dict(), dict(), dict())
     # Returns (A, B) where
     # A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
     # B: { fqan -> activity_method_data }
@@ -620,6 +583,51 @@ def new_context(schemas, resources):
         return res, fqan
     # end utility
 
+    # A dict of {s.id -> schema} , with all schemas having the 'parents' key set with [s.id, ...] of all parents
+    # in order of traversal, [0] is first parent, [-1] is the root of them all
+    # current schemas - the dict will be altered ! Changing global state seems odd, but we own it !
+    def build_schema_map(schemas):
+        # 'type' in t and t.type == 'object' and 'properties' in t or ('items' in t and 'properties' in t.items)
+        PKEY = 'parents'
+        def recurse_properties(prefix, properties, parent_ids):
+            for pn, p in properties.iteritems():
+                if is_nested_type_property(p):
+                    ns = deepcopy(p)
+                    ns.id = _assure_unique_type_name(schemas, nested_type_name(prefix, pn))
+                    schemas[ns.id] = ns
+                    ns[PKEY] = parent_ids
+
+                    # To allow us recursing arrays, we simply put items one level up
+                    if 'items' in p:
+                        ns.update((k, deepcopy(v)) for k, v in p.items.iteritems())
+
+                    if 'properties' in ns:
+                        recurse_properties(prefix + canonical_type_name(pn), ns.properties, parent_ids + [ns.id])
+                elif _is_map_prop(p):
+                    # it's a hash, check its type
+                    # TODO: does this code run ? Why is there a plain prefix
+                    recurse_properties(prefix, {pn: p.additionalProperties}, parent_ids + [])
+                elif 'items' in p:
+                    # it's an array
+                    recurse_properties(prefix, {pn: p.items}, parent_ids + [])
+                # end handle prop itself
+            # end for each property
+        # end utility
+        for s in schemas.values():
+            s[PKEY] = list() # roots never have parents
+            if 'properties' not in s:
+                continue
+            recurse_properties(s.id, s.properties, [s.id])
+        # end for each schema
+        return schemas
+    # end utility
+
+    if schemas:
+        schemas = build_schema_map(schemas)
+    else:
+        schemas = dict()
+    if not resources:
+        return Context(dict(), dict(), dict(), dict(), schemas)
     sta_map, fqan_map = build_activity_mappings(resources)
     rta_map = dict()
     rtc_map = dict()
@@ -627,7 +635,7 @@ def new_context(schemas, resources):
         category, resource, activity = activity_split(an)
         rta_map.setdefault(resource, list()).append(activity)
         assert rtc_map.setdefault(resource, category) == category
-    return Context(sta_map, fqan_map, rta_map, rtc_map)
+    return Context(sta_map, fqan_map, rta_map, rtc_map, schemas)
 
 # Expects v to be 'v\d+', throws otherwise
 def to_api_version(v):
