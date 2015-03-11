@@ -1,5 +1,5 @@
 <%! from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
-			  	      IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type) 
+			  	      IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by) 
 %>\
 ## Create new schema with everything.
 ## 's' contains the schema structure from json to build
@@ -7,7 +7,7 @@
 ###################################################################################################################
 <%def name="new(s, c)">\
 <% 
-	## assert s.type == "object" 
+	assert s.type == "object" 
 	markers = schema_markers(s, c)
 %>\
 <%block filter="rust_doc_comment">\
@@ -18,7 +18,7 @@ pub struct ${s.id}\
 % if 'properties' in s:
  {
 % for pn, p in s.properties.iteritems():
-	${p.get('description', 'no description provided') | rust_doc_comment}
+	${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
 	pub ${mangle_ident(pn)}: ${to_rust_type(s.id, pn, p)},
 % endfor
 }

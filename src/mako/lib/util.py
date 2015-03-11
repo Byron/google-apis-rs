@@ -2,6 +2,7 @@ import re
 import os
 from random import (randint, random, choice, seed)
 import collections
+from copy import deepcopy
 
 seed(1337)
 
@@ -271,7 +272,6 @@ def to_rust_type(sn, pn, t, allow_optionals=True):
         else:
             assert(is_nested_type_property(nt))
             # It's a nested type - we take it literally like $ref, but generate a name for the type ourselves
-            # This of course assumes
             return nested_type_name(sn, pn)
         return to_rust_type(sn, pn, nt, allow_optionals=False)
 
@@ -331,7 +331,7 @@ def iter_nested_types(schemas):
     def iter_nested_properties(prefix, properties):
         for pn, p in properties.iteritems():
             if is_nested_type_property(p):
-                ns = p.copy()
+                ns = deepcopy(p)
                 ns.id = nested_type_name(prefix, pn)
                 ns[NESTED_TYPE_MARKER] = True
                 if 'items' in p:
@@ -410,7 +410,7 @@ def method_params(m, required=None, location=None):
             continue
         if location is not None and p.get('location', '') != location:
             continue
-        np = p.copy()
+        np = deepcopy(p)
         np['name'] = pn
         try:
             # po = ['part', 'foo']
