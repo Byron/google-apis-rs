@@ -269,7 +269,7 @@ def _is_map_prop(p):
 
 def _assure_unique_type_name(schemas, tn):
     if tn in schemas:
-        tn += 'Internal'
+        tn += 'Nested'
     return tn
 
 # map a json type to an rust type
@@ -352,6 +352,7 @@ def is_pod_property(p):
 def schema_markers(s, c):
     res = set()
     ids = s['parents'] + [s.id]
+    print ids
     for sid in ids:
         activities = c.sta_map.get(sid, dict())
         if len(activities) == 0:
@@ -584,17 +585,22 @@ def new_context(schemas, resources):
     # end utility
 
     # A dict of {s.id -> schema} , with all schemas having the 'parents' key set with [s.id, ...] of all parents
-    # in order of traversal, [0] is first parent, [-1] is the root of them all
-    # current schemas - the dict will be altered ! Changing global state seems odd, but we own it !
-    def build_schema_map(schemas):
+    # in order of traversal, [-1] is first parent, [0] is the root of them all
+    def build_schema_map():
         # 'type' in t and t.type == 'object' and 'properties' in t or ('items' in t and 'properties' in t.items)
         PKEY = 'parents'
+        UBKEY = 'used_by'
+        all_schemas = deepcopy(schemas)
         def recurse_properties(prefix, properties, parent_ids):
             for pn, p in properties.iteritems():
+                if TREF in p:
+                    # they can be used in mulFinternaltiple spots - just brute-force copy all parents in there
+                    # which should probably be renamed to used_by instead
+                    pass
                 if is_nested_type_property(p):
                     ns = deepcopy(p)
                     ns.id = _assure_unique_type_name(schemas, nested_type_name(prefix, pn))
-                    schemas[ns.id] = ns
+                    all_schemas[ns.id] = ns
                     ns[PKEY] = parent_ids
 
                     # To allow us recursing arrays, we simply put items one level up
@@ -615,19 +621,21 @@ def new_context(schemas, resources):
         # end utility
         for s in schemas.values():
             s[PKEY] = list() # roots never have parents
+            if UBKEY not in s:
+                s[UBKEY] = list()
             if 'properties' not in s:
                 continue
             recurse_properties(s.id, s.properties, [s.id])
         # end for each schema
-        return schemas
+        return all_schemas
     # end utility
 
     if schemas:
-        schemas = build_schema_map(schemas)
+        all_schemas = build_schema_map()
     else:
-        schemas = dict()
+        all_schemas = dict()
     if not resources:
-        return Context(dict(), dict(), dict(), dict(), schemas)
+        return Context(dict(), dict(), dict(), dict(), all_schemas)
     sta_map, fqan_map = build_activity_mappings(resources)
     rta_map = dict()
     rtc_map = dict()
@@ -635,7 +643,7 @@ def new_context(schemas, resources):
         category, resource, activity = activity_split(an)
         rta_map.setdefault(resource, list()).append(activity)
         assert rtc_map.setdefault(resource, category) == category
-    return Context(sta_map, fqan_map, rta_map, rtc_map, schemas)
+    return Context(sta_map, fqan_map, rta_map, rtc_map, all_schemas)
 
 # Expects v to be 'v\d+', throws otherwise
 def to_api_version(v):
