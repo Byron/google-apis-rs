@@ -52,6 +52,7 @@ DEL_METHOD = 'delete'
 NESTED_TYPE_MARKER = 'is_nested'
 SPACES_PER_TAB = 4
 
+NESTED_TYPE_SUFFIX = 'item'
 DELEGATE_TYPE = 'Delegate'
 REQUEST_PRIORITY = 100
 REQUEST_MARKER_TRAIT = 'RequestValue'
@@ -339,6 +340,7 @@ def is_pod_property(p):
 # return an iterator yielding fake-schemas that identify a nested type
 # NOTE: In case you don't understand how this algorithm really works ... me neither - THE AUTHOR
 def iter_nested_types(schemas):
+    # 'type' in t and t.type == 'object' and 'properties' in t or ('items' in t and 'properties' in t.items)
     def iter_nested_properties(prefix, properties):
         for pn, p in properties.iteritems():
             if is_nested_type_property(p):
@@ -356,7 +358,11 @@ def iter_nested_types(schemas):
                         yield np
             elif _is_map_prop(p):
                 # it's a hash, check its type
+                # TODO: does this code run ? Why is there a plain prefix
                 for np in iter_nested_properties(prefix, {pn: p.additionalProperties}):
+                    yield np
+            elif 'items' in p:
+                for np in iter_nested_properties(prefix, {pn: p.items}):
                     yield np
             # end handle prop itself
         # end for ach property

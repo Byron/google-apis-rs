@@ -1,5 +1,6 @@
 <%! from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
-			  	      IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by) 
+			  	      IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
+			  	      NESTED_TYPE_SUFFIX) 
 %>\
 ## Build a schema which must be an object
 ###################################################################################################################
@@ -32,12 +33,14 @@ ${doc(s, c)}\
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 % if s.type == 'object':
 ${_new_object(s, s.get('properties'), c)}\
-% else: ## assume it's an array
+% elif s.type == 'array':
 % if s.items.get('type') != 'object':
-pub struct ${s.id}(${to_rust_type(s.id, 'item', s)});
+pub struct ${s.id}(${to_rust_type(s.id, NESTED_TYPE_SUFFIX, s)});
 % else:
 ${_new_object(s, s.items.get('properties'), c)}\
 % endif ## array item != 'object'
+% else: ## probably any ... just represent it with NewType ... whatever that is
+pub struct ${s.id};
 % endif ## type == 'object'
 
 % for marker_trait in markers:
