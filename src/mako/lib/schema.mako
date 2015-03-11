@@ -1,6 +1,13 @@
 <%! from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
 			  	      IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by) 
 %>\
+## Build a schema which must be an object
+###################################################################################################################
+###################################################################################################################
+## <% def name="_new_object(s, properties, c)">\
+
+## </%def>
+
 ## Create new schema with everything.
 ## 's' contains the schema structure from json to build
 ###################################################################################################################
@@ -25,8 +32,21 @@ pub struct ${s.id}\
 % else: ## it's an empty struct, i.e. struct Foo;
 ;
 % endif ## 'properties' in s
+% else: ## assume it's an array
+% if s.items.get('type') != 'object':
+(${to_rust_type(s.id, 'item', s)});
 % else:
-(${to_rust_type(s.id, s.id, s)});
+% if 'properties' in s.items:
+ {
+% for pn, p in s.items.properties.iteritems():
+	${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
+	pub ${mangle_ident(pn)}: ${to_rust_type(s.id, pn, p)},
+% endfor
+}
+% else: ## it's an empty struct, i.e. struct Foo;
+;
+% endif ## 'properties' in s.items
+% endif ## array item != 'object'
 % endif ## type == 'object'
 
 % for marker_trait in markers:
