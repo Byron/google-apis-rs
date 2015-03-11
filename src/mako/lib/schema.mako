@@ -7,7 +7,6 @@
 ###################################################################################################################
 <%def name="new(s, c)">\
 <% 
-	assert s.type == "object" 
 	markers = schema_markers(s, c)
 %>\
 <%block filter="rust_doc_comment">\

@@ -25,6 +25,10 @@ ${lib.docs(c)}
 #![feature(core,io)]
 // DEBUG !! TODO: Remove this
 #![allow(dead_code)]
+// We don't warn about this, as depending on the API, some data structures or facilities are never used.
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// unused imports in fully featured APIs
+#![allow(unused_imports)]
 
 
 extern crate hyper;
@@ -40,9 +44,9 @@ use std::marker::PhantomData;
 use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::default::Default;
+use std::collections::BTreeMap;
 use std::io;
 use std::fs;
-use std::collections::BTreeMap;
 
 pub use cmn::{Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
 
