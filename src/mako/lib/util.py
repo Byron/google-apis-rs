@@ -255,7 +255,8 @@ def canonical_type_name(s):
     return capitalize(s)
 
 def nested_type_name(sn, pn):
-    return sn + canonical_type_name(pn)
+    suffix = canonical_type_name(pn)
+    return sn + suffix
 
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
@@ -633,7 +634,7 @@ def new_context(schemas, resources):
                 rs = s
             # end this is already a perfectly valid type
 
-            properties = s.get('properties', {rs.id: s})
+            properties = s.get('properties', {'': s})
             for pn, p in properties.iteritems():
                 link_used(p, rs)
                 if is_nested_type_property(p):
@@ -645,12 +646,13 @@ def new_context(schemas, resources):
                     if 'items' in p:
                         ns.update((k, deepcopy(v)) for k, v in p.items.iteritems())
 
-                    recurse_properties(nested_type_name(prefix, pn), ns, ns, append_unique(parent_ids, rs.id))
+                    recurse_properties(ns.id, ns, ns, append_unique(parent_ids, rs.id))
                 elif _is_map_prop(p):
-                    recurse_properties(nested_type_name(prefix, pn), rs, p.additionalProperties, append_unique(parent_ids, rs.id))
+                    recurse_properties(nested_type_name(prefix, pn), rs, 
+                                                        p.additionalProperties, append_unique(parent_ids, rs.id))
                 elif 'items' in p:
-                    # it's an array
-                    recurse_properties(nested_type_name(prefix, pn), rs, p.items, append_unique(parent_ids, rs.id))
+                    recurse_properties(nested_type_name(prefix, pn), rs, 
+                                                        p.items, append_unique(parent_ids, rs.id))
                 # end handle prop itself
             # end for each property
         # end utility
