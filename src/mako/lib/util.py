@@ -244,11 +244,15 @@ def extract_parts(desc):
 # ------------------------------------------------------------------------------
 ## @{
 
+def capitalize(s):
+    return s[:1].upper() + s[1:]
+
 # Return transformed string that could make a good type name
 def canonical_type_name(s):
     # can't use s.capitalize() as it will lower-case the remainder of the string
-    s = s.replace(' ', '')
-    return s[:1].upper() + s[1:]
+    s = ''.join(capitalize(t) for t in s.split(' '))
+    s = ''.join(capitalize(t) for t in s.split('_'))
+    return capitalize(s)
 
 def nested_type_name(sn, pn):
     return sn + canonical_type_name(pn)
