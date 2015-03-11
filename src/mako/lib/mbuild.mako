@@ -341,7 +341,7 @@ ${'.' + action_name | indent_by(13)}(${action_args});
         add_args = ', ' + stripped(add_args)
     # end handle media params
 
-    action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
+    action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(self%s)' % add_args) + ' -> ' + rtype + where
 
     field_params = [p for p in params if p.get('is_query_param', True)]
 
@@ -444,7 +444,7 @@ else {
     % for item_name, item in p.info.iteritems():
     /// * *${split_camelcase_s(item_name)}*: ${isinstance(item, (list, tuple)) and put_and(enclose_in("'", item)) or str(item)}
     % endfor
-    pub fn ${api.terms.upload_action}${p.type.suffix}<${p.type.param}>(mut self, ${p.type.arg_name}: ${p.type.param}, size: u64, mime_type: mime::Mime) -> ${rtype}
+    pub fn ${api.terms.upload_action}${p.type.suffix}<${p.type.param}>(self, ${p.type.arg_name}: ${p.type.param}, size: u64, mime_type: mime::Mime) -> ${rtype}
                 where ${p.type.param}: ${p.type.where} {
         self.${api.terms.action}(\
         % for _ in range(0, loop.index):

@@ -23,6 +23,9 @@
 ${lib.docs(c)}
 </%block>
 #![feature(core,io)]
+// DEBUG !! TODO: Remove this
+#![allow(dead_code)]
+
 
 extern crate hyper;
 extern crate "rustc-serialize" as rustc_serialize;
