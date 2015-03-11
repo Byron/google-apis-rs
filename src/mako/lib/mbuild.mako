@@ -103,7 +103,7 @@ pub struct ${ThisType}
     % endif
 }
 
-impl${mb_tparams} MethodBuilder for ${ThisType} {}
+impl${mb_tparams} cmn::MethodBuilder for ${ThisType} {}
 
 impl${mb_tparams} ${ThisType} where ${', '.join(mb_type_bounds())} {
 
@@ -322,11 +322,11 @@ ${'.' + action_name | indent_by(13)}(${action_args});
     where = ''
     qualifier = 'pub '
     add_args = ''
-    rtype = 'Result<()>'
+    rtype = 'cmn::Result<()>'
     response_schema = method_response(schemas, c, m)
 
     if response_schema:
-        rtype = 'Result<%s>' % (response_schema.id)
+        rtype = 'cmn::Result<%s>' % (response_schema.id)
 
     if media_params:
         stripped = lambda s: s.strip().strip(',')
@@ -377,7 +377,7 @@ ${'.' + action_name | indent_by(13)}(${action_args});
         ## Additional params - may not overlap with optional params
         for &field in [${', '.join(enclose_in('"', (p.name for p in field_params)))}].iter() {
             if ${paddfields}.contains_key(field) {
-                return Result::FieldClash(field);
+                return cmn::Result::FieldClash(field);
             }
         }
         for (name, value) in ${paddfields}.iter() {
@@ -432,7 +432,7 @@ else {
         ##         return RequestResult::Error(err);
         ##     }
 
-        Result::Success(response)
+        cmn::Result::Success(response)
     }
 
     % for p in media_params:

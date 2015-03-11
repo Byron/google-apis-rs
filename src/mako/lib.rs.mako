@@ -41,8 +41,7 @@ use std::io;
 use std::fs;
 use std::collections::BTreeMap;
 
-pub use cmn::{Hub, ReadSeek, ResourceMethodsBuilder, MethodBuilder, Resource, Part, ResponseResult, RequestValue,
-              NestedType, Delegate, DefaultDelegate, Result};
+pub use cmn::{Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
 
 
 // ##############

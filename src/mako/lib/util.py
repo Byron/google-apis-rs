@@ -24,6 +24,13 @@ TYPE_MAP = {'boolean' : 'bool',
             'string'  : 'String',
             'object'  : 'HashMap'}
 
+RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'const', 'continue', 'crate', 'do',
+                      'else', 'enum', 'extern', 'false', 'final', 'fn', 'for', 'if', 'impl', 'in', 'let', 'loop',
+                      'macro', 'match', 'mod', 'move', 'mut', 'offsetof', 'override', 'priv', 'pub', 'pure', 'ref',
+                      'return', 'sizeof', 'static', 'self', 'struct', 'super', 'true', 'trait', 'type', 'typeof',
+                      'unsafe', 'unsized', 'use', 'virtual', 'where', 'while', 'yield'))
+
+
 _words = [w.strip(',') for w in "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(' ')]
 RUST_TYPE_RND_MAP = {'bool': lambda: str(bool(randint(0, 1))).lower(),
                      'u32' : lambda: randint(0, 100),
@@ -246,8 +253,8 @@ def nested_type_name(sn, pn):
 
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
-    n = '_'.join(singular(w) for w in camel_to_under(n).split('.'))
-    if n in ('type', 'where', 'override', 'move'):
+    n = camel_to_under(n).replace('-', '.').replace('.', '')
+    if n in RESERVED_WORDS:
         return n + '_'
     return n
 
@@ -352,7 +359,7 @@ def schema_markers(s, c):
         # it should have at least one activity that matches it's type to qualify for the Resource trait
         for fqan, iot in activities.iteritems():
             if activity_name_to_type_name(activity_split(fqan)[1]).lower() == s.id.lower():
-                res.add('Resource')
+                res.add('cmn::Resource')
             if IO_RESPONSE in iot:
                 res.add('ResponseResult')
             if IO_REQUEST in iot:
