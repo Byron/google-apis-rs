@@ -56,6 +56,7 @@ NESTED_TYPE_SUFFIX = 'item'
 DELEGATE_TYPE = 'Delegate'
 REQUEST_PRIORITY = 100
 REQUEST_MARKER_TRAIT = 'RequestValue'
+RESPONSE_MARKER_TRAIT = 'ResponseResult'
 PART_MARKER_TRAIT = 'Part'
 NESTED_MARKER_TRAIT = 'NestedType'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
@@ -397,7 +398,7 @@ def schema_markers(s, c):
             if activity_name_to_type_name(activity_split(fqan)[1]).lower() == s.id.lower():
                 res.add('cmn::Resource')
             if IO_RESPONSE in iot:
-                res.add('ResponseResult')
+                res.add(RESPONSE_MARKER_TRAIT)
             if IO_REQUEST in iot:
                 res.add(REQUEST_MARKER_TRAIT)
         # end for each activity

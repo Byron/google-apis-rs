@@ -29,10 +29,8 @@ The license of everything not explicitly under a different license are licensed 
 
 What follows is a list of other material that is licensed differently.
 
-* **./etc/bin/pyratemp.py** is licensed under MIT-like, as shown in [the header][pyratemp-header] of the file.
 * **./etc/api/\*\*/*.json** are licensed under a [MIT-like google license][google-lic].
 
 
 [oauth]: https://crates.io/crates/yup-oauth2
-[pyratemp-header]: https://github.com/Byron/youtube-rs/blob/master/etc/bin/pyratemp.py
 [google-lic]: https://github.com/google/google-api-go-client/blob/master/LICENSE
