@@ -9,13 +9,17 @@ directories:
   # all mako source files
   mako_src: src/mako
 api:
-  list:
-    - name: youtube
-      version: v3
   base_path: "etc/api"
   terms:
     # how to actually do something with the API
-    action: do
+    action: doit
+    # when a resource is supposed to be uploaded
+    upload_action: upload
+  properties:
+    # additional fields specified by the user
+    params: '_additional_params'
+    # custom scopes for authentication
+    scopes: '_scopes'
   templates:
   # all output directories are relative to the one set for the respective API
     - source: README.md

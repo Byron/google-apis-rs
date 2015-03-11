@@ -1,4 +1,4 @@
-#![feature(core)]
+#![feature(core,io)]
 //! library with code shared by all generated implementations
 extern crate hyper;
 extern crate "rustc-serialize" as rustc_serialize;

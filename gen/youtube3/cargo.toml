@@ -14,11 +14,9 @@ license = "MIT"
 keywords = ["youtube", "google", "protocol", "web", "api"]
 
 [dependencies]
-# Just to get hyper to work !
-openssl = "= 0.4.3"
-# Just to get hyper to work !
-cookie = "= 0.1.13"
 hyper = "*"
+mime = "*"
+url = "*"
 rustc-serialize = "*"
 yup-oauth2 = "*"
 
