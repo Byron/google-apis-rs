@@ -286,7 +286,13 @@ def to_rust_type(sn, pn, t, allow_optionals=True):
 
     # unconditionally handle $ref types, which should point to another schema.
     if TREF in t:
-        return wrap_type(t[TREF])
+        # simple, non-recursive fix for some recursive types. This only works on the first depth level
+        # which is fine for now. 'allow_optionals' implicitly restricts type boxing for simple types - it
+        # usually is on on the first call, and off when recursion is involved.
+        tn = t[TREF]
+        if allow_optionals and tn == sn:
+            tn = 'Box<%s>' % tn
+        return wrap_type(tn)
     try:
         rust_type = TYPE_MAP[t.type]
         if t.type == 'array':

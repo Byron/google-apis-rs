@@ -21,7 +21,7 @@
 //! * [subscriptions](struct.Subscription.html) ([*delete*](struct.SubscriptionDeleteMethodBuilder.html), [*insert*](struct.SubscriptionInsertMethodBuilder.html) and [*list*](struct.SubscriptionListMethodBuilder.html))
 //! * [thumbnails](struct.Thumbnail.html) ([*set*](struct.ThumbnailSetMethodBuilder.html))
 //! * [video categories](struct.VideoCategory.html) ([*list*](struct.VideoCategoryListMethodBuilder.html))
-//! * [videos](struct.Video.html) ([*delete*](struct.VideoDeleteMethodBuilder.html), [*getRating*](struct.VideoGetRatingMethodBuilder.html), [*insert*](struct.VideoInsertMethodBuilder.html), [*list*](struct.VideoListMethodBuilder.html), [*rate*](struct.VideoRateMethodBuilder.html) and [*update*](struct.VideoUpdateMethodBuilder.html))
+//! * [videos](struct.Video.html) ([*delete*](struct.VideoDeleteMethodBuilder.html), [*getrating*](struct.VideoGetRatingMethodBuilder.html), [*insert*](struct.VideoInsertMethodBuilder.html), [*list*](struct.VideoListMethodBuilder.html), [*rate*](struct.VideoRateMethodBuilder.html) and [*update*](struct.VideoUpdateMethodBuilder.html))
 //! * watermarks ([*set*](struct.WatermarkSetMethodBuilder.html) and [*unset*](struct.WatermarkUnsetMethodBuilder.html))
 //! 
 //! Everything else about the *YouTube* API can be found at the
@@ -3566,7 +3566,7 @@ impl<'a, C, NC, A> I18nLanguageMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of supported languages.    
-    pub fn list<>(&self, part: &str) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> I18nLanguageListMethodBuilder<'a, C, NC, A> {
         I18nLanguageListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -3628,7 +3628,7 @@ impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
     /// - Call the channelBanners.insert method to upload the binary image data to YouTube. The image must have a 16:9 aspect ratio and be at least 2120x1192 pixels.
     /// - Extract the url property's value from the response that the API returns for step 1.
     /// - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2.
-    pub fn insert<>(&self, request: &ChannelBannerResource) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
+    pub fn insert(&self, request: &ChannelBannerResource) -> ChannelBannerInsertMethodBuilder<'a, C, NC, A> {
         ChannelBannerInsertMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -3686,7 +3686,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns channelSection resources that match the API request criteria.    
-    pub fn list<>(&self, part: &str) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> ChannelSectionListMethodBuilder<'a, C, NC, A> {
         ChannelSectionListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -3703,7 +3703,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Adds a channelSection for the authenticated user's channel.    
-    pub fn insert<>(&self, request: &ChannelSection) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
+    pub fn insert(&self, request: &ChannelSection) -> ChannelSectionInsertMethodBuilder<'a, C, NC, A> {
         ChannelSectionInsertMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -3719,7 +3719,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a channelSection.    
-    pub fn delete<>(&self, id: &str) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {
         ChannelSectionDeleteMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
@@ -3733,7 +3733,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Update a channelSection.    
-    pub fn update<>(&self, request: &ChannelSection) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
+    pub fn update(&self, request: &ChannelSection) -> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {
         ChannelSectionUpdateMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -3792,7 +3792,7 @@ impl<'a, C, NC, A> GuideCategoryMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of categories that can be associated with YouTube channels.    
-    pub fn list<>(&self, part: &str) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> GuideCategoryListMethodBuilder<'a, C, NC, A> {
         GuideCategoryListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -3852,7 +3852,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a playlist.    
-    pub fn insert<>(&self, request: &Playlist) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
+    pub fn insert(&self, request: &Playlist) -> PlaylistInsertMethodBuilder<'a, C, NC, A> {
         PlaylistInsertMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -3868,7 +3868,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.    
-    pub fn list<>(&self, part: &str) -> PlaylistListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> PlaylistListMethodBuilder<'a, C, NC, A> {
         PlaylistListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -3888,7 +3888,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a playlist.    
-    pub fn delete<>(&self, id: &str) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> PlaylistDeleteMethodBuilder<'a, C, NC, A> {
         PlaylistDeleteMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
@@ -3902,7 +3902,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.    
-    pub fn update<>(&self, request: &Playlist) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
+    pub fn update(&self, request: &Playlist) -> PlaylistUpdateMethodBuilder<'a, C, NC, A> {
         PlaylistUpdateMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -3961,7 +3961,7 @@ impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Uploads a custom video thumbnail to YouTube and sets it for a video.    
-    pub fn set<>(&self, video_id: &str) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
+    pub fn set(&self, video_id: &str) -> ThumbnailSetMethodBuilder<'a, C, NC, A> {
         ThumbnailSetMethodBuilder {
             hub: self.hub,
             _video_id: video_id.to_string(),
@@ -4019,7 +4019,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of videos that match the API request parameters.    
-    pub fn list<>(&self, part: &str) -> VideoListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> VideoListMethodBuilder<'a, C, NC, A> {
         VideoListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -4042,7 +4042,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Add a like or dislike rating to a video or remove a rating from a video.    
-    pub fn rate<>(&self, id: &str, rating: &str) -> VideoRateMethodBuilder<'a, C, NC, A> {
+    pub fn rate(&self, id: &str, rating: &str) -> VideoRateMethodBuilder<'a, C, NC, A> {
         VideoRateMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
@@ -4057,7 +4057,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves the ratings that the authorized user gave to a list of specified videos.    
-    pub fn get_rating<>(&self, id: &str) -> VideoGetRatingMethodBuilder<'a, C, NC, A> {
+    pub fn get_rating(&self, id: &str) -> VideoGetRatingMethodBuilder<'a, C, NC, A> {
         VideoGetRatingMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
@@ -4071,7 +4071,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a YouTube video.    
-    pub fn delete<>(&self, id: &str) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> VideoDeleteMethodBuilder<'a, C, NC, A> {
         VideoDeleteMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
@@ -4085,7 +4085,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a video's metadata.    
-    pub fn update<>(&self, request: &Video) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
+    pub fn update(&self, request: &Video) -> VideoUpdateMethodBuilder<'a, C, NC, A> {
         VideoUpdateMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -4100,7 +4100,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Uploads a video to YouTube and optionally sets the video's metadata.    
-    pub fn insert<>(&self, request: &Video) -> VideoInsertMethodBuilder<'a, C, NC, A> {
+    pub fn insert(&self, request: &Video) -> VideoInsertMethodBuilder<'a, C, NC, A> {
         VideoInsertMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -4163,7 +4163,7 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Adds a subscription for the authenticated user's channel.    
-    pub fn insert<>(&self, request: &Subscription) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
+    pub fn insert(&self, request: &Subscription) -> SubscriptionInsertMethodBuilder<'a, C, NC, A> {
         SubscriptionInsertMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -4177,7 +4177,7 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns subscription resources that match the API request criteria.    
-    pub fn list<>(&self, part: &str) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> SubscriptionListMethodBuilder<'a, C, NC, A> {
         SubscriptionListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -4200,7 +4200,7 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a subscription.    
-    pub fn delete<>(&self, id: &str) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> SubscriptionDeleteMethodBuilder<'a, C, NC, A> {
         SubscriptionDeleteMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
@@ -4257,7 +4257,7 @@ impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.    
-    pub fn list<>(&self, part: &str) -> SearchListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> SearchListMethodBuilder<'a, C, NC, A> {
         SearchListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -4343,7 +4343,7 @@ impl<'a, C, NC, A> I18nRegionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of supported regions.    
-    pub fn list<>(&self, part: &str) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> I18nRegionListMethodBuilder<'a, C, NC, A> {
         I18nRegionListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -4401,7 +4401,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.    
-    pub fn update<>(&self, request: &LiveStream) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
+    pub fn update(&self, request: &LiveStream) -> LiveStreamUpdateMethodBuilder<'a, C, NC, A> {
         LiveStreamUpdateMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -4417,7 +4417,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a video stream.    
-    pub fn delete<>(&self, id: &str) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> LiveStreamDeleteMethodBuilder<'a, C, NC, A> {
         LiveStreamDeleteMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
@@ -4432,7 +4432,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of video streams that match the API request parameters.    
-    pub fn list<>(&self, part: &str) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> LiveStreamListMethodBuilder<'a, C, NC, A> {
         LiveStreamListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -4451,7 +4451,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.    
-    pub fn insert<>(&self, request: &LiveStream) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
+    pub fn insert(&self, request: &LiveStream) -> LiveStreamInsertMethodBuilder<'a, C, NC, A> {
         LiveStreamInsertMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -4511,7 +4511,7 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a channel's metadata.    
-    pub fn update<>(&self, request: &Channel) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
+    pub fn update(&self, request: &Channel) -> ChannelUpdateMethodBuilder<'a, C, NC, A> {
         ChannelUpdateMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -4526,7 +4526,7 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a collection of zero or more channel resources that match the request criteria.    
-    pub fn list<>(&self, part: &str) -> ChannelListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> ChannelListMethodBuilder<'a, C, NC, A> {
         ChannelListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -4592,7 +4592,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a playlist item.    
-    pub fn delete<>(&self, id: &str) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {
         PlaylistItemDeleteMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
@@ -4605,7 +4605,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.    
-    pub fn list<>(&self, part: &str) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> PlaylistItemListMethodBuilder<'a, C, NC, A> {
         PlaylistItemListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -4624,7 +4624,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Adds a resource to a playlist.    
-    pub fn insert<>(&self, request: &PlaylistItem) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
+    pub fn insert(&self, request: &PlaylistItem) -> PlaylistItemInsertMethodBuilder<'a, C, NC, A> {
         PlaylistItemInsertMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -4639,7 +4639,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Modifies a playlist item. For example, you could update the item's position in the playlist.    
-    pub fn update<>(&self, request: &PlaylistItem) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
+    pub fn update(&self, request: &PlaylistItem) -> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {
         PlaylistItemUpdateMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -4697,7 +4697,7 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Uploads a watermark image to YouTube and sets it for a channel.    
-    pub fn set<>(&self, request: &InvideoBranding, channel_id: &str) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
+    pub fn set(&self, request: &InvideoBranding, channel_id: &str) -> WatermarkSetMethodBuilder<'a, C, NC, A> {
         WatermarkSetMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -4712,7 +4712,7 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a watermark.    
-    pub fn unset<>(&self, channel_id: &str) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
+    pub fn unset(&self, channel_id: &str) -> WatermarkUnsetMethodBuilder<'a, C, NC, A> {
         WatermarkUnsetMethodBuilder {
             hub: self.hub,
             _channel_id: channel_id.to_string(),
@@ -4770,7 +4770,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Controls the settings for a slate that can be displayed in the broadcast stream.    
-    pub fn control<>(&self, id: &str, part: &str) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
+    pub fn control(&self, id: &str, part: &str) -> LiveBroadcastControlMethodBuilder<'a, C, NC, A> {
         LiveBroadcastControlMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
@@ -4789,7 +4789,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.    
-    pub fn update<>(&self, request: &LiveBroadcast) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
+    pub fn update(&self, request: &LiveBroadcast) -> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {
         LiveBroadcastUpdateMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -4805,7 +4805,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a broadcast.    
-    pub fn insert<>(&self, request: &LiveBroadcast) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
+    pub fn insert(&self, request: &LiveBroadcast) -> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {
         LiveBroadcastInsertMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
@@ -4821,7 +4821,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.    
-    pub fn bind<>(&self, id: &str, part: &str) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
+    pub fn bind(&self, id: &str, part: &str) -> LiveBroadcastBindMethodBuilder<'a, C, NC, A> {
         LiveBroadcastBindMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
@@ -4838,7 +4838,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of YouTube broadcasts that match the API request parameters.    
-    pub fn list<>(&self, part: &str) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> LiveBroadcastListMethodBuilder<'a, C, NC, A> {
         LiveBroadcastListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -4858,7 +4858,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a broadcast.    
-    pub fn delete<>(&self, id: &str) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
+    pub fn delete(&self, id: &str) -> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {
         LiveBroadcastDeleteMethodBuilder {
             hub: self.hub,
             _id: id.to_string(),
@@ -4873,7 +4873,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.    
-    pub fn transition<>(&self, broadcast_status: &str, id: &str, part: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
+    pub fn transition(&self, broadcast_status: &str, id: &str, part: &str) -> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {
         LiveBroadcastTransitionMethodBuilder {
             hub: self.hub,
             _broadcast_status: broadcast_status.to_string(),
@@ -4934,7 +4934,7 @@ impl<'a, C, NC, A> VideoCategoryMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of categories that can be associated with YouTube videos.    
-    pub fn list<>(&self, part: &str) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> VideoCategoryListMethodBuilder<'a, C, NC, A> {
         VideoCategoryListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -4994,7 +4994,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.    
-    pub fn list<>(&self, part: &str) -> ActivityListMethodBuilder<'a, C, NC, A> {
+    pub fn list(&self, part: &str) -> ActivityListMethodBuilder<'a, C, NC, A> {
         ActivityListMethodBuilder {
             hub: self.hub,
             _part: part.to_string(),
@@ -5017,7 +5017,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
     /// Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
     /// 
     /// Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite.
-    pub fn insert<>(&self, request: &Activity) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
+    pub fn insert(&self, request: &Activity) -> ActivityInsertMethodBuilder<'a, C, NC, A> {
         ActivityInsertMethodBuilder {
             hub: self.hub,
             _request: request.clone(),
