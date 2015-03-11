@@ -339,9 +339,9 @@ def iter_nested_types(schemas):
                 ns = deepcopy(p)
                 ns.id = nested_type_name(prefix, pn)
                 ns[NESTED_TYPE_MARKER] = True
-                if 'items' in p:
-                    ns.update(p.items.iteritems())
+
                 yield ns
+                
                 for np in iter_nested_properties(prefix + canonical_type_name(pn), ns.properties):
                     yield np
             elif _is_map_prop(p):

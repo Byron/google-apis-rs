@@ -7,7 +7,6 @@
 ###################################################################################################################
 <%def name="new(s, c)">\
 <% 
-	assert s.type == "object" 
 	markers = schema_markers(s, c)
 %>\
 <%block filter="rust_doc_comment">\
@@ -15,6 +14,7 @@ ${doc(s, c)}\
 </%block>
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
 pub struct ${s.id}\
+% if s.type == 'object':
 % if 'properties' in s:
  {
 % for pn, p in s.properties.iteritems():
@@ -22,9 +22,12 @@ pub struct ${s.id}\
 	pub ${mangle_ident(pn)}: ${to_rust_type(s.id, pn, p)},
 % endfor
 }
-% else:
+% else: ## it's an empty struct, i.e. struct Foo;
 ;
-% endif
+% endif ## 'properties' in s
+% else:
+(${to_rust_type(s.id, s.id, s)});
+% endif ## type == 'object'
 
 % for marker_trait in markers:
 impl ${marker_trait} for ${s.id} {}
@@ -72,4 +75,9 @@ ${''.join("* [%s](struct.%s.html) (%s)\n" % (activity_split(a)[2], mb_type(*acti
 
 This type is not used in any activity, and only used as *part* of another schema.
 % endif
+% if s.type != 'object':
+
+## for some reason, it's not shown in rustdoc ... 
+The contained type is `${to_rust_type(s.id, s.id, s)}`.
+%endif
 </%def>
