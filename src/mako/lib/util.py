@@ -367,7 +367,7 @@ def schema_markers(s, c):
         used_by.extend(oid.used_by)
         used_by.extend(oid.parents)
     # end gather usages
-    
+
     for sid in ids:
         activities = c.sta_map.get(sid, dict())
         if len(activities) == 0:
@@ -616,11 +616,22 @@ def new_context(schemas, resources):
                 if rs.id not in l:
                     l.append(rs.id)
 
+        def append_unique(l, s):
+            if s not in l:
+                l.append(s)
+            return l
+
         all_schemas = deepcopy(schemas)
         def recurse_properties(prefix, rs, s, parent_ids):
             assure_list(s, USED_BY)
             assure_list(s, PARENT).extend(parent_ids)
             link_used(s, rs)
+
+            if is_nested_type_property(s) and 'id' not in s:
+                s.id = prefix
+                all_schemas[s.id] = s
+                rs = s
+            # end this is already a perfectly valid type
 
             properties = s.get('properties', {rs.id: s})
             for pn, p in properties.iteritems():
@@ -634,13 +645,12 @@ def new_context(schemas, resources):
                     if 'items' in p:
                         ns.update((k, deepcopy(v)) for k, v in p.items.iteritems())
 
-                    recurse_properties(prefix + canonical_type_name(pn), ns, ns, parent_ids + [rs.id])
+                    recurse_properties(nested_type_name(prefix, pn), ns, ns, append_unique(parent_ids, rs.id))
                 elif _is_map_prop(p):
-                    # TODO: does this code run ? Why is there a plain prefix
-                    recurse_properties(prefix + canonical_type_name(pn), rs, p.additionalProperties, parent_ids + [])
+                    recurse_properties(nested_type_name(prefix, pn), rs, p.additionalProperties, append_unique(parent_ids, rs.id))
                 elif 'items' in p:
                     # it's an array
-                    recurse_properties(prefix + canonical_type_name(pn), rs, p.items, parent_ids + [])
+                    recurse_properties(nested_type_name(prefix, pn), rs, p.items, append_unique(parent_ids, rs.id))
                 # end handle prop itself
             # end for each property
         # end utility

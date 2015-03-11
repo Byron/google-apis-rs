@@ -5035,7 +5035,7 @@ impl ResponseResult for PageInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
 pub struct ChannelContentDetailsRelatedPlaylists {
     /// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.    
     pub uploads: Option<String>,
@@ -5051,7 +5051,25 @@ pub struct ChannelContentDetailsRelatedPlaylists {
 
 impl NestedType for ChannelContentDetailsRelatedPlaylists {}
 impl Part for ChannelContentDetailsRelatedPlaylists {}
+impl RequestValue for ChannelContentDetailsRelatedPlaylists {}
+impl ResponseResult for ChannelContentDetailsRelatedPlaylists {}
+impl cmn::Resource for ChannelContentDetailsRelatedPlaylists {}
 
+impl ChannelContentDetailsRelatedPlaylists {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.uploads.is_some() { r = r + "uploads,"; }
+        if self.watch_history.is_some() { r = r + "watchHistory,"; }
+        if self.likes.is_some() { r = r + "likes,"; }
+        if self.favorites.is_some() { r = r + "favorites,"; }
+        if self.watch_later.is_some() { r = r + "watchLater,"; }
+        r.pop();
+        r
+    }
+}
 
 
 // ###################
