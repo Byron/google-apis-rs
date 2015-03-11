@@ -146,7 +146,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn scope<T>(mut self, scope: T) -> ${ThisType} 
+    pub fn add_scope<T>(mut self, scope: T) -> ${ThisType} 
                                                         where T: Str {
         self.${api.properties.scopes}.insert(scope.as_slice().to_string(), ());
         self
