@@ -4,9 +4,19 @@
 ## Build a schema which must be an object
 ###################################################################################################################
 ###################################################################################################################
-## <% def name="_new_object(s, properties, c)">\
-
-## </%def>
+<%def name="_new_object(s, properties, c)">\
+pub struct ${s.id}\
+% if properties:
+ {
+% for pn, p in properties.iteritems():
+	${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
+	pub ${mangle_ident(pn)}: ${to_rust_type(s.id, pn, p)},
+% endfor
+}
+% else: ## it's an empty struct, i.e. struct Foo;
+;
+% endif ## 'properties' in s
+</%def>
 
 ## Create new schema with everything.
 ## 's' contains the schema structure from json to build
@@ -20,32 +30,13 @@
 ${doc(s, c)}\
 </%block>
 #[derive(RustcEncodable, RustcDecodable, Default, Clone)]
-pub struct ${s.id}\
 % if s.type == 'object':
-% if 'properties' in s:
- {
-% for pn, p in s.properties.iteritems():
-	${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
-	pub ${mangle_ident(pn)}: ${to_rust_type(s.id, pn, p)},
-% endfor
-}
-% else: ## it's an empty struct, i.e. struct Foo;
-;
-% endif ## 'properties' in s
+${_new_object(s, s.get('properties'), c)}\
 % else: ## assume it's an array
 % if s.items.get('type') != 'object':
-(${to_rust_type(s.id, 'item', s)});
+pub struct ${s.id}(${to_rust_type(s.id, 'item', s)});
 % else:
-% if 'properties' in s.items:
- {
-% for pn, p in s.items.properties.iteritems():
-	${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
-	pub ${mangle_ident(pn)}: ${to_rust_type(s.id, pn, p)},
-% endfor
-}
-% else: ## it's an empty struct, i.e. struct Foo;
-;
-% endif ## 'properties' in s.items
+${_new_object(s, s.items.get('properties'), c)}\
 % endif ## array item != 'object'
 % endif ## type == 'object'
 
