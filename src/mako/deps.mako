@@ -82,10 +82,12 @@ ${doc_index}: ${' '.join(central_api_index(a[0]) for a in api_info)} $(MAKO_STAN
 
 docs: ${doc_index}
 docs-clean:
-	@rm -Rf ${doc_root}	
+	rm -Rf ${doc_root}	
 
+github-pages: | docs-clean docs 
+	ghp-import -n -p ${doc_root}
 
-.PHONY += $(.PHONY) help-api clean-apis cargo apis docs docs-clean ${space_join(0)} ${space_join(1)} ${space_join(2)} ${space_join(3)}
+.PHONY += $(.PHONY) github-pages help-api clean-apis cargo apis docs docs-clean ${space_join(0)} ${space_join(1)} ${space_join(2)} ${space_join(3)}
 
 help-api:
 	$(info apis       -    make all APIs)

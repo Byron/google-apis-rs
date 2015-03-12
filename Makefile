@@ -1,4 +1,4 @@
-.PHONY:  json-to-xml clean help api-deps regen-apis license update-json rebuild-docs
+.PHONY:  json-to-xml clean help api-deps regen-apis license update-json
 .SUFFIXES:
 
 include Makefile.helpers
@@ -28,7 +28,7 @@ help:
 	$(info )
 	$(info Targets)
 	$(info docs         -   cargo-doc on all APIs, assemble them together and generate index)
-	$(info rebuild-docs -   clear out docs folder and regenerate. Should be done if API count changes, and before gh-import)
+	$(info github-pages -   invoke ghp-import on all documentation)
 	$(info apis         -   make all APIs)
 	$(info cargo        -   run cargo on all APIs, use ARGS="args ..." to specify cargo arguments)
 	$(info regen-apis   -   clear out all generated apis, and regenerate them)
@@ -65,8 +65,6 @@ regen-apis: clean-apis apis license
 clean: clean-apis
 	-rm -Rf $(VENV_DIR)
 	-rm $(API_DEPS)
-
-rebuild-docs: docs-clean docs
 
 update-json:
 	etc/bin/update-json.sh $(GOOGLE_GO_APIS_REPO) etc/api
