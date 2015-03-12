@@ -22,6 +22,7 @@ DO NOT EDIT !
 <style type="text/css">
 .mod {
   color: #4d76ae;
+  font-size: 20px
 }
 </style>
 	<title>${title}</title>
