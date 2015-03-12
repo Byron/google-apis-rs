@@ -20,7 +20,7 @@ API_LIST = etc/api/api-list.yaml
 API_JSON_FILES = $(shell find etc -type f -name '*-api.json')
 MAKO_LIB_DIR = $(MAKO_SRC)/lib
 MAKO_LIB_FILES = $(shell find $(MAKO_LIB_DIR) -type f -name '*.*')
-MAKO = PYTHONPATH=$(MAKO_LIB_DIR) $(TPL)
+MAKO = PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.'
 MAKO_STANDARD_DEPENDENCIES = $(API_SHARED_INFO) $(MAKO_LIB_FILES) $(MAKO_RENDER)
 
 help:
@@ -46,7 +46,7 @@ $(PYTHON):
 $(MAKO_RENDER): $(PYTHON)
 
 $(API_DEPS): $(API_DEPS_TPL) $(MAKO_STANDARD_DEPENDENCIES) $(API_LIST)
-	$(MAKO) --template-dir '.' -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
+	$(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
 
 api-deps: $(API_DEPS)
 

@@ -36,7 +36,7 @@
 																								for i in api.templates]
 	api_json = directories.api_base + '/' + an + '/' + version + '/' + an + '-api.json'
 	api_json_overrides = os.path.dirname(api_json) + '/' + an + '-api_overrides.json'
-	api_json_inputs = api_json
+	api_json_inputs = api_json + ' $(API_SHARED_INFO)'
 	if os.path.isfile(api_json_overrides):
 		api_json_inputs += ' ' + api_json_overrides
 	api_info.append((api_name, api_clean, api_cargo, api_doc, gen_root))
