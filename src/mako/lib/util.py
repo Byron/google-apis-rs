@@ -679,10 +679,20 @@ def new_context(schemas, resources):
 
 # Expects v to be 'v\d+', throws otherwise
 def to_api_version(v):
-    assert len(v) >= 2
-    if v.startswith('v'):
-        v = v[1:]
-    return v.replace('.', 'p')
+    m = re.search("_?v(\d(\.\d)*)_?", v)
+    assert m, "Expected to find a version within '%s'" % v
+
+    tokens = m.group(1).split('.')
+    for t in tokens[1:]:
+        if t == '0':
+            tokens.remove(t)
+    version = '.'.join(tokens)
+
+    version = version.replace('.', 'd')
+    remainder = v.replace(m.group(0), '')
+    if remainder:
+        version = version + '_' + remainder
+    return version
 
 # build a full library name (non-canonical)
 def library_name(name, version):
@@ -796,3 +806,29 @@ def size_to_bytes(size):
     except KeyError:
         raise ValueError("Invalid unit: '%s'" % unit)
     # end handle errors gracefully
+
+
+if __name__ == '__main__':
+    def test_to_version():
+        for v, want in (('v1.3', '1d3'),
+                        ('v1', '1'),
+                        ('directory_v1', '1_directory'),
+                        ('directory_v1.3', '1d3_directory'),
+                        ('v1beta2', '1_beta2'),
+                        ('v1sandbox', '1_sandbox'),
+                        ('v2.0', '2'),
+                        ('v2.0beta3', '2_beta3'),):
+            res = to_api_version(v)
+            assert res == want, "%s == %s" % (res, want)
+        # end for each pair
+
+        for iv in ('some_branch_name', '1.3'):
+            try:
+                to_api_version(iv)
+            except AssertionError:
+                pass
+            else:
+                AssertionError("Call should have failed")
+            # end for each invalid version
+    # suite
+    test_to_version()
