@@ -683,10 +683,14 @@ def to_api_version(v):
     assert m, "Expected to find a version within '%s'" % v
 
     tokens = m.group(1).split('.')
-    for t in tokens[1:]:
+    up_to = len(tokens)
+    for t in reversed(tokens[1:]):
         if t == '0':
-            tokens.remove(t)
-    version = '.'.join(tokens)
+            up_to -= 1
+        else:
+            break
+
+    version = '.'.join(tokens[:up_to])
 
     version = version.replace('.', 'd')
     remainder = v.replace(m.group(0), '')
@@ -823,6 +827,9 @@ if __name__ == '__main__':
                         ('v1beta2', '1_beta2'),
                         ('v1sandbox', '1_sandbox'),
                         ('v2.0', '2'),
+                        ('v2.0.1', '2d0d1'),
+                        ('v0.0', '0'),
+                        ('v0.1.0', '0d1'),
                         ('v2.0beta3', '2_beta3'),):
             res = to_api_version(v)
             assert res == want, "%s == %s" % (res, want)
