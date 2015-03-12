@@ -56,7 +56,7 @@ impl${rb_params} ${ThisType} {
 
     # skip part if we have a request resource. Only resources can have parts
     # that we can easily deduce
-    params, request_value = build_all_params(schemas, c, m, IO_REQUEST, REQUEST_VALUE_PROPERTY_NAME)
+    params, request_value = build_all_params(c, m)
     required_props, optional_props, part_prop = organize_params(params, request_value)
 
     method_args = ''

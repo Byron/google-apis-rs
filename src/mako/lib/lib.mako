@@ -1,7 +1,10 @@
-<%! from util import (activity_split, put_and, md_italic, split_camelcase_s, canonical_type_name, 
+<%! from util import (activity_split, put_and, md_italic, split_camelcase_s, canonical_type_name, hub_type,
                       rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment, markdown_rust_block,
-                      unindent_first_by, mangle_ident, mb_type, singular, scope_url_to_variant)  %>\
+                      unindent_first_by, mangle_ident, mb_type, singular, scope_url_to_variant,
+                      PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, METHOD_BUILDER_MARKERT_TRAIT, 
+                      find_fattest_resource, build_all_params, pass_through, parts_from_params)  %>\
 <%namespace name="util" file="util.mako"/>\
+<%namespace name="mbuild" file="mbuild.mako"/>\
 
 ## If rust-doc is True, examples will be made to work for rust doc tests. Otherwise they are set 
 ## for github markdown.
@@ -10,28 +13,21 @@
 <%def name="docs(c, rust_doc=True)">\
 <%
     # fr == fattest resource, the fatter, the more important, right ?
-    fr = None
-    if schemas:
-        for candidate in sorted(schemas.values(), key=lambda s: (len(c.sta_map.get(s.id, [])), len(s.get('properties', []))), reverse=True):
-            if candidate.id in c.sta_map:
-                fr = candidate
-                break
-        # end for each candidate to check
+    fr = find_fattest_resource(c)
+    hub_url = 'struct.' + hub_type(c.schemas, util.canonical_name()) + '.html'
 %>\
 # Features
 
-Handle the following *Resources* with ease ... 
+Handle the following *Resources* with ease from the central [hub](${hub_url}) ... 
 
 % for r in sorted(c.rta_map.keys()):
 <%
     md_methods = list()
+    doc_base_url = ''
+    if not rust_doc:
+        doc_base_url = cargo.doc_base_url + '/' + util.library_name() + '/'
     for method in sorted(c.rta_map[r]):
-        if rust_doc:
-            md_methods.append("[*%s*](struct.%s.html)" % (' '.join(n.lower() for n in reversed(method.split('.'))), mb_type(r, method)))
-        else:
-            # TODO: link to final destination, possibly just have one for all ...
-            md_methods.append("*%s*" % method)
-
+            md_methods.append("[*%s*](%sstruct.%s.html)" % (' '.join(n.lower() for n in reversed(method.split('.'))), doc_base_url, mb_type(r, method)))
     md_resource = split_camelcase_s(r)
     sn = singular(canonical_type_name(r))
 
@@ -45,20 +41,24 @@ Handle the following *Resources* with ease ...
 Everything else about the *${util.canonical_name()}* API can be found at the
 [official documentation site](${documentationLink}).
 % endif
+% if rust_doc:
+
+Not what you are looking for ? Find all other google APIs in their Rust [documentation index](../index.html).
+% endif
 
 # Structure of this Library
 
 The API is structured into the following primary items:
 
-* **Hub**
+* **[Hub](${hub_url})**
     * a central object to maintain state and allow accessing all *Activities*
-* **Resources**
+* **[Resources](cmn/trait.${RESOURCE_MARKER_TRAIT}.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **Parts**
+    * **[Parts](cmn/trait.${PART_MARKER_TRAIT}.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **Activities**
+* **[Activities](cmn/trait.${METHOD_BUILDER_MARKERT_TRAIT}.html)**
     * operations to apply to *Resources*
 
 Generally speaking, you can invoke *Activities* like this:
@@ -87,7 +87,7 @@ The `${api.terms.action}()` method performs the actual communication with the se
 
 ${'##'} Instantiating the Hub
 
-${self.hub_usage_example(rust_doc)}\
+${self.hub_usage_example(c, rust_doc, fr=fr)}\
 
 **TODO** Example calls - there should soon be a generator able to do that with proper inputs
 
@@ -142,21 +142,43 @@ let mut hub = ${hub_type}::new(hyper::Client::new(), auth);\
 ## You will still have to set the filter for your comment type - either nothing, or rust_doc_comment !
 ###############################################################################################
 ###############################################################################################
-<%def name="hub_usage_example(rust_doc=True)">\
+<%def name="hub_usage_example(c, rust_doc=True, fr=None)">\
 <% 
     test_filter = rust_test_fn_invisible
     main_filter = rust_doc_test_norun
     if not rust_doc:
-        test_filter = lambda s: s
+        test_filter = pass_through
         main_filter = markdown_rust_block
+
+    if fr is None:
+        fr = find_fattest_resource(c)
+    if fr is not None:
+        fqan = None
+        last_param_count = None
+        for fqan in c.sta_map[fr.id]:
+            _, aresource, amethod = activity_split(fqan)
+            am = c.fqan_map[fqan]
+            build_all_params(c, am)
+            aparams, arequest_value = build_all_params(c, am)
+
+            if last_param_count is None or len(aparams) > last_param_count:
+                m, resource, method, params, request_value = am, aresource, amethod, aparams, arequest_value
+                last_param_count = len(aparams)
+        # end for each fn to test
+        part_prop, parts = parts_from_params(params)
+    # end fill in values
 %>\
+% if fr:
+${mbuild.usage(resource, method, m, params, request_value, parts, show_all=True, rust_doc=rust_doc)}\
+% else:
 <%block filter="main_filter">\
 ${util.test_prelude()}\
 
 <%block filter="test_filter">\
-${self.test_hub(canonical_type_name(util.canonical_name()))}\
+${self.test_hub(hub_type(c.schemas, util.canonical_name()))}
 </%block>
 </%block>
+% endif
 </%def>
 
 ###############################################################################################

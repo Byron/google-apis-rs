@@ -6,7 +6,7 @@
 <%  
     from util import (new_context, rust_comment, rust_doc_comment,
                       rust_module_doc_comment, rb_type, hub_type, mangle_ident, hub_type_params_s,
-                      hub_type_bounds, rb_type_params_s)
+                      hub_type_bounds, rb_type_params_s, find_fattest_resource)
 
     c = new_context(schemas, resources)
     hub_type = hub_type(c.schemas, util.canonical_name())
@@ -34,7 +34,7 @@ extern crate "yup-oauth2" as oauth2;
 extern crate mime;
 extern crate url;
 
-mod cmn;
+pub mod cmn;
 
 use std::collections::HashMap;
 use std::marker::PhantomData;
@@ -45,7 +45,7 @@ use std::collections::BTreeMap;
 use std::io;
 use std::fs;
 
-pub use cmn::{Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
+use cmn::{Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
 
 
 // ##############
@@ -80,7 +80,7 @@ ${lib.scope_enum()}
 /// Instantiate a new hub
 ///
 <%block filter="rust_doc_comment">\
-<%lib:hub_usage_example/>\
+${lib.hub_usage_example(c)}\
 </%block>
 pub struct ${hub_type}${ht_params} {
     client: RefCell<C>,
