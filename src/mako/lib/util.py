@@ -696,7 +696,13 @@ def to_api_version(v):
 
 # build a full library name (non-canonical)
 def library_name(name, version):
-    return name + to_api_version(version)
+    version = to_api_version(version)
+    assert not version.startswith('v')
+
+    if name[-1].isdigit():
+        name += '_'
+        version = 'v' + version
+    return name + version
 
 # return type name of a resource method builder, from a resource name
 def rb_type(r):
@@ -831,4 +837,11 @@ if __name__ == '__main__':
                 AssertionError("Call should have failed")
             # end for each invalid version
     # suite
+
+    def test_library_name():
+        for v, want in (('v1', 'oauth2_v1'),
+                        ('v1.4', 'oauth2_v1d4'),):
+            res = library_name('oauth2', v)
+            assert res == want, "%s ~== %s" % (res, want)
     test_to_version()
+    test_library_name()
