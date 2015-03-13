@@ -7,25 +7,25 @@ The `youtube3` library allows access to all features of *YouTube*.
 
 # Features
 
-Handle the following *Resources* with ease ... 
+Handle the following *Resources* with ease from the central [hub](struct.YouTube.html) ... 
 
-* activities (*insert* and *list*)
-* channel banners (*insert*)
-* channel sections (*delete*, *insert*, *list* and *update*)
-* channels (*list* and *update*)
-* guide categories (*list*)
-* i18n languages (*list*)
-* i18n regions (*list*)
-* live broadcasts (*bind*, *control*, *delete*, *insert*, *list*, *transition* and *update*)
-* live streams (*delete*, *insert*, *list* and *update*)
-* playlist items (*delete*, *insert*, *list* and *update*)
-* playlists (*delete*, *insert*, *list* and *update*)
-* search (*list*)
-* subscriptions (*delete*, *insert* and *list*)
-* thumbnails (*set*)
-* video categories (*list*)
-* videos (*delete*, *getRating*, *insert*, *list*, *rate* and *update*)
-* watermarks (*set* and *unset*)
+* activities ([*insert*](http://byron.github.io/google-apis-rs/youtube3/struct.ActivityInsertMethodBuilder.html) and [*list*](http://byron.github.io/google-apis-rs/youtube3/struct.ActivityListMethodBuilder.html))
+* channel banners ([*insert*](http://byron.github.io/google-apis-rs/youtube3/struct.ChannelBannerInsertMethodBuilder.html))
+* channel sections ([*delete*](http://byron.github.io/google-apis-rs/youtube3/struct.ChannelSectionDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/youtube3/struct.ChannelSectionInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/youtube3/struct.ChannelSectionListMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/youtube3/struct.ChannelSectionUpdateMethodBuilder.html))
+* channels ([*list*](http://byron.github.io/google-apis-rs/youtube3/struct.ChannelListMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/youtube3/struct.ChannelUpdateMethodBuilder.html))
+* guide categories ([*list*](http://byron.github.io/google-apis-rs/youtube3/struct.GuideCategoryListMethodBuilder.html))
+* i18n languages ([*list*](http://byron.github.io/google-apis-rs/youtube3/struct.I18nLanguageListMethodBuilder.html))
+* i18n regions ([*list*](http://byron.github.io/google-apis-rs/youtube3/struct.I18nRegionListMethodBuilder.html))
+* live broadcasts ([*bind*](http://byron.github.io/google-apis-rs/youtube3/struct.LiveBroadcastBindMethodBuilder.html), [*control*](http://byron.github.io/google-apis-rs/youtube3/struct.LiveBroadcastControlMethodBuilder.html), [*delete*](http://byron.github.io/google-apis-rs/youtube3/struct.LiveBroadcastDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/youtube3/struct.LiveBroadcastInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/youtube3/struct.LiveBroadcastListMethodBuilder.html), [*transition*](http://byron.github.io/google-apis-rs/youtube3/struct.LiveBroadcastTransitionMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/youtube3/struct.LiveBroadcastUpdateMethodBuilder.html))
+* live streams ([*delete*](http://byron.github.io/google-apis-rs/youtube3/struct.LiveStreamDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/youtube3/struct.LiveStreamInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/youtube3/struct.LiveStreamListMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/youtube3/struct.LiveStreamUpdateMethodBuilder.html))
+* playlist items ([*delete*](http://byron.github.io/google-apis-rs/youtube3/struct.PlaylistItemDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/youtube3/struct.PlaylistItemInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/youtube3/struct.PlaylistItemListMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/youtube3/struct.PlaylistItemUpdateMethodBuilder.html))
+* playlists ([*delete*](http://byron.github.io/google-apis-rs/youtube3/struct.PlaylistDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/youtube3/struct.PlaylistInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/youtube3/struct.PlaylistListMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/youtube3/struct.PlaylistUpdateMethodBuilder.html))
+* search ([*list*](http://byron.github.io/google-apis-rs/youtube3/struct.SearchListMethodBuilder.html))
+* subscriptions ([*delete*](http://byron.github.io/google-apis-rs/youtube3/struct.SubscriptionDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/youtube3/struct.SubscriptionInsertMethodBuilder.html) and [*list*](http://byron.github.io/google-apis-rs/youtube3/struct.SubscriptionListMethodBuilder.html))
+* thumbnails ([*set*](http://byron.github.io/google-apis-rs/youtube3/struct.ThumbnailSetMethodBuilder.html))
+* video categories ([*list*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoCategoryListMethodBuilder.html))
+* videos ([*delete*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoDeleteMethodBuilder.html), [*getrating*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoGetRatingMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoListMethodBuilder.html), [*rate*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoRateMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoUpdateMethodBuilder.html))
+* watermarks ([*set*](http://byron.github.io/google-apis-rs/youtube3/struct.WatermarkSetMethodBuilder.html) and [*unset*](http://byron.github.io/google-apis-rs/youtube3/struct.WatermarkUnsetMethodBuilder.html))
 
 Everything else about the *YouTube* API can be found at the
 [official documentation site](https://developers.google.com/youtube/v3).
@@ -34,15 +34,15 @@ Everything else about the *YouTube* API can be found at the
 
 The API is structured into the following primary items:
 
-* **Hub**
+* **[Hub](struct.YouTube.html)**
     * a central object to maintain state and allow accessing all *Activities*
-* **Resources**
+* **[Resources](cmn/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **Parts**
+    * **[Parts](cmn/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **Activities**
+* **[Activities](cmn/trait.MethodBuilder.html)**
     * operations to apply to *Resources*
 
 Generally speaking, you can invoke *Activities* like this:
@@ -68,16 +68,16 @@ supports various methods to configure the impending operation (not shown here). 
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
-# Usage (*TODO*)
+# Usage
 
-## Instantiating the Hub
+## A complete example
 
 ```Rust
 extern crate hyper;
 extern crate "yup-oauth2" as oauth2;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate youtube3;
-
+# use youtube3::cmn::Result;
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 # use youtube3::YouTube;
@@ -93,28 +93,63 @@ let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);
 let mut hub = YouTube::new(hyper::Client::new(), auth);
+// You can configure optional parameters by calling the respective setters at will, and
+// execute the final call using `doit()`.
+// Values shown here are possibly random and not representative !
+let result = hub.live_broadcasts().list("part")
+             .page_token("sit")
+             .on_behalf_of_content_owner_channel("Stet")
+             .on_behalf_of_content_owner("sed")
+             .mine(false)
+             .max_results(83)
+             .id("kasd")
+             .broadcast_status("accusam")
+             .doit();
+
+match result {
+    Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
+    Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
+    Result::Success(value) => println!("Result Value: {:?}", value),
+}
+
 ```
-
-**TODO** Example calls - there should soon be a generator able to do that with proper inputs
-
 ## Handling Errors
 
-# Some details
+All errors produced by the system are provided either as [Result](cmn/enum.Result.html) enumeration as return value of 
+the doit() methods, or handed as possibly intermediate results to either the 
+[Hub Delegate](cmn/trait.Delegate.html), or the [Authenticator Delegate](../yup-oauth2/trait.AuthenticatorDelegate.html).
+
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+makes the system potentially resilient to all kinds of errors.
 
 ## About Customization/Callbacks
 
-## About parts
+You may alter the way an `doit()` method is called by providing a [delegate](cmn/trait.Delegate.html) to the 
+[Method Builder](cmn/trait.MethodBuilder.html) before making the final `doit()` call. 
+Respective methods will be called to provide progress information, as well as determine whether the system should 
+retry on failure.
 
-* Optionals needed for Json, otherwise I'd happily drop them
-* explain that examples use all response parts, even though they are shown for request values
+The [delegate trait](cmn/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
-## About builder arguments
+## About Parts
 
-* pods are copy
-* strings are &str
-* request values are borrowed
-* additional parameters using `param()`
+All structures provided by this library are made to be [enocodable](cmn/trait.RequestValue.html) and 
+[decodable](cmn/trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
+Most optionals are are considered [Parts](cmn/trait.Part.html) which are identifyable by name, which will be sent to 
+the server to indicate either the set parts of the request or the desired parts in the response.
 
+## About Builder Arguments
+
+Using [method builders](cmn/trait.MethodBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+These will always take a single argument, for which the following statements are true.
+
+* [PODs][wiki-pod] are handed by copy
+* strings are passed as `&str`
+* [request values](cmn/trait.RequestValue.html) are borrowed
+
+Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
+
+[wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
 

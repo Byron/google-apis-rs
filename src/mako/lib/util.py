@@ -56,6 +56,8 @@ DELEGATE_TYPE = 'Delegate'
 REQUEST_PRIORITY = 100
 REQUEST_MARKER_TRAIT = 'RequestValue'
 RESPONSE_MARKER_TRAIT = 'ResponseResult'
+RESOURCE_MARKER_TRAIT = 'Resource'
+METHOD_BUILDER_MARKERT_TRAIT = 'MethodBuilder'
 PART_MARKER_TRAIT = 'Part'
 NESTED_MARKER_TRAIT = 'NestedType'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
@@ -125,6 +127,10 @@ def hide_rust_doc_test(s):
 # remove the first indentation (must be spaces !)
 def unindent(s):
     return re_first_4_spaces.sub('', s)
+
+# don't do anything with the passed in string
+def pass_through(s):
+    return s
 
 # tabs: 1 tabs is 4 spaces
 def unindent_first_by(tabs):
@@ -377,7 +383,7 @@ def schema_markers(s, c):
             # it should have at least one activity that matches it's type to qualify for the Resource trait
             for fqan, iot in activities.iteritems():
                 if activity_name_to_type_name(activity_split(fqan)[1]).lower() == sid.lower():
-                    res.add('cmn::Resource')
+                    res.add('cmn::%s' % RESOURCE_MARKER_TRAIT)
                 if IO_RESPONSE in iot:
                     res.add(RESPONSE_MARKER_TRAIT)
                 if IO_REQUEST in iot:
@@ -444,8 +450,8 @@ def method_params(m, required=None, location=None):
     # end for each parameter
     return sorted(res, key=lambda p: (p.priority, p.name), reverse=True)
 
-def _method_io(type_name, schemas, c, m, marker=None):
-    s = schemas.get(m.get(type_name, dict()).get(TREF))
+def _method_io(type_name, c, m, marker=None):
+    s = c.schemas.get(m.get(type_name, dict()).get(TREF))
     if s is None:
         return s
     if s and marker and marker not in schema_markers(s, c):
@@ -454,12 +460,12 @@ def _method_io(type_name, schemas, c, m, marker=None):
 
 # return the given method's request or response schema (dict), or None.
 # optionally return only schemas with the given marker trait
-def method_request(schemas, c, m, marker=None):
-    return _method_io('request', schemas, c, m, marker)
+def method_request(c, m, marker=None):
+    return _method_io('request', c, m, marker)
 
 # As method request, but returns response instead
-def method_response(schemas, c, m, marker=None):
-    return _method_io('response', schemas, c, m, marker)
+def method_response(c, m, marker=None):
+    return _method_io('response', c, m, marker)
 
 # return string like 'n.clone()', but depending on the type name of tn (e.g. &str -> n.to_string())
 def rust_copy_value_s(n, tn, p):
@@ -529,11 +535,11 @@ def method_media_params(m):
 
 # Build all parameters used in a given method !
 # schemas, context, method(dict), 'request'|'response', request_prop_name -> (params, request_value|None)
-def build_all_params(schemas, c, m, n, npn):
-    request_value = method_request(schemas, c, m)
+def build_all_params(c, m):
+    request_value = method_request(c, m)
     params = method_params(m)
     if request_value:
-        params.insert(0, schema_to_required_property(request_value, npn))
+        params.insert(0, schema_to_required_property(request_value, REQUEST_VALUE_PROPERTY_NAME))
     # add the delegate. It's a type parameter, which has to remain in sync with the type-parameters we actually build.
     dp = type(m)({ 'name': 'delegate',
            TREF: "&'a mut %s" % DELEGATE_TYPE, 
@@ -679,14 +685,34 @@ def new_context(schemas, resources):
 
 # Expects v to be 'v\d+', throws otherwise
 def to_api_version(v):
-    assert len(v) >= 2
-    if v.startswith('v'):
-        v = v[1:]
-    return v.replace('.', 'p')
+    m = re.search("_?v(\d(\.\d)*)_?", v)
+    assert m, "Expected to find a version within '%s'" % v
+
+    tokens = m.group(1).split('.')
+    up_to = len(tokens)
+    for t in reversed(tokens[1:]):
+        if t == '0':
+            up_to -= 1
+        else:
+            break
+
+    version = '.'.join(tokens[:up_to])
+
+    version = version.replace('.', 'd')
+    remainder = v.replace(m.group(0), '')
+    if remainder:
+        version = version + '_' + remainder
+    return version
 
 # build a full library name (non-canonical)
 def library_name(name, version):
-    return name + to_api_version(version)
+    version = to_api_version(version)
+    assert not version.startswith('v')
+
+    if name[-1].isdigit():
+        name += '_'
+        version = 'v' + version
+    return name + version
 
 # return type name of a resource method builder, from a resource name
 def rb_type(r):
@@ -728,6 +754,7 @@ def mb_additional_type_params(m):
 def mb_type(r, m):
     return "%s%sMethodBuilder" % (singular(canonical_type_name(r)), dot_sep_to_canonical_type_name(m))
 
+# canonicalName = util.canonical_name()
 def hub_type(schemas, canonicalName):
     name = canonical_type_name(canonicalName)
     if schemas and name in schemas:
@@ -751,6 +778,31 @@ def property(n):
 # n = 'foo.bar.Baz' -> 'FooBarBaz'
 def dot_sep_to_canonical_type_name(n):
     return ''.join(canonical_type_name(singular(t)) for t in n.split('.'))
+
+def find_fattest_resource(c):
+    fr = None
+    if c.schemas:
+        for candidate in sorted(c.schemas.values(), 
+                            key=lambda s: (len(c.sta_map.get(s.id, [])), len(s.get('properties', []))), reverse=True):
+            if candidate.id in c.sta_map:
+                fr = candidate
+                break
+        # end for each candidate to check
+    # end if there are schemas
+    return fr
+
+# Extract valid parts from the description of the parts prop contained within the given parameter list
+# can be an empty list.
+def parts_from_params(params):
+    part_prop = None
+    for p in params:
+        if p.name == 'part':
+            part_prop = p
+            break
+    # end for each param
+    if part_prop:
+        return part_prop, extract_parts(part_prop.get('description', ''))
+    return part_prop, list()
 
 # Convert a scope url to a nice enum variant identifier, ready for use in code
 # name = name of the api, without version
@@ -796,3 +848,39 @@ def size_to_bytes(size):
     except KeyError:
         raise ValueError("Invalid unit: '%s'" % unit)
     # end handle errors gracefully
+
+
+if __name__ == '__main__':
+    def test_to_version():
+        for v, want in (('v1.3', '1d3'),
+                        ('v1', '1'),
+                        ('directory_v1', '1_directory'),
+                        ('directory_v1.3', '1d3_directory'),
+                        ('v1beta2', '1_beta2'),
+                        ('v1sandbox', '1_sandbox'),
+                        ('v2.0', '2'),
+                        ('v2.0.1', '2d0d1'),
+                        ('v0.0', '0'),
+                        ('v0.1.0', '0d1'),
+                        ('v2.0beta3', '2_beta3'),):
+            res = to_api_version(v)
+            assert res == want, "%s == %s" % (res, want)
+        # end for each pair
+
+        for iv in ('some_branch_name', '1.3'):
+            try:
+                to_api_version(iv)
+            except AssertionError:
+                pass
+            else:
+                AssertionError("Call should have failed")
+            # end for each invalid version
+    # suite
+
+    def test_library_name():
+        for v, want in (('v1', 'oauth2_v1'),
+                        ('v1.4', 'oauth2_v1d4'),):
+            res = library_name('oauth2', v)
+            assert res == want, "%s ~== %s" % (res, want)
+    test_to_version()
+    test_library_name()

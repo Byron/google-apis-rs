@@ -6,7 +6,8 @@
                       schema_to_required_property, rust_copy_value_s, is_required_property,
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
-                      hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response)
+                      hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response,
+                      METHOD_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -37,13 +38,9 @@
     mb_tparams = mb_type_params_s(m)
     ThisType = mb_type(resource, method) + mb_tparams
 
-    params, request_value = build_all_params(schemas, c, m, IO_REQUEST, REQUEST_VALUE_PROPERTY_NAME)
-    part_prop = None
-    for p in params:
-        if p.name == 'part':
-            part_prop = p
-            break
-    # end for each param
+    params, request_value = build_all_params(c, m)
+
+    part_prop, parts = parts_from_params(params)
     part_desc = make_parts_desc(part_prop)
     parts = get_parts(part_prop)
 %>\
@@ -103,11 +100,11 @@ pub struct ${ThisType}
     % endif
 }
 
-impl${mb_tparams} cmn::MethodBuilder for ${ThisType} {}
+impl${mb_tparams} cmn::${METHOD_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
 
 impl${mb_tparams} ${ThisType} where ${', '.join(mb_type_bounds())} {
 
-${self._action_fn(resource, method, m, params, request_value, parts)}\
+${self._action_fn(c, resource, method, m, params, request_value, parts)}\
 
 ## SETTERS ###############
 % for p in params:
@@ -208,9 +205,11 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 
 
 ## creates usage docs the method builder
+## show_all: If True, we will show all comments and hide no prelude. It's good to build a complete,
+## documented example for a given method.
 ###############################################################################################
 ###############################################################################################
-<%def name="usage(resource, method, m, params, request_value, parts)">\
+<%def name="usage(resource, method, m, params, request_value, parts=None, show_all=False, rust_doc=True, handle_result=False)">\
 <%
     hub_type_name = hub_type(schemas, util.canonical_name())
     required_props, optional_props, part_prop = organize_params(params, request_value)
@@ -250,24 +249,31 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     action_args = media_params and media_params[-1].type.example_value or ''
 
     random_value_warning = "Values shown here are possibly random and not representative !"
+
+    hide_filter = show_all and pass_through or hide_rust_doc_test
+    test_block_filter = rust_doc and rust_doc_test_norun or markdown_rust_block
+    test_fn_filter = rust_doc and rust_test_fn_invisible or pass_through
 %>\
-<%block filter="rust_doc_test_norun">\
-${capture(util.test_prelude) | hide_rust_doc_test}\
+<%block filter="test_block_filter">\
+${capture(util.test_prelude) | hide_filter}\
 % if request_value:
 # use ${util.library_name()}::${request_value.id};
+% endif
+% if handle_result:
+# use ${util.library_name()}::cmn::Result;
 % endif
 % if media_params:
 # use std::fs;
 % endif
-<%block filter="rust_test_fn_invisible">\
-${capture(lib.test_hub, hub_type_name, comments=False) | hide_rust_doc_test}
+<%block filter="test_fn_filter">\
+${capture(lib.test_hub, hub_type_name, comments=show_all) | hide_filter}
 % if request_value:
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // ${random_value_warning}
 let mut ${rb_name}: ${request_value.id} = Default::default();
 % for spn, sp in request_value.get('properties', dict()).iteritems():
-% if spn not in parts:
+% if parts is not None and spn not in parts:
 <% continue %>
 % endif
 <%
@@ -303,7 +309,14 @@ let result = hub.${mangle_ident(resource)}().${mangle_ident(method)}(${required_
 % endfor
 
 ${'.' + action_name | indent_by(13)}(${action_args});
-// TODO: show how to handle the result !
+% if handle_result:
+
+match result {
+    Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
+    Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
+    Result::Success(value) => println!("Result Value: {:?}", value),
+}
+% endif
 </%block>
 </%block>\
 </%def>
@@ -312,7 +325,7 @@ ${'.' + action_name | indent_by(13)}(${action_args});
 ## create an entire 'api.terms.action' method
 ###############################################################################################
 ###############################################################################################
-<%def name="_action_fn(resource, method, m, params, request_value, parts)">\
+<%def name="_action_fn(c, resource, method, m, params, request_value, parts)">\
 <%
     import os.path
     join_url = lambda b, e: b.strip('/') + e
@@ -323,7 +336,7 @@ ${'.' + action_name | indent_by(13)}(${action_args});
     qualifier = 'pub '
     add_args = ''
     rtype = 'cmn::Result<()>'
-    response_schema = method_response(schemas, c, m)
+    response_schema = method_response(c, m)
 
     if response_schema:
         rtype = 'cmn::Result<%s>' % (response_schema.id)

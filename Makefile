@@ -1,4 +1,4 @@
-.PHONY:  json-to-xml clean help api-deps regen-apis license update-json cargo
+.PHONY:  json-to-xml clean help api-deps regen-apis license update-json
 .SUFFIXES:
 
 include Makefile.helpers
@@ -20,12 +20,16 @@ API_LIST = etc/api/api-list.yaml
 API_JSON_FILES = $(shell find etc -type f -name '*-api.json')
 MAKO_LIB_DIR = $(MAKO_SRC)/lib
 MAKO_LIB_FILES = $(shell find $(MAKO_LIB_DIR) -type f -name '*.*')
+MAKO = PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.'
+MAKO_STANDARD_DEPENDENCIES = $(API_SHARED_INFO) $(MAKO_LIB_FILES) $(MAKO_RENDER)
 
 help:
 	$(info using template engine: '$(TPL)')
 	$(info )
 	$(info Targets)
-	$(info apis         -    make all APIs)
+	$(info docs         -   cargo-doc on all APIs, assemble them together and generate index)
+	$(info github-pages -   invoke ghp-import on all documentation)
+	$(info apis         -   make all APIs)
 	$(info cargo        -   run cargo on all APIs, use ARGS="args ..." to specify cargo arguments)
 	$(info regen-apis   -   clear out all generated apis, and regenerate them)
 	$(info clean-apis   -   delete all generated APIs)
@@ -41,8 +45,8 @@ $(PYTHON):
 
 $(MAKO_RENDER): $(PYTHON)
 
-$(API_DEPS): $(API_SHARED_INFO) $(API_DEPS_TPL) $(MAKO_LIB_FILES) $(MAKO_RENDER) $(API_LIST)
-	PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) --template-dir '.' -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
+$(API_DEPS): $(API_DEPS_TPL) $(MAKO_STANDARD_DEPENDENCIES) $(API_LIST)
+	$(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
 
 api-deps: $(API_DEPS)
 
@@ -51,8 +55,8 @@ $(API_LIST): $(API_VERSION_GEN)
 
 include $(API_DEPS)
 
-LICENSE.md: $(MAKO_SRC)/LICENSE.md.mako $(API_SHARED_INFO)
-	PYTHONPATH=$(MAKO_LIB_DIR) $(TPL) -io $<=$@ --data-files $(API_SHARED_INFO)
+LICENSE.md: $(MAKO_SRC)/LICENSE.md.mako $(API_SHARED_INFO) $(MAKO_RENDER)
+	$(MAKO) -io $<=$@ --data-files $(API_SHARED_INFO)
 
 license: LICENSE.md
 
@@ -64,5 +68,3 @@ clean: clean-apis
 
 update-json:
 	etc/bin/update-json.sh $(GOOGLE_GO_APIS_REPO) etc/api
-
-

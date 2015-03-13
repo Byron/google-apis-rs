@@ -37,7 +37,8 @@ cargo:
   keywords: [google, protocol, web, api]
   # All APIs should live in the same repository
   repository_url: https://github.com/Byron/google-apis-rs
-
+urls:
+  authenticator_delegate: ../yup-oauth2/trait.AuthenticatorDelegate.html
 copyright:
   license_abbrev: "MIT"
   # should at some point be 2015-2016 ... 
