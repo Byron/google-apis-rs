@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/yIlgMiAhuGzU5ET3NtXZn6hNffI\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/q8dY4UIVNRcK1B68dybhQ1dBwWc\"",
  "discoveryVersion": "v1",
  "id": "plus:v1",
  "name": "plus",
  "version": "v1",
- "revision": "20150105",
+ "revision": "20150122",
  "title": "Google+ API",
  "description": "The Google+ API enables developers to build on top of the Google+ platform.",
  "ownerDomain": "google.com",

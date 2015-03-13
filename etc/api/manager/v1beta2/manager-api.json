@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"uUWyYHXmEn-ab7WLvo8qNz2S8ws/iGUA1MFJvjag5CPQwb2aT371UTs\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/iGUA1MFJvjag5CPQwb2aT371UTs\"",
  "discoveryVersion": "v1",
  "id": "manager:v1beta2",
  "name": "manager",

@@ -17,6 +17,8 @@ api:
     - v4.1
     analytics:
     - v3
+    androidenterprise:
+    - v1
     androidpublisher:
     - v2
     appsactivity:
@@ -73,6 +75,8 @@ api:
     - v1
     freebase:
     - v1sandbox
+    fusiontables:
+    - v2
     games:
     - v1
     gamesconfiguration:

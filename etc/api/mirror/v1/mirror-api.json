@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/VW0KvFHTdSFgeNX5qCIVR7JEmkg\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/bzmWA2xIEvQJRAH0k0bKxD0O1Uo\"",
  "discoveryVersion": "v1",
  "id": "mirror:v1",
  "name": "mirror",
  "version": "v1",
- "revision": "20141209",
+ "revision": "20150220",
  "title": "Google Mirror API",
  "description": "API for interacting with Glass users via the timeline.",
  "ownerDomain": "google.com",

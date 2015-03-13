@@ -36,3 +36,5 @@ What follows is a list of other material that is licensed differently.
 
 [oauth]: https://crates.io/crates/yup-oauth2
 [google-lic]: https://github.com/google/google-api-go-client/blob/master/LICENSE
+[api-discovery-video]: https://www.youtube.com/watch?v=lQbT1NrxpUo
+[api-discovery]: https://developers.google.com/discovery/v1/using

@@ -1,4 +1,4 @@
-.PHONY:  json-to-xml clean help api-deps regen-apis license update-json
+.PHONY:  json-to-xml clean help api-deps regen-apis license
 .SUFFIXES:
 
 include Makefile.helpers
@@ -36,7 +36,7 @@ help:
 	$(info help-api     -   show all api targets to build individually)
 	$(info help         -   print this help)
 	$(info license      -   regenerate the main license file)
-	$(info update-json  -   copy API definitions from source GOOGLE_GO_APIS_REPO=<path>)
+	$(info update-json  -   rediscover API schema json files and update api-list.yaml with latest versions)
 	$(info api-deps     -   generate a file to tell make what API file dependencies will be)
 
 $(PYTHON):
@@ -50,9 +50,6 @@ $(API_DEPS): $(API_DEPS_TPL) $(MAKO_STANDARD_DEPENDENCIES) $(API_LIST)
 
 api-deps: $(API_DEPS)
 
-$(API_LIST): $(API_VERSION_GEN)
-	$(API_VERSION_GEN) etc/api $@ $@
-
 include $(API_DEPS)
 
 LICENSE.md: $(MAKO_SRC)/LICENSE.md.mako $(API_SHARED_INFO) $(MAKO_RENDER)
@@ -65,6 +62,3 @@ regen-apis: clean-apis apis license
 clean: clean-apis
 	-rm -Rf $(VENV_DIR)
 	-rm $(API_DEPS)
-
-update-json:
-	etc/bin/update-json.sh $(GOOGLE_GO_APIS_REPO) etc/api

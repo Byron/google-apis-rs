@@ -4,13 +4,19 @@
 
 <%
 	import os
+	import urllib2
+	import json
 
-	api_info=[]
+	api_info = []
 	doc_root = directories.output + '/doc'
 	doc_index = doc_root + '/index.html'
 
 	to_doc_root = lambda gen_root, api_name: gen_root + '/target/doc/' + api_name
 	central_api_index = lambda api_name: doc_root + '/' + api_name + '/index.html'
+
+	discovery_url = 'https://www.googleapis.com/discovery/v1/'
+	apis = json.loads(urllib2.urlopen(discovery_url + "apis").read())
+	json_api_targets = []
 %>\
 % for an, versions in api.list.iteritems():
 % if an in api.get('blacklist', list()):
@@ -82,12 +88,14 @@ ${doc_index}: ${' '.join(central_api_index(a[0]) for a in api_info)} $(MAKO_STAN
 
 docs: ${doc_index}
 docs-clean:
-	rm -Rf ${doc_root}	
+	rm -Rf ${doc_root}  
 
 github-pages: | docs-clean docs 
-	ghp-import -n -p ${doc_root}
+	ghp-import -n ${doc_root}
+	## Have to force-push - I think it resets the branch, thus not keeping history (?)
+	git push origin +gh-pages
 
-.PHONY += $(.PHONY) github-pages help-api clean-apis cargo apis docs docs-clean ${space_join(0)} ${space_join(1)} ${space_join(2)} ${space_join(3)}
+.PHONY += update-json github-pages help-api clean-apis cargo apis docs docs-clean ${space_join(0)} ${space_join(1)} ${space_join(2)} ${space_join(3)}
 
 help-api:
 	$(info apis       -    make all APIs)
@@ -97,3 +105,19 @@ help-api:
 	$(info ${a[2]}    -    run cargo on the ${a[0]} api, using given ARGS="arg1 ...")
 	$(info ${a[3]}    -    run cargo doc on the ${a[0]}")
 % endfor
+
+% for info in apis['items']:
+<%
+	target_dir = directories.api_base + '/' + info['name'] + '/' + info['version']
+	target = target_dir + '/' + info['name'] + '-api.json'
+	## assure the target never actually exists to force him to wget whenver we ask !
+	fake_target = target + '-force'
+	json_api_targets.append(fake_target)
+%>\
+${fake_target}:
+	@mkdir -p ${target_dir}
+	@wget -nv ${discovery_url + info['discoveryLink']} -O ${target}
+% endfor
+
+update-json: ${' '.join(json_api_targets)}
+	$(API_VERSION_GEN) etc/api $(API_LIST) $(API_LIST)

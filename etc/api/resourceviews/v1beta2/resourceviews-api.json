@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"uUWyYHXmEn-ab7WLvo8qNz2S8ws/h07P0KWaqrcoR1sKo_9XnasKmIs\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/h07P0KWaqrcoR1sKo_9XnasKmIs\"",
  "discoveryVersion": "v1",
  "id": "resourceviews:v1beta2",
  "name": "resourceviews",

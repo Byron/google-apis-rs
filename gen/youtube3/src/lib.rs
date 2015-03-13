@@ -215,6 +215,9 @@ pub enum Scope {
     /// Manage your YouTube account
     Full,
 
+    /// Manage your YouTube account
+    ForceSsl,
+
     /// View and manage your assets and associated content on YouTube
     Partner,
 
@@ -228,6 +231,7 @@ impl Str for Scope {
             Scope::PartnerChannelAudit => "https://www.googleapis.com/auth/youtubepartner-channel-audit",
             Scope::Readonly => "https://www.googleapis.com/auth/youtube.readonly",
             Scope::Full => "https://www.googleapis.com/auth/youtube",
+            Scope::ForceSsl => "https://www.googleapis.com/auth/youtube.force-ssl",
             Scope::Partner => "https://www.googleapis.com/auth/youtubepartner",
             Scope::Upload => "https://www.googleapis.com/auth/youtube.upload",
         }
@@ -6659,6 +6663,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
@@ -7020,6 +7025,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
@@ -7233,6 +7239,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
@@ -7604,6 +7611,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
@@ -7805,6 +7813,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
@@ -8002,6 +8011,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
@@ -8222,6 +8232,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
@@ -8632,6 +8643,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
@@ -9027,6 +9039,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
@@ -9813,6 +9826,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
@@ -10058,6 +10072,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.upload*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
@@ -10376,6 +10391,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
@@ -10563,6 +10579,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
@@ -10996,6 +11013,7 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
@@ -11535,6 +11553,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
@@ -11703,7 +11722,10 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 ///
 /// # Scopes
 ///
-/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 ///
 /// # Example
 ///
@@ -12101,6 +12123,7 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 ///
 /// # Example
@@ -12341,7 +12364,10 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 ///
 /// # Scopes
 ///
-/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 ///
 /// # Example
 ///
@@ -12565,6 +12591,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
@@ -12770,6 +12797,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 /// * *https://www.googleapis.com/auth/youtubepartner-channel-audit*
@@ -13190,6 +13218,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
@@ -13431,6 +13460,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
@@ -13636,6 +13666,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
 /// # Example
@@ -14174,7 +14205,10 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 ///
 /// # Scopes
 ///
-/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 ///
 /// # Example
 ///
@@ -14417,7 +14451,10 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 ///
 /// # Scopes
 ///
-/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 ///
 /// # Example
 ///
@@ -14642,7 +14679,10 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 ///
 /// # Scopes
 ///
-/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 ///
 /// # Example
 ///
@@ -14865,7 +14905,10 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 ///
 /// # Scopes
 ///
-/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 ///
 /// # Example
 ///
@@ -15081,6 +15124,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 ///
 /// # Example
@@ -15504,7 +15548,10 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 ///
 /// # Scopes
 ///
-/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 ///
 /// # Example
 ///
@@ -15717,6 +15764,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 /// * *https://www.googleapis.com/auth/youtubepartner*
 ///
@@ -15913,6 +15961,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
 /// 
 /// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 /// * *https://www.googleapis.com/auth/youtube.readonly*
 ///
 /// # Example
@@ -16174,7 +16223,10 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 ///
 /// # Scopes
 ///
-/// You will need authorization for the *https://www.googleapis.com/auth/youtube* scope to make a valid call.
+/// You will need authorization for at least one of the following scopes to make a valid call, possibly depending on *parts*:
+/// 
+/// * *https://www.googleapis.com/auth/youtube*
+/// * *https://www.googleapis.com/auth/youtube.force-ssl*
 ///
 /// # Example
 ///

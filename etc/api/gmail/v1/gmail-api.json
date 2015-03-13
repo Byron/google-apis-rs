@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/Z8EmGyPlhp7KjhJWnQbLacCZ3G8\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/u55VLYY4MP7i0aXvJvy-8Bykhic\"",
  "discoveryVersion": "v1",
  "id": "gmail:v1",
  "name": "gmail",
  "version": "v1",
- "revision": "20150218",
+ "revision": "20150303",
  "title": "Gmail API",
  "description": "The Gmail REST API.",
  "ownerDomain": "google.com",
