@@ -21,24 +21,35 @@
     request_trait_url = 'cmn/trait.' + REQUEST_MARKER_TRAIT + '.html'
     response_trait_url = 'cmn/trait.' + RESPONSE_MARKER_TRAIT + '.html'
     part_trait_url = 'cmn/trait.' + PART_MARKER_TRAIT + '.html'
+
+    doc_base_url = cargo.doc_base_url + '/' + util.library_name() + '/'
+
+    def link(name, url):
+        lf = '[%s](%s)'
+        if rust_doc:
+            return lf % (name, url)
+        for scheme in ('http', 'https'):
+            if url.startswith(scheme + '://'):
+                return lf % (name, url)
+        return lf % (name, doc_base_url + url)
+
+
 %>\
 # Features
 
-Handle the following *Resources* with ease from the central [hub](${hub_url}) ... 
+Handle the following *Resources* with ease from the central ${link('hub', hub_url)} ... 
 
 % for r in sorted(c.rta_map.keys()):
 <%
     md_methods = list()
-    doc_base_url = ''
-    if not rust_doc:
-        doc_base_url = cargo.doc_base_url + '/' + util.library_name() + '/'
     for method in sorted(c.rta_map[r]):
-            md_methods.append("[*%s*](%sstruct.%s.html)" % (' '.join(n.lower() for n in reversed(method.split('.'))), doc_base_url, mb_type(r, method)))
+            md_methods.append(link('*%s*' % ' '.join(n.lower() for n in reversed(method.split('.'))),
+                                   'struct.%s.html' % mb_type(r, method)))
     md_resource = split_camelcase_s(r)
     sn = singular(canonical_type_name(r))
 
-    if rust_doc and sn in schemas:
-        md_resource = '[%s](struct.%s.html)' % (md_resource, singular(canonical_type_name(r)))
+    if sn in schemas:
+        md_resource = link(md_resource, 'struct.%s.html' % singular(canonical_type_name(r)))
 %>\
 * ${md_resource} (${put_and(md_methods)})
 % endfor
@@ -56,15 +67,15 @@ Not what you are looking for ? Find all other google APIs in their Rust [documen
 
 The API is structured into the following primary items:
 
-* **[Hub](${hub_url})**
+* **${link('Hub', hub_url)}**
     * a central object to maintain state and allow accessing all *Activities*
-* **[Resources](cmn/trait.${RESOURCE_MARKER_TRAIT}.html)**
+* **${link('Resources', 'cmn/trait.' + RESOURCE_MARKER_TRAIT + '.html')}**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](${part_trait_url})**
+    * **${link('Parts', part_trait_url)}**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](${method_builder_url})**
+* **${link('Activities', method_builder_url)}**
     * operations to apply to *Resources*
 
 Generally speaking, you can invoke *Activities* like this:
@@ -97,37 +108,37 @@ ${self.hub_usage_example(c, rust_doc, fr=fr)}\
 
 ${'##'} Handling Errors
 
-All errors produced by the system are provided either as [Result](cmn/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as ${link('Result', 'cmn/enum.Result.html')} enumeration as return value of 
 the ${api.terms.action}() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](${delegate_url}), or the [Authenticator Delegate](${urls.authenticator_delegate}).
+${link('Hub Delegate', delegate_url)}, or the ${link('Authenticator Delegate', urls.authenticator_delegate)}.
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ${'##'} About Customization/Callbacks
 
-You may alter the way an `${api.terms.action}()` method is called by providing a [delegate](${delegate_url}) to the 
-[Method Builder](${method_builder_url}) before making the final `${api.terms.action}()` call. 
+You may alter the way an `${api.terms.action}()` method is called by providing a ${link('delegate', delegate_url)} to the 
+${link('Method Builder', method_builder_url)} before making the final `${api.terms.action}()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](${delegate_url}) is default-implemented, allowing you to customize it with minimal effort.
+The ${link('delegate trait', delegate_url)} is default-implemented, allowing you to customize it with minimal effort.
 
 ${'##'} About Parts
 
-All structures provided by this library are made to be [enocodable](${request_trait_url}) and 
-[decodable](${response_trait_url}) via json. Optionals are used to indicate that partial requests are responses are valid.
-Most optionals are are considered [Parts](${part_trait_url}) which are identifyable by name, which will be sent to 
+All structures provided by this library are made to be ${link('enocodable', request_trait_url)} and 
+${link('decodable', response_trait_url)} via json. Optionals are used to indicate that partial requests are responses are valid.
+Most optionals are are considered ${link('Parts', part_trait_url)} which are identifyable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ${'##'} About Builder Arguments
 
-Using [method builders](${method_builder_url}), you are able to prepare an action call by repeatedly calling it's methods.
+Using ${link('method builders', method_builder_url)}, you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](${request_trait_url}) are borrowed
+* ${link('request values', request_trait_url)} are borrowed
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

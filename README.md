@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Byron/google-apis-rs.svg?branch=master)](https://travis-ci.org/Byron/google-apis-rs)
+
 # TODO
 
 * Adjust readme to reflect what this project actually is.
