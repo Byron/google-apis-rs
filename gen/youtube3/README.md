@@ -68,15 +68,16 @@ supports various methods to configure the impending operation (not shown here). 
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
-# Usage (*TODO*)
+# Usage
 
-## Instantiating the Hub
+## A complete example
 
 ```Rust
 extern crate hyper;
 extern crate "yup-oauth2" as oauth2;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate youtube3;
+# use youtube3::cmn::Result;
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 # use youtube3::YouTube;
@@ -104,29 +105,51 @@ let result = hub.live_broadcasts().list("part")
              .id("kasd")
              .broadcast_status("accusam")
              .doit();
-// TODO: show how to handle the result !
+
+match result {
+    Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
+    Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
+    Result::Success(value) => println!("Result Value: {:?}", value),
+}
 
 ```
-**TODO** Example calls - there should soon be a generator able to do that with proper inputs
-
 ## Handling Errors
 
-# Some details
+All errors produced by the system are provided either as [Result](cmn/enum.Result.html) enumeration as return value of 
+the doit() methods, or handed as possibly intermediate results to either the 
+[Hub Delegate](cmn/trait.Delegate.html), or the [Authenticator Delegate](../yup-oauth2/trait.AuthenticatorDelegate.html).
+
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+makes the system potentially resilient to all kinds of errors.
 
 ## About Customization/Callbacks
 
-## About parts
+You may alter the way an `doit()` method is called by providing a [delegate](cmn/trait.Delegate.html) to the 
+[Method Builder](cmn/trait.MethodBuilder.html) before making the final `doit()` call. 
+Respective methods will be called to provide progress information, as well as determine whether the system should 
+retry on failure.
 
-* Optionals needed for Json, otherwise I'd happily drop them
-* explain that examples use all response parts, even though they are shown for request values
+The [delegate trait](cmn/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
-## About builder arguments
+## About Parts
 
-* pods are copy
-* strings are &str
-* request values are borrowed
-* additional parameters using `param()`
+All structures provided by this library are made to be [enocodable](cmn/trait.RequestValue.html) and 
+[decodable](cmn/trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
+Most optionals are are considered [Parts](cmn/trait.Part.html) which are identifyable by name, which will be sent to 
+the server to indicate either the set parts of the request or the desired parts in the response.
 
+## About Builder Arguments
+
+Using [method builders](cmn/trait.MethodBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+These will always take a single argument, for which the following statements are true.
+
+* [PODs][wiki-pod] are handed by copy
+* strings are passed as `&str`
+* [request values](cmn/trait.RequestValue.html) are borrowed
+
+Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
+
+[wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
 

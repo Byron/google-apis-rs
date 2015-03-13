@@ -31,7 +31,7 @@ ${struct};
 <%def name="new(s, c)">\
 <% 
     markers = schema_markers(s, c)
-    traits = ['Default', 'Clone']
+    traits = ['Default', 'Clone', 'Debug']
     
     if REQUEST_MARKER_TRAIT in markers:
         traits.append('RustcEncodable')

@@ -2,7 +2,8 @@
                       rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment, markdown_rust_block,
                       unindent_first_by, mangle_ident, mb_type, singular, scope_url_to_variant,
                       PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, METHOD_BUILDER_MARKERT_TRAIT, 
-                      find_fattest_resource, build_all_params, pass_through, parts_from_params)  %>\
+                      find_fattest_resource, build_all_params, pass_through, parts_from_params,
+                      REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT)  %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="mbuild" file="mbuild.mako"/>\
 
@@ -15,6 +16,11 @@
     # fr == fattest resource, the fatter, the more important, right ?
     fr = find_fattest_resource(c)
     hub_url = 'struct.' + hub_type(c.schemas, util.canonical_name()) + '.html'
+    method_builder_url = 'cmn/trait.' + METHOD_BUILDER_MARKERT_TRAIT + '.html'
+    delegate_url = 'cmn/trait.Delegate.html'
+    request_trait_url = 'cmn/trait.' + REQUEST_MARKER_TRAIT + '.html'
+    response_trait_url = 'cmn/trait.' + RESPONSE_MARKER_TRAIT + '.html'
+    part_trait_url = 'cmn/trait.' + PART_MARKER_TRAIT + '.html'
 %>\
 # Features
 
@@ -55,10 +61,10 @@ The API is structured into the following primary items:
 * **[Resources](cmn/trait.${RESOURCE_MARKER_TRAIT}.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](cmn/trait.${PART_MARKER_TRAIT}.html)**
+    * **[Parts](${part_trait_url})**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](cmn/trait.${METHOD_BUILDER_MARKERT_TRAIT}.html)**
+* **[Activities](${method_builder_url})**
     * operations to apply to *Resources*
 
 Generally speaking, you can invoke *Activities* like this:
@@ -83,32 +89,49 @@ supports various methods to configure the impending operation (not shown here). 
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `${api.terms.action}()` method performs the actual communication with the server and returns the respective result.
 
-# Usage (*TODO*)
+# Usage
 
-${'##'} Instantiating the Hub
+${'##'} A complete example
 
 ${self.hub_usage_example(c, rust_doc, fr=fr)}\
 
-**TODO** Example calls - there should soon be a generator able to do that with proper inputs
-
 ${'##'} Handling Errors
 
-# Some details
+All errors produced by the system are provided either as [Result](cmn/enum.Result.html) enumeration as return value of 
+the ${api.terms.action}() methods, or handed as possibly intermediate results to either the 
+[Hub Delegate](${delegate_url}), or the [Authenticator Delegate](${urls.authenticator_delegate}).
+
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+makes the system potentially resilient to all kinds of errors.
 
 ${'##'} About Customization/Callbacks
 
-${'##'} About parts
+You may alter the way an `${api.terms.action}()` method is called by providing a [delegate](${delegate_url}) to the 
+[Method Builder](${method_builder_url}) before making the final `${api.terms.action}()` call. 
+Respective methods will be called to provide progress information, as well as determine whether the system should 
+retry on failure.
 
-* Optionals needed for Json, otherwise I'd happily drop them
-* explain that examples use all response parts, even though they are shown for request values
+The [delegate trait](${delegate_url}) is default-implemented, allowing you to customize it with minimal effort.
 
-${'##'} About builder arguments
+${'##'} About Parts
 
-* pods are copy
-* strings are &str
-* request values are borrowed
-* additional parameters using `param()`
+All structures provided by this library are made to be [enocodable](${request_trait_url}) and 
+[decodable](${response_trait_url}) via json. Optionals are used to indicate that partial requests are responses are valid.
+Most optionals are are considered [Parts](${part_trait_url}) which are identifyable by name, which will be sent to 
+the server to indicate either the set parts of the request or the desired parts in the response.
 
+${'##'} About Builder Arguments
+
+Using [method builders](${method_builder_url}), you are able to prepare an action call by repeatedly calling it's methods.
+These will always take a single argument, for which the following statements are true.
+
+* [PODs][wiki-pod] are handed by copy
+* strings are passed as `&str`
+* [request values](${request_trait_url}) are borrowed
+
+Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
+
+[wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
 </%def>
@@ -169,7 +192,7 @@ let mut hub = ${hub_type}::new(hyper::Client::new(), auth);\
     # end fill in values
 %>\
 % if fr:
-${mbuild.usage(resource, method, m, params, request_value, parts, show_all=True, rust_doc=rust_doc)}\
+${mbuild.usage(resource, method, m, params, request_value, parts, show_all=True, rust_doc=rust_doc, handle_result=True)}\
 % else:
 <%block filter="main_filter">\
 ${util.test_prelude()}\

@@ -67,15 +67,16 @@
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
 //! 
-//! # Usage (*TODO*)
+//! # Usage
 //! 
-//! ## Instantiating the Hub
+//! ## A complete example
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "rustc-serialize" as rustc_serialize;
 //! extern crate youtube3;
+//! # use youtube3::cmn::Result;
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -104,29 +105,51 @@
 //!              .id("nonumy")
 //!              .broadcast_status("dolores")
 //!              .doit();
-//! // TODO: show how to handle the result !
+//! 
+//! match result {
+//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
+//!     Result::Success(value) => println!("Result Value: {:?}", value),
+//! }
 //! # }
 //! ```
-//! **TODO** Example calls - there should soon be a generator able to do that with proper inputs
-//! 
 //! ## Handling Errors
 //! 
-//! # Some details
+//! All errors produced by the system are provided either as [Result](cmn/enum.Result.html) enumeration as return value of 
+//! the doit() methods, or handed as possibly intermediate results to either the 
+//! [Hub Delegate](cmn/trait.Delegate.html), or the [Authenticator Delegate](../yup-oauth2/trait.AuthenticatorDelegate.html).
+//! 
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## About Customization/Callbacks
 //! 
-//! ## About parts
+//! You may alter the way an `doit()` method is called by providing a [delegate](cmn/trait.Delegate.html) to the 
+//! [Method Builder](cmn/trait.MethodBuilder.html) before making the final `doit()` call. 
+//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//! retry on failure.
 //! 
-//! * Optionals needed for Json, otherwise I'd happily drop them
-//! * explain that examples use all response parts, even though they are shown for request values
+//! The [delegate trait](cmn/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 //! 
-//! ## About builder arguments
+//! ## About Parts
 //! 
-//! * pods are copy
-//! * strings are &str
-//! * request values are borrowed
-//! * additional parameters using `param()`
+//! All structures provided by this library are made to be [enocodable](cmn/trait.RequestValue.html) and 
+//! [decodable](cmn/trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
+//! Most optionals are are considered [Parts](cmn/trait.Part.html) which are identifyable by name, which will be sent to 
+//! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
+//! ## About Builder Arguments
+//! 
+//! Using [method builders](cmn/trait.MethodBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+//! These will always take a single argument, for which the following statements are true.
+//! 
+//! * [PODs][wiki-pod] are handed by copy
+//! * strings are passed as `&str`
+//! * [request values](cmn/trait.RequestValue.html) are borrowed
+//! 
+//! Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
+//! 
+//! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
@@ -234,6 +257,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "rustc-serialize" as rustc_serialize;
 /// extern crate youtube3;
+/// # use youtube3::cmn::Result;
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -262,7 +286,12 @@ impl Default for Scope {
 ///              .id("justo")
 ///              .broadcast_status("et")
 ///              .doit();
-/// // TODO: show how to handle the result !
+/// 
+/// match result {
+///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
+///     Result::Success(value) => println!("Result Value: {:?}", value),
+/// }
 /// # }
 /// ```
 pub struct YouTube<C, NC, A> {
@@ -351,7 +380,7 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
 /// * [list](struct.SubscriptionListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct SubscriptionListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -380,7 +409,7 @@ impl ResponseResult for SubscriptionListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelAuditDetails {
     /// Whether or not the channel has any copyright strikes.    
     pub copyright_strikes_good_standing: Option<bool>,
@@ -416,7 +445,7 @@ impl ChannelAuditDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoFileDetails {
     /// The uploaded video file's combined (video and audio) bitrate in bits per second.    
     pub bitrate_bps: Option<String>,
@@ -473,7 +502,7 @@ impl VideoFileDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PlaylistLocalization {
     /// The localized strings for playlist's description.    
     pub description: Option<String>,
@@ -503,7 +532,7 @@ impl PlaylistLocalization {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetailsComment {
     /// The resourceId object contains information that identifies the resource associated with the comment.    
     pub resource_id: Option<ResourceId>,
@@ -535,7 +564,7 @@ impl ActivityContentDetailsComment {
 /// * [list](struct.PlaylistItemListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct PlaylistItemListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -564,7 +593,7 @@ impl ResponseResult for PlaylistItemListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PropertyValue {
     /// A property.    
     pub property: Option<String>,
@@ -594,7 +623,7 @@ impl PropertyValue {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct InvideoTiming {
     /// Defines the time at which the promotion will appear. Depending on the value of type the value of the offsetMs field will represent a time offset from the start or from the end of the video, expressed in milliseconds.    
     pub offset_ms: Option<String>,
@@ -627,7 +656,7 @@ impl InvideoTiming {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PlaylistSnippet {
     /// The playlist's description.    
     pub description: Option<String>,
@@ -678,7 +707,7 @@ impl PlaylistSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetailsLike {
     /// The resourceId object contains information that identifies the rated resource.    
     pub resource_id: Option<ResourceId>,
@@ -713,7 +742,7 @@ impl ActivityContentDetailsLike {
 /// * [insert](struct.LiveStreamInsertMethodBuilder.html) (request|response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LiveStream {
     /// The status object contains information about live stream's status.    
     pub status: Option<LiveStreamStatus>,
@@ -763,7 +792,7 @@ impl LiveStream {
 /// * [set](struct.ThumbnailSetMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct ThumbnailSetResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -784,7 +813,7 @@ impl ResponseResult for ThumbnailSetResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetailsUpload {
     /// The ID that YouTube uses to uniquely identify the uploaded video.    
     pub video_id: Option<String>,
@@ -810,7 +839,7 @@ impl ActivityContentDetailsUpload {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelSettings {
     /// Specifies the channel description.    
     pub description: Option<String>,
@@ -873,7 +902,7 @@ impl ChannelSettings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct SearchResultSnippet {
     /// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.    
     pub live_broadcast_content: Option<String>,
@@ -899,7 +928,7 @@ impl ResponseResult for SearchResultSnippet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct IngestionInfo {
     /// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.    
     pub backup_ingestion_address: Option<String>,
@@ -936,7 +965,7 @@ impl IngestionInfo {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct CdnSettings {
     /// The format of the video stream that you are sending to Youtube.    
     pub format: Option<String>,
@@ -975,7 +1004,7 @@ impl CdnSettings {
 /// * [getRating](struct.VideoGetRatingMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct VideoGetRatingResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -996,7 +1025,7 @@ impl ResponseResult for VideoGetRatingResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct VideoCategorySnippet {
     /// no description provided    
     pub assignable: Option<bool>,
@@ -1014,7 +1043,7 @@ impl ResponseResult for VideoCategorySnippet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetailsChannelItem {
     /// The resourceId object contains information that identifies the resource that was added to the channel.    
     pub resource_id: Option<ResourceId>,
@@ -1040,7 +1069,7 @@ impl ActivityContentDetailsChannelItem {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LiveBroadcastSnippet {
     /// The date and time that the broadcast actually ended. This information is only available once the broadcast's state is complete. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     pub actual_end_time: Option<String>,
@@ -1091,7 +1120,7 @@ impl LiveBroadcastSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct SubscriptionSnippet {
     /// The subscription's details.    
     pub description: Option<String>,
@@ -1136,7 +1165,7 @@ impl SubscriptionSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelSectionContentDetails {
     /// The channel ids for type multiple_channels.    
     pub channels: Vec<String>,
@@ -1172,7 +1201,7 @@ impl ChannelSectionContentDetails {
 /// * [list](struct.I18nRegionListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct I18nRegionListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -1199,7 +1228,7 @@ impl ResponseResult for I18nRegionListResponse {}
 /// * [list](struct.LiveStreamListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct LiveStreamListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -1228,7 +1257,7 @@ impl ResponseResult for LiveStreamListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LiveStreamContentDetails {
     /// Indicates whether the stream is reusable, which means that it can be bound to multiple broadcasts. It is common for broadcasters to reuse the same stream for many different broadcasts if those broadcasts occur at different times.
     /// 
@@ -1263,7 +1292,7 @@ impl LiveStreamContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct I18nLanguageSnippet {
     /// The human-readable name of the language in the language itself.    
     pub name: Option<String>,
@@ -1286,7 +1315,7 @@ impl cmn::Resource for I18nLanguageSnippet {}
 /// * [set](struct.WatermarkSetMethodBuilder.html) (request)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable)]
+#[derive(Default, Clone, Debug, RustcEncodable)]
 pub struct InvideoBranding {
     /// no description provided    
     pub target_channel_id: Option<String>,
@@ -1322,7 +1351,7 @@ impl InvideoBranding {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PlaylistItemStatus {
     /// This resource's privacy status.    
     pub privacy_status: Option<String>,
@@ -1349,7 +1378,7 @@ impl PlaylistItemStatus {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelConversionPing {
     /// Defines the context of the ping.    
     pub context: Option<String>,
@@ -1379,7 +1408,7 @@ impl ChannelConversionPing {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoProjectDetails {
     /// A list of project tags associated with the video during the upload.    
     pub tags: Vec<String>,
@@ -1424,7 +1453,7 @@ impl VideoProjectDetails {
 /// * [delete](struct.PlaylistItemDeleteMethodBuilder.html) (none)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PlaylistItem {
     /// The status object contains information about the playlist item's privacy status.    
     pub status: Option<PlaylistItemStatus>,
@@ -1471,7 +1500,7 @@ impl PlaylistItem {
 /// * [list](struct.GuideCategoryListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct GuideCategoryListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -1500,7 +1529,7 @@ impl ResponseResult for GuideCategoryListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoLocalization {
     /// Localized version of the video's description.    
     pub description: Option<String>,
@@ -1530,7 +1559,7 @@ impl VideoLocalization {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelSectionSnippet {
     /// The style of the channel section.    
     pub style: Option<String>,
@@ -1575,7 +1604,7 @@ impl ChannelSectionSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelContentDetails {
     /// no description provided    
     pub related_playlists: Option<ChannelContentDetailsRelatedPlaylists>,
@@ -1605,7 +1634,7 @@ impl ChannelContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct TokenPagination;
 
 impl Part for TokenPagination {}
@@ -1622,7 +1651,7 @@ impl ResponseResult for TokenPagination {}
 /// * [list](struct.I18nRegionListMethodBuilder.html) (none)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct I18nRegion {
     /// The snippet object contains basic details about the i18n region, such as region code and human-readable name.    
     pub snippet: Option<I18nRegionSnippet>,
@@ -1642,7 +1671,7 @@ impl cmn::Resource for I18nRegion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ThumbnailDetails {
     /// The default image for this resource.    
     pub default: Option<Thumbnail>,
@@ -1681,7 +1710,7 @@ impl ThumbnailDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoMonetizationDetails {
     /// The value of access indicates whether the video can be monetized or not.    
     pub access: Option<AccessPolicy>,
@@ -1708,7 +1737,7 @@ impl VideoMonetizationDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetailsRecommendation {
     /// The resourceId object contains information that identifies the recommended resource.    
     pub resource_id: Option<ResourceId>,
@@ -1740,7 +1769,7 @@ impl ActivityContentDetailsRecommendation {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoRecordingDetails {
     /// The date and time when the video was recorded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.    
     pub recording_date: Option<String>,
@@ -1773,7 +1802,7 @@ impl VideoRecordingDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetailsSubscription {
     /// The resourceId object contains information that identifies the resource that the user subscribed to.    
     pub resource_id: Option<ResourceId>,
@@ -1799,7 +1828,7 @@ impl ActivityContentDetailsSubscription {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelConversionPings {
     /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.    
     pub pings: Vec<ChannelConversionPing>,
@@ -1826,7 +1855,7 @@ impl ChannelConversionPings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetails {
     /// The comment object contains information about a resource that received a comment. This property is only present if the snippet.type is comment.    
     pub comment: Option<ActivityContentDetailsComment>,
@@ -1888,7 +1917,7 @@ impl ActivityContentDetails {
 /// * [list](struct.PlaylistListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct PlaylistListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -1917,7 +1946,7 @@ impl ResponseResult for PlaylistListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PlaylistItemContentDetails {
     /// A user-generated note for this item.    
     pub note: Option<String>,
@@ -1953,7 +1982,7 @@ impl PlaylistItemContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelContentOwnerDetails {
     /// The ID of the content owner linked to the channel.    
     pub content_owner: Option<String>,
@@ -1983,7 +2012,7 @@ impl ChannelContentOwnerDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoProcessingDetails {
     /// This value indicates whether file details are available for the uploaded video. You can retrieve a video's file details by requesting the fileDetails part in your videos.list() request.    
     pub file_details_availability: Option<String>,
@@ -2031,7 +2060,7 @@ impl VideoProcessingDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LiveBroadcastStatus {
     /// The broadcast's recording status.    
     pub recording_status: Option<String>,
@@ -2067,7 +2096,7 @@ impl LiveBroadcastStatus {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct SubscriptionContentDetails {
     /// The number of new items in the subscription since its content was last read.    
     pub new_item_count: Option<u32>,
@@ -2111,7 +2140,7 @@ impl SubscriptionContentDetails {
 /// * [delete](struct.VideoDeleteMethodBuilder.html) (none)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Video {
     /// The status object contains information about the video's uploading, processing, and privacy statuses.    
     pub status: Option<VideoStatus>,
@@ -2193,7 +2222,7 @@ impl Video {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct GeoPoint {
     /// Latitude in degrees.    
     pub latitude: Option<f64>,
@@ -2226,7 +2255,7 @@ impl GeoPoint {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelBrandingSettings {
     /// Branding properties for branding images.    
     pub image: Option<ImageSettings>,
@@ -2262,7 +2291,7 @@ impl ChannelBrandingSettings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoPlayer {
     /// An <iframe> tag that embeds a player that will play the video.    
     pub embed_html: Option<String>,
@@ -2289,7 +2318,7 @@ impl VideoPlayer {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelSnippet {
     /// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     pub published_at: Option<String>,
@@ -2331,7 +2360,7 @@ impl ChannelSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct WatchSettings {
     /// The background color for the video watch page's branded area.    
     pub text_color: Option<String>,
@@ -2364,7 +2393,7 @@ impl WatchSettings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelSectionLocalization {
     /// The localized strings for channel section's title.    
     pub title: Option<String>,
@@ -2391,7 +2420,7 @@ impl ChannelSectionLocalization {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoContentDetailsRegionRestriction {
     /// A list of region codes that identify countries where the video is viewable. If this property is present and a country is not listed in its value, then the video is blocked from appearing in that country. If this property is present and contains an empty list, the video is blocked in all countries.    
     pub allowed: Vec<String>,
@@ -2421,7 +2450,7 @@ impl VideoContentDetailsRegionRestriction {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoContentDetails {
     /// The value of definition indicates whether the video is available in high definition or only in standard definition.    
     pub definition: Option<String>,
@@ -2469,7 +2498,7 @@ impl VideoContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PromotedItemId {
     /// If the promoted item represents a website, this field represents the url pointing to the website. This field will be present only if type has the value website.    
     pub website_url: Option<String>,
@@ -2513,7 +2542,7 @@ impl PromotedItemId {
 /// * [delete](struct.SubscriptionDeleteMethodBuilder.html) (none)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Subscription {
     /// The snippet object contains basic details about the subscription, including its title and the channel that the user subscribed to.    
     pub snippet: Option<SubscriptionSnippet>,
@@ -2554,7 +2583,7 @@ impl Subscription {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct I18nRegionSnippet {
     /// The region code as a 2-letter ISO country code.    
     pub gl: Option<String>,
@@ -2571,7 +2600,7 @@ impl cmn::Resource for I18nRegionSnippet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetailsPlaylistItem {
     /// The resourceId object contains information about the resource that was added to the playlist.    
     pub resource_id: Option<ResourceId>,
@@ -2603,7 +2632,7 @@ impl ActivityContentDetailsPlaylistItem {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct InvideoPosition {
     /// Describes in which corner of the video the visual widget will appear.    
     pub corner_position: Option<String>,
@@ -2651,7 +2680,7 @@ impl InvideoPosition {
 /// * [update](struct.PlaylistUpdateMethodBuilder.html) (request|response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Playlist {
     /// The status object contains status information for the playlist.    
     pub status: Option<PlaylistStatus>,
@@ -2698,7 +2727,7 @@ impl Playlist {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct GuideCategorySnippet {
     /// no description provided    
     pub channel_id: Option<String>,
@@ -2714,7 +2743,7 @@ impl ResponseResult for GuideCategorySnippet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoSnippet {
     /// The video's description.    
     pub description: Option<String>,
@@ -2771,7 +2800,7 @@ impl VideoSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct InvideoPromotion {
     /// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.    
     pub default_timing: Option<InvideoTiming>,
@@ -2807,7 +2836,7 @@ impl InvideoPromotion {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PromotedItem {
     /// The temporal position within the video where the promoted item will be displayed. If present, it overrides the default timing.    
     pub timing: Option<InvideoTiming>,
@@ -2843,7 +2872,7 @@ impl PromotedItem {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LiveBroadcastContentDetails {
     /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.    
     pub start_with_slate: Option<bool>,
@@ -2899,7 +2928,7 @@ impl LiveBroadcastContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoStatus {
     /// The video's license.    
     pub license: Option<String>,
@@ -2947,7 +2976,7 @@ impl VideoStatus {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct GuideCategory {
     /// The snippet object contains basic details about the category, such as its title.    
     pub snippet: Option<GuideCategorySnippet>,
@@ -2973,7 +3002,7 @@ impl ResponseResult for GuideCategory {}
 /// * [list](struct.ChannelSectionListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct ChannelSectionListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -2994,7 +3023,7 @@ impl ResponseResult for ChannelSectionListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct MonitorStreamInfo {
     /// If you have set the enableMonitorStream property to true, then this property determines the length of the live broadcast delay.    
     pub broadcast_stream_delay_ms: Option<u32>,
@@ -3037,7 +3066,7 @@ impl MonitorStreamInfo {
 /// * [list](struct.I18nLanguageListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct I18nLanguageListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -3058,7 +3087,7 @@ impl ResponseResult for I18nLanguageListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LocalizedProperty {
     /// no description provided    
     pub default: Option<String>,
@@ -3103,7 +3132,7 @@ impl LocalizedProperty {
 /// * [bind](struct.LiveBroadcastBindMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LiveBroadcast {
     /// The status object contains information about the event's status.    
     pub status: Option<LiveBroadcastStatus>,
@@ -3144,7 +3173,7 @@ impl LiveBroadcast {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoFileDetailsVideoStream {
     /// The video stream's bitrate, in bits per second.    
     pub bitrate_bps: Option<String>,
@@ -3198,7 +3227,7 @@ impl VideoFileDetailsVideoStream {
 /// * [set](struct.ThumbnailSetMethodBuilder.html) (none)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Thumbnail {
     /// The thumbnail image's URL.    
     pub url: Option<String>,
@@ -3238,7 +3267,7 @@ impl Thumbnail {
 /// * [update](struct.ChannelUpdateMethodBuilder.html) (request|response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Channel {
     /// The status object encapsulates information about the privacy status of the channel.    
     pub status: Option<ChannelStatus>,
@@ -3303,7 +3332,7 @@ impl Channel {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelStatistics {
     /// The number of comments for the channel.    
     pub comment_count: Option<i64>,
@@ -3342,7 +3371,7 @@ impl ChannelStatistics {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetailsSocial {
     /// The resourceId object encapsulates information that identifies the resource associated with a social network post.    
     pub resource_id: Option<ResourceId>,
@@ -3380,7 +3409,7 @@ impl ActivityContentDetailsSocial {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelLocalization {
     /// The localized strings for channel's description.    
     pub description: Option<String>,
@@ -3410,7 +3439,7 @@ impl ChannelLocalization {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ResourceId {
     /// The type of the API resource.    
     pub kind: Option<String>,
@@ -3446,7 +3475,7 @@ impl ResourceId {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct SearchResult {
     /// The snippet object contains basic details about a search result, such as its title or description. For example, if the search result is a video, then the title will be the video's title and the description will be the video's description.    
     pub snippet: Option<SearchResultSnippet>,
@@ -3472,7 +3501,7 @@ impl ResponseResult for SearchResult {}
 /// * [list](struct.VideoCategoryListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct VideoCategoryListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -3501,7 +3530,7 @@ impl ResponseResult for VideoCategoryListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivitySnippet {
     /// A map of thumbnail images associated with the resource that is primarily associated with the activity. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
     pub thumbnails: Option<ThumbnailDetails>,
@@ -3548,7 +3577,7 @@ impl ActivitySnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoProcessingDetailsProcessingProgress {
     /// An estimate of the amount of time, in millseconds, that YouTube needs to finish processing the video.    
     pub time_left_ms: Option<String>,
@@ -3590,7 +3619,7 @@ impl VideoProcessingDetailsProcessingProgress {
 /// * [list](struct.SearchListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct SearchListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -3619,7 +3648,7 @@ impl ResponseResult for SearchListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelTopicDetails {
     /// A list of Freebase topic IDs associated with the channel. You can retrieve information about each topic using the Freebase Topic API.    
     pub topic_ids: Vec<String>,
@@ -3652,7 +3681,7 @@ impl ChannelTopicDetails {
 /// * [list](struct.VideoListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct VideoListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -3681,7 +3710,7 @@ impl ResponseResult for VideoListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LanguageTag {
     /// no description provided    
     pub value: Option<String>,
@@ -3708,7 +3737,7 @@ impl LanguageTag {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PlaylistStatus {
     /// The playlist's privacy status.    
     pub privacy_status: Option<String>,
@@ -3735,7 +3764,7 @@ impl PlaylistStatus {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct VideoRating {
     /// no description provided    
     pub rating: Option<String>,
@@ -3751,7 +3780,7 @@ impl ResponseResult for VideoRating {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LiveStreamSnippet {
     /// The ID that YouTube uses to uniquely identify the channel that is transmitting the stream.    
     pub channel_id: Option<String>,
@@ -3787,7 +3816,7 @@ impl LiveStreamSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelStatus {
     /// Privacy status of the channel.    
     pub privacy_status: Option<String>,
@@ -3826,7 +3855,7 @@ impl ChannelStatus {
 /// * [list](struct.ChannelListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct ChannelListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -3864,7 +3893,7 @@ impl ResponseResult for ChannelListResponse {}
 /// * [insert](struct.ChannelSectionInsertMethodBuilder.html) (request|response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelSection {
     /// The snippet object contains basic details about the channel section, such as its type, style and title.    
     pub snippet: Option<ChannelSectionSnippet>,
@@ -3911,7 +3940,7 @@ impl ChannelSection {
 /// * [list](struct.LiveBroadcastListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct LiveBroadcastListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -3940,7 +3969,7 @@ impl ResponseResult for LiveBroadcastListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LiveStreamStatus {
     /// no description provided    
     pub stream_status: Option<String>,
@@ -3967,7 +3996,7 @@ impl LiveStreamStatus {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoLiveStreamingDetails {
     /// The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.    
     pub concurrent_viewers: Option<String>,
@@ -4006,7 +4035,7 @@ impl VideoLiveStreamingDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ContentRating {
     /// Internal YouTube rating.    
     pub yt_rating: Option<String>,
@@ -4228,7 +4257,7 @@ impl ContentRating {
 /// * [list](struct.ActivityListMethodBuilder.html) (response)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct ActivityListResponse {
     /// Serialized EventId of the request which produced this response.    
     pub event_id: Option<String>,
@@ -4263,7 +4292,7 @@ impl ResponseResult for ActivityListResponse {}
 /// * [insert](struct.ActivityInsertMethodBuilder.html) (request|response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Activity {
     /// The snippet object contains basic details about the activity, including the activity's type and group ID.    
     pub snippet: Option<ActivitySnippet>,
@@ -4300,7 +4329,7 @@ impl Activity {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct SubscriptionSubscriberSnippet {
     /// The channel ID of the subscriber.    
     pub channel_id: Option<String>,
@@ -4336,7 +4365,7 @@ impl SubscriptionSubscriberSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ImageSettings {
     /// Banner image. TV size medium resolution (1280x720).    
     pub banner_tv_medium_image_url: Option<String>,
@@ -4426,7 +4455,7 @@ impl ImageSettings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetailsPromotedItem {
     /// The type of call-to-action, a message to the user indicating action that can be taken.    
     pub cta_type: Option<String>,
@@ -4479,7 +4508,7 @@ impl ActivityContentDetailsPromotedItem {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoConversionPings {
     /// Pings that the app shall fire for a video (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.    
     pub pings: Vec<VideoConversionPing>,
@@ -4506,7 +4535,7 @@ impl VideoConversionPings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetailsBulletin {
     /// The resourceId object contains information that identifies the resource associated with a bulletin post.    
     pub resource_id: Option<ResourceId>,
@@ -4538,7 +4567,7 @@ impl ActivityContentDetailsBulletin {
 /// * [list](struct.I18nLanguageListMethodBuilder.html) (none)
 /// 
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct I18nLanguage {
     /// The snippet object contains basic details about the i18n language, such as language code and human-readable name.    
     pub snippet: Option<I18nLanguageSnippet>,
@@ -4558,7 +4587,7 @@ impl cmn::Resource for I18nLanguage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LocalizedString {
     /// no description provided    
     pub language: Option<String>,
@@ -4588,7 +4617,7 @@ impl LocalizedString {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoFileDetailsAudioStream {
     /// The audio stream's bitrate, in bits per second.    
     pub bitrate_bps: Option<String>,
@@ -4624,7 +4653,7 @@ impl VideoFileDetailsAudioStream {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoAgeGating {
     /// Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won't be present.    
     pub restricted: Option<bool>,
@@ -4657,7 +4686,7 @@ impl VideoAgeGating {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoTopicDetails {
     /// A list of Freebase topic IDs that are centrally associated with the video. These are topics that are centrally featured in the video, and it can be said that the video is mainly about each of these. You can retrieve information about each topic using the Freebase Topic API.    
     pub topic_ids: Vec<String>,
@@ -4687,7 +4716,7 @@ impl VideoTopicDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoStatistics {
     /// The number of comments for the video.    
     pub comment_count: Option<i64>,
@@ -4726,7 +4755,7 @@ impl VideoStatistics {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoConversionPing {
     /// Defines the context of the ping.    
     pub context: Option<String>,
@@ -4756,7 +4785,7 @@ impl VideoConversionPing {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct VideoCategory {
     /// The snippet object contains basic details about the video category, including its title.    
     pub snippet: Option<VideoCategorySnippet>,
@@ -4776,7 +4805,7 @@ impl ResponseResult for VideoCategory {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PlaylistItemSnippet {
     /// The ID that YouTube uses to uniquely identify the user that added the item to the playlist.    
     pub channel_id: Option<String>,
@@ -4827,7 +4856,7 @@ impl PlaylistItemSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ActivityContentDetailsFavorite {
     /// The resourceId object contains information that identifies the resource that was marked as a favorite.    
     pub resource_id: Option<ResourceId>,
@@ -4853,7 +4882,7 @@ impl ActivityContentDetailsFavorite {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PlaylistPlayer {
     /// An <iframe> tag that embeds a player that will play the playlist.    
     pub embed_html: Option<String>,
@@ -4880,7 +4909,7 @@ impl PlaylistPlayer {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoSuggestionsTagSuggestion {
     /// A set of video categories for which the tag is relevant. You can use this information to display appropriate tag suggestions based on the video category that the video uploader associates with the video. By default, tag suggestions are relevant for all categories if there are no restricts defined for the keyword.    
     pub category_restricts: Vec<String>,
@@ -4910,7 +4939,7 @@ impl VideoSuggestionsTagSuggestion {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct VideoSuggestions {
     /// A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video's current processing status, eventually, that status will almost certainly be failed.    
     pub processing_errors: Vec<String>,
@@ -4949,7 +4978,7 @@ impl VideoSuggestions {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct AccessPolicy {
     /// A list of region codes that identify countries where the default policy do not apply.    
     pub exception: Vec<String>,
@@ -4985,7 +5014,7 @@ impl AccessPolicy {
 /// * [insert](struct.ChannelBannerInsertMethodBuilder.html) (request|response)
 /// 
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelBannerResource {
     /// The URL of this banner image.    
     pub url: Option<String>,
@@ -5016,7 +5045,7 @@ impl ChannelBannerResource {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PlaylistContentDetails {
     /// The number of videos in the playlist.    
     pub item_count: Option<u32>,
@@ -5043,7 +5072,7 @@ impl PlaylistContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct PageInfo {
     /// The number of results included in the API response.    
     pub results_per_page: Option<i32>,
@@ -5059,7 +5088,7 @@ impl ResponseResult for PageInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelContentDetailsRelatedPlaylists {
     /// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.    
     pub uploads: Option<String>,
@@ -6658,7 +6687,6 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// let result = hub.i18n_languages().list("part")
 ///              .hl("diam")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
@@ -6826,7 +6854,6 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// let result = hub.channel_banners().insert(&req)
 ///              .on_behalf_of_content_owner("ipsum")
 ///              .upload(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
@@ -7024,7 +7051,6 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 ///              .id("aliquyam")
 ///              .channel_id("sea")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
@@ -7243,7 +7269,6 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 ///              .on_behalf_of_content_owner_channel("Lorem")
 ///              .on_behalf_of_content_owner("eos")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
@@ -7441,7 +7466,6 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
 /// let result = hub.channel_sections().delete("id")
 ///              .on_behalf_of_content_owner("sadipscing")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
@@ -7615,7 +7639,6 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 /// let result = hub.channel_sections().update(&req)
 ///              .on_behalf_of_content_owner("dolor")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
@@ -7812,7 +7835,6 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 ///              .id("amet")
 ///              .hl("no")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
@@ -8016,7 +8038,6 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 ///              .on_behalf_of_content_owner_channel("labore")
 ///              .on_behalf_of_content_owner("eirmod")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
@@ -8235,7 +8256,6 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 ///              .id("et")
 ///              .channel_id("duo")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistListMethodBuilder<'a, C, NC, A>
@@ -8474,7 +8494,6 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// let result = hub.playlists().delete("id")
 ///              .on_behalf_of_content_owner("eirmod")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
@@ -8648,7 +8667,6 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// let result = hub.playlists().update(&req)
 ///              .on_behalf_of_content_owner("sanctus")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
@@ -8833,7 +8851,6 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// let result = hub.thumbnails().set("videoId")
 ///              .on_behalf_of_content_owner("amet")
 ///              .upload(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
@@ -9047,7 +9064,6 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 ///              .hl("consetetur")
 ///              .chart("amet.")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoListMethodBuilder<'a, C, NC, A>
@@ -9331,7 +9347,6 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// let result = hub.videos().rate("id", "rating")
 ///              .on_behalf_of_content_owner("gubergren")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoRateMethodBuilder<'a, C, NC, A>
@@ -9497,7 +9512,6 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// let result = hub.videos().get_rating("id")
 ///              .on_behalf_of_content_owner("sit")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoGetRatingMethodBuilder<'a, C, NC, A>
@@ -9651,7 +9665,6 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// let result = hub.videos().delete("id")
 ///              .on_behalf_of_content_owner("diam")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
@@ -9845,7 +9858,6 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// let result = hub.videos().update(&req)
 ///              .on_behalf_of_content_owner("rebum.")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
@@ -10097,7 +10109,6 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 ///              .notify_subscribers(false)
 ///              .auto_levels(false)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoInsertMethodBuilder<'a, C, NC, A>
@@ -10399,7 +10410,6 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().insert(&req)
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
@@ -10590,7 +10600,6 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 ///              .for_channel_id("nonumy")
 ///              .channel_id("kasd")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
@@ -10863,7 +10872,6 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().delete("id")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
@@ -11044,7 +11052,6 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 ///              .channel_type("ut")
 ///              .channel_id("justo")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct SearchListMethodBuilder<'a, C, NC, A>
@@ -11556,7 +11563,6 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 /// let result = hub.i18n_regions().list("part")
 ///              .hl("amet")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
@@ -11735,7 +11741,6 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 ///              .on_behalf_of_content_owner_channel("clita")
 ///              .on_behalf_of_content_owner("diam")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
@@ -11940,7 +11945,6 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
 ///              .on_behalf_of_content_owner_channel("est")
 ///              .on_behalf_of_content_owner("clita")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
@@ -12129,7 +12133,6 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 ///              .max_results(82)
 ///              .id("sed")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
@@ -12376,7 +12379,6 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 ///              .on_behalf_of_content_owner_channel("ea")
 ///              .on_behalf_of_content_owner("ea")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
@@ -12598,7 +12600,6 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// let result = hub.channels().update(&req)
 ///              .on_behalf_of_content_owner("dolor")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
@@ -12806,7 +12807,6 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 ///              .for_username("At")
 ///              .category_id("consetetur")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ChannelListMethodBuilder<'a, C, NC, A>
@@ -13064,7 +13064,6 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().delete("id")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
@@ -13224,7 +13223,6 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 ///              .max_results(86)
 ///              .id("Lorem")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
@@ -13469,7 +13467,6 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// let result = hub.playlist_items().insert(&req)
 ///              .on_behalf_of_content_owner("Lorem")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
@@ -13674,7 +13671,6 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().update(&req)
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
@@ -13853,7 +13849,6 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 /// let result = hub.watermarks().set(&req, "channelId")
 ///              .on_behalf_of_content_owner("ut")
 ///              .upload(fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap());
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
@@ -14044,7 +14039,6 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// let result = hub.watermarks().unset("channelId")
 ///              .on_behalf_of_content_owner("amet.")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
@@ -14211,7 +14205,6 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 ///              .offset_time_ms("eirmod")
 ///              .display_slate(true)
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
@@ -14462,7 +14455,6 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 ///              .on_behalf_of_content_owner_channel("dolor")
 ///              .on_behalf_of_content_owner("et")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
@@ -14688,7 +14680,6 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 ///              .on_behalf_of_content_owner_channel("vero")
 ///              .on_behalf_of_content_owner("ut")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
@@ -14903,7 +14894,6 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 ///              .on_behalf_of_content_owner_channel("justo")
 ///              .on_behalf_of_content_owner("dolore")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
@@ -15124,7 +15114,6 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 ///              .id("sed")
 ///              .broadcast_status("no")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
@@ -15362,7 +15351,6 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
 ///              .on_behalf_of_content_owner_channel("rebum.")
 ///              .on_behalf_of_content_owner("labore")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
@@ -15544,7 +15532,6 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 ///              .on_behalf_of_content_owner_channel("sea")
 ///              .on_behalf_of_content_owner("elitr")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
@@ -15760,7 +15747,6 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 ///              .id("consetetur")
 ///              .hl("diam")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
@@ -15961,7 +15947,6 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 ///              .home(true)
 ///              .channel_id("Stet")
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ActivityListMethodBuilder<'a, C, NC, A>
@@ -16223,7 +16208,6 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().insert(&req)
 ///              .doit();
-/// // TODO: show how to handle the result !
 /// # }
 /// ```
 pub struct ActivityInsertMethodBuilder<'a, C, NC, A>

@@ -39,7 +39,7 @@
     ThisType = mb_type(resource, method) + mb_tparams
 
     params, request_value = build_all_params(c, m)
-    
+
     part_prop, parts = parts_from_params(params)
     part_desc = make_parts_desc(part_prop)
     parts = get_parts(part_prop)
@@ -209,7 +209,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 ## documented example for a given method.
 ###############################################################################################
 ###############################################################################################
-<%def name="usage(resource, method, m, params, request_value, parts=None, show_all=False, rust_doc=True)">\
+<%def name="usage(resource, method, m, params, request_value, parts=None, show_all=False, rust_doc=True, handle_result=False)">\
 <%
     hub_type_name = hub_type(schemas, util.canonical_name())
     required_props, optional_props, part_prop = organize_params(params, request_value)
@@ -259,6 +259,9 @@ ${capture(util.test_prelude) | hide_filter}\
 % if request_value:
 # use ${util.library_name()}::${request_value.id};
 % endif
+% if handle_result:
+# use ${util.library_name()}::cmn::Result;
+% endif
 % if media_params:
 # use std::fs;
 % endif
@@ -306,7 +309,14 @@ let result = hub.${mangle_ident(resource)}().${mangle_ident(method)}(${required_
 % endfor
 
 ${'.' + action_name | indent_by(13)}(${action_args});
-// TODO: show how to handle the result !
+% if handle_result:
+
+match result {
+    Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
+    Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
+    Result::Success(value) => println!("Result Value: {:?}", value),
+}
+% endif
 </%block>
 </%block>\
 </%def>
