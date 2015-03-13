@@ -17,7 +17,7 @@ To find a library of your interest, you might want to proceed looking at the [AP
 [![Build Status](https://travis-ci.org/Byron/google-apis-rs.svg?branch=master)](https://travis-ci.org/Byron/google-apis-rs)
 
 All work done on the project is based on [github issues][issues], not only to track progress and show what's going on, but
-to have a place to link screen-recordings to.
+to have a place to link screen-recordings to. [Milestones][milestones] are used to provide a bigger picture.
 
 Additionally, there is a development diary which serves as summary of major steps taken so far. As opposed to issue-screencasts,
 it is not made live, but is authored and narrated, which should make it more accessible.
@@ -40,3 +40,4 @@ The license of everything not explicitly under a different license are licensed 
 [issues]: https://github.com/Byron/google-apis-rs/issues
 [playlist]: https://www.youtube.com/playlist?list=PLMHbQxe1e9Mnnqj3Hs1hRDUXFEK-TgCnz
 [playlist-thumb]: http://img.youtube.com/vi/aGXuGEl90Mo/0.jpg
+[milestones]: https://github.com/Byron/google-apis-rs/milestones
