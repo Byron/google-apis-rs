@@ -62,7 +62,7 @@ ${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_STAN
 ${api_name}: ${api_common}
 
 ${api_cargo}: ${api_name}
-	cd ${gen_root} && cargo $(ARGS)
+	(cd ${gen_root} && cargo $(ARGS))
 
 ${api_doc_index}: ${api_name}
 	cd ${gen_root} && cargo doc
@@ -85,6 +85,7 @@ apis: ${space_join(0)}
 
 ${doc_index}: ${' '.join(central_api_index(a[0]) for a in api_info)} $(MAKO_STANDARD_DEPENDENCIES)
 	$(MAKO) --var DOC_ROOT=${doc_root} -io $(MAKO_SRC)/index.html.mako=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
+	@echo Documentation index created at '$@'
 
 docs: ${doc_index}
 docs-clean:
