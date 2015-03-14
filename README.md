@@ -26,6 +26,63 @@ Click the image below to see the playlist with all project related content:
 
 [![thumb][playlist-thumb]][playlist]
 
+# Build Instructions
+
+## Prerequisites
+
+To generate the APIs yourself, you will need to meet the following prerequisites:
+
+* **make**
+ * Make is used to automate and efficiently call all involved programs
+* **python**
+ * As [*mako*][mako] is a python program, you will need python installed on your system to run it. Some other programs we call depend on python being present as well.
+* **an internet connection and wget**
+ * Make will download all other prerequisites automatically into hidden directories within this repository, which requires it to make some downloads via wget.
+
+## Using Make
+
+The makefile is written to be self-documenting. Just calling `make` will yield a list of all valid targets.
+
+```bash
+➜  google-apis-rs git:(master) make
+using template engine: '.pyenv/bin/python etc/bin/mako-render'
+
+Targets
+docs         -   cargo-doc on all APIs, assemble them together and generate index
+github-pages -   invoke ghp-import on all documentation
+apis         -   make all APIs
+cargo        -   run cargo on all APIs, use ARGS="args ..." to specify cargo arguments
+regen-apis   -   clear out all generated apis, and regenerate them
+clean-apis   -   delete all generated APIs
+help-api     -   show all api targets to build individually
+help         -   print this help
+license      -   regenerate the main license file
+update-json  -   rediscover API schema json files and update api-list.yaml with latest versions
+api-deps     -   generate a file to tell make what API file dependencies will be
+make: Nothing to be done for `help'.
+```
+
+You can easily build the documentation index using `make docs` and individual API documentation using `make <api-name>-doc`. Run doctests on all apis with `make cargo ARGS=test` or on individual ones using `make <api-name>-cargo ARGS=test`. To see which API targets exist, run `make help-api`.
+
+## Make and parallel job execution
+
+In theory, you can run make with `-j4` to process 4 jobs in parallel. However, please note that `cargo` may be run for some jobs and do a full build, which could cause it to fail as it will be updating it's index. The latter isn't working for multiple cargo processes at once as the index is a shared resource.
+
+Nonetheless, once you have built all dependencies for all APIs once, you can safely run cargo in parallel, as it will not update it's index again.
+
+In other words: The first time, you run `make docs` and `make cargo ARGS=test`, you shouldn't run things in parallel. The second time, you are free to parallelize at will.
+
+## Adding new APIs and updating API schemas
+
+The list of available APIs to generate is based on a query of the [Google discovery API][api-discovery], and then baked into a make-compatible dependency file. That will represents a cache, and the only way to enforce a full update is to delete it and run make again.
+
+For example, to update all json files and possibly retrieve new API schemas, do as follows:
+
+```bash
+# -j8 will allow 8 parallel schema downloads
+rm -f .api.deps && make update-json -j8
+```
+
 # License
 
 The license of everything not explicitly under a different license are licensed as specified in `LICENSE.md`.
