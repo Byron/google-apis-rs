@@ -64,7 +64,7 @@ ${api_name}: ${api_common}
 ${api_cargo}: ${api_name}
 	cd ${gen_root} && cargo $(ARGS)
 
-${api_doc_index}: ${gen_root_stamp}
+${api_doc_index}: ${api_name}
 	cd ${gen_root} && cargo doc
 	@echo "Docs for ${api_name} at $@"
 
