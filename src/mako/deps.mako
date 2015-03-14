@@ -95,7 +95,7 @@ github-pages: | docs-clean docs
 	## Have to force-push - I think it resets the branch, thus not keeping history (?)
 	git push origin +gh-pages
 
-.PHONY += update-json github-pages help-api clean-apis cargo apis docs docs-clean ${space_join(0)} ${space_join(1)} ${space_join(2)} ${space_join(3)}
+.PHONY = $(.PHONY) update-json github-pages help-api clean-apis cargo apis docs docs-clean ${space_join(0)} ${space_join(1)} ${space_join(2)} ${space_join(3)}
 
 help-api:
 	$(info apis       -    make all APIs)

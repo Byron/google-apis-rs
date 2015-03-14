@@ -21,7 +21,7 @@
 //! * [subscriptions](struct.Subscription.html) ([*delete*](struct.SubscriptionDeleteMethodBuilder.html), [*insert*](struct.SubscriptionInsertMethodBuilder.html) and [*list*](struct.SubscriptionListMethodBuilder.html))
 //! * [thumbnails](struct.Thumbnail.html) ([*set*](struct.ThumbnailSetMethodBuilder.html))
 //! * [video categories](struct.VideoCategory.html) ([*list*](struct.VideoCategoryListMethodBuilder.html))
-//! * [videos](struct.Video.html) ([*delete*](struct.VideoDeleteMethodBuilder.html), [*getrating*](struct.VideoGetRatingMethodBuilder.html), [*insert*](struct.VideoInsertMethodBuilder.html), [*list*](struct.VideoListMethodBuilder.html), [*rate*](struct.VideoRateMethodBuilder.html) and [*update*](struct.VideoUpdateMethodBuilder.html))
+//! * [videos](struct.Video.html) ([*delete*](struct.VideoDeleteMethodBuilder.html), [*get rating*](struct.VideoGetRatingMethodBuilder.html), [*insert*](struct.VideoInsertMethodBuilder.html), [*list*](struct.VideoListMethodBuilder.html), [*rate*](struct.VideoRateMethodBuilder.html) and [*update*](struct.VideoUpdateMethodBuilder.html))
 //! * watermarks ([*set*](struct.WatermarkSetMethodBuilder.html) and [*unset*](struct.WatermarkUnsetMethodBuilder.html))
 //! 
 //! Everything else about the *YouTube* API can be found at the
@@ -76,11 +76,11 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "rustc-serialize" as rustc_serialize;
 //! extern crate youtube3;
-//! # use youtube3::cmn::Result;
+//! use youtube3::cmn::Result;
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-//! # use youtube3::YouTube;
+//! use youtube3::YouTube;
 //! 
 //! // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
 //! // among other things.
@@ -261,11 +261,11 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "rustc-serialize" as rustc_serialize;
 /// extern crate youtube3;
-/// # use youtube3::cmn::Result;
+/// use youtube3::cmn::Result;
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
 /// // among other things.
@@ -381,8 +381,7 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.SubscriptionListMethodBuilder.html) (response)
-/// 
+/// * [list subscriptions](struct.SubscriptionListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct SubscriptionListResponse {
@@ -565,8 +564,7 @@ impl ActivityContentDetailsComment {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.PlaylistItemListMethodBuilder.html) (response)
-/// 
+/// * [list playlist items](struct.PlaylistItemListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct PlaylistItemListResponse {
@@ -740,11 +738,10 @@ impl ActivityContentDetailsLike {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [delete](struct.LiveStreamDeleteMethodBuilder.html) (none)
-/// * [update](struct.LiveStreamUpdateMethodBuilder.html) (request|response)
-/// * [list](struct.LiveStreamListMethodBuilder.html) (none)
-/// * [insert](struct.LiveStreamInsertMethodBuilder.html) (request|response)
-/// 
+/// * [delete live streams](struct.LiveStreamDeleteMethodBuilder.html) (none)
+/// * [update live streams](struct.LiveStreamUpdateMethodBuilder.html) (request|response)
+/// * [list live streams](struct.LiveStreamListMethodBuilder.html) (none)
+/// * [insert live streams](struct.LiveStreamInsertMethodBuilder.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LiveStream {
@@ -793,8 +790,7 @@ impl LiveStream {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set](struct.ThumbnailSetMethodBuilder.html) (response)
-/// 
+/// * [set thumbnails](struct.ThumbnailSetMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct ThumbnailSetResponse {
@@ -1005,8 +1001,7 @@ impl CdnSettings {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [getRating](struct.VideoGetRatingMethodBuilder.html) (response)
-/// 
+/// * [get rating videos](struct.VideoGetRatingMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct VideoGetRatingResponse {
@@ -1202,8 +1197,7 @@ impl ChannelSectionContentDetails {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.I18nRegionListMethodBuilder.html) (response)
-/// 
+/// * [list i18n regions](struct.I18nRegionListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct I18nRegionListResponse {
@@ -1229,8 +1223,7 @@ impl ResponseResult for I18nRegionListResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.LiveStreamListMethodBuilder.html) (response)
-/// 
+/// * [list live streams](struct.LiveStreamListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct LiveStreamListResponse {
@@ -1316,8 +1309,7 @@ impl cmn::Resource for I18nLanguageSnippet {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set](struct.WatermarkSetMethodBuilder.html) (request)
-/// 
+/// * [set watermarks](struct.WatermarkSetMethodBuilder.html) (request)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable)]
 pub struct InvideoBranding {
@@ -1451,11 +1443,10 @@ impl VideoProjectDetails {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert](struct.PlaylistItemInsertMethodBuilder.html) (request|response)
-/// * [update](struct.PlaylistItemUpdateMethodBuilder.html) (request|response)
-/// * [list](struct.PlaylistItemListMethodBuilder.html) (none)
-/// * [delete](struct.PlaylistItemDeleteMethodBuilder.html) (none)
-/// 
+/// * [insert playlist items](struct.PlaylistItemInsertMethodBuilder.html) (request|response)
+/// * [update playlist items](struct.PlaylistItemUpdateMethodBuilder.html) (request|response)
+/// * [list playlist items](struct.PlaylistItemListMethodBuilder.html) (none)
+/// * [delete playlist items](struct.PlaylistItemDeleteMethodBuilder.html) (none)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct PlaylistItem {
@@ -1501,8 +1492,7 @@ impl PlaylistItem {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.GuideCategoryListMethodBuilder.html) (response)
-/// 
+/// * [list guide categories](struct.GuideCategoryListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct GuideCategoryListResponse {
@@ -1652,8 +1642,7 @@ impl ResponseResult for TokenPagination {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.I18nRegionListMethodBuilder.html) (none)
-/// 
+/// * [list i18n regions](struct.I18nRegionListMethodBuilder.html) (none)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct I18nRegion {
@@ -1918,8 +1907,7 @@ impl ActivityContentDetails {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.PlaylistListMethodBuilder.html) (response)
-/// 
+/// * [list playlists](struct.PlaylistListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct PlaylistListResponse {
@@ -2136,13 +2124,12 @@ impl SubscriptionContentDetails {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [rate](struct.VideoRateMethodBuilder.html) (none)
-/// * [getRating](struct.VideoGetRatingMethodBuilder.html) (none)
-/// * [list](struct.VideoListMethodBuilder.html) (none)
-/// * [insert](struct.VideoInsertMethodBuilder.html) (request|response)
-/// * [update](struct.VideoUpdateMethodBuilder.html) (request|response)
-/// * [delete](struct.VideoDeleteMethodBuilder.html) (none)
-/// 
+/// * [rate videos](struct.VideoRateMethodBuilder.html) (none)
+/// * [get rating videos](struct.VideoGetRatingMethodBuilder.html) (none)
+/// * [list videos](struct.VideoListMethodBuilder.html) (none)
+/// * [insert videos](struct.VideoInsertMethodBuilder.html) (request|response)
+/// * [update videos](struct.VideoUpdateMethodBuilder.html) (request|response)
+/// * [delete videos](struct.VideoDeleteMethodBuilder.html) (none)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Video {
@@ -2541,10 +2528,9 @@ impl PromotedItemId {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert](struct.SubscriptionInsertMethodBuilder.html) (request|response)
-/// * [list](struct.SubscriptionListMethodBuilder.html) (none)
-/// * [delete](struct.SubscriptionDeleteMethodBuilder.html) (none)
-/// 
+/// * [insert subscriptions](struct.SubscriptionInsertMethodBuilder.html) (request|response)
+/// * [list subscriptions](struct.SubscriptionListMethodBuilder.html) (none)
+/// * [delete subscriptions](struct.SubscriptionDeleteMethodBuilder.html) (none)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Subscription {
@@ -2678,11 +2664,10 @@ impl InvideoPosition {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert](struct.PlaylistInsertMethodBuilder.html) (request|response)
-/// * [delete](struct.PlaylistDeleteMethodBuilder.html) (none)
-/// * [list](struct.PlaylistListMethodBuilder.html) (none)
-/// * [update](struct.PlaylistUpdateMethodBuilder.html) (request|response)
-/// 
+/// * [insert playlists](struct.PlaylistInsertMethodBuilder.html) (request|response)
+/// * [delete playlists](struct.PlaylistDeleteMethodBuilder.html) (none)
+/// * [list playlists](struct.PlaylistListMethodBuilder.html) (none)
+/// * [update playlists](struct.PlaylistUpdateMethodBuilder.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Playlist {
@@ -3003,8 +2988,7 @@ impl ResponseResult for GuideCategory {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.ChannelSectionListMethodBuilder.html) (response)
-/// 
+/// * [list channel sections](struct.ChannelSectionListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct ChannelSectionListResponse {
@@ -3067,8 +3051,7 @@ impl MonitorStreamInfo {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.I18nLanguageListMethodBuilder.html) (response)
-/// 
+/// * [list i18n languages](struct.I18nLanguageListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct I18nLanguageListResponse {
@@ -3127,14 +3110,13 @@ impl LocalizedProperty {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [control](struct.LiveBroadcastControlMethodBuilder.html) (response)
-/// * [insert](struct.LiveBroadcastInsertMethodBuilder.html) (request|response)
-/// * [list](struct.LiveBroadcastListMethodBuilder.html) (none)
-/// * [transition](struct.LiveBroadcastTransitionMethodBuilder.html) (response)
-/// * [update](struct.LiveBroadcastUpdateMethodBuilder.html) (request|response)
-/// * [delete](struct.LiveBroadcastDeleteMethodBuilder.html) (none)
-/// * [bind](struct.LiveBroadcastBindMethodBuilder.html) (response)
-/// 
+/// * [control live broadcasts](struct.LiveBroadcastControlMethodBuilder.html) (response)
+/// * [insert live broadcasts](struct.LiveBroadcastInsertMethodBuilder.html) (request|response)
+/// * [list live broadcasts](struct.LiveBroadcastListMethodBuilder.html) (none)
+/// * [transition live broadcasts](struct.LiveBroadcastTransitionMethodBuilder.html) (response)
+/// * [update live broadcasts](struct.LiveBroadcastUpdateMethodBuilder.html) (request|response)
+/// * [delete live broadcasts](struct.LiveBroadcastDeleteMethodBuilder.html) (none)
+/// * [bind live broadcasts](struct.LiveBroadcastBindMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct LiveBroadcast {
@@ -3228,8 +3210,7 @@ impl VideoFileDetailsVideoStream {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set](struct.ThumbnailSetMethodBuilder.html) (none)
-/// 
+/// * [set thumbnails](struct.ThumbnailSetMethodBuilder.html) (none)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Thumbnail {
@@ -3267,9 +3248,8 @@ impl Thumbnail {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.ChannelListMethodBuilder.html) (none)
-/// * [update](struct.ChannelUpdateMethodBuilder.html) (request|response)
-/// 
+/// * [list channels](struct.ChannelListMethodBuilder.html) (none)
+/// * [update channels](struct.ChannelUpdateMethodBuilder.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Channel {
@@ -3502,8 +3482,7 @@ impl ResponseResult for SearchResult {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.VideoCategoryListMethodBuilder.html) (response)
-/// 
+/// * [list video categories](struct.VideoCategoryListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct VideoCategoryListResponse {
@@ -3620,8 +3599,7 @@ impl VideoProcessingDetailsProcessingProgress {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.SearchListMethodBuilder.html) (response)
-/// 
+/// * [list search](struct.SearchListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct SearchListResponse {
@@ -3682,8 +3660,7 @@ impl ChannelTopicDetails {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.VideoListMethodBuilder.html) (response)
-/// 
+/// * [list videos](struct.VideoListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct VideoListResponse {
@@ -3856,8 +3833,7 @@ impl ChannelStatus {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.ChannelListMethodBuilder.html) (response)
-/// 
+/// * [list channels](struct.ChannelListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct ChannelListResponse {
@@ -3891,11 +3867,10 @@ impl ResponseResult for ChannelListResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [delete](struct.ChannelSectionDeleteMethodBuilder.html) (none)
-/// * [update](struct.ChannelSectionUpdateMethodBuilder.html) (request|response)
-/// * [list](struct.ChannelSectionListMethodBuilder.html) (none)
-/// * [insert](struct.ChannelSectionInsertMethodBuilder.html) (request|response)
-/// 
+/// * [delete channel sections](struct.ChannelSectionDeleteMethodBuilder.html) (none)
+/// * [update channel sections](struct.ChannelSectionUpdateMethodBuilder.html) (request|response)
+/// * [list channel sections](struct.ChannelSectionListMethodBuilder.html) (none)
+/// * [insert channel sections](struct.ChannelSectionInsertMethodBuilder.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelSection {
@@ -3941,8 +3916,7 @@ impl ChannelSection {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.LiveBroadcastListMethodBuilder.html) (response)
-/// 
+/// * [list live broadcasts](struct.LiveBroadcastListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct LiveBroadcastListResponse {
@@ -4258,8 +4232,7 @@ impl ContentRating {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.ActivityListMethodBuilder.html) (response)
-/// 
+/// * [list activities](struct.ActivityListMethodBuilder.html) (response)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct ActivityListResponse {
@@ -4293,8 +4266,7 @@ impl ResponseResult for ActivityListResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert](struct.ActivityInsertMethodBuilder.html) (request|response)
-/// 
+/// * [insert activities](struct.ActivityInsertMethodBuilder.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Activity {
@@ -4568,8 +4540,7 @@ impl ActivityContentDetailsBulletin {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list](struct.I18nLanguageListMethodBuilder.html) (none)
-/// 
+/// * [list i18n languages](struct.I18nLanguageListMethodBuilder.html) (none)
 /// 
 #[derive(Default, Clone, Debug, RustcDecodable)]
 pub struct I18nLanguage {
@@ -5015,8 +4986,7 @@ impl AccessPolicy {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert](struct.ChannelBannerInsertMethodBuilder.html) (request|response)
-/// 
+/// * [insert channel banners](struct.ChannelBannerInsertMethodBuilder.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct ChannelBannerResource {
@@ -5149,7 +5119,7 @@ impl ChannelContentDetailsRelatedPlaylists {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -5207,7 +5177,7 @@ impl<'a, C, NC, A> I18nLanguageMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -5269,7 +5239,7 @@ impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -5375,7 +5345,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -5435,7 +5405,7 @@ impl<'a, C, NC, A> GuideCategoryMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -5544,7 +5514,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -5602,7 +5572,7 @@ impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -5746,7 +5716,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -5840,7 +5810,7 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -5926,7 +5896,7 @@ impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -5984,7 +5954,7 @@ impl<'a, C, NC, A> I18nRegionMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -6094,7 +6064,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -6175,7 +6145,7 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -6280,7 +6250,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -6353,7 +6323,7 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -6517,7 +6487,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -6577,7 +6547,7 @@ impl<'a, C, NC, A> VideoCategoryMethodsBuilder<'a, C, NC, A> {
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use youtube3::YouTube;
+/// use youtube3::YouTube;
 /// 
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -6836,8 +6806,8 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::ChannelBannerResource;
-/// # use std::fs;
+/// use youtube3::ChannelBannerResource;
+/// use std::fs;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7251,7 +7221,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::ChannelSection;
+/// use youtube3::ChannelSection;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7623,7 +7593,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::ChannelSection;
+/// use youtube3::ChannelSection;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8023,7 +7993,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::Playlist;
+/// use youtube3::Playlist;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8655,7 +8625,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::Playlist;
+/// use youtube3::Playlist;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8846,7 +8816,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use std::fs;
+/// use std::fs;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9838,7 +9808,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::Video;
+/// use youtube3::Video;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10085,8 +10055,8 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::Video;
-/// # use std::fs;
+/// use youtube3::Video;
+/// use std::fs;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10403,7 +10373,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::Subscription;
+/// use youtube3::Subscription;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11736,7 +11706,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::LiveStream;
+/// use youtube3::LiveStream;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12378,7 +12348,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::LiveStream;
+/// use youtube3::LiveStream;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12603,7 +12573,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::Channel;
+/// use youtube3::Channel;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -13472,7 +13442,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::PlaylistItem;
+/// use youtube3::PlaylistItem;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -13678,7 +13648,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::PlaylistItem;
+/// use youtube3::PlaylistItem;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -13857,8 +13827,8 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::InvideoBranding;
-/// # use std::fs;
+/// use youtube3::InvideoBranding;
+/// use std::fs;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -14465,7 +14435,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::LiveBroadcast;
+/// use youtube3::LiveBroadcast;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -14693,7 +14663,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::LiveBroadcast;
+/// use youtube3::LiveBroadcast;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -16237,7 +16207,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// # extern crate "yup-oauth2" as oauth2;
 /// # extern crate "rustc-serialize" as rustc_serialize;
 /// # extern crate youtube3;
-/// # use youtube3::Activity;
+/// use youtube3::Activity;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
