@@ -1,9 +1,7 @@
 .PHONY:  json-to-xml clean help api-deps regen-apis license
 .SUFFIXES:
 
-include Makefile.helpers
-
-VENV := virtualenv
+VENV = .virtualenv/virtualenv.py
 VENV_DIR := .pyenv
 PYTHON := $(VENV_DIR)/bin/python
 PIP := $(VENV_DIR)/bin/pip
@@ -44,8 +42,13 @@ help:
 	$(info update-json  -   rediscover API schema json files and update api-list.yaml with latest versions)
 	$(info api-deps     -   generate a file to tell make what API file dependencies will be)
 
-$(PYTHON):
-	virtualenv $(VENV_DIR)
+$(VENV):
+	wget -nv https://pypi.python.org/packages/source/v/virtualenv/virtualenv-12.0.7.tar.gz -O virtualenv-12.0.7.tar.gz
+	tar -xzf virtualenv-12.0.7.tar.gz && mv virtualenv-12.0.7 ./.virtualenv && rm -f virtualenv-12.0.7.tar.gz
+	chmod +x $@
+
+$(PYTHON): $(VENV)
+	$(VENV) $(VENV_DIR)
 	$(PIP) install mako pyyaml
 
 $(MAKO_RENDER): $(PYTHON)
