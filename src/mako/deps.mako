@@ -65,7 +65,7 @@ ${api_cargo}: ${api_name}
 	(cd ${gen_root} && cargo $(ARGS))
 
 ${api_doc_index}: ${api_name}
-	cd ${gen_root} && cargo doc
+	(cd ${gen_root} && cargo doc)
 	@echo "Docs for ${api_name} at $@"
 
 ${api_doc}: ${api_doc_index}
