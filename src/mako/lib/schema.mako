@@ -1,7 +1,7 @@
 <%!
     from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
-                      NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT) 
+                      NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s) 
 
     default_traits = ('RustcEncodable', 'Clone', 'Default')
 %>\
@@ -107,8 +107,16 @@ ${s.get('description', 'There is no detailed description.')}
 This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 The list links the activity name, along with information about where it is used (one of ${put_and(enclose_in('*', IO_TYPES))}).
 
-${''.join("* [%s](struct.%s.html) (%s)\n" % (activity_split(a)[2], mb_type(*activity_split(a)[1:3]), iot and '|'.join(iot) or 'none') 
-                                                    for a, iot in c.sta_map[s.id].iteritems())}
+% for a, iot in c.sta_map[s.id].iteritems():
+<%
+    _, name, method = activity_split(a)
+
+    struct_url = 'struct.' + mb_type(name, method) + '.html'
+    method_name = split_camelcase_s(method) + ' ' + split_camelcase_s(name)
+    value_type = '|'.join(iot) or 'none'
+%>\
+* [${method_name}](${struct_url}) (${value_type})
+% endfor
 % else:
 
 This type is not used in any activity, and only used as *part* of another schema.
