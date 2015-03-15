@@ -102,6 +102,15 @@ The `${api.terms.action}()` method performs the actual communication with the se
 
 # Usage
 
+${'##'} Setting up your Project
+
+To use this library, you would put the following lines into your `Cargo.toml` file:
+
+```toml
+[dependencies]
+${util.library_name()} = "${cargo.build_version}"
+```
+
 ${'##'} A complete example
 
 ${self.hub_usage_example(c, rust_doc, fr=fr)}\
@@ -157,15 +166,16 @@ use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, Mem
 use ${util.library_name()}::${hub_type};
 
 % if comments:
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-// among other things.
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// `client_secret`, among other things.
 % endif
 let secret: ApplicationSecret = Default::default();
 % if comments:
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-// unless you replace  `None` with the desired Flow
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-// You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
+// unless you replace  `None` with the desired Flow.
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
+// retrieve them from storage.
 % endif
 let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),

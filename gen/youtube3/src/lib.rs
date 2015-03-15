@@ -69,6 +69,15 @@
 //! 
 //! # Usage
 //! 
+//! ## Setting up your Project
+//! 
+//! To use this library, you would put the following lines into your `Cargo.toml` file:
+//! 
+//! ```toml
+//! [dependencies]
+//! youtube3 = "0.0.1"
+//! ```
+//! 
 //! ## A complete example
 //! 
 //! ```test_harness,no_run
@@ -82,13 +91,14 @@
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 //! use youtube3::YouTube;
 //! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-//! // among other things.
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//! // `client_secret`, among other things.
 //! let secret: ApplicationSecret = Default::default();
 //! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-//! // unless you replace  `None` with the desired Flow
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-//! // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
+//! // unless you replace  `None` with the desired Flow.
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
+//! // retrieve them from storage.
 //! let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
@@ -267,13 +277,14 @@ impl Default for Scope {
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use youtube3::YouTube;
 /// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and `client_secret`, 
-/// // among other things.
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// // `client_secret`, among other things.
 /// let secret: ApplicationSecret = Default::default();
 /// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
-/// // unless you replace  `None` with the desired Flow
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about what's going on
-/// // You probably want to bring in your own `TokenStorage` to persist tokens and retrieve them from storage.
+/// // unless you replace  `None` with the desired Flow.
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
+/// // retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::new(),
 ///                               <MemoryStorage as Default>::default(), None);
