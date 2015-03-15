@@ -24,7 +24,7 @@ api:
   # all output directories are relative to the one set for the respective API
     - source: README.md
     - source: LICENSE.md
-    - source: cargo.toml
+    - source: Cargo.toml
     - source: lib.rs
       output_dir: src
 cargo:
