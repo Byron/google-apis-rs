@@ -48,7 +48,7 @@ $(VENV):
 	chmod +x $@
 
 $(PYTHON): $(VENV)
-	$(VENV) $(VENV_DIR)
+	$(VENV) -p python2.7 $(VENV_DIR)
 	$(PIP) install mako pyyaml
 
 $(MAKO_RENDER): $(PYTHON)
