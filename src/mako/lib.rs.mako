@@ -44,6 +44,7 @@ use std::default::Default;
 use std::collections::BTreeMap;
 use std::io;
 use std::fs;
+use std::old_io::timer::sleep;
 
 use cmn::{Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
 

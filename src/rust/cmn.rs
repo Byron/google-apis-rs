@@ -53,10 +53,10 @@ struct JsonServerError {
 /// uploading media
 pub trait Delegate {
 
-    /// Called whenever there is an HttpError, usually if there are network problems.
+    /// Called whenever there is an [HttpError](http://hyperium.github.io/hyper/hyper/error/enum.HttpError.html), usually if there are network problems.
     /// 
     /// Return retry information.
-    fn connection_error(&mut self, hyper::HttpError) -> oauth2::Retry {
+    fn http_error(&mut self, &hyper::HttpError) -> oauth2::Retry {
         oauth2::Retry::Abort
     }
 }

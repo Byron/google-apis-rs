@@ -7,7 +7,8 @@
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
                       hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response,
-                      METHOD_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params)
+                      METHOD_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
+                      DELEGATE_PROPERTY_NAME)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -359,9 +360,18 @@ match result {
     field_params = [p for p in params if p.get('is_query_param', True)]
 
     paddfields = 'self.' + api.properties.params
+
+    delegate = 'self.' + property(DELEGATE_PROPERTY_NAME)
 %>
     /// Perform the operation you have build so far.
     ${action_fn} {
+        use hyper::method::Method;
+        use hyper::header::UserAgent;
+        % if request_value or response_schema:
+        use hyper::header::ContentType;
+        use mime::{Mime, TopLevel, SubLevel};
+        use rustc_serialize::json;
+        % endif
         let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params)} + ${paddfields}.len());
         % for p in field_params:
 <%
@@ -413,11 +423,40 @@ else {
                 unreachable!() 
         };
         % else:
-        let mut url = "${baseUrl}".to_string();
+        let mut url = "${baseUrl}${m.path}".to_string();
         % endif
 
         url.push('?');
         url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+
+        loop {
+            match self.hub.client.borrow_mut().borrow_mut().request(Method::Extension("${m.httpMethod}".to_string()), &url)
+               .header(UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))
+               % if request_value:
+               .header(ContentType(Mime(TopLevel::Application, SubLevel::Json, Default::default())))
+               .body(json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap())
+               % endif
+               .send() {
+                Err(err) => {
+                    if ${delegate}.is_some() {
+                        match ${delegate}.as_mut().unwrap().http_error(&err) {
+                            oauth2::Retry::Abort => return cmn::Result::HttpError(err),
+                            oauth2::Retry::After(d) => {
+                                sleep(d);
+                                continue;
+                            }
+                        }
+                    } else {
+                        return cmn::Result::HttpError(err);
+                    }
+                }
+                Ok(mut res) => {
+
+                    break;
+                }
+            }
+        }
+
 
         % if response_schema:
         let response: ${response_schema.id} = Default::default();

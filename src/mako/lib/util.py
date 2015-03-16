@@ -61,6 +61,7 @@ METHOD_BUILDER_MARKERT_TRAIT = 'MethodBuilder'
 PART_MARKER_TRAIT = 'Part'
 NESTED_MARKER_TRAIT = 'NestedType'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
+DELEGATE_PROPERTY_NAME = 'delegate'
 
 PROTOCOL_TYPE_INFO = {
     'simple' : {
@@ -541,7 +542,7 @@ def build_all_params(c, m):
     if request_value:
         params.insert(0, schema_to_required_property(request_value, REQUEST_VALUE_PROPERTY_NAME))
     # add the delegate. It's a type parameter, which has to remain in sync with the type-parameters we actually build.
-    dp = type(m)({ 'name': 'delegate',
+    dp = type(m)({ 'name': DELEGATE_PROPERTY_NAME,
            TREF: "&'a mut %s" % DELEGATE_TYPE, 
           'input_type': "&'a mut %s" % DELEGATE_TYPE,
           'clone_value': '{}',
