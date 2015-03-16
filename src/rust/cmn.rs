@@ -59,6 +59,13 @@ pub trait Delegate {
     fn http_error(&mut self, &hyper::HttpError) -> oauth2::Retry {
         oauth2::Retry::Abort
     }
+
+    /// Called whenever there is the need for your applications API key after 
+    /// the official authenticator implementation didn't provide one, for some reason.
+    /// If this method returns None as well, the underlying operation will fail
+    fn api_key(&mut self) -> Option<String> {
+        None
+    }
 }
 
 #[derive(Default)]
@@ -71,6 +78,13 @@ impl Delegate for DefaultDelegate {}
 pub enum Result<T = ()> {
     /// The http connection failed
     HttpError(hyper::HttpError),
+
+    /// We needed an API key for authentication, but didn't obtain one.
+    /// Neither through the authenticator, nor through the Delegate.
+    MissingAPIKey,
+
+    /// We required a Token, but didn't get one from the Authenticator
+    MissingToken,
 
     /// An additional, free form field clashed with one of the built-in optional ones
     FieldClash(&'static str),

@@ -38,8 +38,10 @@ pub mod cmn;
 
 use std::collections::HashMap;
 use std::cell::RefCell;
+use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::marker::PhantomData;
 use std::io;
 use std::fs;
 use std::old_io::timer::sleep;
@@ -82,8 +84,10 @@ ${lib.scope_enum()}
 ${lib.hub_usage_example(c)}\
 </%block>
 pub struct ${hub_type}${ht_params} {
-    client: RefCell<hyper::Client<NC>>,
+    client: RefCell<C>,
     auth: RefCell<A>,
+
+    _m: PhantomData<NC>
 }
 
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> Hub for ${hub_type}${ht_params} {}
@@ -91,10 +95,11 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> Hub for ${hub_type}${ht_params} {}
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
     where  ${', '.join(hub_type_bounds())} {
 
-    pub fn new(client: hyper::Client<NC>, authenticator: A) -> ${hub_type}${ht_params} {
+    pub fn new(client: C, authenticator: A) -> ${hub_type}${ht_params} {
         ${hub_type} {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
+            _m: PhantomData
         }
     }
 

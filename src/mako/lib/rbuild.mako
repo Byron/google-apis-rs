@@ -4,7 +4,8 @@
                       to_fqan, indent_all_but_first_by, 
                       activity_input_type, TREF, IO_REQUEST, schema_to_required_property, 
                       rust_copy_value_s, is_required_property, organize_params, REQUEST_VALUE_PROPERTY_NAME,
-                      build_all_params, rb_type_params_s, hub_type_params_s, mb_type_params_s, mb_additional_type_params)
+                      build_all_params, rb_type_params_s, hub_type_params_s, mb_type_params_s, mb_additional_type_params, 
+                      struct_type_bounds_s)
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -38,8 +39,7 @@ let rb = hub.${mangle_ident(resource)}();
 </%block>
 </%block>
 pub struct ${ThisType}
-    where NC: 'a,
-           A: 'a, {
+    where ${struct_type_bounds_s()} {
 
     hub: &'a ${hub_type_name}${hub_type_params_s()},
 }

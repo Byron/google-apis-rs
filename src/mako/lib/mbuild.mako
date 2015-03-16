@@ -8,7 +8,7 @@
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
                       hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response,
                       METHOD_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
-                      DELEGATE_PROPERTY_NAME)
+                      DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -79,8 +79,7 @@ the *${m.scopes[0]}* scope to make a valid call.
 ${self.usage(resource, method, m, params, request_value, parts)}\
 </%block>
 pub struct ${ThisType}
-    where NC: 'a,
-           A: 'a, {
+    where ${struct_type_bounds_s()} {
 
     hub: &'a ${hub_type_name}${hub_type_params_s()},
 ## PROPERTIES ###############
@@ -94,7 +93,7 @@ pub struct ${ThisType}
 % endfor
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
     ${api.properties.params}: HashMap<String, String>,
-    % if auth and auth.oauth2:
+    % if supports_scopes(auth):
 ## We need the scopes sorted, to not unnecessarily query new tokens
     ${api.properties.scopes}: BTreeMap<String, ()>
     % endif
@@ -131,7 +130,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         self
     }
 
-    % if auth and auth.oauth2:
+    % if supports_scopes(auth):
     /// Identifies the authorization scope for the method you are building.
     /// 
     /// Use this method to actively specify which scope should be used, instead of relying on the 
@@ -361,6 +360,21 @@ match result {
     paddfields = 'self.' + api.properties.params
 
     delegate = 'self.' + property(DELEGATE_PROPERTY_NAME)
+    delegate_call = delegate + '.as_mut().unwrap()'
+    auth_call = 'self.hub.auth.borrow_mut()'
+    client = '(*self.hub.client.borrow_mut()).borrow_mut()'
+
+    if supports_scopes(auth):
+        all_scopes = auth.oauth2.scopes.keys()
+        default_scope = all_scopes[0]
+        assert 'readonly' not in default_scope
+        if m.httpMethod in ('HEAD', 'GET', 'OPTIONS', 'TRACE'):
+            for scope in all_scopes:
+                if 'readonly' in scope:
+                    default_scope = scope
+                    break
+        # end try to find read-only default scope
+    # end handle default scope
 %>
     /// Perform the operation you have build so far.
     ${action_fn} {
@@ -425,20 +439,49 @@ else {
         let mut url = "${baseUrl}${m.path}".to_string();
         % endif
 
+        % if not supports_scopes(auth):
+        <% 
+            assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
+        %>\
+        let mut key = ${auth_call}.api_key();
+        if key.is_none() && ${delegate}.is_some() {
+            key = ${delegate_call}.api_key();
+        }
+        if key.is_some() {
+            params.push(("key", key.unwrap()));
+        } else {
+            return cmn::Result::MissingAPIKey
+        }
+        % else:
+        if self.${api.properties.scopes}.len() == 0 {
+            self.${api.properties.scopes}.insert(${scope_url_to_variant(name, default_scope, fully_qualified=True)}.as_slice().to_string(), ());
+        }
+        % endif
+
         url.push('?');
         url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
 
         loop {
-            match self.hub.client.borrow_mut().request(Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
+            % if supports_scopes(auth):
+            let token = ${auth_call}.token(self.${api.properties.scopes}.keys());
+            if token.is_none() {
+                return cmn::Result::MissingToken
+            }
+            let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            % endif
+            match ${client}.request(Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
                .header(UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))
+               % if supports_scopes(auth):
+               .header(auth_header)
+               % endif
                % if request_value:
                .header(ContentType(Mime(TopLevel::Application, SubLevel::Json, Default::default())))
-               .body(json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap())
+               .body(json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap().as_slice())
                % endif
                .send() {
                 Err(err) => {
                     if ${delegate}.is_some() {
-                        match ${delegate}.as_mut().unwrap().http_error(&err) {
+                        match ${delegate_call}.http_error(&err) {
                             oauth2::Retry::Abort => return cmn::Result::HttpError(err),
                             oauth2::Retry::After(d) => {
                                 sleep(d);

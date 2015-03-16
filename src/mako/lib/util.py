@@ -98,7 +98,7 @@ data_unit_multipliers = {
     '%': 1,
 }
 
-HUB_TYPE_PARAMETERS = ('NC', 'A')
+HUB_TYPE_PARAMETERS = ('C', 'NC', 'A')
 
 # ==============================================================================
 ## @name Filters
@@ -732,7 +732,12 @@ def hub_type_params_s():
 # return a list of where statements to server as bounds for the hub.
 def hub_type_bounds():
     return ['NC: hyper::net::NetworkConnector',
+            'C: BorrowMut<hyper::Client<NC>>',
             'A: oauth2::GetToken']
+
+# Returns True if this API has particular authentication scopes to choose from
+def supports_scopes(auth):
+    return bool(auth) and bool(auth.oauth2)
 
 # return list of type bounds required by method builder
 def mb_type_bounds():
@@ -744,6 +749,10 @@ _rb_type_params = ("'a", ) + HUB_TYPE_PARAMETERS
 # type parameters for a resource builder - keeps hub as borrow
 def rb_type_params_s(resource, c):
     return _to_type_params_s(_rb_type_params)
+
+# type bounds for resource and method builder 
+def struct_type_bounds_s():
+    return ', '.join(tp + ": 'a" for tp in HUB_TYPE_PARAMETERS)
 
 # type params for the given method builder, as string suitable for Rust code
 def mb_type_params_s(m):
@@ -808,8 +817,9 @@ def parts_from_params(params):
     return part_prop, list()
 
 # Convert a scope url to a nice enum variant identifier, ready for use in code
-# name = name of the api, without version
+# name = name of the api, without version, non-normalized (!)
 def scope_url_to_variant(name, url, fully_qualified=True):
+    name = normalize_library_name(name)
     FULL = 'Full'
     fqvn = lambda n: fully_qualified and 'Scope::%s' % n or n
     repl = lambda n: n.replace('-', '.').replace('_', '.')

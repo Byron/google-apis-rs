@@ -3,7 +3,7 @@
                       unindent_first_by, mangle_ident, mb_type, singular, scope_url_to_variant,
                       PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, METHOD_BUILDER_MARKERT_TRAIT, 
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
-                      REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT)  %>\
+                      REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes)  %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="mbuild" file="mbuild.mako"/>\
 
@@ -242,7 +242,7 @@ You can read the full text at the repository's [license file][repo-license].
 ###############################################################################################
 ###############################################################################################
 <%def name="scope_enum()">\
-% if not auth or not auth.oauth2:
+% if not supports_scopes(auth):
 <% return '' %>\
 % endif
 /// Identifies the an OAuth2 authorization scope.
