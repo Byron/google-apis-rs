@@ -109,8 +109,10 @@ help-api:
 
 % for info in apis['items']:
 <%
-	target_dir = directories.api_base + '/' + info['name'] + '/' + info['version']
-	target = target_dir + '/' + info['name'] + '-api.json'
+	import util
+	name = util.normalize_library_name(info['name'])
+	target_dir = directories.api_base + '/' + name + '/' + info['version']
+	target = target_dir + '/' + name + '-api.json'
 	## assure the target never actually exists to force him to wget whenver we ask !
 	fake_target = target + '-force'
 	json_api_targets.append(fake_target)

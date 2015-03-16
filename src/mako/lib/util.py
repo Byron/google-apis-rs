@@ -704,6 +704,9 @@ def to_api_version(v):
         version = version + '_' + remainder
     return version
 
+def normalize_library_name(name):
+    return name.lower()
+
 # build a full library name (non-canonical)
 def library_name(name, version):
     version = to_api_version(version)
@@ -712,7 +715,7 @@ def library_name(name, version):
     if name[-1].isdigit():
         name += '_'
         version = 'v' + version
-    return name + version
+    return normalize_library_name(name) + version
 
 # return type name of a resource method builder, from a resource name
 def rb_type(r):
