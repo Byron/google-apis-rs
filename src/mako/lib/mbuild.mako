@@ -334,11 +334,11 @@ match result {
     where = ''
     qualifier = 'pub '
     add_args = ''
-    rtype = 'cmn::Result<()>'
+    rtype = 'cmn::Result<hyper::client::Response>'
     response_schema = method_response(c, m)
 
     if response_schema:
-        rtype = 'cmn::Result<%s>' % (response_schema.id)
+        rtype = 'cmn::Result<(hyper::client::Response, %s)>' % (response_schema.id)
 
     if media_params:
         stripped = lambda s: s.strip().strip(',')
@@ -365,26 +365,20 @@ match result {
     client = '(*self.hub.client.borrow_mut()).borrow_mut()'
 
     if supports_scopes(auth):
-        all_scopes = auth.oauth2.scopes.keys()
+        all_scopes = sorted(auth.oauth2.scopes.keys())
         default_scope = all_scopes[0]
-        assert 'readonly' not in default_scope
         if m.httpMethod in ('HEAD', 'GET', 'OPTIONS', 'TRACE'):
             for scope in all_scopes:
                 if 'readonly' in scope:
                     default_scope = scope
                     break
+            # end for each scope
         # end try to find read-only default scope
     # end handle default scope
 %>
     /// Perform the operation you have build so far.
     ${action_fn} {
-        use hyper::method::Method;
-        use hyper::header::UserAgent;
-        % if request_value or response_schema:
-        use hyper::header::ContentType;
-        use mime::{Mime, TopLevel, SubLevel};
-        use rustc_serialize::json;
-        % endif
+        use std::io::Read;
         let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params)} + ${paddfields}.len());
         % for p in field_params:
 <%
@@ -463,19 +457,22 @@ else {
 
         loop {
             % if supports_scopes(auth):
-            let token = ${auth_call}.token(self.${api.properties.scopes}.keys());
+            let mut token = ${auth_call}.token(self.${api.properties.scopes}.keys());
+            if token.is_none() && ${delegate}.is_some() {
+                token = ${delegate_call}.token();
+            }
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
             % endif
-            match ${client}.request(Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
-               .header(UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))
+            match ${client}.request(hyper::method::Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
+               .header(hyper::header::UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))
                % if supports_scopes(auth):
                .header(auth_header)
                % endif
                % if request_value:
-               .header(ContentType(Mime(TopLevel::Application, SubLevel::Json, Default::default())))
+               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
                .body(json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap().as_slice())
                % endif
                .send() {
@@ -493,19 +490,29 @@ else {
                     }
                 }
                 Ok(mut res) => {
-
-                    break;
+                    if !res.status.is_success() {
+                        if ${delegate}.is_some() {
+                            let mut json_err = String::new();
+                            res.read_to_string(&mut json_err).ok();
+                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                            if let oauth2::Retry::After(d) = ${delegate_call}.http_failure(&res, error_info) {
+                                sleep(d);
+                                continue;
+                            }
+                        }
+                        return cmn::Result::Failure(res)
+                    }
+                % if response_schema:
+                    let mut json_response = String::new();
+                    res.read_to_string(&mut json_response).ok();
+                    let result_value = (res, json::decode(&json_response).unwrap());
+                % else:
+                    let result_value = res;
+                % endif
+                    return cmn::Result::Success(result_value)
                 }
             }
         }
-
-        % if response_schema:
-        let response: ${response_schema.id} = Default::default();
-        % else:
-        let response = ();
-        % endif
-
-        cmn::Result::Success(response)
     }
 
     % for p in media_params:

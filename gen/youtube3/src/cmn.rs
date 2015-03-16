@@ -42,7 +42,7 @@ impl<T: Seek + Read> ReadSeek for T {}
 
 /// A utility type which can decode a server response that indicates error
 #[derive(RustcDecodable)]
-struct JsonServerError {
+pub struct JsonServerError {
     error: String,
     error_description: Option<String>
 }
@@ -68,6 +68,22 @@ pub trait Delegate {
     fn api_key(&mut self) -> Option<String> {
         None
     }
+
+    /// Called whenever the Authenticator didn't yield a token. The delegate
+    /// may attempt to provide one, or just take is a general information about the
+    /// pending impending failure
+    fn token(&mut self) -> Option<oauth2::Token> {
+        None
+    }
+
+    /// Called whenever the http request returns with a non-success status code.
+    /// This can involve authentication issues, or anything else that very much 
+    /// depends on the used API method.
+    /// The delegate should check the status, header and decoded json error to decide
+    /// whether to retry or not. In the latter case, the underlying call will fail.
+    fn http_failure(&mut self, _: &hyper::client::Response, JsonServerError) -> oauth2::Retry {
+        oauth2::Retry::Abort
+    }
 }
 
 #[derive(Default)]
@@ -90,6 +106,9 @@ pub enum Result<T = ()> {
 
     /// An additional, free form field clashed with one of the built-in optional ones
     FieldClash(&'static str),
+
+    /// Indicates an HTTP repsonse with a non-success status code
+    Failure(hyper::client::Response),
 
     /// It worked !
     Success(T),

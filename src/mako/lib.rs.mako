@@ -42,6 +42,7 @@ use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use std::marker::PhantomData;
+use rustc_serialize::json;
 use std::io;
 use std::fs;
 use std::old_io::timer::sleep;
