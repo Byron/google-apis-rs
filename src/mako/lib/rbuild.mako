@@ -39,7 +39,6 @@ let rb = hub.${mangle_ident(resource)}();
 </%block>
 pub struct ${ThisType}
     where NC: 'a,
-           C: 'a,
            A: 'a, {
 
     hub: &'a ${hub_type_name}${hub_type_params_s()},

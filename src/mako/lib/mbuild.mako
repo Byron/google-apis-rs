@@ -80,7 +80,6 @@ ${self.usage(resource, method, m, params, request_value, parts)}\
 </%block>
 pub struct ${ThisType}
     where NC: 'a,
-           C: 'a,
            A: 'a, {
 
     hub: &'a ${hub_type_name}${hub_type_params_s()},
@@ -430,7 +429,7 @@ else {
         url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
 
         loop {
-            match self.hub.client.borrow_mut().borrow_mut().request(Method::Extension("${m.httpMethod}".to_string()), &url)
+            match self.hub.client.borrow_mut().request(Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
                .header(UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))
                % if request_value:
                .header(ContentType(Mime(TopLevel::Application, SubLevel::Json, Default::default())))
@@ -457,32 +456,11 @@ else {
             }
         }
 
-
         % if response_schema:
         let response: ${response_schema.id} = Default::default();
         % else:
         let response = ();
         % endif
-
-
-        ## let mut params: Vec<(String, String)> = Vec::with_capacity
-        ## // note: cloned() shouldn't be needed, see issue
-        ## // https://github.com/servo/rust-url/issues/81
-        ## let req = form_urlencoded::serialize(
-        ##           [("client_id", client_id),
-        ##            ("scope", scopes.into_iter()
-        ##                            .map(|s| s.as_slice())
-        ##                            .intersperse(" ")
-        ##                            .collect::<String>()
-        ##                            .as_slice())].iter().cloned());
-
-        ## match self.client.borrow_mut().post(FlowType::Device.as_slice())
-        ##        .header(ContentType("application/x-www-form-urlencoded".parse().unwrap()))
-        ##        .body(req.as_slice())
-        ##        .send() {
-        ##     Err(err) => {
-        ##         return RequestResult::Error(err);
-        ##     }
 
         cmn::Result::Success(response)
     }

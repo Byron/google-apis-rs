@@ -6,7 +6,7 @@
 <%  
     from util import (new_context, rust_comment, rust_doc_comment,
                       rust_module_doc_comment, rb_type, hub_type, mangle_ident, hub_type_params_s,
-                      hub_type_bounds, rb_type_params_s, find_fattest_resource)
+                      hub_type_bounds, rb_type_params_s, find_fattest_resource, HUB_TYPE_PARAMETERS)
 
     c = new_context(schemas, resources)
     hub_type = hub_type(c.schemas, util.canonical_name())
@@ -19,9 +19,9 @@
 <%block filter="rust_module_doc_comment">\
 ${lib.docs(c)}
 </%block>
-#![feature(core,io)]
+#![feature(core,io, old_io)]
 // DEBUG !! TODO: Remove this
-#![allow(dead_code)]
+#![allow(dead_code, deprecated)]
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
@@ -37,8 +37,6 @@ extern crate url;
 pub mod cmn;
 
 use std::collections::HashMap;
-use std::marker::PhantomData;
-use std::borrow::BorrowMut;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
@@ -84,21 +82,19 @@ ${lib.scope_enum()}
 ${lib.hub_usage_example(c)}\
 </%block>
 pub struct ${hub_type}${ht_params} {
-    client: RefCell<C>,
+    client: RefCell<hyper::Client<NC>>,
     auth: RefCell<A>,
-    _m: PhantomData<NC>
 }
 
-impl<'a, C, NC, A> Hub for ${hub_type}${ht_params} {}
+impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> Hub for ${hub_type}${ht_params} {}
 
-impl<'a, C, NC, A> ${hub_type}${ht_params}
+impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
     where  ${', '.join(hub_type_bounds())} {
 
-    pub fn new(client: C, authenticator: A) -> ${hub_type}${ht_params} {
+    pub fn new(client: hyper::Client<NC>, authenticator: A) -> ${hub_type}${ht_params} {
         ${hub_type} {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _m: PhantomData,
         }
     }
 
