@@ -160,6 +160,12 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 <%
     InType = activity_input_type(schemas, p)
 
+    is_repeated_property = p.get('repeated', False)
+    if is_repeated_property:
+        p.repeated = False
+        InType = activity_input_type(schemas, p)
+        p.repeated = True
+
     def show_part_info(m, p):
         if p.name != 'part':
             return False
@@ -169,7 +175,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 
     value_name = 'new_value'
     new_value_copied = rust_copy_value_s(value_name, InType, p)
-    if not is_required_property(p):
+    if not is_required_property(p) and not is_repeated_property:
         new_value_copied = 'Some(%s)' % new_value_copied
 
     part_desc = None
@@ -198,7 +204,11 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     ${p.description | rust_doc_comment, indent_all_but_first_by(1)}
     % endif
     pub fn ${mangle_ident(p.name)}(mut self, ${value_name}: ${InType}) -> ${ThisType} {
+        % if p.get('repeated', False):
+        self.${property(p.name)}.push(${new_value_copied});
+        % else:
         self.${property(p.name)} = ${new_value_copied};
+        % endif
         self
     }
 </%def>
@@ -421,7 +431,15 @@ match result {
         }
         % endif
         % endif
-        % if not is_required_property(p):
+        % if p.get('repeated', False):
+        if ${pname}.len() > 0 {
+            let mut s = String::new();
+            for f in ${pname}.iter() {
+                s.push_str(&("/".to_string() + f));
+            }
+            params.push(("${p.name}", s));
+        }
+        % elif not is_required_property(p):
         if ${pname}.is_some() {
             params.push(("${p.name}", ${pname}.unwrap().to_string()));
         }

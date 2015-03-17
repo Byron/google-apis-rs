@@ -330,7 +330,12 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True):
             rust_type = 'i64'
         elif rust_type == USE_FORMAT:
             rust_type = TYPE_MAP[t.format]
-        return wrap_type(rust_type)
+            
+        if t.get('repeated', False):
+            rust_type = 'Vec<%s>' % rust_type
+        else:
+            rust_type = wrap_type(rust_type)
+        return rust_type
     except KeyError as err:
         raise AssertionError("%s: Property type '%s' unknown - add new type mapping: %s" % (str(err), t.type, str(t)))
     except AttributeError as err:
