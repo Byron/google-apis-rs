@@ -25,6 +25,16 @@
         part_desc += ''.join('* *%s*\n' % part for part in parts)
         part_desc = part_desc[:-1]
         return part_desc
+
+    def is_repeated_property(p):
+        return p.get('repeated', False)
+
+    def setter_fn_name(p):
+        fn_name = p.name
+        if is_repeated_property(p):
+            fn_name = 'add_' + fn_name
+        return fn_name
+
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -160,8 +170,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 <%
     InType = activity_input_type(schemas, p)
 
-    is_repeated_property = p.get('repeated', False)
-    if is_repeated_property:
+    if is_repeated_property(p):
         p.repeated = False
         InType = activity_input_type(schemas, p)
         p.repeated = True
@@ -175,7 +184,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 
     value_name = 'new_value'
     new_value_copied = rust_copy_value_s(value_name, InType, p)
-    if not is_required_property(p) and not is_repeated_property:
+    if not is_required_property(p) and not is_repeated_property(p):
         new_value_copied = 'Some(%s)' % new_value_copied
 
     part_desc = None
@@ -203,7 +212,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     % if 'description' in p:
     ${p.description | rust_doc_comment, indent_all_but_first_by(1)}
     % endif
-    pub fn ${mangle_ident(p.name)}(mut self, ${value_name}: ${InType}) -> ${ThisType} {
+    pub fn ${mangle_ident(setter_fn_name(p))}(mut self, ${value_name}: ${InType}) -> ${ThisType} {
         % if p.get('repeated', False):
         self.${property(p.name)}.push(${new_value_copied});
         % else:
@@ -226,7 +235,12 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     is_string_value = lambda v: v.endswith('"')
 
     # to rust value
-    trv = lambda spn, sp, sn=None: to_rust_type(schemas, sn, spn, sp, allow_optionals=False)
+    def trv(spn, sp, sn=None):
+        prev = sp.get('repeated', False)
+        sp.repeated = False
+        res = to_rust_type(schemas, sn, spn, sp, allow_optionals=False)
+        sp.repeated = prev
+        return res
     # rvfrt = random value for rust type
     rvfrt = lambda spn, sp, sn=None: rnd_arg_val_for_type(trv(spn, sp, sn))
 
@@ -314,7 +328,7 @@ let result = hub.${mangle_ident(resource)}().${mangle_ident(method)}(${required_
 % endif
 
 <%block  filter="indent_by(13)">\
-.${mangle_ident(p.name)}(${rvfrt(p.name, p)})\
+.${mangle_ident(setter_fn_name(p))}(${rvfrt(p.name, p)})\
 </%block>\
 % endfor
 
