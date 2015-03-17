@@ -532,20 +532,23 @@ else {
         }
         % endif
 
+        ## Hanlde URI Tempates
         % if replacements:
         for &(find_this, param_name) in [${', '.join('("%s", "%s")' % r for r in replacements)}].iter() {
-            % if URL_ENCODE in special_cases:
-            let mut replace_with = String::new();
-            % else:
-            let mut replace_with: Option<<&str> = None;
-            % endif
+            <%
+                replace_init = ': Option<&str> = None'
+                replace_assign = 'Some(value)'
+                url_replace_arg = 'replace_with.expect("to find substitution value in params")'
+                if URL_ENCODE in special_cases:  
+                    replace_init = ' = String::new()'
+                    replace_assign = 'value.to_string()'
+                    url_replace_arg = '&replace_with'
+                # end handle url encoding
+            %>\
+            let mut replace_with${replace_init};
             for &(name, ref value) in params.iter() {
                 if name == param_name {
-                    % if URL_ENCODE in special_cases:
-                    replace_with = value.to_string();
-                    % else:
-                    replace_with = Some(value);
-                    % endif
+                    replace_with = ${replace_assign};
                     break;
                 }
             }
@@ -553,10 +556,8 @@ else {
             if find_this.as_bytes()[1] == '+' as u8 {
                 replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
             }
-            url = url.replace(find_this, &replace_with);
-            % else:
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
             % endif
+            url = url.replace(find_this, ${url_replace_arg});
         }
         ## Remove all used parameters
         {
