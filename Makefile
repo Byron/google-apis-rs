@@ -53,7 +53,9 @@ $(PYTHON): $(VENV)
 
 $(MAKO_RENDER): $(PYTHON)
 
-$(API_DEPS): $(API_DEPS_TPL) $(MAKO_STANDARD_DEPENDENCIES) $(API_LIST)
+# Explicitly NOT depending on $(MAKO_LIB_FILES), as it's quite stable and now takes 'too long' thanks
+# to a URL get call to the google discovery service
+$(API_DEPS): $(API_DEPS_TPL) $(API_SHARED_INFO) $(MAKO_RENDER) $(API_LIST)
 	$(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
 
 api-deps: $(API_DEPS)
