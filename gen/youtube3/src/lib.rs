@@ -2,6 +2,8 @@
 // This file was generated automatically from 'src/mako/lib.rs.mako'
 // DO NOT EDIT !
 
+//! This documentation was generated from *YouTube* crate version *0.0.1*.
+//! The original source code can be found [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/youtube3).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.YouTube.html) ... 
@@ -24,7 +26,7 @@
 //! * [videos](struct.Video.html) ([*delete*](struct.VideoDeleteMethodBuilder.html), [*get rating*](struct.VideoGetRatingMethodBuilder.html), [*insert*](struct.VideoInsertMethodBuilder.html), [*list*](struct.VideoListMethodBuilder.html), [*rate*](struct.VideoRateMethodBuilder.html) and [*update*](struct.VideoUpdateMethodBuilder.html))
 //! * watermarks ([*set*](struct.WatermarkSetMethodBuilder.html) and [*unset*](struct.WatermarkUnsetMethodBuilder.html))
 //! 
-//! Everything else about the *YouTube* API can be found at the
+//! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/v3).
 //! 
 //! Not what you are looking for ? Find all other google APIs in their Rust [documentation index](../index.html).
@@ -118,8 +120,11 @@
 //! 
 //! match result {
 //!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!     Result::MissingAPIKey => println!("Missing API Key"),
+//!     Result::MissingToken => println!("Missing Token"),
+//!     Result::Failure(_) => println!("General Failure (Response doesn't print)"),
 //!     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
-//!     Result::Success(value) => println!("Result Value: {:?}", value),
+//!     Result::Success(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -306,8 +311,11 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///     Result::MissingAPIKey => println!("Missing API Key"),
+///     Result::MissingToken => println!("Missing Token"),
+///     Result::Failure(_) => println!("General Failure (Response doesn't print)"),
 ///     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
-///     Result::Success(value) => println!("Result Value: {:?}", value),
+///     Result::Success(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -6678,13 +6686,15 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/i18nLanguages".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -6889,20 +6899,23 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
             params.push((&name, value.clone()));
         }
 
-        let mut url = if stream.is_some() {
-                "https://www.googleapis.com/upload/youtube/v3/channelBanners/insert".to_string()
+        let (mut url, protocol) = if stream.is_some() {
+                ("https://www.googleapis.com/upload/youtube/v3/channelBanners/insert".to_string(), "simple")
             } else if resumeable_stream.is_some() {
-                "https://www.googleapis.com/resumable/upload/youtube/v3/channelBanners/insert".to_string()
+                ("https://www.googleapis.com/resumable/upload/youtube/v3/channelBanners/insert".to_string(), "resumable")
             } else { 
                 unreachable!() 
         };
-
+        params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -7149,13 +7162,15 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/channelSections".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -7410,13 +7425,15 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/channelSections".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -7647,13 +7664,15 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/channelSections".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -7869,13 +7888,15 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/channelSections".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -8118,13 +8139,15 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/guideCategories".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -8368,13 +8391,15 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/playlists".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -8651,13 +8676,15 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/playlists".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -8911,13 +8938,15 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/playlists".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -9133,13 +9162,15 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/playlists".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -9360,20 +9391,23 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
             params.push((&name, value.clone()));
         }
 
-        let mut url = if stream.is_some() {
-                "https://www.googleapis.com/upload/youtube/v3/thumbnails/set".to_string()
+        let (mut url, protocol) = if stream.is_some() {
+                ("https://www.googleapis.com/upload/youtube/v3/thumbnails/set".to_string(), "simple")
             } else if resumeable_stream.is_some() {
-                "https://www.googleapis.com/resumable/upload/youtube/v3/thumbnails/set".to_string()
+                ("https://www.googleapis.com/resumable/upload/youtube/v3/thumbnails/set".to_string(), "resumable")
             } else { 
                 unreachable!() 
         };
-
+        params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -9657,13 +9691,15 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/videos".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -9952,13 +9988,15 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/videos/rate".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -10159,13 +10197,15 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/videos/getRating".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -10358,13 +10398,15 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/videos".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -10600,13 +10642,15 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/videos".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -10915,20 +10959,23 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
             params.push((&name, value.clone()));
         }
 
-        let mut url = if stream.is_some() {
-                "https://www.googleapis.com/upload/youtube/v3/videos".to_string()
+        let (mut url, protocol) = if stream.is_some() {
+                ("https://www.googleapis.com/upload/youtube/v3/videos".to_string(), "simple")
             } else if resumeable_stream.is_some() {
-                "https://www.googleapis.com/resumable/upload/youtube/v3/videos".to_string()
+                ("https://www.googleapis.com/resumable/upload/youtube/v3/videos".to_string(), "resumable")
             } else { 
                 unreachable!() 
         };
-
+        params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -11246,13 +11293,15 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/subscriptions".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -11521,13 +11570,15 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/subscriptions".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -11799,13 +11850,15 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/subscriptions".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -12140,13 +12193,15 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/search".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -12586,13 +12641,15 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/i18nRegions".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -12821,13 +12878,15 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/liveStreams".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -13069,13 +13128,15 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/liveStreams".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -13318,13 +13379,15 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/liveStreams".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -13601,13 +13664,15 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/liveStreams".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -13867,13 +13932,15 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/channels".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -14151,13 +14218,15 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/channels".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -14418,13 +14487,15 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/playlistItems".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -14646,13 +14717,15 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/playlistItems".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -14921,13 +14994,15 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/playlistItems".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -15170,13 +15245,15 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/playlistItems".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -15396,20 +15473,23 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
             params.push((&name, value.clone()));
         }
 
-        let mut url = if stream.is_some() {
-                "https://www.googleapis.com/upload/youtube/v3/watermarks/set".to_string()
+        let (mut url, protocol) = if stream.is_some() {
+                ("https://www.googleapis.com/upload/youtube/v3/watermarks/set".to_string(), "simple")
             } else if resumeable_stream.is_some() {
-                "https://www.googleapis.com/resumable/upload/youtube/v3/watermarks/set".to_string()
+                ("https://www.googleapis.com/resumable/upload/youtube/v3/watermarks/set".to_string(), "resumable")
             } else { 
                 unreachable!() 
         };
-
+        params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -15632,13 +15712,15 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/watermarks/unset".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -15863,13 +15945,15 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts/control".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -16152,13 +16236,15 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -16428,13 +16514,15 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -16695,13 +16783,15 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts/bind".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -16976,13 +17066,15 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -17239,13 +17331,15 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -17471,13 +17565,15 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/liveBroadcasts/transition".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -17733,13 +17829,15 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/videoCategories".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -18000,13 +18098,15 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/activities".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -18282,13 +18382,15 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let mut url = "https://www.googleapis.com/youtube/v3/activities".to_string();
-
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_slice().to_string(), ());
         }
 
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());

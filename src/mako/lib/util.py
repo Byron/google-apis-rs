@@ -52,6 +52,7 @@ IO_REQUEST = 'request'
 IO_TYPES = (IO_REQUEST, IO_RESPONSE)
 INS_METHOD = 'insert'
 DEL_METHOD = 'delete'
+METHODS_RESOURCE = 'methods'
 
 SPACES_PER_TAB = 4
 
@@ -416,7 +417,7 @@ def activity_split(fqan):
     if not mt:
         # make this the method, with not resource 
         mt = [t[1]]
-        t[1] = None
+        t[1] = METHODS_RESOURCE
     # end 
     return t[0], t[1], '.'.join(mt)
 
@@ -593,11 +594,14 @@ def new_context(schemas, resources, methods):
                 continue
             for mn, m in a.methods.iteritems():
                 assert m.id not in fqan
-                fqan[m.id] = m
                 category, resource, method = activity_split(m.id)
-                # Put the same method under different names to make access easier
-                if resource is None:
-                    fqan[to_fqan(category, category, method)] = m
+                # This may be another name by which people try to find the method.
+                # As it has no resource, we put in a 'fake resource' (METHODS_RESOURCE), which 
+                # needs some special treatment only in key-spots
+                fqan_key = m.id
+                if resource == METHODS_RESOURCE:
+                    fqan_key = to_fqan(category, resource, method)
+                fqan[fqan_key] = m
                 for in_out_type_name in IO_TYPES:
                     t = m.get(in_out_type_name, None)
                     if t is None:
@@ -612,12 +616,11 @@ def new_context(schemas, resources, methods):
                 # delete: has no response or request
                 # getrating: response is a 'SomethingResult', which is still related to activities name
                 #            the latter is used to deduce the resource name
-                if resource:
-                    tn = activity_name_to_type_name(resource)
-                    info = res.setdefault(tn, dict())
-                    if m.id not in info:
-                        info.setdefault(m.id, [])
-                    # end handle other cases
+                tn = activity_name_to_type_name(resource)
+                info = res.setdefault(tn, dict())
+                if m.id not in info:
+                    info.setdefault(m.id, [])
+                # end handle other cases
             # end for each method
         # end for each activity
         return res, fqan
@@ -702,13 +705,9 @@ def new_context(schemas, resources, methods):
         _sta_map, _fqan_map = build_activity_mappings(data_source)
         for an in _fqan_map:
             category, resource, activity = activity_split(an)
-            resource = resource or category
             rta_map.setdefault(resource, list()).append(activity)
             assert rtc_map.setdefault(resource, category) == category
         # end for each fqan
-        # TODO: DEBUG: Remove this when it was run on all APIs
-        assert len(set(sta_map.keys()) & set(_sta_map.keys())) == 0
-        assert len(set(fqan_map.keys()) & set(_fqan_map.keys())) == 0, set(fqan_map.keys()) & set(_fqan_map.keys())
         sta_map.update(_sta_map)
         fqan_map.update(_fqan_map)
     # end for each data source

@@ -3,7 +3,8 @@
                       unindent_first_by, mangle_ident, mb_type, singular, scope_url_to_variant,
                       PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, METHOD_BUILDER_MARKERT_TRAIT, 
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
-                      REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version)  %>\
+                      REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
+                      to_fqan)  %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="mbuild" file="mbuild.mako"/>\
 
@@ -97,11 +98,7 @@ Or specifically ...
 ```ignore
 % for an, a in c.sta_map[fr.id].iteritems():
 <% category, resource, activity = activity_split(an) %>\
-% if resource:
 let r = hub.${mangle_ident(resource)}().${mangle_ident(activity)}(...).${api.terms.action}()
-% else:
-let r = hub.${mangle_ident(activity)}(...).${api.terms.action}()
-% endif
 % endfor
 ```
 % endif
@@ -212,7 +209,9 @@ let mut hub = ${hub_type}::new(hyper::Client::new(), auth);\
         last_param_count = None
         for fqan in c.sta_map[fr.id]:
             category, aresource, amethod = activity_split(fqan)
-            am = c.fqan_map[fqan]
+            # Cannot use fqan directly, as it might need remapping thanks to 'special case' resource.
+            # see METHODS_RESOURCE for more information
+            am = c.fqan_map[to_fqan(category, aresource, amethod)]
             build_all_params(c, am)
             aparams, arequest_value = build_all_params(c, am)
 

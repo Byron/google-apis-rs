@@ -27,7 +27,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [videos](http://byron.github.io/google-apis-rs/youtube3/struct.Video.html) ([*delete*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoDeleteMethodBuilder.html), [*get rating*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoGetRatingMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoListMethodBuilder.html), [*rate*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoRateMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoUpdateMethodBuilder.html))
 * watermarks ([*set*](http://byron.github.io/google-apis-rs/youtube3/struct.WatermarkSetMethodBuilder.html) and [*unset*](http://byron.github.io/google-apis-rs/youtube3/struct.WatermarkUnsetMethodBuilder.html))
 
-Everything else about the *YouTube* API can be found at the
+Everything else about the *YouTube* *v3* API can be found at the
 [official documentation site](https://developers.google.com/youtube/v3).
 
 # Structure of this Library
@@ -118,8 +118,11 @@ let result = hub.live_broadcasts().list("part")
 
 match result {
     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
+    Result::MissingAPIKey => println!("Missing API Key"),
+    Result::MissingToken => println!("Missing Token"),
+    Result::Failure(_) => println!("General Failure (Response doesn't print)"),
     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
-    Result::Success(value) => println!("Result Value: {:?}", value),
+    Result::Success(_) => println!("Success (value doesn't print)"),
 }
 
 ```

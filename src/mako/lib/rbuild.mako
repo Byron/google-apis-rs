@@ -90,11 +90,11 @@ impl${rb_params} ${ThisType} {
             % for p in optional_props:
             ${property(p.name)}: Default::default(),
             % endfor
-            % for prop_key, custom_name in api.properties.iteritems():
+% for prop_key, custom_name in api.properties.iteritems():
             % if prop_key == 'scopes' and (not auth or not auth.oauth2):
-            <% continue %>\
+<% continue %>\
             % endif
-${custom_name}: Default::default(),
+            ${custom_name}: Default::default(),
             % endfor
         }
     }
