@@ -472,7 +472,7 @@ match result {
         if ${pname}.len() > 0 {
             let mut s = String::new();
             for f in ${pname}.iter() {
-                s.push_str(&("/".to_string() + f));
+                s.push_str(&("/".to_string() + &f.to_string()));
             }
             params.push(("${p.name}", s));
         }
