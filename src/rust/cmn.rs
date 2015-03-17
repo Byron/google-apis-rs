@@ -82,6 +82,10 @@ pub trait Delegate {
     fn http_failure(&mut self, _: &hyper::client::Response, JsonServerError) -> oauth2::Retry {
         oauth2::Retry::Abort
     }
+
+    /// Called prior to sending the main request of the given method. It can be used to time 
+    /// the call or to print progress information.
+    fn pre_request(&mut self, method_name: &str) { let _ = method_name; }
 }
 
 #[derive(Default)]

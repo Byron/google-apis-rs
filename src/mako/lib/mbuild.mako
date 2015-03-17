@@ -466,6 +466,9 @@ else {
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
             % endif
+            if ${delegate}.is_some() {
+                ${delegate_call}.pre_request("${m.id}");
+            }
             match ${client}.request(hyper::method::Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))
                % if supports_scopes(auth):

@@ -6695,6 +6695,9 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.i18nLanguages.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -6910,6 +6913,9 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.channelBanners.insert");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -7160,6 +7166,9 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.channelSections.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -7418,6 +7427,9 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.channelSections.insert");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -7652,6 +7664,9 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.channelSections.delete");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -7871,6 +7886,9 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.channelSections.update");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -8117,6 +8135,9 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.guideCategories.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -8364,6 +8385,9 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.playlists.insert");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -8644,6 +8668,9 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.playlists.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -8901,6 +8928,9 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.playlists.delete");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -9120,6 +9150,9 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.playlists.update");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -9351,6 +9384,9 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.thumbnails.set");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -9638,6 +9674,9 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.videos.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -9930,6 +9969,9 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.videos.rate");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -10134,6 +10176,9 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.videos.getRating");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -10330,6 +10375,9 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.videos.delete");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -10569,6 +10617,9 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.videos.update");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -10888,6 +10939,9 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.videos.insert");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -11209,6 +11263,9 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.subscriptions.insert");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -11481,6 +11538,9 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.subscriptions.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -11756,6 +11816,9 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.subscriptions.delete");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -12094,6 +12157,9 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.search.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -12537,6 +12603,9 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.i18nRegions.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -12769,6 +12838,9 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.liveStreams.update");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -13014,6 +13086,9 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.liveStreams.delete");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -13260,6 +13335,9 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.liveStreams.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -13540,6 +13618,9 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.liveStreams.insert");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -13803,6 +13884,9 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.channels.update");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -14084,6 +14168,9 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.channels.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -14348,6 +14435,9 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.playlistItems.delete");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -14573,6 +14663,9 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.playlistItems.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -14845,6 +14938,9 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.playlistItems.insert");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -15091,6 +15187,9 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.playlistItems.update");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -15321,6 +15420,9 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.watermarks.set");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -15547,6 +15649,9 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.watermarks.unset");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -15775,6 +15880,9 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.liveBroadcasts.control");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -16061,6 +16169,9 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.liveBroadcasts.update");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -16334,6 +16445,9 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.liveBroadcasts.insert");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -16598,6 +16712,9 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.liveBroadcasts.bind");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -16876,6 +16993,9 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.liveBroadcasts.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -17136,6 +17256,9 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.liveBroadcasts.delete");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -17365,6 +17488,9 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.liveBroadcasts.transition");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -17624,6 +17750,9 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.videoCategories.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -17888,6 +18017,9 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.activities.list");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
@@ -18167,6 +18299,9 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            if self._delegate.is_some() {
+                self._delegate.as_mut().unwrap().pre_request("youtube.activities.insert");
+            }
             match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                .header(auth_header)
