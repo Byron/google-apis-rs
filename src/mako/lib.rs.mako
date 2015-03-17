@@ -54,20 +54,6 @@ use cmn::{Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegat
 // UTILITIES ###
 // ############
 
-/// This macro is advertised in the documentation, which is why we deliver it as well
-#[macro_export]
-macro_rules! map(
-    { $($key:expr => $value:expr),+ } => {
-        {
-            let mut m = ::std::collections::HashMap::new();
-            $(
-                m.insert($key, $value);
-            )+
-            m
-        }
-     };
-);
-
 ${lib.scope_enum()}
 
 

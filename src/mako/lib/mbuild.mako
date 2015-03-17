@@ -592,8 +592,9 @@ else {
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
             % endif
-            if ${delegate}.is_some() {
-                ${delegate_call}.pre_request("${m.id}");
+            match ${delegate} {
+                Some(ref mut d) => d.pre_request("${m.id}"),
+                None => {}
             }
             match ${client}.request(hyper::method::Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
                .header(hyper::header::UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))
@@ -607,16 +608,12 @@ else {
                .send() {
                 Err(err) => {
                     if ${delegate}.is_some() {
-                        match ${delegate_call}.http_error(&err) {
-                            oauth2::Retry::Abort => return cmn::Result::HttpError(err),
-                            oauth2::Retry::After(d) => {
-                                sleep(d);
-                                continue;
-                            }
+                        if let oauth2::Retry::After(d) = ${delegate_call}.http_error(&err) {
+                            sleep(d);
+                            continue;
                         }
-                    } else {
-                        return cmn::Result::HttpError(err);
                     }
+                    return cmn::Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
