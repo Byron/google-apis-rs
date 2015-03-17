@@ -900,5 +900,15 @@ if __name__ == '__main__':
                         ('v1.4', 'oauth2_v1d4'),):
             res = library_name('oauth2', v)
             assert res == want, "%s ~== %s" % (res, want)
+
+
+    def test_url_substitution():
+        url = "https://www.googleapis.com/resumable/upload/groups/v1/groups/{groupId}/{foo}/archive"
+        ms = list(re_find_replacements.finditer(url))
+        assert len(ms) == 2
+        assert ms[0].group(0) == '{groupId}'
+        assert ms[1].group(0) == '{foo}'
+
     test_to_version()
     test_library_name()
+    test_url_substitution()

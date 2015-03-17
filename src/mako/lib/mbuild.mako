@@ -8,7 +8,8 @@
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
                       hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response,
                       METHOD_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
-                      DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant)
+                      DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant,
+                      re_find_replacements)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -343,6 +344,7 @@ match result {
     if response_schema:
         rtype = 'cmn::Result<(hyper::client::Response, %s)>' % (response_schema.id)
 
+    possible_urls = [m.path]
     if media_params:
         stripped = lambda s: s.strip().strip(',')
         qualifier = ''
@@ -350,6 +352,7 @@ match result {
             type_params += p.type.param + ', '
             where += p.type.param + ': ' + p.type.where + ', '
             add_args += p.type.arg_name + ': ' + ('Option<(%s, u64, mime::Mime)>' % p.type.param) + ', '
+            possible_urls.append(p.path)
         # end for each param
         where = ' where ' + stripped(where)
         type_params = '<' + stripped(type_params) + '>'
@@ -378,6 +381,25 @@ match result {
             # end for each scope
         # end try to find read-only default scope
     # end handle default scope
+
+    # s = '{foo}' -> ('{foo}', 'foo') -> (find_this, replace_with)
+    seen = set()
+    replacements = list()
+    all_required_param_name = set(p.name for p in params if is_required_property(p))
+    for possible_url in possible_urls:
+        for s in re_find_replacements.findall(possible_url):
+            if s in seen: continue
+            seen.add(s)
+            sn = s[1:-1]
+            assert sn in all_required_param_name, "Expected param '%s' to be in required parameter list for substitution" % sn
+            replacements.append((s, sn))
+        # end for each found substitution
+        # Assure we can substitue everything
+        for s, d in replacements:
+            possible_url = possible_url.replace(s, d)
+        assert '{' not in possible_url, "Failed to replace all fields in '%s', have to parse expressions" % possible_url
+    # end for each possible url
+    del seen
 %>
     /// Perform the operation you have build so far.
     ${action_fn} {
@@ -418,7 +440,7 @@ match result {
         }
 
         % if media_params:
-        let mut url = \
+        let (mut url, protocol) = \
             % for mp in media_params:
             % if loop.first:
 if \
@@ -426,20 +448,20 @@ if \
 else if \
             % endif
 ${mp.type.arg_name}.is_some() {
-                "${join_url(rootUrl, mp.path)}".to_string()
+                ("${join_url(rootUrl, mp.path)}".to_string(), "${mp.protocol}")
             } \
             % endfor
 else { 
                 unreachable!() 
         };
+        params.push(("uploadType", protocol.to_string()));
         % else:
         let mut url = "${baseUrl}${m.path}".to_string();
         % endif
-
         % if not supports_scopes(auth):
         <% 
             assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
-        %>\
+        %>
         let mut key = ${auth_call}.api_key();
         if key.is_none() && ${delegate}.is_some() {
             key = ${delegate_call}.api_key();
@@ -454,27 +476,24 @@ else {
             self.${api.properties.scopes}.insert(${scope_url_to_variant(name, default_scope, fully_qualified=True)}.as_slice().to_string(), ());
         }
         % endif
-        ## Only one of them is going to be set, even though we generate code that doesn't care
-        % if media_params:
-        {
-            let protocol =\
-            % for mp in media_params:
-            % if loop.first:
- if \
-            % else:
- else if \
-            % endif
-${mp.type.arg_name}.is_some() {
-                "${mp.protocol}"
-            }\
-            % endfor
- else { unreachable!() };
-            params.push(("uploadType", protocol.to_string()));
+
+        % if replacements:
+        for &(find_this, param_name) in [${', '.join('("%s", "%s")' % r for r in replacements)}].iter() {
+            let mut replace_with: Option<<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         % endif
-
-        url.push('?');
-        url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+        }
 
         loop {
             % if supports_scopes(auth):
