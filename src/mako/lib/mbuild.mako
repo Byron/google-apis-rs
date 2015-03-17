@@ -444,15 +444,12 @@ match result {
         assert '{' not in possible_url, "Failed to replace all fields in '%s', have to parse expressions" % possible_url
     # end for each possible url
     del seen
-
-    def add_to_params(p):
-        for s, pname in replacements:
-            if pname == p.name:
-                return False
-        return True
 %>
     /// Perform the operation you have build so far.
     ${action_fn} {
+        % if URL_ENCODE in special_cases:
+        use url::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        % endif
         use std::io::Read;
         let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params)} + ${paddfields}.len());
         % for p in field_params:
@@ -460,7 +457,6 @@ match result {
     pname = 'self.' + property(p.name)    # property identifier
 %>\
         ## parts can also be derived from the request, but we do that only if it's not set
-        % if add_to_params(p):
         % if p.name == 'part' and request_value:
         % if not is_required_property(p):
         if ${pname}.is_none() {
@@ -487,7 +483,6 @@ match result {
         % else:
         params.push(("${p.name}", ${pname}.to_string()));
         % endif
-        % endif ## add_to_params(p)
         % endfor
         ## Additional params - may not overlap with optional params
         for &field in [${', '.join(enclose_in('"', (p.name for p in field_params)))}].iter() {
@@ -539,14 +534,44 @@ else {
 
         % if replacements:
         for &(find_this, param_name) in [${', '.join('("%s", "%s")' % r for r in replacements)}].iter() {
+            % if URL_ENCODE in special_cases:
+            let mut replace_with = String::new();
+            % else:
             let mut replace_with: Option<<&str> = None;
+            % endif
             for &(name, ref value) in params.iter() {
                 if name == param_name {
+                    % if URL_ENCODE in special_cases:
+                    replace_with = value.to_string();
+                    % else:
                     replace_with = Some(value);
+                    % endif
                     break;
                 }
             }
+            % if URL_ENCODE in special_cases:
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), FORM_URLENCODED_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+            % else:
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+            % endif
+        }
+        ## Remove all used parameters
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(${len(replacements)});
+            for param_name in [${', '.join('"%s"' % r[1] for r in replacements)}].iter() {
+                for (index, &(ref name, _)) in params.iter().rev().enumerate() {
+                    if name == param_name {
+                        indices_for_removal.push(params.len() - index - 1);
+                        break;
+                    }
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
         }
         % endif
         
