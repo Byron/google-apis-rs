@@ -312,8 +312,11 @@ ${'.' + action_name | indent_by(13)}(${action_args});
 
 match result {
     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
+    Result::MissingAPIKey => println!("Missing API Key"),
+    Result::MissingToken => println!("Missing Token"),
+    Result::Failure(_) => println!("General Failure (Response doesn't print)"),
     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
-    Result::Success(value) => println!("Result Value: {:?}", value),
+    Result::Success(_) => println!("Success (value doesn't print)"),
 }
 % endif
 </%block>
