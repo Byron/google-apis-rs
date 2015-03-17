@@ -94,7 +94,7 @@ impl${rb_params} ${ThisType} {
             % if prop_key == 'scopes' and (not auth or not auth.oauth2):
             <% continue %>\
             % endif
-            ${custom_name}: Default::default(),
+${custom_name}: Default::default(),
             % endfor
         }
     }

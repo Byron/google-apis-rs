@@ -50,8 +50,8 @@ Handle the following *Resources* with ease from the central ${link('hub', hub_ur
 <%
     md_methods = list()
     for method in sorted(c.rta_map[r]):
-            md_methods.append(link('*%s*' % split_camelcase_s(method),
-                                   'struct.%s.html' % mb_type(r, method)))
+        md_methods.append(link('*%s*' % split_camelcase_s(method),
+                               'struct.%s.html' % mb_type(r, method)))
     md_resource = split_camelcase_s(r)
     sn = singular(canonical_type_name(r))
 
@@ -97,7 +97,11 @@ Or specifically ...
 ```ignore
 % for an, a in c.sta_map[fr.id].iteritems():
 <% category, resource, activity = activity_split(an) %>\
+% if resource:
 let r = hub.${mangle_ident(resource)}().${mangle_ident(activity)}(...).${api.terms.action}()
+% else:
+let r = hub.${mangle_ident(activity)}(...).${api.terms.action}()
+% endif
 % endfor
 ```
 % endif
@@ -207,13 +211,13 @@ let mut hub = ${hub_type}::new(hyper::Client::new(), auth);\
         fqan = None
         last_param_count = None
         for fqan in c.sta_map[fr.id]:
-            _, aresource, amethod = activity_split(fqan)
+            category, aresource, amethod = activity_split(fqan)
             am = c.fqan_map[fqan]
             build_all_params(c, am)
             aparams, arequest_value = build_all_params(c, am)
 
             if last_param_count is None or len(aparams) > last_param_count:
-                m, resource, method, params, request_value = am, aresource, amethod, aparams, arequest_value
+                m, resource, method, params, request_value = am, aresource or category, amethod, aparams, arequest_value
                 last_param_count = len(aparams)
         # end for each fn to test
         part_prop, parts = parts_from_params(params)

@@ -109,8 +109,8 @@ The list links the activity name, along with information about where it is used 
 
 % for a, iot in c.sta_map[s.id].iteritems():
 <%
-    _, name, method = activity_split(a)
-
+    category, name, method = activity_split(a)
+    name = name or category
     struct_url = 'struct.' + mb_type(name, method) + '.html'
     method_name = split_camelcase_s(method) + ' ' + split_camelcase_s(name)
     value_type = '|'.join(iot) or 'none'

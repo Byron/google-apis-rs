@@ -8,7 +8,7 @@
                       rust_module_doc_comment, rb_type, hub_type, mangle_ident, hub_type_params_s,
                       hub_type_bounds, rb_type_params_s, find_fattest_resource, HUB_TYPE_PARAMETERS)
 
-    c = new_context(schemas, resources)
+    c = new_context(schemas, resources, context.get('methods'))
     hub_type = hub_type(c.schemas, util.canonical_name())
     ht_params = hub_type_params_s()
 %>\

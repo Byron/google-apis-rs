@@ -387,7 +387,8 @@ def schema_markers(s, c):
         else:
             # it should have at least one activity that matches it's type to qualify for the Resource trait
             for fqan, iot in activities.iteritems():
-                if activity_name_to_type_name(activity_split(fqan)[1]).lower() == sid.lower():
+                _, resource, _ = activity_split(fqan)
+                if resource and activity_name_to_type_name(resource).lower() == sid.lower():
                     res.add('cmn::%s' % RESOURCE_MARKER_TRAIT)
                 if IO_RESPONSE in iot:
                     res.add(RESPONSE_MARKER_TRAIT)
@@ -408,10 +409,16 @@ def schema_markers(s, c):
 # -------------------------
 ## @name Activity Utilities
 # @{
-# return (category, name, method)
+# return (category, name|None, method)
 def activity_split(fqan):
     t = fqan.split('.')
-    return t[0], t[1], '.'.join(t[2:])
+    mt = t[2:]
+    if not mt:
+        # make this the method, with not resource 
+        mt = [t[1]]
+        t[1] = None
+    # end 
+    return t[0], t[1], '.'.join(mt)
 
 # Shorthand to get a type from parameters of activities
 def activity_rust_type(schemas, p, allow_optionals=True):
@@ -569,7 +576,7 @@ It should be used to handle progress information, and to implement a certain lev
 Context = collections.namedtuple('Context', ['sta_map', 'fqan_map', 'rta_map', 'rtc_map', 'schemas'])
 
 # return a newly build context from the given data
-def new_context(schemas, resources):
+def new_context(schemas, resources, methods):
     # Returns (A, B) where
     # A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
     # B: { fqan -> activity_method_data }
@@ -579,7 +586,7 @@ def new_context(schemas, resources):
             res = dict()
         if fqan is None:
             fqan = dict()
-        for an, a in activities.iteritems():
+        for a in activities.values():
             if 'resources' in a:
                 build_activity_mappings(a.resources, res, fqan)
             if 'methods' not in a:
@@ -587,6 +594,10 @@ def new_context(schemas, resources):
             for mn, m in a.methods.iteritems():
                 assert m.id not in fqan
                 fqan[m.id] = m
+                category, resource, method = activity_split(m.id)
+                # Put the same method under different names to make access easier
+                if resource is None:
+                    fqan[to_fqan(category, category, method)] = m
                 for in_out_type_name in IO_TYPES:
                     t = m.get(in_out_type_name, None)
                     if t is None:
@@ -601,12 +612,12 @@ def new_context(schemas, resources):
                 # delete: has no response or request
                 # getrating: response is a 'SomethingResult', which is still related to activities name
                 #            the latter is used to deduce the resource name
-                _, an, _ = activity_split(m.id)
-                tn = activity_name_to_type_name(an)
-                info = res.setdefault(tn, dict())
-                if m.id not in info:
-                    info.setdefault(m.id, [])
-                # end handle other cases
+                if resource:
+                    tn = activity_name_to_type_name(resource)
+                    info = res.setdefault(tn, dict())
+                    if m.id not in info:
+                        info.setdefault(m.id, [])
+                    # end handle other cases
             # end for each method
         # end for each activity
         return res, fqan
@@ -676,17 +687,31 @@ def new_context(schemas, resources):
     # end utility
 
     all_schemas = schemas and build_schema_map() or dict()
-    if not resources:
+    if not (resources or methods):
         return Context(dict(), dict(), dict(), dict(), all_schemas)
 
-    sta_map, fqan_map = build_activity_mappings(resources)
-    rta_map = dict()
-    rtc_map = dict()
-    for an in fqan_map:
-        category, resource, activity = activity_split(an)
-        rta_map.setdefault(resource, list()).append(activity)
-        assert rtc_map.setdefault(resource, category) == category
-    # DEBUG
+    rta_map, rtc_map, sta_map, fqan_map = dict(), dict(), dict(), dict()
+
+    sources = list()
+    if bool(resources):
+        sources.append(resources)
+    if bool(methods):
+        sources.append({None : type(methods)({'methods' : methods})})
+
+    for data_source in sources:
+        _sta_map, _fqan_map = build_activity_mappings(data_source)
+        for an in _fqan_map:
+            category, resource, activity = activity_split(an)
+            resource = resource or category
+            rta_map.setdefault(resource, list()).append(activity)
+            assert rtc_map.setdefault(resource, category) == category
+        # end for each fqan
+        # TODO: DEBUG: Remove this when it was run on all APIs
+        assert len(set(sta_map.keys()) & set(_sta_map.keys())) == 0
+        assert len(set(fqan_map.keys()) & set(_fqan_map.keys())) == 0, set(fqan_map.keys()) & set(_fqan_map.keys())
+        sta_map.update(_sta_map)
+        fqan_map.update(_fqan_map)
+    # end for each data source
     return Context(sta_map, fqan_map, rta_map, rtc_map, all_schemas)
 
 # Expects v to be 'v\d+', throws otherwise
