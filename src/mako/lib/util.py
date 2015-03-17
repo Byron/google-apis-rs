@@ -10,6 +10,10 @@ re_linestart = re.compile('^', flags=re.MULTILINE)
 re_first_4_spaces = re.compile('^ {1,4}', flags=re.MULTILINE)
 re_desc_parts = re.compile("((the part (names|properties) that you can include in the parameter value are)|(supported values are ))(.*?)\.", flags=re.IGNORECASE|re.MULTILINE)
 
+re_find_replacements = re.compile("\{\w+\}")
+
+
+
 USE_FORMAT = 'use_format_field'
 TYPE_MAP = {'boolean' : 'bool',
             'integer' : USE_FORMAT,
@@ -524,7 +528,8 @@ def method_media_params(m):
         except KeyError:
             raise AssertionError("media upload protocol '%s' is not implemented" % pn)
         p = type(m)({'name': 'media_%s',
-             'info': pi, 
+             'info': pi,
+             'protocol': pn,
              'path': proto.path, 
              'type': ti,
              'description': ti.description,

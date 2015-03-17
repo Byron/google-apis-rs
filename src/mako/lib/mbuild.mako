@@ -454,6 +454,24 @@ else {
             self.${api.properties.scopes}.insert(${scope_url_to_variant(name, default_scope, fully_qualified=True)}.as_slice().to_string(), ());
         }
         % endif
+        ## Only one of them is going to be set, even though we generate code that doesn't care
+        % if media_params:
+        {
+            let protocol =\
+            % for mp in media_params:
+            % if loop.first:
+ if \
+            % else:
+ else if \
+            % endif
+${mp.type.arg_name}.is_some() {
+                "${mp.protocol}"
+            }\
+            % endfor
+ else { unreachable!() };
+            params.push(("uploadType", protocol.to_string()));
+        }
+        % endif
 
         url.push('?');
         url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
