@@ -3,7 +3,7 @@
                       unindent_first_by, mangle_ident, mb_type, singular, scope_url_to_variant,
                       PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, METHOD_BUILDER_MARKERT_TRAIT, 
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
-                      REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes)  %>\
+                      REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version)  %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="mbuild" file="mbuild.mako"/>\
 
@@ -34,7 +34,14 @@
         return lf % (name, doc_base_url + url)
 
 
+    api_version = to_api_version(version)
+    if api_version[0].isdigit():
+        api_version = 'v' + api_version
 %>\
+% if rust_doc:
+This documentation was generated from *${util.canonical_name()}* crate version *${cargo.build_version}*.
+The original source code can be found [on github](${cargo.repo_base_url}/tree/master/${directories.output}/${util.library_name()}).
+% endif
 # Features
 
 Handle the following *Resources* with ease from the central ${link('hub', hub_url)} ... 
@@ -55,7 +62,7 @@ Handle the following *Resources* with ease from the central ${link('hub', hub_ur
 % endfor
 
 % if documentationLink:
-Everything else about the *${util.canonical_name()}* API can be found at the
+Everything else about the *${util.canonical_name()}* *${api_version}* API can be found at the
 [official documentation site](${documentationLink}).
 % endif
 % if rust_doc:
