@@ -192,7 +192,12 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         part_desc = make_parts_desc(part_prop)
     # end part description
 %>\
+    % if is_repeated_property(p):
+    /// Append the given value to the *${split_camelcase_s(p.name)}* ${get_word(p, 'location')}property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    % else:
     /// Sets the *${split_camelcase_s(p.name)}* ${get_word(p, 'location')}property to the given value.
+    % endif
     ///
     % if show_part_info(m, p):
     /// Even though the *parts* list is automatically derived from *Resource* passed in 
