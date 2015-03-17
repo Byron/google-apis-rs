@@ -415,11 +415,26 @@ match result {
     seen = set()
     replacements = list()
     all_required_param_name = set(p.name for p in params if is_required_property(p))
+    MULTI_SLASH = 'multi-slash-prefix'
+    URL_ENCODE = 'url-encode'
+
+    special_cases = set()
     for possible_url in possible_urls:
         for s in re_find_replacements.findall(possible_url):
             if s in seen: continue
             seen.add(s)
             sn = s[1:-1]
+
+            # NOTE: We only handle the cases that are actually used in the schemas. If this shouldn't
+            # be worth it anymore (i.e. too many cases), then we should use a uri-template library 
+            # to handle this at runtime, possibly, or use a python uri-template library, to more easily
+            # handle the required cases. Whatever is less work, I guess.
+            if sn.startswith('/') and sn.endswith('*'):
+                sn = sn[1:-1]
+                special_cases.add(MULTI_SLASH)
+            elif sn.startswith('+'):
+                sn = sn[1:]
+                special_cases.add(URL_ENCODE)
             assert sn in all_required_param_name, "Expected param '%s' to be in required parameter list for substitution" % sn
             replacements.append((s, sn))
         # end for each found substitution
@@ -429,6 +444,12 @@ match result {
         assert '{' not in possible_url, "Failed to replace all fields in '%s', have to parse expressions" % possible_url
     # end for each possible url
     del seen
+
+    def add_to_params(p):
+        for s, pname in replacements:
+            if pname == p.name:
+                return False
+        return True
 %>
     /// Perform the operation you have build so far.
     ${action_fn} {
@@ -439,6 +460,7 @@ match result {
     pname = 'self.' + property(p.name)    # property identifier
 %>\
         ## parts can also be derived from the request, but we do that only if it's not set
+        % if add_to_params(p):
         % if p.name == 'part' and request_value:
         % if not is_required_property(p):
         if ${pname}.is_none() {
@@ -448,8 +470,8 @@ match result {
         if ${pname}.len() == 0 {
             ${pname} = self.${property(REQUEST_VALUE_PROPERTY_NAME)}.to_parts();
         }
-        % endif
-        % endif
+        % endif ## not is_required_property(p):
+        % endif ## p.name == 'part' and request_value:
         % if p.get('repeated', False):
         if ${pname}.len() > 0 {
             let mut s = String::new();
@@ -465,6 +487,7 @@ match result {
         % else:
         params.push(("${p.name}", ${pname}.to_string()));
         % endif
+        % endif ## add_to_params(p)
         % endfor
         ## Additional params - may not overlap with optional params
         for &field in [${', '.join(enclose_in('"', (p.name for p in field_params)))}].iter() {

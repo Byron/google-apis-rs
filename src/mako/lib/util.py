@@ -10,7 +10,7 @@ re_linestart = re.compile('^', flags=re.MULTILINE)
 re_first_4_spaces = re.compile('^ {1,4}', flags=re.MULTILINE)
 re_desc_parts = re.compile("((the part (names|properties) that you can include in the parameter value are)|(supported values are ))(.*?)\.", flags=re.IGNORECASE|re.MULTILINE)
 
-re_find_replacements = re.compile("\{\w+\}")
+re_find_replacements = re.compile("\{[/\+]?\w+\*?\}")
 
 
 
@@ -330,7 +330,7 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True):
             rust_type = 'i64'
         elif rust_type == USE_FORMAT:
             rust_type = TYPE_MAP[t.format]
-            
+
         if t.get('repeated', False):
             rust_type = 'Vec<%s>' % rust_type
         else:
@@ -937,6 +937,17 @@ if __name__ == '__main__':
         assert len(ms) == 2
         assert ms[0].group(0) == '{groupId}'
         assert ms[1].group(0) == '{foo}'
+
+        url = "customer/{customerId}/orgunits{/orgUnitPath*}"
+        ms = list(re_find_replacements.findall(url))
+        assert len(ms) == 2
+        assert ms[0] == '{customerId}'
+        assert ms[1] == '{/orgUnitPath*}'
+
+        url = "{+project}/subscriptions"
+        ms = list(re_find_replacements.findall(url))
+        assert len(ms) == 1
+        assert ms[0] == '{+project}'
 
     test_to_version()
     test_library_name()
