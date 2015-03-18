@@ -450,6 +450,10 @@ match result {
         % if URL_ENCODE in special_cases:
         use url::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         % endif
+        ## TODO: IntoBody is called explicilty, even though it should be working implicitly.
+        ## However, the compiler complains about
+        ## "the trait `core::marker::Sized` is not implemented for the type `std::io::Read`"
+        use hyper::client::IntoBody;
         use std::io::Read;
         let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params)} + ${paddfields}.len());
         % for p in field_params:
@@ -581,6 +585,14 @@ else {
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        % if request_value and media_params:
+        // let mp_reader = MultiPart ...
+        let mut request_value_reader = io::Cursor::new(json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap().into_bytes());
+        let mut body_reader: &mut io::Read = if true {
+            &mut request_value_reader
+        } else { unreachable!() };
+        % endif ## media upload handling
+
         loop {
             % if supports_scopes(auth):
             let mut token = ${auth_call}.token(self.${api.properties.scopes}.keys());
@@ -602,9 +614,13 @@ else {
                .header(auth_header)
                % endif
                % if request_value:
+               % if not media_params:
                .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
                .body(json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap().as_slice())
-               % endif
+               % else:
+               .body(body_reader.into_body())
+               % endif ## media-mediaparams
+               % endif ## endif request value
                .send() {
                 Err(err) => {
                     if ${delegate}.is_some() {
