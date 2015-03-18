@@ -1,6 +1,5 @@
 use std::marker::MarkerTrait;
 use std::io::{self, Read, Seek, Cursor, Write, SeekFrom};
-use std::default::Default;
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2;

@@ -17,7 +17,6 @@ mod tests {
     use self::hyper_mock::*;
     use std::io::Read;
     use std::default::Default;
-    use std::old_path::BytesContainer;
 
     const EXPECTED: &'static str = 
 "\r\n--MDuXWGyeE33QFXGchb2VFWc4Z7945d\r\n\
@@ -40,8 +39,8 @@ bar\r\n\
         let mut r2 = MockStream::with_input(b"bar");
         let mut mpr: MultiPartReader = Default::default();
 
-        mpr.add_part(&mut r1, 50, &"application/json".parse().unwrap())
-           .add_part(&mut r2, 25, &"application/plain".parse().unwrap());
+        mpr.add_part(&mut r1, 50, "application/json".parse().unwrap())
+           .add_part(&mut r2, 25, "application/plain".parse().unwrap());
 
         let mut res = String::new();
         let r = mpr.read_to_string(&mut res);
@@ -51,8 +50,8 @@ bar\r\n\
         // As the test is just for dev, and doesn't run on travis, we are fine, 
         // for now. Possible solution would be to omit the size field (make it 
         // optional)
-        // assert_eq!(res, EXPECTED);
         assert_eq!(r, Ok(EXPECTED_LEN));
+        // assert_eq!(res, EXPECTED);
     }
 
     #[test]
@@ -61,8 +60,8 @@ bar\r\n\
         let mut r2 = MockStream::with_input(b"bar");
         let mut mpr: MultiPartReader = Default::default();
 
-        mpr.add_part(&mut r1, 50, &"application/json".parse().unwrap())
-           .add_part(&mut r2, 25, &"application/plain".parse().unwrap());
+        mpr.add_part(&mut r1, 50, "application/json".parse().unwrap())
+           .add_part(&mut r2, 25, "application/plain".parse().unwrap());
 
         let mut buf = &mut [0u8];
         let mut v = Vec::<u8>::new();
