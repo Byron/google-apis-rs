@@ -619,9 +619,9 @@ else {
             let mut body_reader: &mut io::Read = match ${simple_media_param.type.arg_name}.as_mut() {
                 Some(&mut (ref mut reader, size, ref mime)) => {
                     let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-                    request_value_reader.seek(io::SeekFrom::Start(0)).ok();
-                    mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
-                                         .add_part(reader, size, mime);
+                    request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
+                              .add_part(reader, size, mime);
                     content_type = ContentType(mp_reader.mime_type());
                     &mut mp_reader
                 }
@@ -675,7 +675,7 @@ else {
                     if !res.status.is_success() {
                         if ${delegate}.is_some() {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
                             if let oauth2::Retry::After(d) = ${delegate_call}.http_failure(&res, error_info) {
                                 sleep(d);
@@ -686,7 +686,7 @@ else {
                     }
                 % if response_schema:
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                 % else:
                     let result_value = res;

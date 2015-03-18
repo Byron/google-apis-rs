@@ -1,10 +1,11 @@
 use std::marker::MarkerTrait;
-use std::io::{self, Read, Seek, Cursor};
+use std::io::{self, Read, Seek, Cursor, Write, SeekFrom};
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2;
 use hyper;
 use hyper::header::{ContentType, ContentLength, Headers};
+use hyper::http::LINE_ENDING;
 
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
@@ -145,7 +146,7 @@ impl<'a> MultiPartReader<'a> {
     /// # Panics
     ///
     /// If this method is called after the first `read` call, it will panic
-    pub fn add_part(mut self, reader: &'a mut Read, size: u64, mime_type: &Mime) -> MultiPartReader<'a> {
+    pub fn add_part(&mut self, reader: &'a mut Read, size: u64, mime_type: &Mime) -> &mut MultiPartReader<'a> {
         let mut headers = Headers::new();
         headers.set(ContentType(mime_type.clone()));
         headers.set(ContentLength(size));
@@ -166,6 +167,36 @@ impl<'a> MultiPartReader<'a> {
 
 impl<'a> Read for MultiPartReader<'a> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        Err(io::Error::from_os_error(0))
+        if self.raw_parts.len() == 0 && self.current_part.is_none() {
+            return Ok(0)
+        } else if self.raw_parts.len() > 0 && self.current_part.is_none() {
+            let (headers, reader) = self.raw_parts.remove(0);
+            let mut c = Cursor::new(Vec::<u8>::new());
+            write!(&mut c, "{}{}", headers, LINE_ENDING).unwrap();
+            c.seek(SeekFrom::Start(0)).unwrap();
+            self.current_part = Some((c, reader));
+        }
+        // read headers as long as possible
+        let (hb, rr) = {
+            let &mut (ref mut c, ref mut reader) = self.current_part.as_mut().unwrap();
+            let b = c.read(buf).unwrap_or(0);
+            (b, reader.read(&mut buf[b..]))
+        };
+        
+        match rr {
+            Ok(bytes_read) => {
+                if bytes_read == 0 {
+                    // We are depleted - this can trigger the next part to come in
+                    self.current_part = None;
+                }
+                Ok(hb + bytes_read)
+            }
+            Err(err) => {
+                // fail permanently
+                self.current_part = None;
+                self.raw_parts.clear();
+                Err(err)
+            }
+        }
     }
 }

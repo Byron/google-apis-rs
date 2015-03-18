@@ -21,6 +21,3 @@ mime = "*"
 url = "*"
 rustc-serialize = "*"
 yup-oauth2 = "*"
-
-[dev-dependencies]
-yup-hyper-mock = "*"

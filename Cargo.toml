@@ -17,6 +17,7 @@ path = "src/rust/lib.rs"
 
 [dependencies]
 hyper = "*"
+mime = "*"
 rustc-serialize = "*"
 yup-oauth2 = "*"
 
