@@ -1,9 +1,10 @@
 use std::marker::MarkerTrait;
 use std::io::{self, Read, Seek, Cursor};
 
-use mime;
+use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2;
 use hyper;
+use hyper::header::{ContentType, ContentLength, Headers};
 
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
@@ -117,6 +118,7 @@ pub enum Result<T = ()> {
     Success(T),
 }
 
+const BOUNDARY: &'static str = "MDuXWGyeE33QFXGchb2VFWc4Z7945d";
 
 /// Provides a `Read` interface that converts multiple parts into the protocol
 /// identified by [RFC2387](https://tools.ietf.org/html/rfc2387).
@@ -124,7 +126,7 @@ pub enum Result<T = ()> {
 /// to google APIs, and might not be a fully-featured implementation.
 #[derive(Default)]
 pub struct MultiPartReader<'a> {
-    raw_parts: Vec<(hyper::header::Headers, &'a mut Read)>,
+    raw_parts: Vec<(Headers, &'a mut Read)>,
     current_part: Option<(Cursor<Vec<u8>>, &'a mut Read)>,
 }
 
@@ -143,10 +145,22 @@ impl<'a> MultiPartReader<'a> {
     /// # Panics
     ///
     /// If this method is called after the first `read` call, it will panic
-    pub fn add_part(mut self, reader: &'a mut Read, size: u64, mime_type: &mime::Mime) -> MultiPartReader<'a> {
-        // let mut headers = hyper::header::Headers::
-        // raw_parts.push((headers, reader));
+    pub fn add_part(mut self, reader: &'a mut Read, size: u64, mime_type: &Mime) -> MultiPartReader<'a> {
+        let mut headers = Headers::new();
+        headers.set(ContentType(mime_type.clone()));
+        headers.set(ContentLength(size));
+        self.raw_parts.push((headers, reader));
         self
+    }
+
+    /// Returns the mime-type representing our multi-part message.
+    /// Use it with the ContentType header.
+    pub fn mime_type(&self) -> Mime {
+        Mime(
+            TopLevel::Multipart,
+            SubLevel::Ext("Related".to_string()),
+            vec![(Attr::Ext("boundary".to_string()), Value::Ext(BOUNDARY.to_string()))],
+        )
     }
 }
 

@@ -461,6 +461,7 @@ match result {
         ## "the trait `core::marker::Sized` is not implemented for the type `std::io::Read`"
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params) + len(reserved_params)} + ${paddfields}.len());
         % if response_schema:
         params.push(("alt", "json".to_string()));
@@ -614,14 +615,14 @@ else {
             % if request_value and simple_media_param:
             let mut request_value_reader = io::Cursor::new(json_encoded_request.clone().into_bytes());
             let mut mp_reader: cmn::MultiPartReader = Default::default();
-            let mut content_type = hyper::header::ContentType(json_mime_type.clone());
+            let mut content_type = ContentType(json_mime_type.clone());
             let mut body_reader: &mut io::Read = match ${simple_media_param.type.arg_name}.as_mut() {
                 Some(&mut (ref mut reader, size, ref mime)) => {
                     let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
                     request_value_reader.seek(io::SeekFrom::Start(0)).ok();
                     mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
                                          .add_part(reader, size, mime);
-                    ## TODO: content_type = multi-part
+                    content_type = ContentType(mp_reader.mime_type());
                     &mut mp_reader
                 }
                 None => &mut request_value_reader,
@@ -637,8 +638,8 @@ else {
                 % if request_value:
                 % if not simple_media_param:
 
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice())\
                 % else:
 
@@ -649,8 +650,8 @@ else {
 ;
             % if simple_media_param and not request_value:
             if let Some(&mut (ref mut reader, size, ref mime)) = ${simple_media_param.type.arg_name}.as_mut() {
-                req = req.header(hyper::header::ContentType(mime.clone()))
-                         .header(hyper::header::ContentLength(size))
+                req = req.header(ContentType(mime.clone()))
+                         .header(ContentLength(size))
                          .body(reader.into_body());
             }
             % endif ## media upload handling
