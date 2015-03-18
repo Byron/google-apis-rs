@@ -370,8 +370,12 @@ match result {
     rtype = 'cmn::Result<hyper::client::Response>'
     response_schema = method_response(c, m)
 
+    reserved_params = []
     if response_schema:
         rtype = 'cmn::Result<(hyper::client::Response, %s)>' % (response_schema.id)
+        reserved_params = ['alt']
+
+
 
     possible_urls = [m.path]
     simple_media_param = None
@@ -457,7 +461,10 @@ match result {
         ## "the trait `core::marker::Sized` is not implemented for the type `std::io::Read`"
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params)} + ${paddfields}.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params) + len(reserved_params)} + ${paddfields}.len());
+        % if response_schema:
+        params.push(("alt", "json".to_string()));
+        % endif
         % for p in field_params:
 <%
     pname = 'self.' + property(p.name)    # property identifier
@@ -491,7 +498,7 @@ match result {
         % endif
         % endfor
         ## Additional params - may not overlap with optional params
-        for &field in [${', '.join(enclose_in('"', (p.name for p in field_params)))}].iter() {
+        for &field in [${', '.join(enclose_in('"', reserved_params + [p.name for p in field_params]))}].iter() {
             if ${paddfields}.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -604,8 +611,6 @@ else {
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
             % endif
-
-
             % if request_value and simple_media_param:
             let mut request_value_reader = io::Cursor::new(json_encoded_request.clone().into_bytes());
             let mut mp_reader: cmn::MultiPartReader = Default::default();
