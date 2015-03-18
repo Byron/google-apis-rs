@@ -1,5 +1,6 @@
 use std::marker::MarkerTrait;
 use std::io::{self, Read, Seek, Cursor, Write, SeekFrom};
+use std::default::Default;
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2;
@@ -134,6 +135,11 @@ pub struct MultiPartReader<'a> {
 
 impl<'a> MultiPartReader<'a> {
 
+    /// Reserve memory for exactly the given amount of parts
+    pub fn reserve_exact(&mut self, cap: usize) {
+        self.raw_parts.reserve_exact(cap);
+    }
+
     /// Add a new part to the queue of parts to be read on the first `read` call.
     ///
     /// # Arguments
@@ -147,9 +153,9 @@ impl<'a> MultiPartReader<'a> {
     /// # Panics
     ///
     /// If this method is called after the first `read` call, it will panic
-    pub fn add_part(&mut self, reader: &'a mut Read, size: u64, mime_type: &Mime) -> &mut MultiPartReader<'a> {
+    pub fn add_part(&mut self, reader: &'a mut Read, size: u64, mime_type: Mime) -> &mut MultiPartReader<'a> {
         let mut headers = Headers::new();
-        headers.set(ContentType(mime_type.clone()));
+        headers.set(ContentType(mime_type));
         headers.set(ContentLength(size));
         self.raw_parts.push((headers, reader));
         self

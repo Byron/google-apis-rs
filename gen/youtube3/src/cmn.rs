@@ -1,11 +1,14 @@
 // COPY OF 'src/rust/cmn.rs'
 // DO NOT EDIT
 use std::marker::MarkerTrait;
-use std::io::{self, Read, Seek, Cursor};
+use std::io::{self, Read, Seek, Cursor, Write, SeekFrom};
+use std::default::Default;
 
-use mime;
+use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2;
 use hyper;
+use hyper::header::{ContentType, ContentLength, Headers};
+use hyper::http::LINE_ENDING;
 
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
@@ -119,6 +122,7 @@ pub enum Result<T = ()> {
     Success(T),
 }
 
+const BOUNDARY: &'static str = "MDuXWGyeE33QFXGchb2VFWc4Z7945d";
 
 /// Provides a `Read` interface that converts multiple parts into the protocol
 /// identified by [RFC2387](https://tools.ietf.org/html/rfc2387).
@@ -126,11 +130,17 @@ pub enum Result<T = ()> {
 /// to google APIs, and might not be a fully-featured implementation.
 #[derive(Default)]
 pub struct MultiPartReader<'a> {
-    raw_parts: Vec<(hyper::header::Headers, &'a mut Read)>,
+    raw_parts: Vec<(Headers, &'a mut Read)>,
     current_part: Option<(Cursor<Vec<u8>>, &'a mut Read)>,
+    last_part_boundary: Option<Cursor<Vec<u8>>>,
 }
 
 impl<'a> MultiPartReader<'a> {
+
+    /// Reserve memory for exactly the given amount of parts
+    pub fn reserve_exact(&mut self, cap: usize) {
+        self.raw_parts.reserve_exact(cap);
+    }
 
     /// Add a new part to the queue of parts to be read on the first `read` call.
     ///
@@ -145,15 +155,88 @@ impl<'a> MultiPartReader<'a> {
     /// # Panics
     ///
     /// If this method is called after the first `read` call, it will panic
-    pub fn add_part(mut self, reader: &'a mut Read, size: u64, mime_type: &mime::Mime) -> MultiPartReader<'a> {
-        // let mut headers = hyper::header::Headers::
-        // raw_parts.push((headers, reader));
+    pub fn add_part(&mut self, reader: &'a mut Read, size: u64, mime_type: Mime) -> &mut MultiPartReader<'a> {
+        let mut headers = Headers::new();
+        headers.set(ContentType(mime_type));
+        headers.set(ContentLength(size));
+        self.raw_parts.push((headers, reader));
         self
+    }
+
+    /// Returns the mime-type representing our multi-part message.
+    /// Use it with the ContentType header.
+    pub fn mime_type(&self) -> Mime {
+        Mime(
+            TopLevel::Multipart,
+            SubLevel::Ext("Related".to_string()),
+            vec![(Attr::Ext("boundary".to_string()), Value::Ext(BOUNDARY.to_string()))],
+        )
+    }
+
+    /// Returns true if we are totally used
+    fn is_depleted(&self) -> bool {
+        self.raw_parts.len() == 0 && self.current_part.is_none() && self.last_part_boundary.is_none()
+    }
+
+    /// Returns true if we are handling our last part
+    fn is_last_part(&self) -> bool {
+        self.raw_parts.len() == 0 && self.current_part.is_some()
     }
 }
 
 impl<'a> Read for MultiPartReader<'a> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        Err(io::Error::from_os_error(0))
+        if self.last_part_boundary.is_some() {
+            let br = self.last_part_boundary.as_mut().unwrap().read(buf).unwrap_or(0);
+            if br < buf.len() {
+                self.last_part_boundary = None;
+            }
+            return Ok(br)
+        } else if self.is_depleted() {
+            return Ok(0)
+        } else if self.raw_parts.len() > 0 && self.current_part.is_none() {
+            let (headers, reader) = self.raw_parts.remove(0);
+            let mut c = Cursor::new(Vec::<u8>::new());
+            write!(&mut c, "{}--{}{}{}{}", LINE_ENDING, BOUNDARY, LINE_ENDING, 
+                                           headers, LINE_ENDING).unwrap();
+            c.seek(SeekFrom::Start(0)).unwrap();
+            self.current_part = Some((c, reader));
+        }
+        // read headers as long as possible
+        let (hb, rr) = {
+            let &mut (ref mut c, ref mut reader) = self.current_part.as_mut().unwrap();
+            let b = c.read(buf).unwrap_or(0);
+            (b, reader.read(&mut buf[b..]))
+        };
+        
+        match rr {
+            Ok(bytes_read) => {
+                if hb < buf.len() && bytes_read == 0 {
+                    if self.is_last_part() {
+                        // before clearing the last part, we will add the boundary that 
+                        // will be written last
+                        self.last_part_boundary = Some(Cursor::new(
+                                                        format!("{}--{}", LINE_ENDING, BOUNDARY).into_bytes()))
+                    }
+                    // We are depleted - this can trigger the next part to come in
+                    self.current_part = None;
+                }
+                let mut total_bytes_read = hb + bytes_read;
+                while total_bytes_read < buf.len() && !self.is_depleted() {
+                    match self.read(&mut buf[total_bytes_read ..]) {
+                        Ok(br) => total_bytes_read += br,
+                        Err(err) => return Err(err),
+                    }
+                }
+                Ok(total_bytes_read)
+            }
+            Err(err) => {
+                // fail permanently
+                self.current_part = None;
+                self.last_part_boundary = None;
+                self.raw_parts.clear();
+                Err(err)
+            }
+        }
     }
 }

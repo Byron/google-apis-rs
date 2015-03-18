@@ -6658,12 +6658,15 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, I18nLanguageListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._hl.is_some() {
-            params.push(("hl", self._hl.unwrap().to_string()));
+        if let Some(value) = self._hl {
+            params.push(("hl", value.to_string()));
         }
-        for &field in ["part", "hl"].iter() {
+        for &field in ["alt", "part", "hl"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -6687,15 +6690,13 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -6708,8 +6709,8 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -6718,11 +6719,11 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -6730,7 +6731,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -6878,11 +6879,14 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ChannelBannerResource)> where R: ReadSeek, RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -6915,27 +6919,26 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
             let mut request_value_reader = io::Cursor::new(json_encoded_request.clone().into_bytes());
             let mut mp_reader: cmn::MultiPartReader = Default::default();
-            let mut content_type = hyper::header::ContentType(json_mime_type.clone());
-            let mut body_reader: &mut io::Read = match stream.as_mut() {
+            let (mut body_reader, content_type) = match stream.as_mut() {
                 Some(&mut (ref mut reader, size, ref mime)) => {
+                    mp_reader.reserve_exact(2);
                     let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-                    request_value_reader.seek(io::SeekFrom::Start(0)).ok();
-                    mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
-                                         .add_part(reader, size, mime);
-                    &mut mp_reader
-                }
-                None => &mut request_value_reader,
+                    request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    mp_reader.add_part(&mut request_value_reader, rsize, json_mime_type.clone())
+                             .add_part(reader, size, mime.clone());
+                    let mime_type = mp_reader.mime_type();
+                    (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                },
+                None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
             };
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
@@ -6951,8 +6954,8 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -6961,11 +6964,11 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -6973,7 +6976,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -7150,21 +7153,24 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelSectionListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((7 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        if self._mine.is_some() {
-            params.push(("mine", self._mine.unwrap().to_string()));
+        if let Some(value) = self._mine {
+            params.push(("mine", value.to_string()));
         }
-        if self._id.is_some() {
-            params.push(("id", self._id.unwrap().to_string()));
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
         }
-        if self._channel_id.is_some() {
-            params.push(("channelId", self._channel_id.unwrap().to_string()));
+        if let Some(value) = self._channel_id {
+            params.push(("channelId", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwner", "mine", "id", "channelId"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwner", "mine", "id", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -7188,15 +7194,13 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -7209,8 +7213,8 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -7219,11 +7223,11 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -7231,7 +7235,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -7421,18 +7425,21 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelSection)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((6 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -7458,21 +7465,19 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -7482,8 +7487,8 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -7492,11 +7497,11 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -7504,7 +7509,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -7674,10 +7679,12 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((3 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7703,15 +7710,13 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -7724,8 +7729,8 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -7734,11 +7739,11 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -7900,15 +7905,18 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelSection)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((5 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -7934,21 +7942,19 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -7958,8 +7964,8 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -7968,11 +7974,11 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -7980,7 +7986,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -8156,18 +8162,21 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, GuideCategoryListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((6 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._region_code.is_some() {
-            params.push(("regionCode", self._region_code.unwrap().to_string()));
+        if let Some(value) = self._region_code {
+            params.push(("regionCode", value.to_string()));
         }
-        if self._id.is_some() {
-            params.push(("id", self._id.unwrap().to_string()));
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
         }
-        if self._hl.is_some() {
-            params.push(("hl", self._hl.unwrap().to_string()));
+        if let Some(value) = self._hl {
+            params.push(("hl", value.to_string()));
         }
-        for &field in ["part", "regionCode", "id", "hl"].iter() {
+        for &field in ["alt", "part", "regionCode", "id", "hl"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -8191,15 +8200,13 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -8212,8 +8219,8 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -8222,11 +8229,11 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -8234,7 +8241,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -8413,18 +8420,21 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Playlist)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((6 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -8450,21 +8460,19 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -8474,8 +8482,8 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -8484,11 +8492,11 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -8496,7 +8504,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -8694,30 +8702,33 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((10 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._page_token.is_some() {
-            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
         }
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        if self._mine.is_some() {
-            params.push(("mine", self._mine.unwrap().to_string()));
+        if let Some(value) = self._mine {
+            params.push(("mine", value.to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
         }
-        if self._id.is_some() {
-            params.push(("id", self._id.unwrap().to_string()));
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
         }
-        if self._channel_id.is_some() {
-            params.push(("channelId", self._channel_id.unwrap().to_string()));
+        if let Some(value) = self._channel_id {
+            params.push(("channelId", value.to_string()));
         }
-        for &field in ["part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "channelId"].iter() {
+        for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -8741,15 +8752,13 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -8762,8 +8771,8 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -8772,11 +8781,11 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -8784,7 +8793,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -8979,10 +8988,12 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((3 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9008,15 +9019,13 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -9029,8 +9038,8 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -9039,11 +9048,11 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -9205,15 +9214,18 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Playlist)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((5 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -9239,21 +9251,19 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -9263,8 +9273,8 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -9273,11 +9283,11 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -9285,7 +9295,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -9446,12 +9456,15 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ThumbnailSetResponse)> where R: ReadSeek, RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("videoId", self._video_id.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["videoId", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "videoId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -9482,22 +9495,20 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
             if let Some(&mut (ref mut reader, size, ref mime)) = stream.as_mut() {
-                req = req.header(hyper::header::ContentType(mime.clone()))
-                         .header(hyper::header::ContentLength(size))
+                req = req.header(ContentType(mime.clone()))
+                         .header(ContentLength(size))
                          .body(reader.into_body());
             }
 
@@ -9508,8 +9519,8 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -9518,11 +9529,11 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -9530,7 +9541,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -9728,39 +9739,42 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, VideoListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((13 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._video_category_id.is_some() {
-            params.push(("videoCategoryId", self._video_category_id.unwrap().to_string()));
+        if let Some(value) = self._video_category_id {
+            params.push(("videoCategoryId", value.to_string()));
         }
-        if self._region_code.is_some() {
-            params.push(("regionCode", self._region_code.unwrap().to_string()));
+        if let Some(value) = self._region_code {
+            params.push(("regionCode", value.to_string()));
         }
-        if self._page_token.is_some() {
-            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        if self._my_rating.is_some() {
-            params.push(("myRating", self._my_rating.unwrap().to_string()));
+        if let Some(value) = self._my_rating {
+            params.push(("myRating", value.to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
         }
-        if self._locale.is_some() {
-            params.push(("locale", self._locale.unwrap().to_string()));
+        if let Some(value) = self._locale {
+            params.push(("locale", value.to_string()));
         }
-        if self._id.is_some() {
-            params.push(("id", self._id.unwrap().to_string()));
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
         }
-        if self._hl.is_some() {
-            params.push(("hl", self._hl.unwrap().to_string()));
+        if let Some(value) = self._hl {
+            params.push(("hl", value.to_string()));
         }
-        if self._chart.is_some() {
-            params.push(("chart", self._chart.unwrap().to_string()));
+        if let Some(value) = self._chart {
+            params.push(("chart", value.to_string()));
         }
-        for &field in ["part", "videoCategoryId", "regionCode", "pageToken", "onBehalfOfContentOwner", "myRating", "maxResults", "locale", "id", "hl", "chart"].iter() {
+        for &field in ["alt", "part", "videoCategoryId", "regionCode", "pageToken", "onBehalfOfContentOwner", "myRating", "maxResults", "locale", "id", "hl", "chart"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -9784,15 +9798,13 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -9805,8 +9817,8 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -9815,11 +9827,11 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -9827,7 +9839,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -10056,11 +10068,13 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         params.push(("rating", self._rating.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
         for &field in ["id", "rating", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10086,15 +10100,13 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -10107,8 +10119,8 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -10117,11 +10129,11 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -10271,12 +10283,15 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, VideoGetRatingResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("id", self._id.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["id", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -10300,15 +10315,13 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -10321,8 +10334,8 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -10331,11 +10344,11 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -10343,7 +10356,7 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -10477,10 +10490,12 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((3 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10506,15 +10521,13 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -10527,8 +10540,8 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -10537,11 +10550,11 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -10723,15 +10736,18 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Video)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((5 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -10757,21 +10773,19 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -10781,8 +10795,8 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -10791,11 +10805,11 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -10803,7 +10817,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -11037,27 +11051,30 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, Video)> where R: ReadSeek, RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((9 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._stabilize.is_some() {
-            params.push(("stabilize", self._stabilize.unwrap().to_string()));
+        if let Some(value) = self._stabilize {
+            params.push(("stabilize", value.to_string()));
         }
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        if self._notify_subscribers.is_some() {
-            params.push(("notifySubscribers", self._notify_subscribers.unwrap().to_string()));
+        if let Some(value) = self._notify_subscribers {
+            params.push(("notifySubscribers", value.to_string()));
         }
-        if self._auto_levels.is_some() {
-            params.push(("autoLevels", self._auto_levels.unwrap().to_string()));
+        if let Some(value) = self._auto_levels {
+            params.push(("autoLevels", value.to_string()));
         }
-        for &field in ["part", "stabilize", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "notifySubscribers", "autoLevels"].iter() {
+        for &field in ["alt", "part", "stabilize", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "notifySubscribers", "autoLevels"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -11090,27 +11107,26 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
             let mut request_value_reader = io::Cursor::new(json_encoded_request.clone().into_bytes());
             let mut mp_reader: cmn::MultiPartReader = Default::default();
-            let mut content_type = hyper::header::ContentType(json_mime_type.clone());
-            let mut body_reader: &mut io::Read = match stream.as_mut() {
+            let (mut body_reader, content_type) = match stream.as_mut() {
                 Some(&mut (ref mut reader, size, ref mime)) => {
+                    mp_reader.reserve_exact(2);
                     let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-                    request_value_reader.seek(io::SeekFrom::Start(0)).ok();
-                    mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
-                                         .add_part(reader, size, mime);
-                    &mut mp_reader
-                }
-                None => &mut request_value_reader,
+                    request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    mp_reader.add_part(&mut request_value_reader, rsize, json_mime_type.clone())
+                             .add_part(reader, size, mime.clone());
+                    let mime_type = mp_reader.mime_type();
+                    (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                },
+                None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
             };
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
@@ -11126,8 +11142,8 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -11136,11 +11152,11 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -11148,7 +11164,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -11405,12 +11421,15 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Subscription)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        for &field in ["part"].iter() {
+        for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -11436,21 +11455,19 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -11460,8 +11477,8 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -11470,11 +11487,11 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -11482,7 +11499,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -11663,39 +11680,42 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, SubscriptionListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((13 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._page_token.is_some() {
-            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
         }
-        if self._order.is_some() {
-            params.push(("order", self._order.unwrap().to_string()));
+        if let Some(value) = self._order {
+            params.push(("order", value.to_string()));
         }
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        if self._my_subscribers.is_some() {
-            params.push(("mySubscribers", self._my_subscribers.unwrap().to_string()));
+        if let Some(value) = self._my_subscribers {
+            params.push(("mySubscribers", value.to_string()));
         }
-        if self._mine.is_some() {
-            params.push(("mine", self._mine.unwrap().to_string()));
+        if let Some(value) = self._mine {
+            params.push(("mine", value.to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
         }
-        if self._id.is_some() {
-            params.push(("id", self._id.unwrap().to_string()));
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
         }
-        if self._for_channel_id.is_some() {
-            params.push(("forChannelId", self._for_channel_id.unwrap().to_string()));
+        if let Some(value) = self._for_channel_id {
+            params.push(("forChannelId", value.to_string()));
         }
-        if self._channel_id.is_some() {
-            params.push(("channelId", self._channel_id.unwrap().to_string()));
+        if let Some(value) = self._channel_id {
+            params.push(("channelId", value.to_string()));
         }
-        for &field in ["part", "pageToken", "order", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "id", "forChannelId", "channelId"].iter() {
+        for &field in ["alt", "part", "pageToken", "order", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "id", "forChannelId", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -11719,15 +11739,13 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -11740,8 +11758,8 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -11750,11 +11768,11 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -11762,7 +11780,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -11978,7 +11996,9 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((2 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12004,15 +12024,13 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -12025,8 +12043,8 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -12035,11 +12053,11 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -12239,96 +12257,99 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, SearchListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(31 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((32 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._video_type.is_some() {
-            params.push(("videoType", self._video_type.unwrap().to_string()));
+        if let Some(value) = self._video_type {
+            params.push(("videoType", value.to_string()));
         }
-        if self._video_syndicated.is_some() {
-            params.push(("videoSyndicated", self._video_syndicated.unwrap().to_string()));
+        if let Some(value) = self._video_syndicated {
+            params.push(("videoSyndicated", value.to_string()));
         }
-        if self._video_license.is_some() {
-            params.push(("videoLicense", self._video_license.unwrap().to_string()));
+        if let Some(value) = self._video_license {
+            params.push(("videoLicense", value.to_string()));
         }
-        if self._video_embeddable.is_some() {
-            params.push(("videoEmbeddable", self._video_embeddable.unwrap().to_string()));
+        if let Some(value) = self._video_embeddable {
+            params.push(("videoEmbeddable", value.to_string()));
         }
-        if self._video_duration.is_some() {
-            params.push(("videoDuration", self._video_duration.unwrap().to_string()));
+        if let Some(value) = self._video_duration {
+            params.push(("videoDuration", value.to_string()));
         }
-        if self._video_dimension.is_some() {
-            params.push(("videoDimension", self._video_dimension.unwrap().to_string()));
+        if let Some(value) = self._video_dimension {
+            params.push(("videoDimension", value.to_string()));
         }
-        if self._video_definition.is_some() {
-            params.push(("videoDefinition", self._video_definition.unwrap().to_string()));
+        if let Some(value) = self._video_definition {
+            params.push(("videoDefinition", value.to_string()));
         }
-        if self._video_category_id.is_some() {
-            params.push(("videoCategoryId", self._video_category_id.unwrap().to_string()));
+        if let Some(value) = self._video_category_id {
+            params.push(("videoCategoryId", value.to_string()));
         }
-        if self._video_caption.is_some() {
-            params.push(("videoCaption", self._video_caption.unwrap().to_string()));
+        if let Some(value) = self._video_caption {
+            params.push(("videoCaption", value.to_string()));
         }
-        if self._type_.is_some() {
-            params.push(("type", self._type_.unwrap().to_string()));
+        if let Some(value) = self._type_ {
+            params.push(("type", value.to_string()));
         }
-        if self._topic_id.is_some() {
-            params.push(("topicId", self._topic_id.unwrap().to_string()));
+        if let Some(value) = self._topic_id {
+            params.push(("topicId", value.to_string()));
         }
-        if self._safe_search.is_some() {
-            params.push(("safeSearch", self._safe_search.unwrap().to_string()));
+        if let Some(value) = self._safe_search {
+            params.push(("safeSearch", value.to_string()));
         }
-        if self._relevance_language.is_some() {
-            params.push(("relevanceLanguage", self._relevance_language.unwrap().to_string()));
+        if let Some(value) = self._relevance_language {
+            params.push(("relevanceLanguage", value.to_string()));
         }
-        if self._related_to_video_id.is_some() {
-            params.push(("relatedToVideoId", self._related_to_video_id.unwrap().to_string()));
+        if let Some(value) = self._related_to_video_id {
+            params.push(("relatedToVideoId", value.to_string()));
         }
-        if self._region_code.is_some() {
-            params.push(("regionCode", self._region_code.unwrap().to_string()));
+        if let Some(value) = self._region_code {
+            params.push(("regionCode", value.to_string()));
         }
-        if self._q.is_some() {
-            params.push(("q", self._q.unwrap().to_string()));
+        if let Some(value) = self._q {
+            params.push(("q", value.to_string()));
         }
-        if self._published_before.is_some() {
-            params.push(("publishedBefore", self._published_before.unwrap().to_string()));
+        if let Some(value) = self._published_before {
+            params.push(("publishedBefore", value.to_string()));
         }
-        if self._published_after.is_some() {
-            params.push(("publishedAfter", self._published_after.unwrap().to_string()));
+        if let Some(value) = self._published_after {
+            params.push(("publishedAfter", value.to_string()));
         }
-        if self._page_token.is_some() {
-            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
         }
-        if self._order.is_some() {
-            params.push(("order", self._order.unwrap().to_string()));
+        if let Some(value) = self._order {
+            params.push(("order", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
         }
-        if self._location_radius.is_some() {
-            params.push(("locationRadius", self._location_radius.unwrap().to_string()));
+        if let Some(value) = self._location_radius {
+            params.push(("locationRadius", value.to_string()));
         }
-        if self._location.is_some() {
-            params.push(("location", self._location.unwrap().to_string()));
+        if let Some(value) = self._location {
+            params.push(("location", value.to_string()));
         }
-        if self._for_mine.is_some() {
-            params.push(("forMine", self._for_mine.unwrap().to_string()));
+        if let Some(value) = self._for_mine {
+            params.push(("forMine", value.to_string()));
         }
-        if self._for_content_owner.is_some() {
-            params.push(("forContentOwner", self._for_content_owner.unwrap().to_string()));
+        if let Some(value) = self._for_content_owner {
+            params.push(("forContentOwner", value.to_string()));
         }
-        if self._event_type.is_some() {
-            params.push(("eventType", self._event_type.unwrap().to_string()));
+        if let Some(value) = self._event_type {
+            params.push(("eventType", value.to_string()));
         }
-        if self._channel_type.is_some() {
-            params.push(("channelType", self._channel_type.unwrap().to_string()));
+        if let Some(value) = self._channel_type {
+            params.push(("channelType", value.to_string()));
         }
-        if self._channel_id.is_some() {
-            params.push(("channelId", self._channel_id.unwrap().to_string()));
+        if let Some(value) = self._channel_id {
+            params.push(("channelId", value.to_string()));
         }
-        for &field in ["part", "videoType", "videoSyndicated", "videoLicense", "videoEmbeddable", "videoDuration", "videoDimension", "videoDefinition", "videoCategoryId", "videoCaption", "type", "topicId", "safeSearch", "relevanceLanguage", "relatedToVideoId", "regionCode", "q", "publishedBefore", "publishedAfter", "pageToken", "order", "onBehalfOfContentOwner", "maxResults", "locationRadius", "location", "forMine", "forContentOwner", "eventType", "channelType", "channelId"].iter() {
+        for &field in ["alt", "part", "videoType", "videoSyndicated", "videoLicense", "videoEmbeddable", "videoDuration", "videoDimension", "videoDefinition", "videoCategoryId", "videoCaption", "type", "topicId", "safeSearch", "relevanceLanguage", "relatedToVideoId", "regionCode", "q", "publishedBefore", "publishedAfter", "pageToken", "order", "onBehalfOfContentOwner", "maxResults", "locationRadius", "location", "forMine", "forContentOwner", "eventType", "channelType", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -12352,15 +12373,13 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -12373,8 +12392,8 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -12383,11 +12402,11 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -12395,7 +12414,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -12776,12 +12795,15 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, I18nRegionListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._hl.is_some() {
-            params.push(("hl", self._hl.unwrap().to_string()));
+        if let Some(value) = self._hl {
+            params.push(("hl", value.to_string()));
         }
-        for &field in ["part", "hl"].iter() {
+        for &field in ["alt", "part", "hl"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -12805,15 +12827,13 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -12826,8 +12846,8 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -12836,11 +12856,11 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -12848,7 +12868,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -13012,18 +13032,21 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveStream)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((6 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -13049,21 +13072,19 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -13073,8 +13094,8 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -13083,11 +13104,11 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -13095,7 +13116,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -13273,13 +13294,15 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
         for &field in ["id", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13305,15 +13328,13 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -13326,8 +13347,8 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -13336,11 +13357,11 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -13517,27 +13538,30 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveStreamListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((9 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._page_token.is_some() {
-            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
         }
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        if self._mine.is_some() {
-            params.push(("mine", self._mine.unwrap().to_string()));
+        if let Some(value) = self._mine {
+            params.push(("mine", value.to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
         }
-        if self._id.is_some() {
-            params.push(("id", self._id.unwrap().to_string()));
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
         }
-        for &field in ["part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id"].iter() {
+        for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -13561,15 +13585,13 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -13582,8 +13604,8 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -13592,11 +13614,11 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -13604,7 +13626,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -13816,18 +13838,21 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveStream)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((6 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -13853,21 +13878,19 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -13877,8 +13900,8 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -13887,11 +13910,11 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -13899,7 +13922,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -14095,15 +14118,18 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Channel)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((5 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -14129,21 +14155,19 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -14153,8 +14177,8 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -14163,11 +14187,11 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -14175,7 +14199,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -14368,36 +14392,39 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((12 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._page_token.is_some() {
-            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        if self._my_subscribers.is_some() {
-            params.push(("mySubscribers", self._my_subscribers.unwrap().to_string()));
+        if let Some(value) = self._my_subscribers {
+            params.push(("mySubscribers", value.to_string()));
         }
-        if self._mine.is_some() {
-            params.push(("mine", self._mine.unwrap().to_string()));
+        if let Some(value) = self._mine {
+            params.push(("mine", value.to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
         }
-        if self._managed_by_me.is_some() {
-            params.push(("managedByMe", self._managed_by_me.unwrap().to_string()));
+        if let Some(value) = self._managed_by_me {
+            params.push(("managedByMe", value.to_string()));
         }
-        if self._id.is_some() {
-            params.push(("id", self._id.unwrap().to_string()));
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
         }
-        if self._for_username.is_some() {
-            params.push(("forUsername", self._for_username.unwrap().to_string()));
+        if let Some(value) = self._for_username {
+            params.push(("forUsername", value.to_string()));
         }
-        if self._category_id.is_some() {
-            params.push(("categoryId", self._category_id.unwrap().to_string()));
+        if let Some(value) = self._category_id {
+            params.push(("categoryId", value.to_string()));
         }
-        for &field in ["part", "pageToken", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "managedByMe", "id", "forUsername", "categoryId"].iter() {
+        for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "managedByMe", "id", "forUsername", "categoryId"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -14421,15 +14448,13 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -14442,8 +14467,8 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -14452,11 +14477,11 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -14464,7 +14489,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -14669,7 +14694,9 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((2 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
@@ -14695,15 +14722,13 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -14716,8 +14741,8 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -14726,11 +14751,11 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -14886,27 +14911,30 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistItemListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((9 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._video_id.is_some() {
-            params.push(("videoId", self._video_id.unwrap().to_string()));
+        if let Some(value) = self._video_id {
+            params.push(("videoId", value.to_string()));
         }
-        if self._playlist_id.is_some() {
-            params.push(("playlistId", self._playlist_id.unwrap().to_string()));
+        if let Some(value) = self._playlist_id {
+            params.push(("playlistId", value.to_string()));
         }
-        if self._page_token.is_some() {
-            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
         }
-        if self._id.is_some() {
-            params.push(("id", self._id.unwrap().to_string()));
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
         }
-        for &field in ["part", "videoId", "playlistId", "pageToken", "onBehalfOfContentOwner", "maxResults", "id"].iter() {
+        for &field in ["alt", "part", "videoId", "playlistId", "pageToken", "onBehalfOfContentOwner", "maxResults", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -14930,15 +14958,13 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -14951,8 +14977,8 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -14961,11 +14987,11 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -14973,7 +14999,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -15180,15 +15206,18 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistItem)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((5 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -15214,21 +15243,19 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -15238,8 +15265,8 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -15248,11 +15275,11 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -15260,7 +15287,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -15442,12 +15469,15 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistItem)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        for &field in ["part"].iter() {
+        for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -15473,21 +15503,19 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -15497,8 +15525,8 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -15507,11 +15535,11 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -15519,7 +15547,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -15679,10 +15707,12 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<hyper::client::Response> where R: ReadSeek, RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
         params.push(("channelId", self._channel_id.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
         for &field in ["channelId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
@@ -15717,27 +15747,26 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
             let mut request_value_reader = io::Cursor::new(json_encoded_request.clone().into_bytes());
             let mut mp_reader: cmn::MultiPartReader = Default::default();
-            let mut content_type = hyper::header::ContentType(json_mime_type.clone());
-            let mut body_reader: &mut io::Read = match stream.as_mut() {
+            let (mut body_reader, content_type) = match stream.as_mut() {
                 Some(&mut (ref mut reader, size, ref mime)) => {
+                    mp_reader.reserve_exact(2);
                     let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-                    request_value_reader.seek(io::SeekFrom::Start(0)).ok();
-                    mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
-                                         .add_part(reader, size, mime);
-                    &mut mp_reader
-                }
-                None => &mut request_value_reader,
+                    request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    mp_reader.add_part(&mut request_value_reader, rsize, json_mime_type.clone())
+                             .add_part(reader, size, mime.clone());
+                    let mime_type = mp_reader.mime_type();
+                    (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                },
+                None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
             };
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
@@ -15753,8 +15782,8 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -15763,11 +15792,11 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -15937,10 +15966,12 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((3 + self._additional_params.len()));
         params.push(("channelId", self._channel_id.to_string()));
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
         for &field in ["channelId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
@@ -15966,15 +15997,13 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -15987,8 +16016,8 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -15997,11 +16026,11 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -16162,25 +16191,28 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((9 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
-        if self._walltime.is_some() {
-            params.push(("walltime", self._walltime.unwrap().to_string()));
+        if let Some(value) = self._walltime {
+            params.push(("walltime", value.to_string()));
         }
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        if self._offset_time_ms.is_some() {
-            params.push(("offsetTimeMs", self._offset_time_ms.unwrap().to_string()));
+        if let Some(value) = self._offset_time_ms {
+            params.push(("offsetTimeMs", value.to_string()));
         }
-        if self._display_slate.is_some() {
-            params.push(("displaySlate", self._display_slate.unwrap().to_string()));
+        if let Some(value) = self._display_slate {
+            params.push(("displaySlate", value.to_string()));
         }
-        for &field in ["id", "part", "walltime", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "offsetTimeMs", "displaySlate"].iter() {
+        for &field in ["alt", "id", "part", "walltime", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "offsetTimeMs", "displaySlate"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -16204,15 +16236,13 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -16225,8 +16255,8 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -16235,11 +16265,11 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -16247,7 +16277,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -16465,18 +16495,21 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((6 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -16502,21 +16535,19 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -16526,8 +16557,8 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -16536,11 +16567,11 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -16548,7 +16579,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -16751,18 +16782,21 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((6 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -16788,21 +16822,19 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -16812,8 +16844,8 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -16822,11 +16854,11 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -16834,7 +16866,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -17027,19 +17059,22 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((7 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
-        if self._stream_id.is_some() {
-            params.push(("streamId", self._stream_id.unwrap().to_string()));
+        if let Some(value) = self._stream_id {
+            params.push(("streamId", value.to_string()));
         }
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["id", "part", "streamId", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "id", "part", "streamId", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -17063,15 +17098,13 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -17084,8 +17117,8 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -17094,11 +17127,11 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -17106,7 +17139,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -17304,30 +17337,33 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcastListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((10 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._page_token.is_some() {
-            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
         }
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        if self._mine.is_some() {
-            params.push(("mine", self._mine.unwrap().to_string()));
+        if let Some(value) = self._mine {
+            params.push(("mine", value.to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
         }
-        if self._id.is_some() {
-            params.push(("id", self._id.unwrap().to_string()));
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
         }
-        if self._broadcast_status.is_some() {
-            params.push(("broadcastStatus", self._broadcast_status.unwrap().to_string()));
+        if let Some(value) = self._broadcast_status {
+            params.push(("broadcastStatus", value.to_string()));
         }
-        for &field in ["part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "broadcastStatus"].iter() {
+        for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "broadcastStatus"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -17351,15 +17387,13 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -17372,8 +17406,8 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -17382,11 +17416,11 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -17394,7 +17428,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -17589,13 +17623,15 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
         for &field in ["id", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
@@ -17621,15 +17657,13 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -17642,8 +17676,8 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -17652,11 +17686,11 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -17826,17 +17860,20 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((7 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("broadcastStatus", self._broadcast_status.to_string()));
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
-        if self._on_behalf_of_content_owner_channel.is_some() {
-            params.push(("onBehalfOfContentOwnerChannel", self._on_behalf_of_content_owner_channel.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner_channel {
+            params.push(("onBehalfOfContentOwnerChannel", value.to_string()));
         }
-        if self._on_behalf_of_content_owner.is_some() {
-            params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
+        if let Some(value) = self._on_behalf_of_content_owner {
+            params.push(("onBehalfOfContentOwner", value.to_string()));
         }
-        for &field in ["broadcastStatus", "id", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
+        for &field in ["alt", "broadcastStatus", "id", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -17860,15 +17897,13 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -17881,8 +17916,8 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -17891,11 +17926,11 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -17903,7 +17938,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -18094,18 +18129,21 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, VideoCategoryListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((6 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._region_code.is_some() {
-            params.push(("regionCode", self._region_code.unwrap().to_string()));
+        if let Some(value) = self._region_code {
+            params.push(("regionCode", value.to_string()));
         }
-        if self._id.is_some() {
-            params.push(("id", self._id.unwrap().to_string()));
+        if let Some(value) = self._id {
+            params.push(("id", value.to_string()));
         }
-        if self._hl.is_some() {
-            params.push(("hl", self._hl.unwrap().to_string()));
+        if let Some(value) = self._hl {
+            params.push(("hl", value.to_string()));
         }
-        for &field in ["part", "regionCode", "id", "hl"].iter() {
+        for &field in ["alt", "part", "regionCode", "id", "hl"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -18129,15 +18167,13 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -18150,8 +18186,8 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -18160,11 +18196,11 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -18172,7 +18208,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -18353,33 +18389,36 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ActivityListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((11 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         params.push(("part", self._part.to_string()));
-        if self._region_code.is_some() {
-            params.push(("regionCode", self._region_code.unwrap().to_string()));
+        if let Some(value) = self._region_code {
+            params.push(("regionCode", value.to_string()));
         }
-        if self._published_before.is_some() {
-            params.push(("publishedBefore", self._published_before.unwrap().to_string()));
+        if let Some(value) = self._published_before {
+            params.push(("publishedBefore", value.to_string()));
         }
-        if self._published_after.is_some() {
-            params.push(("publishedAfter", self._published_after.unwrap().to_string()));
+        if let Some(value) = self._published_after {
+            params.push(("publishedAfter", value.to_string()));
         }
-        if self._page_token.is_some() {
-            params.push(("pageToken", self._page_token.unwrap().to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
         }
-        if self._mine.is_some() {
-            params.push(("mine", self._mine.unwrap().to_string()));
+        if let Some(value) = self._mine {
+            params.push(("mine", value.to_string()));
         }
-        if self._max_results.is_some() {
-            params.push(("maxResults", self._max_results.unwrap().to_string()));
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
         }
-        if self._home.is_some() {
-            params.push(("home", self._home.unwrap().to_string()));
+        if let Some(value) = self._home {
+            params.push(("home", value.to_string()));
         }
-        if self._channel_id.is_some() {
-            params.push(("channelId", self._channel_id.unwrap().to_string()));
+        if let Some(value) = self._channel_id {
+            params.push(("channelId", value.to_string()));
         }
-        for &field in ["part", "regionCode", "publishedBefore", "publishedAfter", "pageToken", "mine", "maxResults", "home", "channelId"].iter() {
+        for &field in ["alt", "part", "regionCode", "publishedBefore", "publishedAfter", "pageToken", "mine", "maxResults", "home", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -18403,15 +18442,13 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
-
-
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
@@ -18424,8 +18461,8 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -18434,11 +18471,11 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -18446,7 +18483,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }
@@ -18663,12 +18700,15 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Activity)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        use hyper::header::{ContentType, ContentLength};
+        let mut params = Vec::new();
+        params.reserve_exact((4 + self._additional_params.len()));
+        params.push(("alt", "json".to_string()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        for &field in ["part"].iter() {
+        for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
                 return cmn::Result::FieldClash(field);
             }
@@ -18694,21 +18734,19 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() && self._delegate.is_some() {
-                token = self._delegate.as_mut().unwrap().token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-
-
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type.clone()))
-                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .header(ContentType(json_mime_type.clone()))
+                .header(ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
 
             match self._delegate {
@@ -18718,8 +18756,8 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 
             match req.send() {
                 Err(err) => {
-                    if self._delegate.is_some() {
-                        if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
+                    if let Some(ref mut dlg) = self._delegate {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -18728,11 +18766,11 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if self._delegate.is_some() {
+                        if let Some(ref mut dlg) = self._delegate {
                             let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).ok();
+                            res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
@@ -18740,7 +18778,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                         return cmn::Result::Failure(res)
                     }
                     let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).ok();
+                    res.read_to_string(&mut json_response).unwrap();
                     let result_value = (res, json::decode(&json_response).unwrap());
                     return cmn::Result::Success(result_value)
                 }

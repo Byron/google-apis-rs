@@ -402,7 +402,6 @@ match result {
     paddfields = 'self.' + api.properties.params
 
     delegate = 'self.' + property(DELEGATE_PROPERTY_NAME)
-    delegate_call = delegate + '.as_mut().unwrap()'
     auth_call = 'self.hub.auth.borrow_mut()'
 
     if supports_scopes(auth):
@@ -462,7 +461,8 @@ match result {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength};
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params) + len(reserved_params)} + ${paddfields}.len());
+        let mut params = Vec::new();
+        params.reserve_exact((${len(params) + len(reserved_params)} + ${paddfields}.len()));
         % if response_schema:
         params.push(("alt", "json".to_string()));
         % endif
@@ -491,8 +491,8 @@ match result {
             params.push(("${p.name}", s));
         }
         % elif not is_required_property(p):
-        if ${pname}.is_some() {
-            params.push(("${p.name}", ${pname}.unwrap().to_string()));
+        if let Some(value) = ${pname} {
+            params.push(("${p.name}", value.to_string()));
         }
         % else:
         params.push(("${p.name}", ${pname}.to_string()));
@@ -532,13 +532,12 @@ else {
             assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
         %>
         let mut key = ${auth_call}.api_key();
-        if key.is_none() && ${delegate}.is_some() {
-            key = ${delegate_call}.api_key();
-        }
-        if key.is_some() {
-            params.push(("key", key.unwrap()));
-        } else {
-            return cmn::Result::MissingAPIKey
+        if key.is_none() { if let Some(ref mut dlg) = ${delegate} {
+            key = dlg.api_key();
+        }}
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => return cmn::Result::MissingAPIKey,
         }
         % else:
         if self.${api.properties.scopes}.len() == 0 {
@@ -604,9 +603,9 @@ else {
         loop {
             % if supports_scopes(auth):
             let mut token = ${auth_call}.token(self.${api.properties.scopes}.keys());
-            if token.is_none() && ${delegate}.is_some() {
-                token = ${delegate_call}.token();
-            }
+            if token.is_none() { if let Some(ref mut dlg) = ${delegate} {
+                token = dlg.token();
+            }}
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
@@ -615,17 +614,17 @@ else {
             % if request_value and simple_media_param:
             let mut request_value_reader = io::Cursor::new(json_encoded_request.clone().into_bytes());
             let mut mp_reader: cmn::MultiPartReader = Default::default();
-            let mut content_type = ContentType(json_mime_type.clone());
-            let mut body_reader: &mut io::Read = match ${simple_media_param.type.arg_name}.as_mut() {
+            let (mut body_reader, content_type) = match ${simple_media_param.type.arg_name}.as_mut() {
                 Some(&mut (ref mut reader, size, ref mime)) => {
+                    mp_reader.reserve_exact(2);
                     let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
                     request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
-                              .add_part(reader, size, mime);
-                    content_type = ContentType(mp_reader.mime_type());
-                    &mut mp_reader
-                }
-                None => &mut request_value_reader,
+                    mp_reader.add_part(&mut request_value_reader, rsize, json_mime_type.clone())
+                             .add_part(reader, size, mime.clone());
+                    let mime_type = mp_reader.mime_type();
+                    (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                },
+                None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
             };
             % endif
 
@@ -663,8 +662,8 @@ else {
 
             match req.send() {
                 Err(err) => {
-                    if ${delegate}.is_some() {
-                        if let oauth2::Retry::After(d) = ${delegate_call}.http_error(&err) {
+                    if let Some(ref mut dlg) = ${delegate} {
+                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                             sleep(d);
                             continue;
                         }
@@ -673,11 +672,11 @@ else {
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if ${delegate}.is_some() {
+                        if let Some(ref mut dlg) = ${delegate} {
                             let mut json_err = String::new();
                             res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = ${delegate_call}.http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
