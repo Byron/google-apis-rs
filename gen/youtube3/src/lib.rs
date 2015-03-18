@@ -6657,7 +6657,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, I18nLanguageListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._hl.is_some() {
@@ -6693,14 +6693,20 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.i18nLanguages.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -6869,9 +6875,9 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ChannelBannerResource)> where R: io::Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ChannelBannerResource)> where R: io::Read, RS: ReadSeek {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         if self._on_behalf_of_content_owner.is_some() {
             params.push(("onBehalfOfContentOwner", self._on_behalf_of_content_owner.unwrap().to_string()));
@@ -6903,11 +6909,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
-        // let mp_reader = MultiPart ...
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
-        let mut body_reader: &mut io::Read = if true {
-            &mut request_value_reader
-        } else { unreachable!() };
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -6918,15 +6920,35 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            let mut mp_reader: cmn::MultiPartReader = Default::default();
+            let mut request_value_reader = io::Cursor::new(json_encoded_request.into_bytes());
+            let mut content_type = hyper::header::ContentType(json_mime_type);
+            let mut body_reader: &mut io::Read = match stream.as_mut() {
+                Some(&mut (ref mut reader, size, ref mime)) => {
+                    let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+                    request_value_reader.seek(io::SeekFrom::Start(0));
+                    mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
+                                         .add_part(reader, size, mime);
+                    &mut mp_reader
+                }
+                None => &mut request_value_reader,
+            };
+            req = req.header(content_type).body(body_reader.into_body());
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channelBanners.insert"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .body(body_reader.into_body())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -7126,7 +7148,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelSectionListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
@@ -7171,14 +7193,20 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channelSections.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -7391,7 +7419,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelSection)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -7423,6 +7451,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -7433,16 +7462,23 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channelSections.insert"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -7635,7 +7671,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
@@ -7671,14 +7707,20 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channelSections.delete"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -7855,7 +7897,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelSection)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -7884,6 +7926,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -7894,16 +7937,23 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channelSections.update"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -8102,7 +8152,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, GuideCategoryListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
@@ -8144,14 +8194,20 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.guideCategories.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -8353,7 +8409,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Playlist)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -8385,6 +8441,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -8395,16 +8452,23 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlists.insert"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -8625,7 +8689,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
@@ -8679,14 +8743,20 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlists.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -8904,7 +8974,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
@@ -8940,14 +9010,20 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlists.delete"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -9124,7 +9200,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Playlist)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -9153,6 +9229,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -9163,16 +9240,23 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlists.update"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -9354,9 +9438,9 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ThumbnailSetResponse)> where R: io::Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ThumbnailSetResponse)> where R: io::Read, RS: ReadSeek {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("videoId", self._video_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
@@ -9399,14 +9483,24 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            if let Some(&mut (ref mut reader, size, ref mime)) = stream.as_mut() {
+                req = req.header(hyper::header::ContentType(mime.clone())).body(reader.into_body());
+            }
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.thumbnails.set"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -9627,7 +9721,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, VideoListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._video_category_id.is_some() {
@@ -9690,14 +9784,20 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -9949,7 +10049,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         params.push(("rating", self._rating.to_string()));
@@ -9986,14 +10086,20 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.rate"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -10158,7 +10264,7 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, VideoGetRatingResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
@@ -10194,14 +10300,20 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.getRating"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -10358,7 +10470,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
@@ -10394,14 +10506,20 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.delete"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -10598,7 +10716,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Video)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -10627,6 +10745,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -10637,16 +10756,23 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.update"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -10901,9 +11027,9 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, Video)> where R: io::Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, Video)> where R: io::Read, RS: ReadSeek {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -10951,11 +11077,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
-        // let mp_reader = MultiPart ...
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
-        let mut body_reader: &mut io::Read = if true {
-            &mut request_value_reader
-        } else { unreachable!() };
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -10966,15 +11088,35 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            let mut mp_reader: cmn::MultiPartReader = Default::default();
+            let mut request_value_reader = io::Cursor::new(json_encoded_request.into_bytes());
+            let mut content_type = hyper::header::ContentType(json_mime_type);
+            let mut body_reader: &mut io::Read = match stream.as_mut() {
+                Some(&mut (ref mut reader, size, ref mime)) => {
+                    let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+                    request_value_reader.seek(io::SeekFrom::Start(0));
+                    mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
+                                         .add_part(reader, size, mime);
+                    &mut mp_reader
+                }
+                None => &mut request_value_reader,
+            };
+            req = req.header(content_type).body(body_reader.into_body());
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.insert"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .body(body_reader.into_body())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -11254,7 +11396,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Subscription)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -11280,6 +11422,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -11290,16 +11433,23 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.subscriptions.insert"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -11503,7 +11653,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, SubscriptionListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
@@ -11566,14 +11716,20 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.subscriptions.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -11812,7 +11968,7 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
@@ -11845,14 +12001,20 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.subscriptions.delete"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -12067,7 +12229,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, SearchListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(31 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._video_type.is_some() {
@@ -12187,14 +12349,20 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.search.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -12598,7 +12766,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, I18nRegionListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._hl.is_some() {
@@ -12634,14 +12802,20 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.i18nRegions.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -12828,7 +13002,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveStream)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -12860,6 +13034,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -12870,16 +13045,23 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveStreams.update"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -13080,7 +13262,7 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner_channel.is_some() {
@@ -13119,14 +13301,20 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveStreams.delete"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -13318,7 +13506,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveStreamListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
@@ -13369,14 +13557,20 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveStreams.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -13611,7 +13805,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveStream)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -13643,6 +13837,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -13653,16 +13848,23 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveStreams.insert"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -13881,7 +14083,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Channel)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -13910,6 +14112,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -13920,16 +14123,23 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channels.update"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -14145,7 +14355,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
@@ -14205,14 +14415,20 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channels.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -14440,7 +14656,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
@@ -14473,14 +14689,20 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlistItems.delete"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -14651,7 +14873,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistItemListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._video_id.is_some() {
@@ -14702,14 +14924,20 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlistItems.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -14939,7 +15167,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistItem)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -14968,6 +15196,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -14978,16 +15207,23 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlistItems.insert"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -15192,7 +15428,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistItem)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -15218,6 +15454,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -15228,16 +15465,23 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlistItems.update"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -15418,9 +15662,9 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, stream: Option<(R, u64, mime::Mime)>, resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<hyper::client::Response> where R: io::Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<hyper::client::Response> where R: io::Read, RS: ReadSeek {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("channelId", self._channel_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
@@ -15453,11 +15697,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
-        // let mp_reader = MultiPart ...
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
-        let mut body_reader: &mut io::Read = if true {
-            &mut request_value_reader
-        } else { unreachable!() };
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -15468,15 +15708,35 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            let mut mp_reader: cmn::MultiPartReader = Default::default();
+            let mut request_value_reader = io::Cursor::new(json_encoded_request.into_bytes());
+            let mut content_type = hyper::header::ContentType(json_mime_type);
+            let mut body_reader: &mut io::Read = match stream.as_mut() {
+                Some(&mut (ref mut reader, size, ref mime)) => {
+                    let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+                    request_value_reader.seek(io::SeekFrom::Start(0));
+                    mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
+                                         .add_part(reader, size, mime);
+                    &mut mp_reader
+                }
+                None => &mut request_value_reader,
+            };
+            req = req.header(content_type).body(body_reader.into_body());
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.watermarks.set"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .body(body_reader.into_body())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -15661,7 +15921,7 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("channelId", self._channel_id.to_string()));
         if self._on_behalf_of_content_owner.is_some() {
@@ -15697,14 +15957,20 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.watermarks.unset"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -15880,7 +16146,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
@@ -15929,14 +16195,20 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.control"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -16177,7 +16449,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -16209,6 +16481,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -16219,16 +16492,23 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.update"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -16454,7 +16734,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -16486,6 +16766,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -16496,16 +16777,23 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.insert"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -16721,7 +17009,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
@@ -16764,14 +17052,20 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.bind"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -16992,7 +17286,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcastListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._page_token.is_some() {
@@ -17046,14 +17340,20 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -17271,7 +17571,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("id", self._id.to_string()));
         if self._on_behalf_of_content_owner_channel.is_some() {
@@ -17310,14 +17610,20 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.delete"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -17502,7 +17808,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("broadcastStatus", self._broadcast_status.to_string()));
         params.push(("id", self._id.to_string()));
@@ -17543,14 +17849,20 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.transition"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -17764,7 +18076,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, VideoCategoryListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
@@ -17806,14 +18118,20 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videoCategories.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -18017,7 +18335,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ActivityListResponse)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("part", self._part.to_string()));
         if self._region_code.is_some() {
@@ -18074,14 +18392,20 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header);
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.activities.list"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {
@@ -18321,7 +18645,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Activity)> {
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -18347,6 +18671,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
+        let json_encoded_request = json::encode(&self._request).unwrap();
 
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
@@ -18357,16 +18682,23 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                 return cmn::Result::MissingToken
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+
+            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice());
+
+            
+
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.activities.insert"),
                 None => {}
             }
-            match (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-               .header(auth_header)
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self._request).unwrap().as_slice())
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if self._delegate.is_some() {
                         if let oauth2::Retry::After(d) = self._delegate.as_mut().unwrap().http_error(&err) {

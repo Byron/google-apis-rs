@@ -374,14 +374,17 @@ match result {
         rtype = 'cmn::Result<(hyper::client::Response, %s)>' % (response_schema.id)
 
     possible_urls = [m.path]
+    simple_media_param = None
     if media_params:
         stripped = lambda s: s.strip().strip(',')
         qualifier = ''
         for p in media_params:
             type_params += p.type.param + ', '
             where += p.type.param + ': ' + p.type.where + ', '
-            add_args += p.type.arg_name + ': ' + ('Option<(%s, u64, mime::Mime)>' % p.type.param) + ', '
+            add_args += 'mut ' + p.type.arg_name + ': ' + ('Option<(%s, u64, mime::Mime)>' % p.type.param) + ', '
             possible_urls.append(p.path)
+            if p.protocol == 'simple':
+                simple_media_param = p
         # end for each param
         where = ' where ' + stripped(where)
         type_params = '<' + stripped(type_params) + '>'
@@ -454,7 +457,7 @@ match result {
         ## However, the compiler complains about
         ## "the trait `core::marker::Sized` is not implemented for the type `std::io::Read`"
         use hyper::client::IntoBody;
-        use std::io::Read;
+        use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params)} + ${paddfields}.len());
         % for p in field_params:
 <%
@@ -585,15 +588,12 @@ else {
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
         }
 
-        % if request_value and media_params:
-        // let mp_reader = MultiPart ...
-        let mut request_value_reader = io::Cursor::new(json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap().into_bytes());
-        let mut body_reader: &mut io::Read = if true {
-            &mut request_value_reader
-        } else { unreachable!() };
-        % endif ## media upload handling
+        % if request_value:
+        let json_encoded_request = json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap();
+        % endif
 
         loop {
+            ## TODO: Need to Seek as we are in a loop here ... 
             % if supports_scopes(auth):
             let mut token = ${auth_call}.token(self.${api.properties.scopes}.keys());
             if token.is_none() && ${delegate}.is_some() {
@@ -604,24 +604,53 @@ else {
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
             % endif
+
+            % if request_value or simple_media_param:
+            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+            % endif
+
+            let mut req = ${client}.request(hyper::method::Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))\
+                % if supports_scopes(auth):
+
+                .header(auth_header)\
+                % endif
+                % if request_value and not simple_media_param:
+
+                .header(hyper::header::ContentType(json_mime_type))
+                .body(json_encoded_request.as_slice())\
+                % endif
+;
+
+            % if request_value and simple_media_param:
+            let mut mp_reader: cmn::MultiPartReader = Default::default();
+            let mut request_value_reader = io::Cursor::new(json_encoded_request.into_bytes());
+            let mut content_type = hyper::header::ContentType(json_mime_type);
+            let mut body_reader: &mut io::Read = match ${simple_media_param.type.arg_name}.as_mut() {
+                Some(&mut (ref mut reader, size, ref mime)) => {
+                    let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+                    request_value_reader.seek(io::SeekFrom::Start(0));
+                    mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
+                                         .add_part(reader, size, mime);
+                    ## TODO: content_type = multi-part
+                    &mut mp_reader
+                }
+                None => &mut request_value_reader,
+            };
+            req = req.header(content_type).body(body_reader.into_body());
+            % elif simple_media_param:
+            if let Some(&mut (ref mut reader, size, ref mime)) = ${simple_media_param.type.arg_name}.as_mut() {
+                req = req.header(hyper::header::ContentType(mime.clone())).body(reader.into_body());
+            }
+            % endif ## media upload handling
+            
+
             match ${delegate} {
                 Some(ref mut d) => d.pre_request("${m.id}"),
                 None => {}
             }
-            match ${client}.request(hyper::method::Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
-               .header(hyper::header::UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))
-               % if supports_scopes(auth):
-               .header(auth_header)
-               % endif
-               % if request_value:
-               % if not media_params:
-               .header(hyper::header::ContentType(mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default())))
-               .body(json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap().as_slice())
-               % else:
-               .body(body_reader.into_body())
-               % endif ## media-mediaparams
-               % endif ## endif request value
-               .send() {
+
+            match req.send() {
                 Err(err) => {
                     if ${delegate}.is_some() {
                         if let oauth2::Retry::After(d) = ${delegate_call}.http_error(&err) {

@@ -1,6 +1,7 @@
 use std::marker::MarkerTrait;
-use std::io::{Read, Seek};
+use std::io::{self, Read, Seek, Cursor};
 
+use mime;
 use oauth2;
 use hyper;
 
@@ -114,4 +115,43 @@ pub enum Result<T = ()> {
 
     /// It worked !
     Success(T),
+}
+
+
+/// Provides a `Read` interface that converts multiple parts into the protocol
+/// identified by [RFC2387](https://tools.ietf.org/html/rfc2387).
+/// **Note**: This implementation is just as rich as it needs to be to perform uploads
+/// to google APIs, and might not be a fully-featured implementation.
+#[derive(Default)]
+pub struct MultiPartReader<'a> {
+    raw_parts: Vec<(hyper::header::Headers, &'a mut Read)>,
+    current_part: Option<(Cursor<Vec<u8>>, &'a mut Read)>,
+}
+
+impl<'a> MultiPartReader<'a> {
+
+    /// Add a new part to the queue of parts to be read on the first `read` call.
+    ///
+    /// # Arguments
+    /// `headers` - identifying the body of the part. It's similar to the header
+    ///             in an ordinary single-part call, and should thus contain the
+    ///             same information.
+    /// `reader`  - a reader providing the part's body
+    /// `size`    - the amount of bytes provided by the reader. It will be put onto the header as
+    ///             content-size.
+    /// `mime`    - It will be put onto the content type
+    /// # Panics
+    ///
+    /// If this method is called after the first `read` call, it will panic
+    pub fn add_part(mut self, reader: &'a mut Read, size: u64, mime_type: &mime::Mime) -> MultiPartReader<'a> {
+        // let mut headers = hyper::header::Headers::
+        // raw_parts.push((headers, reader));
+        self
+    }
+}
+
+impl<'a> Read for MultiPartReader<'a> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        Err(io::Error::from_os_error(0))
+    }
 }
