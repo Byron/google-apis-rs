@@ -29,8 +29,27 @@ mod tests {
            .add_part(&mut r2, 25, &"application/plain".parse().unwrap());
 
         let mut res = String::new();
-        assert_eq!(mpr.read_to_string(&mut res), Ok(57));
+        let r = mpr.read_to_string(&mut res);
+        assert_eq!(res.len(), r.clone().unwrap());
         println!("{}", res);
-        assert!(false);
+
+        let expected = 
+"\r\n--MDuXWGyeE33QFXGchb2VFWc4Z7945d\r\n\
+Content-Length: 50\r\n\
+Content-Type: application/json\r\n\
+\r\n\
+foo\r\n\
+--MDuXWGyeE33QFXGchb2VFWc4Z7945d\r\n\
+Content-Length: 25\r\n\
+Content-Type: application/plain\r\n\
+\r\n\
+bar\r\n\
+--MDuXWGyeE33QFXGchb2VFWc4Z7945d";
+        // NOTE: This CAN fail, as the underlying header hashmap is not sorted
+        // As the test is just for dev, and doesn't run on travis, we are fine, 
+        // for now. Possible solution would be to omit the size field (make it 
+        // optional)
+        assert_eq!(res, expected);
+        assert_eq!(r, Ok(221));
     }
 }

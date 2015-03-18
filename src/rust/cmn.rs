@@ -129,6 +129,7 @@ const BOUNDARY: &'static str = "MDuXWGyeE33QFXGchb2VFWc4Z7945d";
 pub struct MultiPartReader<'a> {
     raw_parts: Vec<(Headers, &'a mut Read)>,
     current_part: Option<(Cursor<Vec<u8>>, &'a mut Read)>,
+    last_part_boundary: Option<Cursor<Vec<u8>>>,
 }
 
 impl<'a> MultiPartReader<'a> {
@@ -163,16 +164,33 @@ impl<'a> MultiPartReader<'a> {
             vec![(Attr::Ext("boundary".to_string()), Value::Ext(BOUNDARY.to_string()))],
         )
     }
+
+    /// Returns true if we are totally used
+    fn is_depleted(&self) -> bool {
+        self.raw_parts.len() == 0 && self.current_part.is_none()
+    }
+
+    /// Returns true if we are handling our last part
+    fn is_last_part(&self) -> bool {
+        self.raw_parts.len() == 0 && self.current_part.is_some()
+    }
 }
 
 impl<'a> Read for MultiPartReader<'a> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        if self.raw_parts.len() == 0 && self.current_part.is_none() {
+        if self.last_part_boundary.is_some() {
+            let br = self.last_part_boundary.as_mut().unwrap().read(buf).unwrap_or(0);
+            if br < buf.len() {
+                self.last_part_boundary = None;
+            }
+            return Ok(br)
+        } else if self.is_depleted() {
             return Ok(0)
         } else if self.raw_parts.len() > 0 && self.current_part.is_none() {
             let (headers, reader) = self.raw_parts.remove(0);
             let mut c = Cursor::new(Vec::<u8>::new());
-            write!(&mut c, "{}{}", headers, LINE_ENDING).unwrap();
+            write!(&mut c, "{}--{}{}{}{}", LINE_ENDING, BOUNDARY, LINE_ENDING, 
+                                           headers, LINE_ENDING).unwrap();
             c.seek(SeekFrom::Start(0)).unwrap();
             self.current_part = Some((c, reader));
         }
@@ -186,10 +204,23 @@ impl<'a> Read for MultiPartReader<'a> {
         match rr {
             Ok(bytes_read) => {
                 if bytes_read == 0 {
+                    if self.is_last_part() {
+                        // before clearing the last part, we will add the boundary that 
+                        // will be written last
+                        self.last_part_boundary = Some(Cursor::new(
+                                                        format!("{}--{}", LINE_ENDING, BOUNDARY).into_bytes()))
+                    }
                     // We are depleted - this can trigger the next part to come in
                     self.current_part = None;
                 }
-                Ok(hb + bytes_read)
+                let mut total_bytes_read = hb + bytes_read;
+                while total_bytes_read < buf.len() && !self.is_depleted() {
+                    match self.read(&mut buf[total_bytes_read ..]) {
+                        Ok(br) => total_bytes_read += br,
+                        Err(err) => return Err(err),
+                    }
+                }
+                Ok(total_bytes_read)
             }
             Err(err) => {
                 // fail permanently
