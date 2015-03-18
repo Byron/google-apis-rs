@@ -6684,6 +6684,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -6695,11 +6696,10 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.i18nLanguages.list"),
@@ -6875,7 +6875,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ChannelBannerResource)> where R: io::Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ChannelBannerResource)> where R: ReadSeek, RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
@@ -6910,7 +6910,9 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -6921,27 +6923,26 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-                .header(auth_header);
-
+            let mut request_value_reader = io::Cursor::new(json_encoded_request.clone().into_bytes());
             let mut mp_reader: cmn::MultiPartReader = Default::default();
-            let mut request_value_reader = io::Cursor::new(json_encoded_request.into_bytes());
-            let mut content_type = hyper::header::ContentType(json_mime_type);
+            let mut content_type = hyper::header::ContentType(json_mime_type.clone());
             let mut body_reader: &mut io::Read = match stream.as_mut() {
                 Some(&mut (ref mut reader, size, ref mime)) => {
                     let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-                    request_value_reader.seek(io::SeekFrom::Start(0));
+                    request_value_reader.seek(io::SeekFrom::Start(0)).ok();
                     mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
                                          .add_part(reader, size, mime);
                     &mut mp_reader
                 }
                 None => &mut request_value_reader,
             };
-            req = req.header(content_type).body(body_reader.into_body());
-            
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(content_type)
+                .body(body_reader.into_body());
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channelBanners.insert"),
@@ -6987,7 +6988,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload<R>(self, stream: R, size: u64, mime_type: mime::Mime) -> cmn::Result<(hyper::client::Response, ChannelBannerResource)>
-                where R: io::Read {
+                where R: ReadSeek {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
     /// Upload media in a resumeable fashion.
@@ -7184,6 +7185,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -7195,11 +7197,10 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channelSections.list"),
@@ -7452,7 +7453,9 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -7463,15 +7466,14 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channelSections.insert"),
@@ -7698,6 +7700,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -7709,11 +7712,10 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channelSections.delete"),
@@ -7927,7 +7929,9 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -7938,15 +7942,14 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channelSections.update"),
@@ -8185,6 +8188,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -8196,11 +8200,10 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.guideCategories.list"),
@@ -8442,7 +8445,9 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -8453,15 +8458,14 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlists.insert"),
@@ -8734,6 +8738,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -8745,11 +8750,10 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlists.list"),
@@ -9001,6 +9005,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -9012,11 +9017,10 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlists.delete"),
@@ -9230,7 +9234,9 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -9241,15 +9247,14 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlists.update"),
@@ -9438,7 +9443,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ThumbnailSetResponse)> where R: io::Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ThumbnailSetResponse)> where R: ReadSeek, RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
@@ -9474,6 +9479,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -9484,16 +9490,16 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
             if let Some(&mut (ref mut reader, size, ref mime)) = stream.as_mut() {
-                req = req.header(hyper::header::ContentType(mime.clone())).body(reader.into_body());
+                req = req.header(hyper::header::ContentType(mime.clone()))
+                         .header(hyper::header::ContentLength(size))
+                         .body(reader.into_body());
             }
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.thumbnails.set"),
@@ -9539,7 +9545,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload<R>(self, stream: R, size: u64, mime_type: mime::Mime) -> cmn::Result<(hyper::client::Response, ThumbnailSetResponse)>
-                where R: io::Read {
+                where R: ReadSeek {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
     /// Upload media in a resumeable fashion.
@@ -9775,6 +9781,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -9786,11 +9793,10 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.list"),
@@ -10077,6 +10083,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -10088,11 +10095,10 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.rate"),
@@ -10291,6 +10297,7 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -10302,11 +10309,10 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.getRating"),
@@ -10497,6 +10503,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -10508,11 +10515,10 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.delete"),
@@ -10746,7 +10752,9 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -10757,15 +10765,14 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.update"),
@@ -11027,7 +11034,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, Video)> where R: io::Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<(hyper::client::Response, Video)> where R: ReadSeek, RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
@@ -11078,7 +11085,9 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -11089,27 +11098,26 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-                .header(auth_header);
-
+            let mut request_value_reader = io::Cursor::new(json_encoded_request.clone().into_bytes());
             let mut mp_reader: cmn::MultiPartReader = Default::default();
-            let mut request_value_reader = io::Cursor::new(json_encoded_request.into_bytes());
-            let mut content_type = hyper::header::ContentType(json_mime_type);
+            let mut content_type = hyper::header::ContentType(json_mime_type.clone());
             let mut body_reader: &mut io::Read = match stream.as_mut() {
                 Some(&mut (ref mut reader, size, ref mime)) => {
                     let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-                    request_value_reader.seek(io::SeekFrom::Start(0));
+                    request_value_reader.seek(io::SeekFrom::Start(0)).ok();
                     mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
                                          .add_part(reader, size, mime);
                     &mut mp_reader
                 }
                 None => &mut request_value_reader,
             };
-            req = req.header(content_type).body(body_reader.into_body());
-            
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(content_type)
+                .body(body_reader.into_body());
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videos.insert"),
@@ -11155,7 +11163,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream' and 'video/*'
     pub fn upload<R>(self, stream: R, size: u64, mime_type: mime::Mime) -> cmn::Result<(hyper::client::Response, Video)>
-                where R: io::Read {
+                where R: ReadSeek {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
     /// Upload media in a resumeable fashion.
@@ -11423,7 +11431,9 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -11434,15 +11444,14 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.subscriptions.insert"),
@@ -11707,6 +11716,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -11718,11 +11728,10 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.subscriptions.list"),
@@ -11992,6 +12001,7 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -12003,11 +12013,10 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.subscriptions.delete"),
@@ -12340,6 +12349,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -12351,11 +12361,10 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.search.list"),
@@ -12793,6 +12802,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -12804,11 +12814,10 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.i18nRegions.list"),
@@ -13035,7 +13044,9 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -13046,15 +13057,14 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveStreams.update"),
@@ -13292,6 +13302,7 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -13303,11 +13314,10 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveStreams.delete"),
@@ -13548,6 +13558,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -13559,11 +13570,10 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveStreams.list"),
@@ -13838,7 +13848,9 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -13849,15 +13861,14 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveStreams.insert"),
@@ -14113,7 +14124,9 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -14124,15 +14137,14 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channels.update"),
@@ -14406,6 +14418,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -14417,11 +14430,10 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.channels.list"),
@@ -14680,6 +14692,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -14691,11 +14704,10 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlistItems.delete"),
@@ -14915,6 +14927,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -14926,11 +14939,10 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlistItems.list"),
@@ -15197,7 +15209,9 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -15208,15 +15222,14 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlistItems.insert"),
@@ -15455,7 +15468,9 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -15466,15 +15481,14 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.playlistItems.update"),
@@ -15662,7 +15676,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 
 
     /// Perform the operation you have build so far.
-    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<hyper::client::Response> where R: io::Read, RS: ReadSeek {
+    fn doit<R, RS>(mut self, mut stream: Option<(R, u64, mime::Mime)>, mut resumeable_stream: Option<(RS, u64, mime::Mime)>) -> cmn::Result<hyper::client::Response> where R: ReadSeek, RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
@@ -15698,7 +15712,9 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -15709,27 +15725,26 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
-                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
-                .header(auth_header);
-
+            let mut request_value_reader = io::Cursor::new(json_encoded_request.clone().into_bytes());
             let mut mp_reader: cmn::MultiPartReader = Default::default();
-            let mut request_value_reader = io::Cursor::new(json_encoded_request.into_bytes());
-            let mut content_type = hyper::header::ContentType(json_mime_type);
+            let mut content_type = hyper::header::ContentType(json_mime_type.clone());
             let mut body_reader: &mut io::Read = match stream.as_mut() {
                 Some(&mut (ref mut reader, size, ref mime)) => {
                     let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-                    request_value_reader.seek(io::SeekFrom::Start(0));
+                    request_value_reader.seek(io::SeekFrom::Start(0)).ok();
                     mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
                                          .add_part(reader, size, mime);
                     &mut mp_reader
                 }
                 None => &mut request_value_reader,
             };
-            req = req.header(content_type).body(body_reader.into_body());
-            
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
+                .header(auth_header)
+                .header(content_type)
+                .body(body_reader.into_body());
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.watermarks.set"),
@@ -15773,7 +15788,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload<R>(self, stream: R, size: u64, mime_type: mime::Mime) -> cmn::Result<hyper::client::Response>
-                where R: io::Read {
+                where R: ReadSeek {
         self.doit(Some((stream, size, mime_type)), None::<(fs::File, u64, mime::Mime)>, )
     }
     /// Upload media in a resumeable fashion.
@@ -15948,6 +15963,7 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -15959,11 +15975,10 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.watermarks.unset"),
@@ -16186,6 +16201,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -16197,11 +16213,10 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.control"),
@@ -16482,7 +16497,9 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -16493,15 +16510,14 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.update"),
@@ -16767,7 +16783,9 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -16778,15 +16796,14 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.insert"),
@@ -17043,6 +17060,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -17054,11 +17072,10 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.bind"),
@@ -17331,6 +17348,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -17342,11 +17360,10 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.list"),
@@ -17601,6 +17618,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -17612,11 +17630,10 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.delete"),
@@ -17840,6 +17857,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -17851,11 +17869,10 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.transition"),
@@ -18109,6 +18126,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -18120,11 +18138,10 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.videoCategories.list"),
@@ -18383,6 +18400,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -18394,11 +18412,10 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header);
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.activities.list"),
@@ -18672,7 +18689,9 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let json_encoded_request = json::encode(&self._request).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() && self._delegate.is_some() {
@@ -18683,15 +18702,14 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
 
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
 
-            let mut req = (*self.hub.client.borrow_mut()).borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
                 .header(hyper::header::UserAgent("google-api-rust-client/0.0.1".to_string()))
                 .header(auth_header)
-                .header(hyper::header::ContentType(json_mime_type))
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
                 .body(json_encoded_request.as_slice());
-
-            
 
             match self._delegate {
                 Some(ref mut d) => d.pre_request("youtube.activities.insert"),

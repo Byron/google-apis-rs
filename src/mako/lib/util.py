@@ -75,7 +75,7 @@ PROTOCOL_TYPE_INFO = {
         'description': """Upload media all at once.
 If the upload fails for whichever reason, all progress is lost.""",
         'default': 'fs::File',
-        'where': 'io::Read',
+        'where': 'ReadSeek',
         'suffix': '',
         'example_value': 'fs::File::open("file.ext").unwrap(), 148, "application/octet-stream".parse().unwrap()'
     },

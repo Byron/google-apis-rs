@@ -400,7 +400,6 @@ match result {
     delegate = 'self.' + property(DELEGATE_PROPERTY_NAME)
     delegate_call = delegate + '.as_mut().unwrap()'
     auth_call = 'self.hub.auth.borrow_mut()'
-    client = '(*self.hub.client.borrow_mut()).borrow_mut()'
 
     if supports_scopes(auth):
         all_scopes = sorted(auth.oauth2.scopes.keys())
@@ -590,10 +589,11 @@ else {
 
         % if request_value:
         let json_encoded_request = json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap();
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         % endif
 
+        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
-            ## TODO: Need to Seek as we are in a loop here ... 
             % if supports_scopes(auth):
             let mut token = ${auth_call}.token(self.${api.properties.scopes}.keys());
             if token.is_none() && ${delegate}.is_some() {
@@ -605,31 +605,15 @@ else {
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
             % endif
 
-            % if request_value or simple_media_param:
-            let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-            % endif
-
-            let mut req = ${client}.request(hyper::method::Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
-                .header(hyper::header::UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))\
-                % if supports_scopes(auth):
-
-                .header(auth_header)\
-                % endif
-                % if request_value and not simple_media_param:
-
-                .header(hyper::header::ContentType(json_mime_type))
-                .body(json_encoded_request.as_slice())\
-                % endif
-;
 
             % if request_value and simple_media_param:
+            let mut request_value_reader = io::Cursor::new(json_encoded_request.clone().into_bytes());
             let mut mp_reader: cmn::MultiPartReader = Default::default();
-            let mut request_value_reader = io::Cursor::new(json_encoded_request.into_bytes());
-            let mut content_type = hyper::header::ContentType(json_mime_type);
+            let mut content_type = hyper::header::ContentType(json_mime_type.clone());
             let mut body_reader: &mut io::Read = match ${simple_media_param.type.arg_name}.as_mut() {
                 Some(&mut (ref mut reader, size, ref mime)) => {
                     let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-                    request_value_reader.seek(io::SeekFrom::Start(0));
+                    request_value_reader.seek(io::SeekFrom::Start(0)).ok();
                     mp_reader = mp_reader.add_part(&mut request_value_reader, rsize, &json_mime_type)
                                          .add_part(reader, size, mime);
                     ## TODO: content_type = multi-part
@@ -637,13 +621,34 @@ else {
                 }
                 None => &mut request_value_reader,
             };
-            req = req.header(content_type).body(body_reader.into_body());
-            % elif simple_media_param:
+            % endif
+
+            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
+                .header(hyper::header::UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))\
+                % if supports_scopes(auth):
+
+                .header(auth_header)\
+                % endif
+                % if request_value:
+                % if not simple_media_param:
+
+                .header(hyper::header::ContentType(json_mime_type.clone()))
+                .header(hyper::header::ContentLength(json_encoded_request.len() as u64))
+                .body(json_encoded_request.as_slice())\
+                % else:
+
+                .header(content_type)
+                .body(body_reader.into_body())\
+                % endif ## not simple_media_param
+                % endif
+;
+            % if simple_media_param and not request_value:
             if let Some(&mut (ref mut reader, size, ref mime)) = ${simple_media_param.type.arg_name}.as_mut() {
-                req = req.header(hyper::header::ContentType(mime.clone())).body(reader.into_body());
+                req = req.header(hyper::header::ContentType(mime.clone()))
+                         .header(hyper::header::ContentLength(size))
+                         .body(reader.into_body());
             }
             % endif ## media upload handling
-            
 
             match ${delegate} {
                 Some(ref mut d) => d.pre_request("${m.id}"),
