@@ -167,7 +167,7 @@ impl<'a> MultiPartReader<'a> {
 
     /// Returns true if we are totally used
     fn is_depleted(&self) -> bool {
-        self.raw_parts.len() == 0 && self.current_part.is_none()
+        self.raw_parts.len() == 0 && self.current_part.is_none() && self.last_part_boundary.is_none()
     }
 
     /// Returns true if we are handling our last part
@@ -203,7 +203,7 @@ impl<'a> Read for MultiPartReader<'a> {
         
         match rr {
             Ok(bytes_read) => {
-                if bytes_read == 0 {
+                if hb < buf.len() && bytes_read == 0 {
                     if self.is_last_part() {
                         // before clearing the last part, we will add the boundary that 
                         // will be written last
@@ -225,6 +225,7 @@ impl<'a> Read for MultiPartReader<'a> {
             Err(err) => {
                 // fail permanently
                 self.current_part = None;
+                self.last_part_boundary = None;
                 self.raw_parts.clear();
                 Err(err)
             }
