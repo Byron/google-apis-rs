@@ -100,7 +100,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "rustc-serialize" as rustc_serialize;
 //! extern crate "google-youtube3" as youtube3;
-//! use youtube3::cmn::Result;
+//! use youtube3::Result;
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -208,7 +208,7 @@ extern crate "yup-oauth2" as oauth2;
 extern crate mime;
 extern crate url;
 
-pub mod cmn;
+mod cmn;
 
 use std::collections::HashMap;
 use std::cell::RefCell;
@@ -221,7 +221,7 @@ use std::io;
 use std::fs;
 use std::old_io::timer::sleep;
 
-use cmn::{Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
+pub use cmn::{MultiPartReader, MethodInfo, Result, MethodBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
 
 
 // ##############
@@ -288,7 +288,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "rustc-serialize" as rustc_serialize;
 /// extern crate "google-youtube3" as youtube3;
-/// use youtube3::cmn::Result;
+/// use youtube3::Result;
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6685,16 +6685,23 @@ pub struct I18nLanguageListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for I18nLanguageListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for I18nLanguageListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, I18nLanguageListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, I18nLanguageListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.i18nLanguages.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._hl {
@@ -6702,7 +6709,8 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
         for &field in ["alt", "part", "hl"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6726,52 +6734,48 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.i18nLanguages.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -6908,23 +6912,31 @@ pub struct ChannelBannerInsertMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for ChannelBannerInsertMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for ChannelBannerInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ChannelBannerResource)> where RS: ReadSeek {
+    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> Result<(hyper::client::Response, ChannelBannerResource)> where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.channelBanners.insert", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if let Some(value) = self._on_behalf_of_content_owner {
             params.push(("onBehalfOfContentOwner", value.to_string()));
         }
         for &field in ["alt", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6959,15 +6971,16 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut mp_reader: cmn::MultiPartReader = Default::default();
+            let mut mp_reader: MultiPartReader = Default::default();
             let (mut body_reader, content_type) = match stream.as_mut() {
                 Some(&mut (ref mut reader, ref mime)) => {
                     mp_reader.reserve_exact(2);
@@ -6981,46 +6994,41 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
                 None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
             };
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(content_type)
                 .body(body_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.channelBanners.insert"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -7032,7 +7040,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// * *max size*: 6MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> cmn::Result<(hyper::client::Response, ChannelBannerResource)>
+    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ChannelBannerResource)>
                 where RS: ReadSeek {
         self.doit(Some((stream, mime_type)), None, )
     }
@@ -7045,7 +7053,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
     /// * *max size*: 6MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> cmn::Result<(hyper::client::Response, ChannelBannerResource)>
+    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ChannelBannerResource)>
                 where RS: ReadSeek {
         self.doit(None, Some((resumeable_stream, mime_type)), )
     }
@@ -7186,16 +7194,23 @@ pub struct ChannelSectionListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for ChannelSectionListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for ChannelSectionListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelSectionListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelSectionListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.channelSections.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
@@ -7212,7 +7227,8 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner", "mine", "id", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7236,52 +7252,48 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.channelSections.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -7460,16 +7472,23 @@ pub struct ChannelSectionInsertMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for ChannelSectionInsertMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for ChannelSectionInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelSection)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelSection)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.channelSections.insert", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -7483,7 +7502,8 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7511,56 +7531,52 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.channelSections.insert"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -7719,16 +7735,23 @@ pub struct ChannelSectionDeleteMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for ChannelSectionDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.channelSections.delete", 
+                               http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
@@ -7736,7 +7759,8 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
         }
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7759,48 +7783,44 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.channelSections.delete"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = res;
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -7945,16 +7965,23 @@ pub struct ChannelSectionUpdateMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for ChannelSectionUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelSection)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelSection)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.channelSections.update", 
+                               http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -7965,7 +7992,8 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7993,56 +8021,52 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.channelSections.update"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -8207,16 +8231,23 @@ pub struct GuideCategoryListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for GuideCategoryListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for GuideCategoryListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, GuideCategoryListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GuideCategoryListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.guideCategories.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._region_code {
@@ -8230,7 +8261,8 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
         for &field in ["alt", "part", "regionCode", "id", "hl"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8254,52 +8286,48 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.guideCategories.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -8467,16 +8495,23 @@ pub struct PlaylistInsertMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for PlaylistInsertMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for PlaylistInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Playlist)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Playlist)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.playlists.insert", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -8490,7 +8525,8 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8518,56 +8554,52 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.playlists.insert"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -8754,16 +8786,23 @@ pub struct PlaylistListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for PlaylistListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for PlaylistListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.playlists.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._page_token {
@@ -8789,7 +8828,8 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         }
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8813,52 +8853,48 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.playlists.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -9042,16 +9078,23 @@ pub struct PlaylistDeleteMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for PlaylistDeleteMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for PlaylistDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.playlists.delete", 
+                               http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
@@ -9059,7 +9102,8 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9082,48 +9126,44 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.playlists.delete"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = res;
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -9268,16 +9308,23 @@ pub struct PlaylistUpdateMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for PlaylistUpdateMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for PlaylistUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Playlist)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Playlist)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.playlists.update", 
+                               http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -9288,7 +9335,8 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9316,56 +9364,52 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.playlists.update"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -9515,16 +9559,23 @@ pub struct ThumbnailSetMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for ThumbnailSetMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for ThumbnailSetMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> cmn::Result<(hyper::client::Response, ThumbnailSetResponse)> where RS: ReadSeek {
+    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> Result<(hyper::client::Response, ThumbnailSetResponse)> where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.thumbnails.set", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("videoId", self._video_id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
@@ -9532,7 +9583,8 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         }
         for &field in ["alt", "videoId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9563,15 +9615,16 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
             if let Some(&mut (ref mut reader, ref mime)) = stream.as_mut() {
@@ -9582,40 +9635,35 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                          .body(reader.into_body());
             }
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.thumbnails.set"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -9627,7 +9675,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 2MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> cmn::Result<(hyper::client::Response, ThumbnailSetResponse)>
+    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ThumbnailSetResponse)>
                 where RS: ReadSeek {
         self.doit(Some((stream, mime_type)), None, )
     }
@@ -9640,7 +9688,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 2MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> cmn::Result<(hyper::client::Response, ThumbnailSetResponse)>
+    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ThumbnailSetResponse)>
                 where RS: ReadSeek {
         self.doit(None, Some((resumeable_stream, mime_type)), )
     }
@@ -9802,16 +9850,23 @@ pub struct VideoListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for VideoListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for VideoListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, VideoListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, VideoListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.videos.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._video_category_id {
@@ -9846,7 +9901,8 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         }
         for &field in ["alt", "part", "videoCategoryId", "regionCode", "pageToken", "onBehalfOfContentOwner", "myRating", "maxResults", "locale", "id", "hl", "chart"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9870,52 +9926,48 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.videos.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -10133,16 +10185,23 @@ pub struct VideoRateMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for VideoRateMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for VideoRateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.videos.rate", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         params.push(("rating", self._rating.to_string()));
@@ -10151,7 +10210,8 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         }
         for &field in ["id", "rating", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10174,48 +10234,44 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.videos.rate"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = res;
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -10348,16 +10404,23 @@ pub struct VideoGetRatingMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for VideoGetRatingMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for VideoGetRatingMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, VideoGetRatingResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, VideoGetRatingResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.videos.getRating", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
@@ -10365,7 +10428,8 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
         for &field in ["alt", "id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10389,52 +10453,48 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.videos.getRating"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -10557,16 +10617,23 @@ pub struct VideoDeleteMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for VideoDeleteMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for VideoDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.videos.delete", 
+                               http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
@@ -10574,7 +10641,8 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10597,48 +10665,44 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.videos.delete"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = res;
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -10803,16 +10867,23 @@ pub struct VideoUpdateMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for VideoUpdateMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for VideoUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Video)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Video)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.videos.update", 
+                               http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -10823,7 +10894,8 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10851,56 +10923,52 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.videos.update"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -11123,16 +11191,23 @@ pub struct VideoInsertMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for VideoInsertMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for VideoInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> cmn::Result<(hyper::client::Response, Video)> where RS: ReadSeek {
+    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> Result<(hyper::client::Response, Video)> where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.videos.insert", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -11155,7 +11230,8 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
         for &field in ["alt", "part", "stabilize", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "notifySubscribers", "autoLevels"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11190,15 +11266,16 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut mp_reader: cmn::MultiPartReader = Default::default();
+            let mut mp_reader: MultiPartReader = Default::default();
             let (mut body_reader, content_type) = match stream.as_mut() {
                 Some(&mut (ref mut reader, ref mime)) => {
                     mp_reader.reserve_exact(2);
@@ -11212,46 +11289,41 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                 None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
             };
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(content_type)
                 .body(body_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.videos.insert"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -11263,7 +11335,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *max size*: 64GB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream' and 'video/*'
-    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> cmn::Result<(hyper::client::Response, Video)>
+    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Video)>
                 where RS: ReadSeek {
         self.doit(Some((stream, mime_type)), None, )
     }
@@ -11276,7 +11348,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *max size*: 64GB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream' and 'video/*'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> cmn::Result<(hyper::client::Response, Video)>
+    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Video)>
                 where RS: ReadSeek {
         self.doit(None, Some((resumeable_stream, mime_type)), )
     }
@@ -11497,16 +11569,23 @@ pub struct SubscriptionInsertMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for SubscriptionInsertMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for SubscriptionInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Subscription)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Subscription)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.subscriptions.insert", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -11514,7 +11593,8 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         params.push(("part", self._part.to_string()));
         for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11542,56 +11622,52 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.subscriptions.insert"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -11761,16 +11837,23 @@ pub struct SubscriptionListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for SubscriptionListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for SubscriptionListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, SubscriptionListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SubscriptionListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.subscriptions.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._page_token {
@@ -11805,7 +11888,8 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
         for &field in ["alt", "part", "pageToken", "order", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "id", "forChannelId", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11829,52 +11913,48 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.subscriptions.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -12079,21 +12159,29 @@ pub struct SubscriptionDeleteMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for SubscriptionDeleteMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for SubscriptionDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.subscriptions.delete", 
+                               http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12116,48 +12204,44 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.subscriptions.delete"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = res;
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -12340,16 +12424,23 @@ pub struct SearchListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for SearchListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for SearchListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, SearchListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SearchListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.search.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((32 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._video_type {
@@ -12441,7 +12532,8 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
         }
         for &field in ["alt", "part", "videoType", "videoSyndicated", "videoLicense", "videoEmbeddable", "videoDuration", "videoDimension", "videoDefinition", "videoCategoryId", "videoCaption", "type", "topicId", "safeSearch", "relevanceLanguage", "relatedToVideoId", "regionCode", "q", "publishedBefore", "publishedAfter", "pageToken", "order", "onBehalfOfContentOwner", "maxResults", "locationRadius", "location", "forMine", "forContentOwner", "eventType", "channelType", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12465,52 +12557,48 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.search.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -12880,16 +12968,23 @@ pub struct I18nRegionListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for I18nRegionListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for I18nRegionListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, I18nRegionListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, I18nRegionListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.i18nRegions.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._hl {
@@ -12897,7 +12992,8 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
         for &field in ["alt", "part", "hl"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12921,52 +13017,48 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.i18nRegions.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -13119,16 +13211,23 @@ pub struct LiveStreamUpdateMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for LiveStreamUpdateMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for LiveStreamUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveStream)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LiveStream)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveStreams.update", 
+                               http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -13142,7 +13241,8 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13170,56 +13270,52 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.liveStreams.update"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -13386,16 +13482,23 @@ pub struct LiveStreamDeleteMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for LiveStreamDeleteMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for LiveStreamDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveStreams.delete", 
+                               http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner_channel {
@@ -13406,7 +13509,8 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
         for &field in ["id", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13429,48 +13533,44 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.liveStreams.delete"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = res;
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -13630,16 +13730,23 @@ pub struct LiveStreamListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for LiveStreamListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for LiveStreamListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveStreamListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LiveStreamListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveStreams.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._page_token {
@@ -13662,7 +13769,8 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13686,52 +13794,48 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.liveStreams.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -13932,16 +14036,23 @@ pub struct LiveStreamInsertMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for LiveStreamInsertMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for LiveStreamInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveStream)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LiveStream)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveStreams.insert", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -13955,7 +14066,8 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13983,56 +14095,52 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.liveStreams.insert"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -14217,16 +14325,23 @@ pub struct ChannelUpdateMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for ChannelUpdateMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for ChannelUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Channel)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.channels.update", 
+                               http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -14237,7 +14352,8 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14265,56 +14381,52 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.channels.update"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -14496,16 +14608,23 @@ pub struct ChannelListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for ChannelListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for ChannelListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ChannelListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.channels.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._page_token {
@@ -14537,7 +14656,8 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "managedByMe", "id", "forUsername", "categoryId"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14561,52 +14681,48 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.channels.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -14800,21 +14916,29 @@ pub struct PlaylistItemDeleteMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for PlaylistItemDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.playlistItems.delete", 
+                               http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14837,48 +14961,44 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.playlistItems.delete"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = res;
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -15017,16 +15137,23 @@ pub struct PlaylistItemListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for PlaylistItemListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for PlaylistItemListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistItemListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistItemListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.playlistItems.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._video_id {
@@ -15049,7 +15176,8 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
         for &field in ["alt", "part", "videoId", "playlistId", "pageToken", "onBehalfOfContentOwner", "maxResults", "id"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15073,52 +15201,48 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.playlistItems.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -15314,16 +15438,23 @@ pub struct PlaylistItemInsertMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for PlaylistItemInsertMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for PlaylistItemInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistItem)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistItem)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.playlistItems.insert", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -15334,7 +15465,8 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15362,56 +15494,52 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.playlistItems.insert"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -15582,16 +15710,23 @@ pub struct PlaylistItemUpdateMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for PlaylistItemUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, PlaylistItem)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistItem)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.playlistItems.update", 
+                               http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -15599,7 +15734,8 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
         params.push(("part", self._part.to_string()));
         for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15627,56 +15763,52 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.playlistItems.update"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -15825,16 +15957,23 @@ pub struct WatermarkSetMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for WatermarkSetMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for WatermarkSetMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> cmn::Result<hyper::client::Response> where RS: ReadSeek {
+    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> Result<hyper::client::Response> where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.watermarks.set", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("channelId", self._channel_id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
@@ -15842,7 +15981,8 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         }
         for &field in ["channelId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15876,15 +16016,16 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut mp_reader: cmn::MultiPartReader = Default::default();
+            let mut mp_reader: MultiPartReader = Default::default();
             let (mut body_reader, content_type) = match stream.as_mut() {
                 Some(&mut (ref mut reader, ref mime)) => {
                     mp_reader.reserve_exact(2);
@@ -15898,42 +16039,37 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                 None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
             };
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(content_type)
                 .body(body_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.watermarks.set"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = res;
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -15945,7 +16081,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 10MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> cmn::Result<hyper::client::Response>
+    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<hyper::client::Response>
                 where RS: ReadSeek {
         self.doit(Some((stream, mime_type)), None, )
     }
@@ -15958,7 +16094,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *max size*: 10MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> cmn::Result<hyper::client::Response>
+    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<hyper::client::Response>
                 where RS: ReadSeek {
         self.doit(None, Some((resumeable_stream, mime_type)), )
     }
@@ -16086,16 +16222,23 @@ pub struct WatermarkUnsetMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for WatermarkUnsetMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for WatermarkUnsetMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.watermarks.unset", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("channelId", self._channel_id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
@@ -16103,7 +16246,8 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
         for &field in ["channelId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16126,48 +16270,44 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.watermarks.unset"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = res;
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -16311,16 +16451,23 @@ pub struct LiveBroadcastControlMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for LiveBroadcastControlMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastControlMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveBroadcasts.control", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
@@ -16341,7 +16488,8 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
         }
         for &field in ["alt", "id", "part", "walltime", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "offsetTimeMs", "displaySlate"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16365,52 +16513,48 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.control"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -16617,16 +16761,23 @@ pub struct LiveBroadcastUpdateMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveBroadcasts.update", 
+                               http_method: hyper::method::Method::Put });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -16640,7 +16791,8 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16668,56 +16820,52 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("PUT".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.update"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -16909,16 +17057,23 @@ pub struct LiveBroadcastInsertMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveBroadcasts.insert", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -16932,7 +17087,8 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16960,56 +17116,52 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.insert"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -17191,16 +17343,23 @@ pub struct LiveBroadcastBindMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for LiveBroadcastBindMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastBindMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveBroadcasts.bind", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         params.push(("part", self._part.to_string()));
@@ -17215,7 +17374,8 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
         for &field in ["alt", "id", "part", "streamId", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17239,52 +17399,48 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.bind"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -17471,16 +17627,23 @@ pub struct LiveBroadcastListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for LiveBroadcastListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcastListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcastListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveBroadcasts.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._page_token {
@@ -17506,7 +17669,8 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "broadcastStatus"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17530,52 +17694,48 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -17759,16 +17919,23 @@ pub struct LiveBroadcastDeleteMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveBroadcasts.delete", 
+                               http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner_channel {
@@ -17779,7 +17946,8 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
         }
         for &field in ["id", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17802,48 +17970,44 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("DELETE".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.delete"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = res;
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -17996,16 +18160,23 @@ pub struct LiveBroadcastTransitionMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, LiveBroadcast)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.liveBroadcasts.transition", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("broadcastStatus", self._broadcast_status.to_string()));
         params.push(("id", self._id.to_string()));
@@ -18018,7 +18189,8 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
         }
         for &field in ["alt", "broadcastStatus", "id", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18042,52 +18214,48 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.liveBroadcasts.transition"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -18267,16 +18435,23 @@ pub struct VideoCategoryListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for VideoCategoryListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for VideoCategoryListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, VideoCategoryListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, VideoCategoryListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.videoCategories.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._region_code {
@@ -18290,7 +18465,8 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         }
         for &field in ["alt", "part", "regionCode", "id", "hl"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18314,52 +18490,48 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.videoCategories.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -18529,16 +18701,23 @@ pub struct ActivityListMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for ActivityListMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for ActivityListMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, ActivityListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ActivityListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.activities.list", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._region_code {
@@ -18567,7 +18746,8 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         }
         for &field in ["alt", "part", "regionCode", "publishedBefore", "publishedAfter", "pageToken", "mine", "maxResults", "home", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18591,52 +18771,48 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("GET".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header);
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.activities.list"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }
@@ -18842,16 +19018,23 @@ pub struct ActivityInsertMethodBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> cmn::MethodBuilder for ActivityInsertMethodBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodBuilder for ActivityInsertMethodBuilder<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> cmn::Result<(hyper::client::Response, Activity)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Activity)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "youtube.activities.insert", 
+                               http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
@@ -18859,7 +19042,8 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         params.push(("part", self._part.to_string()));
         for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
-                return cmn::Result::FieldClash(field);
+                dlg.finished();
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18887,56 +19071,52 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
-            if token.is_none() { if let Some(ref mut dlg) = self._delegate {
-                token = dlg.token();
-            }}
             if token.is_none() {
-                return cmn::Result::MissingToken
+                token = dlg.token();
+            }
+            if token.is_none() {
+                dlg.finished();
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("POST".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))
                 .header(auth_header)
                 .header(ContentType(json_mime_type.clone()))
                 .header(ContentLength(request_size as u64))
                 .body(request_value_reader.into_body());
 
-            match self._delegate {
-                Some(ref mut d) => d.pre_request("youtube.activities.insert"),
-                None => {}
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = self._delegate {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
-                    return cmn::Result::HttpError(err)
+                    dlg.finished();
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = self._delegate {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
-                        return cmn::Result::Failure(res)
+                        dlg.finished();
+                        return Result::Failure(res)
                     }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         (res, json::decode(&json_response).unwrap())
                     };
-                    return cmn::Result::Success(result_value)
+                    dlg.finished();
+                    return Result::Success(result_value)
                 }
             }
         }

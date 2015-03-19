@@ -99,7 +99,7 @@ extern crate hyper;
 extern crate "yup-oauth2" as oauth2;
 extern crate "rustc-serialize" as rustc_serialize;
 extern crate "google-youtube3" as youtube3;
-use youtube3::cmn::Result;
+use youtube3::Result;
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 use youtube3::YouTube;

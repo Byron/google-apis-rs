@@ -107,6 +107,8 @@ pub trait Delegate {
     fn finished(&mut self) {}
 }
 
+/// A delegate with a conservative default implementation, which is used if no other delegate is
+/// set.
 #[derive(Default)]
 pub struct DefaultDelegate;
 

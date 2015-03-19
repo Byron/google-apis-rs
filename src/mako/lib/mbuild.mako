@@ -422,7 +422,7 @@ match result {
     paddfields = 'self.' + api.properties.params
 
     delegate = 'self.' + property(DELEGATE_PROPERTY_NAME)
-    delegate_finish = 'if let Some(ref mut d) = ' + delegate + ' { d.finished(); }'
+    delegate_finish = 'dlg.finished();'
     auth_call = 'self.hub.auth.borrow_mut()'
 
     if supports_scopes(auth):
@@ -483,10 +483,13 @@ match result {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
-        if let Some(ref mut d) = ${delegate} {
-            d.begin(MethodInfo { id: "${m.id}", 
-                                      http_method: ${method_name_to_variant(m.httpMethod)} });
-        }
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match ${delegate} {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "${m.id}", 
+                               http_method: ${method_name_to_variant(m.httpMethod)} });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((${len(params) + len(reserved_params)} + ${paddfields}.len()));
         % for p in field_params:
 <%
@@ -579,9 +582,9 @@ else {
             assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
         %>
         let mut key = ${auth_call}.api_key();
-        if key.is_none() { if let Some(ref mut d) = ${delegate} {
-            key = d.api_key();
-        }}
+        if key.is_none() {
+            key = dlg.api_key();
+        }
         match key {
             Some(value) => params.push(("key", value)),
             None => {
@@ -655,9 +658,9 @@ else {
         loop {
             % if supports_scopes(auth):
             let mut token = ${auth_call}.token(self.${api.properties.scopes}.keys());
-            if token.is_none() { if let Some(ref mut d) = ${delegate} {
-                token = d.token();
-            }}
+            if token.is_none() {
+                token = dlg.token();
+            }
             if token.is_none() {
                 ${delegate_finish}
                 return Result::MissingToken
@@ -710,31 +713,24 @@ else {
             }
             % endif ## media upload handling
 
-            if let Some(ref mut d) = ${delegate} {
-                d.pre_request();
-            }
-
+            dlg.pre_request();
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut d) = ${delegate} {
-                        if let oauth2::Retry::After(d) = d.http_error(&err) {
-                            sleep(d);
-                            continue;
-                        }
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
                     }
                     ${delegate_finish}
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut d) = ${delegate} {
-                            let mut json_err = String::new();
-                            res.read_to_string(&mut json_err).unwrap();
-                            let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = d.http_failure(&res, error_info) {
-                                sleep(d);
-                                continue;
-                            }
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            sleep(d);
+                            continue;
                         }
                         ${delegate_finish}
                         return Result::Failure(res)
