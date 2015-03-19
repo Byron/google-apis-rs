@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/kwpiRqjQBcnxhE5-xYxQ0kF3ilA\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/O_5j_7aKimaeibrW3NmYraO3Ajs\"",
  "discoveryVersion": "v1",
  "id": "compute:v1",
  "name": "compute",
  "version": "v1",
- "revision": "20150303",
+ "revision": "20150302",
  "title": "Compute Engine API",
  "description": "API for the Google Compute Engine service.",
  "ownerDomain": "google.com",
@@ -803,11 +803,11 @@
    "properties": {
     "destinationZone": {
      "type": "string",
-     "description": "The URL of the zone to which the disk will be moved."
+     "description": "The URL of the destination zone to move the disk to. This can be a full or partial URL. For example, the following are all valid URLs to a zone:  \n- https://www.googleapis.com/compute/v1/projects/project/zones/zone \n- projects/project/zones/zone \n- zones/zone"
     },
     "targetDisk": {
      "type": "string",
-     "description": "The URL of the target disk to be moved."
+     "description": "The URL of the target disk to move. This can be a full or partial URL. For example, the following are all valid URLs to a disk:  \n- https://www.googleapis.com/compute/v1/projects/project/zones/zone/disks/disk \n- projects/project/zones/zone/disks/disk \n- zones/zone/disks/disk"
     }
    }
   },
@@ -1880,11 +1880,11 @@
    "properties": {
     "destinationZone": {
      "type": "string",
-     "description": "The URL of the zone to move the instance to."
+     "description": "The URL of the destination zone to move the instance to. This can be a full or partial URL. For example, the following are all valid URLs to a zone:  \n- https://www.googleapis.com/compute/v1/projects/project/zones/zone \n- projects/project/zones/zone \n- zones/zone"
     },
     "targetInstance": {
      "type": "string",
-     "description": "The URL of the target instance to move."
+     "description": "The URL of the target instance to move. This can be a full or partial URL. For example, the following are all valid URLs to an instance:  \n- https://www.googleapis.com/compute/v1/projects/project/zones/zone/instances/instance \n- projects/project/zones/zone/instances/instance \n- zones/zone/instances/instance"
     }
    }
   },
@@ -2948,20 +2948,14 @@
      "enum": [
       "BACKEND_SERVICES",
       "CPUS",
-      "DISKS",
       "DISKS_TOTAL_GB",
-      "EPHEMERAL_ADDRESSES",
       "FIREWALLS",
       "FORWARDING_RULES",
       "HEALTH_CHECKS",
       "IMAGES",
-      "IMAGES_TOTAL_GB",
       "IN_USE_ADDRESSES",
-      "KERNELS",
-      "KERNELS_TOTAL_GB",
       "LOCAL_SSD_TOTAL_GB",
       "NETWORKS",
-      "OPERATIONS",
       "ROUTES",
       "SNAPSHOTS",
       "SSD_TOTAL_GB",
@@ -2972,12 +2966,6 @@
       "URL_MAPS"
      ],
      "enumDescriptions": [
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
       "",
       "",
       "",
@@ -5030,6 +5018,7 @@
      "id": "compute.disks.createSnapshot",
      "path": "{project}/zones/{zone}/disks/{disk}/createSnapshot",
      "httpMethod": "POST",
+     "description": "Creates a snapshot of this disk.",
      "parameters": {
       "disk": {
        "type": "string",

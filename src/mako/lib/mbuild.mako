@@ -35,6 +35,8 @@
             fn_name = 'add_' + fn_name
         return fn_name
 
+    add_param_fn = 'param'
+
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -46,6 +48,8 @@
 <% 
     hub_type_name = hub_type(schemas,util.canonical_name())
     m = c.fqan_map[to_fqan(c.rtc_map[resource], resource, method)]
+    response_schema = method_response(c, m)
+
     # an identifier for a property. We prefix them to prevent clashes with the setters
     mb_tparams = mb_type_params_s(m)
     ThisType = mb_type(resource, method) + mb_tparams
@@ -60,6 +64,15 @@
 ${m.description | rust_doc_comment}
 ///
 % endif
+% if m.get('supportsMediaDownload', False):
+/// This method supports **media download**. To enable it, set the *alt* parameter to *media*, .i.e.
+/// `.${add_param_fn}("alt", "media")`.
+% if response_schema:
+/// Please note that due to missing multi-part support on the server side, you will only receive the media,
+/// but not the `${response_schema.id}` structure that you would usually get. The latter will be a default value.
+% endif
+///
+% endif ## supports media download
 /// A builder for the *${method}* method supported by a *${singular(resource)}* resource.
 /// It is not used directly, but through a `${rb_type(resource)}`.
 ///
@@ -135,7 +148,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// * *${opn}* (${op.location}-${op.type}) - ${op.description}
     % endfor
     % endif
-    pub fn param<T>(mut self, name: T, value: T) -> ${ThisType}
+    pub fn ${add_param_fn}<T>(mut self, name: T, value: T) -> ${ThisType}
                                                         where T: Str {
         self.${api.properties.params}.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -370,10 +383,12 @@ match result {
     rtype = 'cmn::Result<hyper::client::Response>'
     response_schema = method_response(c, m)
 
+    supports_download = m.get('supportsMediaDownload', False);
     reserved_params = []
     if response_schema:
+        if not supports_download:
+            reserved_params = ['alt']
         rtype = 'cmn::Result<(hyper::client::Response, %s)>' % (response_schema.id)
-        reserved_params = ['alt']
 
     mtype_param = 'RS'
     mtype_where = 'ReadSeek'
@@ -462,12 +477,8 @@ match result {
         ## "the trait `core::marker::Sized` is not implemented for the type `std::io::Read`"
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength};
-        let mut params = Vec::new();
-        params.reserve_exact((${len(params) + len(reserved_params)} + ${paddfields}.len()));
-        % if response_schema:
-        params.push(("alt", "json".to_string()));
-        % endif
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((${len(params) + len(reserved_params)} + ${paddfields}.len()));
         % for p in field_params:
 <%
     pname = 'self.' + property(p.name)    # property identifier
@@ -509,6 +520,30 @@ match result {
         for (name, value) in ${paddfields}.iter() {
             params.push((&name, value.clone()));
         }
+
+        % if response_schema:
+        % if supports_download:
+        let (json_field_missing, enable_resource_parsing) = {
+            let mut enable = true;
+            let mut field_present = true;
+            for &(name, ref value) in params.iter() {
+                if name == "alt" {
+                    field_present = false;
+                    if value.as_slice() != "json" {
+                        enable = false;
+                    }
+                    break;
+                }
+            }
+            (field_present, enable)
+        };
+        if json_field_missing {
+            params.push(("alt", "json".to_string()));
+        }
+        % else:
+        params.push(("alt", "json".to_string()));
+        % endif ## supportsMediaDownload
+        % endif ## response schema
 
         % if media_params:
         let (mut url, protocol) = \
@@ -613,7 +648,7 @@ else {
             if token.is_none() {
                 return cmn::Result::MissingToken
             }
-            let auth_header = hyper::header::Authorization(token.unwrap().access_token);
+            let auth_header = Authorization(token.unwrap().access_token);
             % endif
             % if request_value:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
@@ -634,7 +669,7 @@ else {
             % endif
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
-                .header(hyper::header::UserAgent(self.hub._user_agent.clone()))\
+                .header(UserAgent(self.hub._user_agent.clone()))\
                 % if supports_scopes(auth):
 
                 .header(auth_header)\
@@ -690,9 +725,20 @@ else {
                         return cmn::Result::Failure(res)
                     }
                 % if response_schema:
-                    let mut json_response = String::new();
-                    res.read_to_string(&mut json_response).unwrap();
-                    let result_value = (res, json::decode(&json_response).unwrap());
+                    ## If 'alt' is not json, we cannot attempt to decode the response
+                    let result_value = \
+                    % if supports_download:
+if enable_resource_parsing \
+                    % endif
+{
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        (res, json::decode(&json_response).unwrap())
+                    }\
+                    % if supports_download:
+ else { (res, Default::default()) }\
+                    % endif
+;
                 % else:
                     let result_value = res;
                 % endif

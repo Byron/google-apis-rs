@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/uftxkEqaj-t-6C93huW22geUJjs\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/Avr5yLDEaSyBxOoYvm8FoDAE8-g\"",
  "discoveryVersion": "v1",
  "id": "genomics:v1beta2",
  "name": "genomics",
  "version": "v1beta2",
- "revision": "20150307",
+ "revision": "20150303",
  "title": "Genomics API",
  "description": "Provides access to Genomics data.",
  "ownerDomain": "google.com",
@@ -552,7 +552,7 @@
    "properties": {
     "exportUri": {
      "type": "string",
-     "description": "A Google Cloud Storage URI where the exported BAM file will be created. The currently authenticated user must have write access to the new file location. An error will be returned if the URI already contains data."
+     "description": "A Google Cloud Storage URI for the exported BAM file. The currently authenticated user must have write access to the new file. An error will be returned if the URI already contains data."
     },
     "projectNumber": {
      "type": "string",
@@ -1484,7 +1484,7 @@
     },
     "description": {
      "type": "string",
-     "description": "free text description of this reference set."
+     "description": "Free text description of this reference set."
     },
     "id": {
      "type": "string",
@@ -1765,7 +1765,7 @@
     },
     "pageSize": {
      "type": "integer",
-     "description": "Specifies number of results to return in a single page. If unspecified, it will default to 128. The maximum value is 1024.",
+     "description": "Specifies number of results to return in a single page. If unspecified, it will default to 256. The maximum value is 1024.",
      "format": "int32"
     },
     "pageToken": {
@@ -2856,12 +2856,11 @@
      "id": "genomics.datasets.list",
      "path": "datasets",
      "httpMethod": "GET",
-     "description": "Lists all datasets.",
+     "description": "Lists datasets within a project.",
      "parameters": {
       "pageSize": {
        "type": "integer",
-       "description": "The maximum number of results returned by this request.",
-       "default": "50",
+       "description": "The maximum number of results returned by this request. If unspecified, defaults to 50.",
        "format": "int32",
        "location": "query"
       },
@@ -3241,7 +3240,6 @@
         "pageSize": {
          "type": "integer",
          "description": "The maximum number of results to return in a single page. If unspecified, defaults to 1024. The maximum value is 2048.",
-         "default": "1024",
          "format": "int32",
          "location": "query"
         },

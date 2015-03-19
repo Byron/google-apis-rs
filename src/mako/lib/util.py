@@ -748,6 +748,10 @@ def library_name(name, version):
         version = 'v' + version
     return normalize_library_name(name) + version
 
+# return crate name for given result of `library_name()`
+def library_to_crate_name(name):
+    return 'google-' + name
+
 # return type name of a resource method builder, from a resource name
 def rb_type(r):
     return "%sMethodsBuilder" % singular(canonical_type_name(r))

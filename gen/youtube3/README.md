@@ -76,7 +76,7 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 
 ```toml
 [dependencies]
-youtube3 = "0.0.1"
+google-youtube3 = "0.0.1"
 ```
 
 ## A complete example
@@ -85,7 +85,7 @@ youtube3 = "0.0.1"
 extern crate hyper;
 extern crate "yup-oauth2" as oauth2;
 extern crate "rustc-serialize" as rustc_serialize;
-extern crate youtube3;
+extern crate "google-youtube3" as youtube3;
 use youtube3::cmn::Result;
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

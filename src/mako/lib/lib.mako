@@ -132,6 +132,10 @@ ${link('Hub Delegate', delegate_url)}, or the ${link('Authenticator Delegate', u
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
+${'##'} About Uploads and Downlods
+
+TODO: 'alt' media for downloads, custom methods for uploads (simple, resumable)
+
 ${'##'} About Customization/Callbacks
 
 You may alter the way an `${api.terms.action}()` method is called by providing a ${link('delegate', delegate_url)} to the 

@@ -3,7 +3,7 @@
 # DO NOT EDIT !
 [package]
 
-name = "youtube3"
+name = "google-youtube3"
 version = "0.0.1"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with YouTube (protocol v3)"

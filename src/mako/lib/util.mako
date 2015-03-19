@@ -24,7 +24,7 @@ ${util.library_name(name, version)}\
 </%def>
 
 <%def name="crate_name()" buffered="True">\
-google-${self.library_name()}\
+${util.library_to_crate_name(util.library_name(name, version))}\
 </%def>
 
 ## All crates and standard `use` declaration, required for all examples

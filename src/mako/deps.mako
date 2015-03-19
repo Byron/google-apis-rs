@@ -11,8 +11,8 @@
 	doc_root = directories.output + '/doc'
 	doc_index = doc_root + '/index.html'
 
-	to_doc_root = lambda gen_root, api_name: gen_root + '/target/doc/' + api_name
-	central_api_index = lambda api_name: doc_root + '/' + api_name + '/index.html'
+	to_doc_root = lambda gen_root, crate_name: gen_root + '/target/doc/' + crate_name
+	central_api_index = lambda crate_name: doc_root + '/' + crate_name + '/index.html'
 
 	discovery_url = 'https://www.googleapis.com/discovery/v1/'
 	apis = json.loads(urllib2.urlopen(discovery_url + "apis").read())
@@ -27,6 +27,7 @@
 	import util
 	import os
 	api_name = util.library_name(an, version)
+	crate_name = util.library_to_crate_name(api_name)
 	gen_root = directories.output + '/' + api_name
 	gen_root_stamp = gen_root + '/.timestamp'
 	api_common = gen_root + '/src/cmn.rs'
@@ -34,7 +35,7 @@
 	api_cargo = api_name + '-cargo'
 	api_doc = api_name + '-doc'
 
-	api_doc_root = to_doc_root(gen_root, api_name)
+	api_doc_root = to_doc_root(gen_root, crate_name)
 	api_doc_index = api_doc_root + '/index.html'
 
 	# source, destination of individual output files
@@ -70,9 +71,9 @@ ${api_doc_index}: ${api_name}
 
 ${api_doc}: ${api_doc_index}
 
-${central_api_index(api_name)}: ${api_doc_index}
+${central_api_index(crate_name)}: ${api_doc_index}
 	@mkdir -p ${doc_root}
-	cp -Rf ${os.path.dirname(to_doc_root(gen_root, api_name))}/* ${doc_root}
+	cp -Rf ${os.path.dirname(to_doc_root(gen_root, crate_name))}/* ${doc_root}
 
 ${api_clean}:
 	-rm -Rf ${gen_root}
@@ -83,7 +84,7 @@ clean-apis: ${space_join(1)} docs-clean
 cargo: ${space_join(2)}
 apis: ${space_join(0)}
 
-${doc_index}: ${' '.join(central_api_index(a[0]) for a in api_info)} $(MAKO_STANDARD_DEPENDENCIES)
+${doc_index}: ${' '.join(central_api_index(util.library_to_crate_name(a[0])) for a in api_info)} $(MAKO_STANDARD_DEPENDENCIES)
 	$(MAKO) --var DOC_ROOT=${doc_root} -io $(MAKO_SRC)/index.html.mako=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
 	@echo Documentation index created at '$@'
 
