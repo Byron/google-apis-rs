@@ -4,7 +4,8 @@
                       PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, METHOD_BUILDER_MARKERT_TRAIT, 
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
                       REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
-                      to_fqan)  %>\
+                      to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
+                      upload_action_fn)  %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="mbuild" file="mbuild.mako"/>\
 
@@ -38,6 +39,17 @@
     api_version = to_api_version(version)
     if api_version[0].isdigit():
         api_version = 'v' + api_version
+
+
+    upload_methods, download_methods, subscription_methods = list(), list(), list()
+    for m in c.fqan_map.values():
+        for array, param in ((download_methods, 'supportsMediaDownload'),
+                             (upload_methods, 'supportsMediaUpload'),
+                             (subscription_methods, 'supportsSubscription')):
+            if m.get(param, False):
+                array.append(m)
+    # end for each method
+    header_methods = (('Upload', upload_methods), ('Download', download_methods), ('Subscription', subscription_methods))
 %>\
 % if rust_doc:
 This documentation was generated from *${util.canonical_name()}* crate version *${cargo.build_version}*.
@@ -61,6 +73,23 @@ Handle the following *Resources* with ease from the central ${link('hub', hub_ur
 %>\
 * ${md_resource} (${put_and(md_methods)})
 % endfor
+
+% for method_type, methods in header_methods:
+% if methods:
+${method_type} supported by ...
+
+% for m in methods:
+<% 
+    _, resource, method = activity_split(m.id)
+    name_parts = [split_camelcase_s(method)]
+    if resource != METHODS_RESOURCE:
+        name_parts.append(split_camelcase_s(resource))
+%>\
+* ${link('*%s*' % ' '.join(name_parts), 'struct.%s.html' % mb_type(resource, method))}
+% endfor ## for each method
+
+% endif  ## if methods
+% endfor ## for each method type
 
 % if documentationLink:
 Everything else about the *${util.canonical_name()}* *${api_version}* API can be found at the
@@ -133,8 +162,15 @@ When delegates handle errors or intermediate values, they may have a chance to i
 makes the system potentially resilient to all kinds of errors.
 
 ${'##'} About Uploads and Downlods
+If a method supports downloads, the response body, which is part of the ${link('Result', 'cmn/enum.Result.html')}, should be
+read by you to obtain the media.
+If such a method also supports a ${link('Response Result', 'cmn/trait.ResponseResult.html')}, it will return that by default.
+You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
+this call: `${ADD_PARAM_MEDIA_EXAMPLE}`.
 
-TODO: 'alt' media for downloads, custom methods for uploads (simple, resumable)
+Methods supporting uploads can do so using up to ${len(PROTOCOL_TYPE_INFO)} different protocols: 
+${put_and(md_italic(PROTOCOL_TYPE_INFO.keys()))}. The distinctiveness of each is represented by customized 
+`${api.terms.action}(...)` methods, which are then named ${put_and(enclose_in('`', ("%s(...)" % upload_action_fn(api.terms.upload_action, v['suffix']) for v in PROTOCOL_TYPE_INFO.values())))} respectively.
 
 ${'##'} About Customization/Callbacks
 

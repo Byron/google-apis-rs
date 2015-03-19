@@ -27,6 +27,18 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [videos](http://byron.github.io/google-apis-rs/youtube3/struct.Video.html) ([*delete*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoDeleteMethodBuilder.html), [*get rating*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoGetRatingMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoListMethodBuilder.html), [*rate*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoRateMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoUpdateMethodBuilder.html))
 * watermarks ([*set*](http://byron.github.io/google-apis-rs/youtube3/struct.WatermarkSetMethodBuilder.html) and [*unset*](http://byron.github.io/google-apis-rs/youtube3/struct.WatermarkUnsetMethodBuilder.html))
 
+Upload supported by ...
+
+* [*set watermarks*](http://byron.github.io/google-apis-rs/youtube3/struct.WatermarkSetMethodBuilder.html)
+* [*insert channel banners*](http://byron.github.io/google-apis-rs/youtube3/struct.ChannelBannerInsertMethodBuilder.html)
+* [*set thumbnails*](http://byron.github.io/google-apis-rs/youtube3/struct.ThumbnailSetMethodBuilder.html)
+* [*insert videos*](http://byron.github.io/google-apis-rs/youtube3/struct.VideoInsertMethodBuilder.html)
+
+Subscription supported by ...
+
+* [*list playlist items*](http://byron.github.io/google-apis-rs/youtube3/struct.PlaylistItemListMethodBuilder.html)
+
+
 Everything else about the *YouTube* *v3* API can be found at the
 [official documentation site](https://developers.google.com/youtube/v3).
 
@@ -134,6 +146,10 @@ the doit() methods, or handed as possibly intermediate results to either the
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
+
+## About Uploads and Downlods
+
+TODO: 'alt' media for downloads, custom methods for uploads (simple, resumable)
 
 ## About Customization/Callbacks
 

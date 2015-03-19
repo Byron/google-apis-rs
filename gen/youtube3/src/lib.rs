@@ -26,6 +26,18 @@
 //! * [videos](struct.Video.html) ([*delete*](struct.VideoDeleteMethodBuilder.html), [*get rating*](struct.VideoGetRatingMethodBuilder.html), [*insert*](struct.VideoInsertMethodBuilder.html), [*list*](struct.VideoListMethodBuilder.html), [*rate*](struct.VideoRateMethodBuilder.html) and [*update*](struct.VideoUpdateMethodBuilder.html))
 //! * watermarks ([*set*](struct.WatermarkSetMethodBuilder.html) and [*unset*](struct.WatermarkUnsetMethodBuilder.html))
 //! 
+//! Upload supported by ...
+//! 
+//! * [*set watermarks*](struct.WatermarkSetMethodBuilder.html)
+//! * [*insert channel banners*](struct.ChannelBannerInsertMethodBuilder.html)
+//! * [*set thumbnails*](struct.ThumbnailSetMethodBuilder.html)
+//! * [*insert videos*](struct.VideoInsertMethodBuilder.html)
+//! 
+//! Subscription supported by ...
+//! 
+//! * [*list playlist items*](struct.PlaylistItemListMethodBuilder.html)
+//! 
+//! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/v3).
 //! 
@@ -136,6 +148,10 @@
 //! 
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
+//! 
+//! ## About Uploads and Downlods
+//! 
+//! TODO: 'alt' media for downloads, custom methods for uploads (simple, resumable)
 //! 
 //! ## About Customization/Callbacks
 //! 

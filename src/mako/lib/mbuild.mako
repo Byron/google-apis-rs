@@ -9,7 +9,7 @@
                       hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response,
                       METHOD_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant,
-                      re_find_replacements)
+                      re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -34,9 +34,6 @@
         if is_repeated_property(p):
             fn_name = 'add_' + fn_name
         return fn_name
-
-    add_param_fn = 'param'
-
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -65,8 +62,8 @@ ${m.description | rust_doc_comment}
 ///
 % endif
 % if m.get('supportsMediaDownload', False):
-/// This method supports **media download**. To enable it, set the *alt* parameter to *media*, .i.e.
-/// `.${add_param_fn}("alt", "media")`.
+/// This method supports **media download**. To enable it, adjust the builder like this:
+/// `${ADD_PARAM_MEDIA_EXAMPLE}`.
 % if response_schema:
 /// Please note that due to missing multi-part support on the server side, you will only receive the media,
 /// but not the `${response_schema.id}` structure that you would usually get. The latter will be a default value.
@@ -148,7 +145,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// * *${opn}* (${op.location}-${op.type}) - ${op.description}
     % endfor
     % endif
-    pub fn ${add_param_fn}<T>(mut self, name: T, value: T) -> ${ThisType}
+    pub fn ${ADD_PARAM_FN}<T>(mut self, name: T, value: T) -> ${ThisType}
                                                         where T: Str {
         self.${api.properties.params}.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -285,7 +282,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         index = -1
         if media_params[-1].max_size < 100*1024*1024:
             index = 0
-        action_name = api.terms.upload_action + media_params[index].type.suffix
+        action_name = upload_action_fn(api.terms.upload_action, media_params[index].type.suffix)
     else:
         action_name = api.terms.action
     action_args = media_params and media_params[-1].type.example_value or ''
@@ -754,7 +751,7 @@ if enable_resource_parsing \
     % for item_name, item in p.info.iteritems():
     /// * *${split_camelcase_s(item_name)}*: ${isinstance(item, (list, tuple)) and put_and(enclose_in("'", item)) or str(item)}
     % endfor
-    pub fn ${api.terms.upload_action}${p.type.suffix}<${mtype_param}>(self, ${p.type.arg_name}: ${mtype_param}, mime_type: mime::Mime) -> ${rtype}
+    pub fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}<${mtype_param}>(self, ${p.type.arg_name}: ${mtype_param}, mime_type: mime::Mime) -> ${rtype}
                 where ${mtype_param}: ${mtype_where} {
         self.${api.terms.action}(\
         % for _ in range(0, loop.index):

@@ -54,6 +54,9 @@ INS_METHOD = 'insert'
 DEL_METHOD = 'delete'
 METHODS_RESOURCE = 'methods'
 
+ADD_PARAM_FN = 'param'
+ADD_PARAM_MEDIA_EXAMPLE = "." + ADD_PARAM_FN + '("alt", "media")'
+
 SPACES_PER_TAB = 4
 
 NESTED_TYPE_SUFFIX = 'item'
@@ -820,6 +823,9 @@ def get_word(d, n, e = ''):
 # n = 'FooBar' -> _foo_bar
 def property(n):
     return '_' + mangle_ident(n)
+
+def upload_action_fn(upload_action_term, suffix):
+    return upload_action_term + suffix
 
 # n = 'foo.bar.Baz' -> 'FooBarBaz'
 def dot_sep_to_canonical_type_name(n):
