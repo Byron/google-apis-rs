@@ -11,6 +11,8 @@
     c = new_context(schemas, resources, context.get('methods'))
     hub_type = hub_type(c.schemas, util.canonical_name())
     ht_params = hub_type_params_s()
+
+    default_user_agent = "google-api-rust-client/" + cargo.build_version
 %>\
 <%block filter="rust_comment">\
 <%util:gen_info source="${self.uri}" />\
@@ -73,6 +75,7 @@ ${lib.hub_usage_example(c)}\
 pub struct ${hub_type}${ht_params} {
     client: RefCell<C>,
     auth: RefCell<A>,
+    _user_agent: String,
 
     _m: PhantomData<NC>
 }
@@ -86,6 +89,7 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
         ${hub_type} {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
+            _user_agent: "${default_user_agent}".to_string(),
             _m: PhantomData
         }
     }
@@ -95,6 +99,16 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
         ${rb_type(resource)} { hub: &self }
     }
     % endfor
+
+    /// Set the user-agent header field to use in all requests to the server.
+    /// It defaults to `${default_user_agent}`.
+    ///
+    /// Returns the previously set user-agent.
+    pub fn user_agent(&mut self, agent_name: String) -> String {
+        let prev = self._user_agent.clone();
+        self._user_agent = agent_name;
+        prev
+    }
 }
 
 

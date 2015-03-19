@@ -634,7 +634,7 @@ else {
             % endif
 
             let mut req = client.borrow_mut().request(hyper::method::Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
-                .header(hyper::header::UserAgent("google-api-rust-client/${cargo.build_version}".to_string()))\
+                .header(hyper::header::UserAgent(self.hub._user_agent.clone()))\
                 % if supports_scopes(auth):
 
                 .header(auth_header)\
