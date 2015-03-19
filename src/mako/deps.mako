@@ -94,7 +94,7 @@ docs-clean:
 
 github-pages: | docs-clean docs 
 	ghp-import -n ${doc_root}
-	## Have to force-push - I think it resets the branch, thus not keeping history (?)
+	## Have to force-push - allows us to start docs fresh, clearing out unused history
 	git push origin +gh-pages
 
 .PHONY = $(.PHONY) update-json github-pages help-api clean-apis cargo apis docs docs-clean ${space_join(0)} ${space_join(1)} ${space_join(2)} ${space_join(3)}

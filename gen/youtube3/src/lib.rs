@@ -26,6 +26,7 @@
 //! * [videos](struct.Video.html) ([*delete*](struct.VideoDeleteMethodBuilder.html), [*get rating*](struct.VideoGetRatingMethodBuilder.html), [*insert*](struct.VideoInsertMethodBuilder.html), [*list*](struct.VideoListMethodBuilder.html), [*rate*](struct.VideoRateMethodBuilder.html) and [*update*](struct.VideoUpdateMethodBuilder.html))
 //! * watermarks ([*set*](struct.WatermarkSetMethodBuilder.html) and [*unset*](struct.WatermarkUnsetMethodBuilder.html))
 //! 
+//! 
 //! Upload supported by ...
 //! 
 //! * [*set watermarks*](struct.WatermarkSetMethodBuilder.html)
@@ -150,8 +151,15 @@
 //! makes the system potentially resilient to all kinds of errors.
 //! 
 //! ## About Uploads and Downlods
+//! If a method supports downloads, the response body, which is part of the [Result](cmn/enum.Result.html), should be
+//! read by you to obtain the media.
+//! If such a method also supports a [Response Result](cmn/trait.ResponseResult.html), it will return that by default.
+//! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
+//! this call: `.param("alt", "media")`.
 //! 
-//! TODO: 'alt' media for downloads, custom methods for uploads (simple, resumable)
+//! Methods supporting uploads can do so using up to 2 different protocols: 
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
 //! ## About Customization/Callbacks
 //! 

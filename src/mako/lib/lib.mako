@@ -24,7 +24,7 @@
     response_trait_url = 'cmn/trait.' + RESPONSE_MARKER_TRAIT + '.html'
     part_trait_url = 'cmn/trait.' + PART_MARKER_TRAIT + '.html'
 
-    doc_base_url = cargo.doc_base_url + '/' + util.library_name() + '/'
+    doc_base_url = cargo.doc_base_url + '/' + util.crate_name() + '/'
 
     def link(name, url):
         lf = '[%s](%s)'
@@ -62,7 +62,6 @@ Handle the following *Resources* with ease from the central ${link('hub', hub_ur
 % elif METHODS_RESOURCE in c.rta_map:
 Use the following functionality with ease from the central ${link('hub', hub_url)} ... 
 % else:
-<% assert False, "Shouldn't be here" %>
 It seems there is nothing you can do here ... .
 % endif
 
