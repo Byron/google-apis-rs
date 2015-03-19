@@ -375,17 +375,18 @@ match result {
         rtype = 'cmn::Result<(hyper::client::Response, %s)>' % (response_schema.id)
         reserved_params = ['alt']
 
-
+    mtype_param = 'RS'
+    mtype_where = 'ReadSeek'
 
     possible_urls = [m.path]
     simple_media_param = None
     if media_params:
         stripped = lambda s: s.strip().strip(',')
         qualifier = ''
+        type_params = mtype_param
+        where = mtype_param + ': ' + mtype_where
         for p in media_params:
-            type_params += p.type.param + ', '
-            where += p.type.param + ': ' + p.type.where + ', '
-            add_args += 'mut ' + p.type.arg_name + ': ' + ('Option<(%s, u64, mime::Mime)>' % p.type.param) + ', '
+            add_args += 'mut ' + p.type.arg_name + ': ' + ('Option<(%s, mime::Mime)>' % mtype_param) + ', '
             possible_urls.append(p.path)
             if p.protocol == 'simple':
                 simple_media_param = p
@@ -422,6 +423,7 @@ match result {
     all_required_param_name = set(p.name for p in params if is_required_property(p))
     MULTI_SLASH = 'multi-slash-prefix'
     URL_ENCODE = 'url-encode'
+    READER_SEEK = "let size = reader.seek(io::SeekFrom::End(0)).unwrap();\nreader.seek(io::SeekFrom::Start(0)).unwrap();"
 
     special_cases = set()
     for possible_url in possible_urls:
@@ -595,8 +597,10 @@ else {
         }
 
         % if request_value:
-        let json_encoded_request = json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap();
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = io::Cursor::new(json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap().into_bytes());
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
         % endif
 
         let mut client = &mut *self.hub.client.borrow_mut();
@@ -611,15 +615,16 @@ else {
             }
             let auth_header = hyper::header::Authorization(token.unwrap().access_token);
             % endif
+            % if request_value:
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            % endif
             % if request_value and simple_media_param:
-            let mut request_value_reader = io::Cursor::new(json_encoded_request.clone().into_bytes());
             let mut mp_reader: cmn::MultiPartReader = Default::default();
             let (mut body_reader, content_type) = match ${simple_media_param.type.arg_name}.as_mut() {
-                Some(&mut (ref mut reader, size, ref mime)) => {
+                Some(&mut (ref mut reader, ref mime)) => {
                     mp_reader.reserve_exact(2);
-                    let rsize = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-                    request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    mp_reader.add_part(&mut request_value_reader, rsize, json_mime_type.clone())
+                    ${READER_SEEK | indent_all_but_first_by(5)}
+                    mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                              .add_part(reader, size, mime.clone());
                     let mime_type = mp_reader.mime_type();
                     (&mut mp_reader as &mut io::Read, ContentType(mime_type))
@@ -638,8 +643,8 @@ else {
                 % if not simple_media_param:
 
                 .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(json_encoded_request.len() as u64))
-                .body(json_encoded_request.as_slice())\
+                .header(ContentLength(request_size as u64))
+                .body(request_value_reader.into_body())\
                 % else:
 
                 .header(content_type)
@@ -648,7 +653,8 @@ else {
                 % endif
 ;
             % if simple_media_param and not request_value:
-            if let Some(&mut (ref mut reader, size, ref mime)) = ${simple_media_param.type.arg_name}.as_mut() {
+            if let Some(&mut (ref mut reader, ref mime)) = ${simple_media_param.type.arg_name}.as_mut() {
+                ${READER_SEEK | indent_all_but_first_by(4)}
                 req = req.header(ContentType(mime.clone()))
                          .header(ContentLength(size))
                          .body(reader.into_body());
@@ -697,23 +703,20 @@ else {
     }
 
     % for p in media_params:
-<% 
-        none_type = 'None::<(' + p.type.default + ', u64, mime::Mime)>' 
-%>\
     ${p.description | rust_doc_comment, indent_all_but_first_by(1)}
     ///
     % for item_name, item in p.info.iteritems():
     /// * *${split_camelcase_s(item_name)}*: ${isinstance(item, (list, tuple)) and put_and(enclose_in("'", item)) or str(item)}
     % endfor
-    pub fn ${api.terms.upload_action}${p.type.suffix}<${p.type.param}>(self, ${p.type.arg_name}: ${p.type.param}, size: u64, mime_type: mime::Mime) -> ${rtype}
-                where ${p.type.param}: ${p.type.where} {
+    pub fn ${api.terms.upload_action}${p.type.suffix}<${mtype_param}>(self, ${p.type.arg_name}: ${mtype_param}, mime_type: mime::Mime) -> ${rtype}
+                where ${mtype_param}: ${mtype_where} {
         self.${api.terms.action}(\
         % for _ in range(0, loop.index):
-${none_type}, \
+None, \
         % endfor
-Some((${p.type.arg_name}, size, mime_type)), \
+Some((${p.type.arg_name}, mime_type)), \
         % for _ in range(loop.index+1, len(media_params)):
-${none_type}, \
+None, \
         % endfor
 )
     }

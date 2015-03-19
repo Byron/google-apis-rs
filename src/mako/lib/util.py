@@ -71,26 +71,22 @@ DELEGATE_PROPERTY_NAME = 'delegate'
 PROTOCOL_TYPE_INFO = {
     'simple' : {
         'arg_name': 'stream',
-        'param': 'R',
         'description': """Upload media all at once.
 If the upload fails for whichever reason, all progress is lost.""",
         'default': 'fs::File',
-        'where': 'ReadSeek',
         'suffix': '',
-        'example_value': 'fs::File::open("file.ext").unwrap(), 148, "application/octet-stream".parse().unwrap()'
+        'example_value': 'fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()'
     },
     'resumable' : {
         'arg_name': 'resumeable_stream',
-        'param': 'RS',
         'description': """Upload media in a resumeable fashion.
 Even if the upload fails or is interrupted, it can be resumed for a 
 certain amount of time as the server maintains state temporarily.
 
 TODO: Write more about how delegation works in this particular case.""",
         'default': 'fs::File',
-        'where': 'ReadSeek',
         'suffix': '_resumable',
-        'example_value': 'fs::File::open("file.ext").unwrap(), 282, "application/octet-stream".parse().unwrap()'
+        'example_value': 'fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()'
     }
 }
 

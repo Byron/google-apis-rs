@@ -183,22 +183,28 @@ impl<'a> MultiPartReader<'a> {
 
 impl<'a> Read for MultiPartReader<'a> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        if self.last_part_boundary.is_some() {
-            let br = self.last_part_boundary.as_mut().unwrap().read(buf).unwrap_or(0);
-            if br < buf.len() {
-                self.last_part_boundary = None;
+        match (self.raw_parts.len(), 
+               self.current_part.is_none(), 
+               self.last_part_boundary.is_none()) {
+            (_, _, false) => {
+                let br = self.last_part_boundary.as_mut().unwrap().read(buf).unwrap_or(0);
+                if br < buf.len() {
+                    self.last_part_boundary = None;
+                }
+                return Ok(br)
+            },
+            (0, true, true) => return Ok(0),
+            (n, true, _) if n > 0 => {
+                let (headers, reader) = self.raw_parts.remove(0);
+                let mut c = Cursor::new(Vec::<u8>::new());
+                write!(&mut c, "{}--{}{}{}{}", LINE_ENDING, BOUNDARY, LINE_ENDING, 
+                                               headers, LINE_ENDING).unwrap();
+                c.seek(SeekFrom::Start(0)).unwrap();
+                self.current_part = Some((c, reader));
             }
-            return Ok(br)
-        } else if self.is_depleted() {
-            return Ok(0)
-        } else if self.raw_parts.len() > 0 && self.current_part.is_none() {
-            let (headers, reader) = self.raw_parts.remove(0);
-            let mut c = Cursor::new(Vec::<u8>::new());
-            write!(&mut c, "{}--{}{}{}{}", LINE_ENDING, BOUNDARY, LINE_ENDING, 
-                                           headers, LINE_ENDING).unwrap();
-            c.seek(SeekFrom::Start(0)).unwrap();
-            self.current_part = Some((c, reader));
+            _ => {},
         }
+
         // read headers as long as possible
         let (hb, rr) = {
             let &mut (ref mut c, ref mut reader) = self.current_part.as_mut().unwrap();

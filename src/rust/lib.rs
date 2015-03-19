@@ -17,6 +17,7 @@ mod tests {
     use self::hyper_mock::*;
     use std::io::Read;
     use std::default::Default;
+    use std::old_path::BytesContainer;
 
     const EXPECTED: &'static str = 
 "\r\n--MDuXWGyeE33QFXGchb2VFWc4Z7945d\r\n\
