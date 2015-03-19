@@ -36,7 +36,7 @@ extern crate "yup-oauth2" as oauth2;
 extern crate mime;
 extern crate url;
 
-pub mod cmn;
+mod cmn;
 
 use std::collections::HashMap;
 use std::cell::RefCell;
@@ -49,7 +49,7 @@ use std::io;
 use std::fs;
 use std::old_io::timer::sleep;
 
-use cmn::{Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
+pub use cmn::{MultiPartReader, MethodInfo, Result, MethodBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
 
 
 // ##############

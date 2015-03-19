@@ -35,6 +35,7 @@ RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'co
                       'return', 'sizeof', 'static', 'self', 'struct', 'super', 'true', 'trait', 'type', 'typeof',
                       'unsafe', 'unsized', 'use', 'virtual', 'where', 'while', 'yield'))
 
+RESERVED_TYPES = set(("Result", ))
 
 _words = [w.strip(',') for w in "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(' ')]
 RUST_TYPE_RND_MAP = {'bool': lambda: str(bool(randint(0, 1))).lower(),
@@ -283,7 +284,7 @@ def _assure_unique_type_name(schemas, tn):
     if tn in schemas:
         tn += 'Nested'
         assert tn not in schemas
-    return tn
+    return unique_type_name(tn)
 
 # map a json type to an rust type
 # sn = schema name
@@ -305,7 +306,7 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True):
     def wrap_type(tn):
         if allow_optionals:
             tn = "Option<%s>" % tn
-        return tn
+        return unique_type_name(tn)
 
     # unconditionally handle $ref types, which should point to another schema.
     if TREF in t:
@@ -314,7 +315,7 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True):
         # usually is on on the first call, and off when recursion is involved.
         tn = t[TREF]
         if allow_optionals and tn == sn:
-            tn = 'Box<%s>' % tn
+            tn = 'Box<%s>' % unique_type_name(tn)
         return wrap_type(tn)
     try:
         rust_type = TYPE_MAP[t.type]
@@ -798,6 +799,12 @@ def mb_type_params_s(m):
 # as rb_additional_type_params, but for an individual method, as seen from a resource builder !
 def mb_additional_type_params(m):
     return []
+
+# check type_name against a list of reserved types, and return a possibly rename type_name to prevent a clash
+def unique_type_name(type_name):
+    if type_name in RESERVED_TYPES:
+        type_name += 'Type'
+    return type_name
 
 # return type name for a method on the given resource
 def mb_type(r, m):

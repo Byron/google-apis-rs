@@ -10,7 +10,7 @@
                       METHOD_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
-                      method_name_to_variant)
+                      method_name_to_variant, unique_type_name)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -67,7 +67,7 @@ ${m.description | rust_doc_comment}
 /// `${ADD_PARAM_MEDIA_EXAMPLE}`.
 % if response_schema:
 /// Please note that due to missing multi-part support on the server side, you will only receive the media,
-/// but not the `${response_schema.id}` structure that you would usually get. The latter will be a default value.
+/// but not the `${unique_type_name(response_schema.id)}` structure that you would usually get. The latter will be a default value.
 % endif
 ///
 % endif ## supports media download
@@ -125,7 +125,7 @@ pub struct ${ThisType}
     % endif
 }
 
-impl${mb_tparams} cmn::${METHOD_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
+impl${mb_tparams} ${METHOD_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
 
 impl${mb_tparams} ${ThisType} where ${', '.join(mb_type_bounds())} {
 
@@ -297,14 +297,17 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     hide_filter = show_all and pass_through or hide_rust_doc_test
     test_block_filter = rust_doc and rust_doc_test_norun or markdown_rust_block
     test_fn_filter = rust_doc and rust_test_fn_invisible or pass_through
+
+    if request_value:
+        request_value_type = unique_type_name(request_value.id)
 %>\
 <%block filter="test_block_filter">\
 ${capture(util.test_prelude) | hide_filter}\
 % if request_value:
-use ${util.library_name()}::${request_value.id};
+use ${util.library_name()}::${request_value_type};
 % endif
 % if handle_result:
-use ${util.library_name()}::cmn::Result;
+use ${util.library_name()}::Result;
 % endif
 % if media_params:
 use std::fs;
@@ -315,7 +318,7 @@ ${capture(lib.test_hub, hub_type_name, comments=show_all) | hide_filter}
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // ${random_value_warning}
-let mut ${rb_name}: ${request_value.id} = Default::default();
+let mut ${rb_name}: ${request_value_type} = Default::default();
 % for spn, sp in request_value.get('properties', dict()).iteritems():
 % if parts is not None and spn not in parts:
 <% continue %>
@@ -331,7 +334,6 @@ let mut ${rb_name}: ${request_value.id} = Default::default();
     else:
         assignment = 'Some(%s);' % assignment
 %>\
-## ${to_rust_type(request_value.id, spn, sp, allow_optionals=False)}
 ${rb_name}.${mangle_ident(spn)} = ${assignment}
 % endfor
 
@@ -382,7 +384,7 @@ match result {
     where = ''
     qualifier = 'pub '
     add_args = ''
-    rtype = 'cmn::Result<hyper::client::Response>'
+    rtype = 'Result<hyper::client::Response>'
     response_schema = method_response(c, m)
 
     supports_download = m.get('supportsMediaDownload', False);
@@ -390,7 +392,7 @@ match result {
     if response_schema:
         if not supports_download:
             reserved_params = ['alt']
-        rtype = 'cmn::Result<(hyper::client::Response, %s)>' % (response_schema.id)
+        rtype = 'Result<(hyper::client::Response, %s)>' % (unique_type_name(response_schema.id))
 
     mtype_param = 'RS'
     mtype_where = 'ReadSeek'
@@ -482,7 +484,7 @@ match result {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
         if let Some(ref mut d) = ${delegate} {
-            d.begin(cmn::MethodInfo { id: "${m.id}", 
+            d.begin(MethodInfo { id: "${m.id}", 
                                       http_method: ${method_name_to_variant(m.httpMethod)} });
         }
         let mut params: Vec<(&str, String)> = Vec::with_capacity((${len(params) + len(reserved_params)} + ${paddfields}.len()));
@@ -522,7 +524,7 @@ match result {
         for &field in [${', '.join(enclose_in('"', reserved_params + [p.name for p in field_params]))}].iter() {
             if ${paddfields}.contains_key(field) {
                 ${delegate_finish}
-                return cmn::Result::FieldClash(field);
+                return Result::FieldClash(field);
             }
         }
         for (name, value) in ${paddfields}.iter() {
@@ -584,7 +586,7 @@ else {
             Some(value) => params.push(("key", value)),
             None => {
                 ${delegate_finish}
-                return cmn::Result::MissingAPIKey
+                return Result::MissingAPIKey
             }
         }
         % else:
@@ -658,7 +660,7 @@ else {
             }}
             if token.is_none() {
                 ${delegate_finish}
-                return cmn::Result::MissingToken
+                return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             % endif
@@ -666,7 +668,7 @@ else {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             % endif
             % if request_value and simple_media_param:
-            let mut mp_reader: cmn::MultiPartReader = Default::default();
+            let mut mp_reader: MultiPartReader = Default::default();
             let (mut body_reader, content_type) = match ${simple_media_param.type.arg_name}.as_mut() {
                 Some(&mut (ref mut reader, ref mime)) => {
                     mp_reader.reserve_exact(2);
@@ -721,7 +723,7 @@ else {
                         }
                     }
                     ${delegate_finish}
-                    return cmn::Result::HttpError(err)
+                    return Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -735,7 +737,7 @@ else {
                             }
                         }
                         ${delegate_finish}
-                        return cmn::Result::Failure(res)
+                        return Result::Failure(res)
                     }
                 % if response_schema:
                     ## If 'alt' is not json, we cannot attempt to decode the response
@@ -756,7 +758,7 @@ if enable_resource_parsing \
                     let result_value = res;
                 % endif
                     ${delegate_finish}
-                    return cmn::Result::Success(result_value)
+                    return Result::Success(result_value)
                 }
             }
         }

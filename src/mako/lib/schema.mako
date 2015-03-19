@@ -1,7 +1,7 @@
 <%!
     from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
-                      NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE) 
+                      NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE, unique_type_name) 
 
     default_traits = ('RustcEncodable', 'Clone', 'Default')
 %>\
@@ -9,7 +9,7 @@
 ###################################################################################################################
 ###################################################################################################################
 <%def name="_new_object(s, properties, c)">\
-<% struct = 'pub struct ' + s.id %>\
+<% struct = 'pub struct ' + unique_type_name(s.id) %>\
 % if properties:
 ${struct} {
 % for pn, p in properties.iteritems():
@@ -41,6 +41,8 @@ ${struct};
     ## waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
     if s.type == 'any':
         traits.remove('Default')
+
+    s_type = unique_type_name(s.id)
 %>\
 <%block filter="rust_doc_comment">\
 ${doc(s, c)}\
@@ -50,17 +52,17 @@ ${doc(s, c)}\
 ${_new_object(s, s.get('properties'), c)}\
 % elif s.type == 'array':
 % if s.items.get('type') != 'object':
-pub struct ${s.id}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s)});
+pub struct ${s_type}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s)});
 % else:
 ${_new_object(s, s.items.get('properties'), c)}\
 % endif ## array item != 'object'
 % elif s.type == 'any':
 ## waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
-pub struct ${s.id}(rustc_serialize::json::Json);
+pub struct ${s_type}(rustc_serialize::json::Json);
 
-impl Default for ${s.id} {
-    fn default() -> ${s.id} {
-        ${s.id}(rustc_serialize::json::Json::Null)
+impl Default for ${s_type} {
+    fn default() -> ${s_type} {
+        ${s_type}(rustc_serialize::json::Json::Null)
     }
 }
 % else:
@@ -68,11 +70,11 @@ impl Default for ${s.id} {
 % endif ## type == ?
 
 % for marker_trait in markers:
-impl ${marker_trait} for ${s.id} {}
+impl ${marker_trait} for ${s_type} {}
 % endfor
 
 % if REQUEST_MARKER_TRAIT in markers and 'properties' in s:
-impl ${s.id} {
+impl ${s_type} {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.

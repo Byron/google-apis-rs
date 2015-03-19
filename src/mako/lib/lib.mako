@@ -5,7 +5,7 @@
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
                       REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
                       to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
-                      upload_action_fn)  %>\
+                      upload_action_fn, unique_type_name)  %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="mbuild" file="mbuild.mako"/>\
 
@@ -78,7 +78,7 @@ It seems there is nothing you can do here ... .
     sn = singular(canonical_type_name(r))
 
     if sn in schemas:
-        md_resource = link(md_resource, 'struct.%s.html' % singular(canonical_type_name(r)))
+        md_resource = link(md_resource, 'struct.%s.html' % unique_type_name(singular(canonical_type_name(r))))
 %>\
 * ${md_resource} (${put_and(md_methods)})
 % endfor ## each resource activity
