@@ -9,7 +9,8 @@
                       hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response,
                       METHOD_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant,
-                      re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE)
+                      re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
+                      method_name_to_variant)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -419,6 +420,7 @@ match result {
     paddfields = 'self.' + api.properties.params
 
     delegate = 'self.' + property(DELEGATE_PROPERTY_NAME)
+    delegate_finish = 'if let Some(ref mut d) = ' + delegate + ' { d.finished(); }'
     auth_call = 'self.hub.auth.borrow_mut()'
 
     if supports_scopes(auth):
@@ -479,6 +481,10 @@ match result {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        if let Some(ref mut d) = ${delegate} {
+            d.begin(cmn::MethodInfo { id: "${m.id}", 
+                                      http_method: ${method_name_to_variant(m.httpMethod)} });
+        }
         let mut params: Vec<(&str, String)> = Vec::with_capacity((${len(params) + len(reserved_params)} + ${paddfields}.len()));
         % for p in field_params:
 <%
@@ -515,6 +521,7 @@ match result {
         ## Additional params - may not overlap with optional params
         for &field in [${', '.join(enclose_in('"', reserved_params + [p.name for p in field_params]))}].iter() {
             if ${paddfields}.contains_key(field) {
+                ${delegate_finish}
                 return cmn::Result::FieldClash(field);
             }
         }
@@ -570,12 +577,15 @@ else {
             assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
         %>
         let mut key = ${auth_call}.api_key();
-        if key.is_none() { if let Some(ref mut dlg) = ${delegate} {
-            key = dlg.api_key();
+        if key.is_none() { if let Some(ref mut d) = ${delegate} {
+            key = d.api_key();
         }}
         match key {
             Some(value) => params.push(("key", value)),
-            None => return cmn::Result::MissingAPIKey,
+            None => {
+                ${delegate_finish}
+                return cmn::Result::MissingAPIKey
+            }
         }
         % else:
         if self.${api.properties.scopes}.len() == 0 {
@@ -643,10 +653,11 @@ else {
         loop {
             % if supports_scopes(auth):
             let mut token = ${auth_call}.token(self.${api.properties.scopes}.keys());
-            if token.is_none() { if let Some(ref mut dlg) = ${delegate} {
-                token = dlg.token();
+            if token.is_none() { if let Some(ref mut d) = ${delegate} {
+                token = d.token();
             }}
             if token.is_none() {
+                ${delegate_finish}
                 return cmn::Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
@@ -669,7 +680,7 @@ else {
             };
             % endif
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Extension("${m.httpMethod}".to_string()), url.as_slice())
+            let mut req = client.borrow_mut().request(${method_name_to_variant(m.httpMethod)}, url.as_slice())
                 .header(UserAgent(self.hub._user_agent.clone()))\
                 % if supports_scopes(auth):
 
@@ -697,32 +708,33 @@ else {
             }
             % endif ## media upload handling
 
-            match ${delegate} {
-                Some(ref mut d) => d.pre_request("${m.id}"),
-                None => {}
+            if let Some(ref mut d) = ${delegate} {
+                d.pre_request();
             }
 
             match req.send() {
                 Err(err) => {
-                    if let Some(ref mut dlg) = ${delegate} {
-                        if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                    if let Some(ref mut d) = ${delegate} {
+                        if let oauth2::Retry::After(d) = d.http_error(&err) {
                             sleep(d);
                             continue;
                         }
                     }
+                    ${delegate_finish}
                     return cmn::Result::HttpError(err)
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
-                        if let Some(ref mut dlg) = ${delegate} {
+                        if let Some(ref mut d) = ${delegate} {
                             let mut json_err = String::new();
                             res.read_to_string(&mut json_err).unwrap();
                             let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
-                            if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                            if let oauth2::Retry::After(d) = d.http_failure(&res, error_info) {
                                 sleep(d);
                                 continue;
                             }
                         }
+                        ${delegate_finish}
                         return cmn::Result::Failure(res)
                     }
                 % if response_schema:
@@ -743,6 +755,7 @@ if enable_resource_parsing \
                 % else:
                     let result_value = res;
                 % endif
+                    ${delegate_finish}
                     return cmn::Result::Success(result_value)
                 }
             }

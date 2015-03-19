@@ -12,7 +12,7 @@ re_desc_parts = re.compile("((the part (names|properties) that you can include i
 
 re_find_replacements = re.compile("\{[/\+]?\w+\*?\}")
 
-
+HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH" ))
 
 USE_FORMAT = 'use_format_field'
 TYPE_MAP = {'boolean' : 'bool',
@@ -879,6 +879,12 @@ def scope_url_to_variant(name, url, fully_qualified=True):
         return fqvn(FULL)
     return fqvn(dot_sep_to_canonical_type_name(repl(base)))
 
+def method_name_to_variant(name):
+    fmt = 'hyper::method::Method::Extension("%s")'
+    if name in HTTP_METHODS:
+        name = name.capitalize()
+        fmt = 'hyper::method::Method::%s'
+    return fmt % name.capitalize()
 
 # given a rust type-name (no optional, as from to_rust_type), you will get a suitable random default value
 # as string suitable to be passed as reference (or copy, where applicable)

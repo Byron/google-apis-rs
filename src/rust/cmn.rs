@@ -6,6 +6,7 @@ use oauth2;
 use hyper;
 use hyper::header::{ContentType, ContentLength, Headers};
 use hyper::http::LINE_ENDING;
+use hyper::method::Method;
 
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
@@ -56,6 +57,14 @@ pub struct JsonServerError {
 /// uploading media
 pub trait Delegate {
 
+    /// Called at the beginning of any API request. The delegate should store the method
+    /// information if he is interesting in knowing more context when further calls to it
+    /// are made.
+    /// The matching `finished()` call will always be made, no matter whether or not the API
+    /// request was sucessfull. That way, the delgate may easily maintain a clean state 
+    /// between various API calls.
+    fn begin(&mut self, MethodInfo) {}
+
     /// Called whenever there is an [HttpError](http://hyperium.github.io/hyper/hyper/error/enum.HttpError.html), usually if there are network problems.
     /// 
     /// Return retry information.
@@ -88,7 +97,14 @@ pub trait Delegate {
 
     /// Called prior to sending the main request of the given method. It can be used to time 
     /// the call or to print progress information.
-    fn pre_request(&mut self, method_name: &str) { let _ = method_name; }
+    /// It's also useful as you can be sure that a request will definitely be made.
+    fn pre_request(&mut self) { }
+
+
+    /// Called before the API request method returns, in every case. It can be used to clean up
+    /// internal state between calls to the API.
+    /// This call always has a matching call to `begin(...)`.
+    fn finished(&mut self) {}
 }
 
 #[derive(Default)]
@@ -117,6 +133,12 @@ pub enum Result<T = ()> {
 
     /// It worked !
     Success(T),
+}
+
+/// Contains information about an API request.
+pub struct MethodInfo {
+    pub id: &'static str,
+    pub http_method: Method,
 }
 
 const BOUNDARY: &'static str = "MDuXWGyeE33QFXGchb2VFWc4Z7945d";
