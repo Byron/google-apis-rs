@@ -5,7 +5,7 @@
                       activity_input_type, TREF, IO_REQUEST, schema_to_required_property, 
                       rust_copy_value_s, is_required_property, organize_params, REQUEST_VALUE_PROPERTY_NAME,
                       build_all_params, rb_type_params_s, hub_type_params_s, mb_type_params_s, mb_additional_type_params, 
-                      struct_type_bounds_s)
+                      struct_type_bounds_s, METHODS_RESOURCE)
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -19,7 +19,11 @@
     rb_params = rb_type_params_s(resource, c)
     ThisType = rb_type(resource) + rb_params
 %>\
+% if resource == METHODS_RESOURCE:
+/// A builder providing access to all free methods, which are not associated with a particular resource.
+% else:
 /// A builder providing access to all methods supported on *${singular(resource)}* resources.
+% endif
 /// It is not used directly, but through the `${hub_type_name}` hub.
 ///
 /// # Example

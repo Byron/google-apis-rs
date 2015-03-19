@@ -57,9 +57,19 @@ The original source code can be found [on github](${cargo.repo_base_url}/tree/ma
 % endif
 # Features
 
+% if len(c.rta_map) > 1:
 Handle the following *Resources* with ease from the central ${link('hub', hub_url)} ... 
+% elif METHODS_RESOURCE in c.rta_map:
+Use the following functionality with ease from the central ${link('hub', hub_url)} ... 
+% else:
+<% assert False, "Shouldn't be here" %>
+It seems there is nothing you can do here ... .
+% endif
 
 % for r in sorted(c.rta_map.keys()):
+% if r == METHODS_RESOURCE:
+<% continue %>
+% endif ## skip method resource
 <%
     md_methods = list()
     for method in sorted(c.rta_map[r]):
@@ -72,7 +82,17 @@ Handle the following *Resources* with ease from the central ${link('hub', hub_ur
         md_resource = link(md_resource, 'struct.%s.html' % singular(canonical_type_name(r)))
 %>\
 * ${md_resource} (${put_and(md_methods)})
+% endfor ## each resource activity
+
+% if METHODS_RESOURCE in c.rta_map:
+% if len(c.rta_map) > 1:
+Other activities are ...
+
+% endif
+% for method in sorted(c.rta_map[METHODS_RESOURCE]):
+* ${link(split_camelcase_s(method), 'struct.%s.html' % mb_type(METHODS_RESOURCE, method))}
 % endfor
+% endif
 
 % for method_type, methods in header_methods:
 % if methods:

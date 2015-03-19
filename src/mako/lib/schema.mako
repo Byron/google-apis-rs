@@ -1,7 +1,7 @@
 <%!
     from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
-                      NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s) 
+                      NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE) 
 
     default_traits = ('RustcEncodable', 'Clone', 'Default')
 %>\
@@ -110,9 +110,11 @@ The list links the activity name, along with information about where it is used 
 % for a, iot in c.sta_map[s.id].iteritems():
 <%
     category, name, method = activity_split(a)
-    name = name or category
+    name_suffix = ' ' + split_camelcase_s(name)
+    if name == METHODS_RESOURCE:
+        name_suffix = ''
     struct_url = 'struct.' + mb_type(name, method) + '.html'
-    method_name = split_camelcase_s(method) + ' ' + split_camelcase_s(name)
+    method_name = ' '.join(split_camelcase_s(method).split('.')) + name_suffix
     value_type = '|'.join(iot) or 'none'
 %>\
 * [${method_name}](${struct_url}) (${value_type})

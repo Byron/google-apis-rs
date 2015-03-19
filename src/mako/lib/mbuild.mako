@@ -9,7 +9,7 @@
                       hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response,
                       METHOD_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant,
-                      re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn)
+                      re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -70,7 +70,11 @@ ${m.description | rust_doc_comment}
 % endif
 ///
 % endif ## supports media download
+% if resource == METHODS_RESOURCE:
+/// A builder for the *${method}* method.
+% else:
 /// A builder for the *${method}* method supported by a *${singular(resource)}* resource.
+% endif
 /// It is not used directly, but through a `${rb_type(resource)}`.
 ///
 % if part_desc:
