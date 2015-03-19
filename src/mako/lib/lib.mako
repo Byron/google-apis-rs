@@ -116,7 +116,7 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 
 ```toml
 [dependencies]
-${util.library_name()} = "${cargo.build_version}"
+${util.crate_name()} = "${cargo.build_version}"
 ```
 
 ${'##'} A complete example

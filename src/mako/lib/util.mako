@@ -23,13 +23,17 @@ ${cargo.repo_base_url}/${OUTPUT_DIR}\
 ${util.library_name(name, version)}\
 </%def>
 
+<%def name="crate_name()" buffered="True">\
+google-${self.library_name()}\
+</%def>
+
 ## All crates and standard `use` declaration, required for all examples
 ## Must be outside of a test function
 <%def name="test_prelude()">\
 extern crate hyper;
 extern crate "yup-oauth2" as oauth2;
 extern crate "rustc-serialize" as rustc_serialize;
-extern crate ${self.library_name()};
+extern crate "${self.crate_name()}" as ${self.library_name()};
 </%def>
 
 ## Define the canonical name, if present, or name otherwise

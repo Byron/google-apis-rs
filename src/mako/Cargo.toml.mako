@@ -5,7 +5,7 @@
 </%block>
 [package]
 
-name = "${util.library_name()}"
+name = "${util.crate_name()}"
 version = "${cargo.build_version}"
 authors = [${",\n           ".join('"%s"' % a for a in cargo.authors)}]
 description = "A complete library to interact with ${util.canonical_name()} (protocol ${version})"
