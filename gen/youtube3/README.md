@@ -152,6 +152,7 @@ match result {
     Result::MissingToken => println!("Missing Token"),
     Result::Failure(_) => println!("General Failure (Response doesn't print)"),
     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
+    Result::JsonDecodeError(err) => println!("Json failed to decode: {:?}", err),
     Result::Success(_) => println!("Success (value doesn't print)"),
 }
 

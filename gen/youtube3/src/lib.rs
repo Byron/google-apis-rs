@@ -154,6 +154,7 @@
 //!     Result::MissingToken => println!("Missing Token"),
 //!     Result::Failure(_) => println!("General Failure (Response doesn't print)"),
 //!     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
+//!     Result::JsonDecodeError(err) => println!("Json failed to decode: {:?}", err),
 //!     Result::Success(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
@@ -240,7 +241,7 @@ use std::io;
 use std::fs;
 use std::old_io::timer::sleep;
 
-pub use cmn::{MultiPartReader, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
+pub use cmn::{MultiPartReader, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, UnusedType};
 
 
 // ##############
@@ -344,6 +345,7 @@ impl Default for Scope {
 ///     Result::MissingToken => println!("Missing Token"),
 ///     Result::Failure(_) => println!("General Failure (Response doesn't print)"),
 ///     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
+///     Result::JsonDecodeError(err) => println!("Json failed to decode: {:?}", err),
 ///     Result::Success(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
@@ -5643,7 +5645,10 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -5896,7 +5901,10 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -6161,7 +6169,10 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -6444,7 +6455,10 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -6934,7 +6948,10 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -7195,7 +7212,10 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -7467,7 +7487,10 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -7762,7 +7785,10 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -8277,7 +8303,10 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -8531,7 +8560,10 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -8835,7 +8867,10 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -9362,7 +9397,10 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -9836,7 +9874,10 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -10191,7 +10232,10 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -10535,7 +10579,10 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -10822,7 +10869,10 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -11466,7 +11516,10 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -11926,7 +11979,10 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -12183,7 +12239,10 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -12703,7 +12762,10 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -13008,7 +13070,10 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -13294,7 +13359,10 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -13590,7 +13658,10 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -14110,7 +14181,10 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -14407,7 +14481,10 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -14676,7 +14753,10 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -15422,7 +15502,10 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -15733,7 +15816,10 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -16029,7 +16115,10 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -16308,7 +16397,10 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -16603,7 +16695,10 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -17123,7 +17218,10 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -17399,7 +17497,10 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -17680,7 +17781,10 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -17984,7 +18088,10 @@ impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     };
                     dlg.finished();
                     return Result::Success(result_value)
