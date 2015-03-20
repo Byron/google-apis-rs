@@ -1,5 +1,5 @@
-#![feature(core,io,old_path, custom_derive, plugin)]
-#![allow(dead_code, deprecated, unused_features)]
+#![feature(core,io,old_path, custom_derive, custom_attribute, plugin)]
+#![allow(dead_code, deprecated, unused_features, unused_variables, unused_imports)]
 //! library with code shared by all generated implementations
 #![plugin(serde_macros)]
 extern crate hyper;
@@ -19,6 +19,8 @@ mod tests {
     use std::io::Read;
     use std::default::Default;
     use std::old_path::BytesContainer;
+
+    use serde::json;
 
     const EXPECTED: &'static str = 
 "\r\n--MDuXWGyeE33QFXGchb2VFWc4Z7945d\r\n\
@@ -76,5 +78,38 @@ bar\r\n\
         assert_eq!(v.len(), EXPECTED_LEN);
         // See above: headers are unordered
         // assert_eq!(v.container_as_str().unwrap(), EXPECTED);
+    }
+
+    #[test]
+    fn serde() {
+        #[derive(Default, Serialize, Deserialize)]
+        struct Foo {
+            opt: Option<String>,
+            req: u32,
+            opt_vec: Option<Vec<String>>,
+            vec: Vec<String>,
+        }
+
+        let f: Foo = Default::default();
+        json::to_string(&f).unwrap(); // should work
+
+        let j = "{\"opt\":null,\"req\":0,\"vec\":[]}";
+        let f: Foo = json::from_str(j).unwrap();
+
+        // This fails, unless 'vec' is optional
+        // let j = "{\"opt\":null,\"req\":0}";
+        // let f: Foo = json::from_str(j).unwrap();
+
+        #[derive(Default, Serialize, Deserialize)]
+        struct Bar {
+            #[serde(alias="snooSnoo")]
+            snoo_snoo: String
+        }
+        json::to_string(&<Bar as Default>::default()).unwrap();
+
+
+        let j = "{\"snooSnoo\":\"foo\"}";
+        let b: Bar = json::from_str(&j).unwrap();
+        assert_eq!(b.snoo_snoo, "foo");
     }
 }

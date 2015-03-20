@@ -29,7 +29,7 @@ ${lib.docs(c)}
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut)]
 // Required for serde annotations
-#![feature(custom_derive, plugin)]
+#![feature(custom_derive, custom_attribute, plugin)]
 #![plugin(serde_macros)]
 
 extern crate hyper;

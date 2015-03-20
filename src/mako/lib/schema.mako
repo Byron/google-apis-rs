@@ -14,6 +14,9 @@
 ${struct} {
 % for pn, p in properties.iteritems():
     ${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
+    % if pn != mangle_ident(pn):
+    #[serde(alias="${pn}")]
+    % endif
     pub ${mangle_ident(pn)}: ${to_rust_type(schemas, s.id, pn, p)},
 % endfor
 }
