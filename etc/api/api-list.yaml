@@ -107,8 +107,9 @@ api:
     - v2
     pagespeedonline:
     - v2
-    plus:
-    - v1
+    # Does not build yet, see serde issue: https://github.com/erickt/rust-serde/issues/45
+    # plus:
+    # - v1
     plusdomains:
     - v1
     prediction:

@@ -291,7 +291,7 @@ def _assure_unique_type_name(schemas, tn):
 # pn = property name
 # t = type dict
 # NOTE: In case you don't understand how this algorithm really works ... me neither - THE AUTHOR
-def to_rust_type(schemas, sn, pn, t, allow_optionals=True):
+def to_rust_type(schemas, sn, pn, t, allow_optionals=True, _is_recursive=False):
     def nested_type(nt):
         if 'items' in nt:
             nt = nt.items
@@ -301,7 +301,7 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True):
             assert(is_nested_type_property(nt))
             # It's a nested type - we take it literally like $ref, but generate a name for the type ourselves
             return _assure_unique_type_name(schemas, nested_type_name(sn, pn))
-        return to_rust_type(schemas, sn, pn, nt, allow_optionals=False)
+        return to_rust_type(schemas, sn, pn, nt, allow_optionals=False, _is_recursive=True)
 
     def wrap_type(tn):
         if allow_optionals:
@@ -314,8 +314,8 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True):
         # which is fine for now. 'allow_optionals' implicitly restricts type boxing for simple types - it
         # usually is on on the first call, and off when recursion is involved.
         tn = t[TREF]
-        if allow_optionals and tn == sn:
-            tn = 'Box<%s>' % unique_type_name(tn)
+        if not _is_recursive and tn == sn:
+            tn = 'Option<Box<%s>>' % unique_type_name(tn)
         return wrap_type(tn)
     try:
         rust_type = TYPE_MAP[t.type]
