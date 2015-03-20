@@ -97,7 +97,7 @@ google-youtube3 = "0.0.1"
 ```Rust
 extern crate hyper;
 extern crate "yup-oauth2" as oauth2;
-extern crate "rustc-serialize" as rustc_serialize;
+extern crate serde;
 extern crate "google-youtube3" as youtube3;
 use youtube3::Result;
 use std::default::Default;

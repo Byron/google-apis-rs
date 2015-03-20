@@ -98,7 +98,7 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
-//! extern crate "rustc-serialize" as rustc_serialize;
+//! extern crate serde;
 //! extern crate "google-youtube3" as youtube3;
 //! use youtube3::Result;
 //! # #[test] fn egal() {
@@ -200,10 +200,12 @@
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut)]
-
+// Required for serde annotations
+#![feature(custom_derive, custom_attribute, plugin)]
+#![plugin(serde_macros)]
 
 extern crate hyper;
-extern crate "rustc-serialize" as rustc_serialize;
+extern crate serde;
 extern crate "yup-oauth2" as oauth2;
 extern crate mime;
 extern crate url;
@@ -216,7 +218,7 @@ use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use std::marker::PhantomData;
-use rustc_serialize::json;
+use serde::json;
 use std::io;
 use std::fs;
 use std::old_io::timer::sleep;
@@ -286,7 +288,7 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// use youtube3::Result;
 /// # #[test] fn egal() {
@@ -427,25 +429,31 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
 /// 
 /// * [list subscriptions](struct.SubscriptionListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct SubscriptionListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#subscriptionListResponse".    
     pub kind: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
     /// A list of subscriptions that match the request criteria.    
-    pub items: Vec<Subscription>,
+    pub items: Option<Vec<Subscription>>,
     /// no description provided    
+    #[serde(alias="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    #[serde(alias="prevPageToken")]
     pub prev_page_token: Option<String>,
     /// no description provided    
+    #[serde(alias="pageInfo")]
     pub page_info: Option<PageInfo>,
 }
 
@@ -456,15 +464,19 @@ impl ResponseResult for SubscriptionListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelAuditDetails {
     /// Whether or not the channel has any copyright strikes.    
+    #[serde(alias="copyrightStrikesGoodStanding")]
     pub copyright_strikes_good_standing: Option<bool>,
     /// Whether or not the channel respects the community guidelines.    
+    #[serde(alias="communityGuidelinesGoodStanding")]
     pub community_guidelines_good_standing: Option<bool>,
     /// Whether or not the channel has any unresolved claims.    
+    #[serde(alias="contentIdClaimsGoodStanding")]
     pub content_id_claims_good_standing: Option<bool>,
     /// Describes the general state of the channel. This field will always show if there are any issues whatsoever with the channel. Currently this field represents the result of the logical and operation over the community guidelines good standing, the copyright strikes good standing and the content ID claims good standing, but this may change in the future.    
+    #[serde(alias="overallGoodStanding")]
     pub overall_good_standing: Option<bool>,
 }
 
@@ -492,31 +504,40 @@ impl ChannelAuditDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoFileDetails {
     /// The uploaded video file's combined (video and audio) bitrate in bits per second.    
+    #[serde(alias="bitrateBps")]
     pub bitrate_bps: Option<String>,
     /// The uploaded video file's container format.    
     pub container: Option<String>,
     /// Geographic coordinates that identify the place where the uploaded video was recorded. Coordinates are defined using WGS 84.    
+    #[serde(alias="recordingLocation")]
     pub recording_location: Option<GeoPoint>,
     /// The uploaded file's type as detected by YouTube's video processing engine. Currently, YouTube only processes video files, but this field is present whether a video file or another type of file was uploaded.    
+    #[serde(alias="fileType")]
     pub file_type: Option<String>,
     /// The date and time when the uploaded video file was created. The value is specified in ISO 8601 format. Currently, the following ISO 8601 formats are supported:  
     /// - Date only: YYYY-MM-DD 
     /// - Naive time: YYYY-MM-DDTHH:MM:SS 
     /// - Time with timezone: YYYY-MM-DDTHH:MM:SS+HH:MM
+    #[serde(alias="creationTime")]
     pub creation_time: Option<String>,
     /// The length of the uploaded video in milliseconds.    
+    #[serde(alias="durationMs")]
     pub duration_ms: Option<String>,
     /// The uploaded file's name. This field is present whether a video file or another type of file was uploaded.    
+    #[serde(alias="fileName")]
     pub file_name: Option<String>,
     /// The uploaded file's size in bytes. This field is present whether a video file or another type of file was uploaded.    
+    #[serde(alias="fileSize")]
     pub file_size: Option<String>,
     /// A list of video streams contained in the uploaded video file. Each item in the list contains detailed metadata about a video stream.    
-    pub video_streams: Vec<VideoFileDetailsVideoStream>,
+    #[serde(alias="videoStreams")]
+    pub video_streams: Option<Vec<VideoFileDetailsVideoStream>>,
     /// A list of audio streams contained in the uploaded video file. Each item in the list contains detailed metadata about an audio stream.    
-    pub audio_streams: Vec<VideoFileDetailsAudioStream>,
+    #[serde(alias="audioStreams")]
+    pub audio_streams: Option<Vec<VideoFileDetailsAudioStream>>,
 }
 
 impl Part for VideoFileDetails {}
@@ -538,8 +559,8 @@ impl VideoFileDetails {
         if self.duration_ms.is_some() { r = r + "durationMs,"; }
         if self.file_name.is_some() { r = r + "fileName,"; }
         if self.file_size.is_some() { r = r + "fileSize,"; }
-        if self.video_streams.len() > 0 { r = r + "videoStreams,"; }
-        if self.audio_streams.len() > 0 { r = r + "audioStreams,"; }
+        if self.video_streams.is_some() { r = r + "videoStreams,"; }
+        if self.audio_streams.is_some() { r = r + "audioStreams,"; }
         r.pop();
         r
     }
@@ -549,7 +570,7 @@ impl VideoFileDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistLocalization {
     /// The localized strings for playlist's description.    
     pub description: Option<String>,
@@ -579,9 +600,10 @@ impl PlaylistLocalization {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsComment {
     /// The resourceId object contains information that identifies the resource associated with the comment.    
+    #[serde(alias="resourceId")]
     pub resource_id: Option<ResourceId>,
 }
 
@@ -610,25 +632,31 @@ impl ActivityContentDetailsComment {
 /// 
 /// * [list playlist items](struct.PlaylistItemListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlaylistItemListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistItemListResponse".    
     pub kind: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
     /// A list of playlist items that match the request criteria.    
-    pub items: Vec<PlaylistItem>,
+    pub items: Option<Vec<PlaylistItem>>,
     /// no description provided    
+    #[serde(alias="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    #[serde(alias="prevPageToken")]
     pub prev_page_token: Option<String>,
     /// no description provided    
+    #[serde(alias="pageInfo")]
     pub page_info: Option<PageInfo>,
 }
 
@@ -639,7 +667,7 @@ impl ResponseResult for PlaylistItemListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PropertyValue {
     /// A property.    
     pub property: Option<String>,
@@ -669,13 +697,16 @@ impl PropertyValue {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InvideoTiming {
     /// Defines the time at which the promotion will appear. Depending on the value of type the value of the offsetMs field will represent a time offset from the start or from the end of the video, expressed in milliseconds.    
+    #[serde(alias="offsetMs")]
     pub offset_ms: Option<String>,
     /// Describes a timing type. If the value is offsetFromStart, then the offsetMs field represents an offset from the start of the video. If the value is offsetFromEnd, then the offsetMs field represents an offset from the end of the video.    
+    #[serde(alias="type")]
     pub type_: Option<String>,
     /// Defines the duration in milliseconds for which the promotion should be displayed. If missing, the client should use the default.    
+    #[serde(alias="durationMs")]
     pub duration_ms: Option<String>,
 }
 
@@ -702,21 +733,25 @@ impl InvideoTiming {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistSnippet {
     /// The playlist's description.    
     pub description: Option<String>,
     /// The playlist's title.    
     pub title: Option<String>,
     /// The ID that YouTube uses to uniquely identify the channel that published the playlist.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The date and time that the playlist was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="publishedAt")]
     pub published_at: Option<String>,
     /// Keyword tags associated with the playlist.    
-    pub tags: Vec<String>,
+    pub tags: Option<Vec<String>>,
     /// The channel title of the channel that the video belongs to.    
+    #[serde(alias="channelTitle")]
     pub channel_title: Option<String>,
     /// The language of the playlist's default title and description.    
+    #[serde(alias="defaultLanguage")]
     pub default_language: Option<String>,
     /// Localized title and description, read-only.    
     pub localized: Option<PlaylistLocalization>,
@@ -739,7 +774,7 @@ impl PlaylistSnippet {
         if self.title.is_some() { r = r + "title,"; }
         if self.channel_id.is_some() { r = r + "channelId,"; }
         if self.published_at.is_some() { r = r + "publishedAt,"; }
-        if self.tags.len() > 0 { r = r + "tags,"; }
+        if self.tags.is_some() { r = r + "tags,"; }
         if self.channel_title.is_some() { r = r + "channelTitle,"; }
         if self.default_language.is_some() { r = r + "defaultLanguage,"; }
         if self.localized.is_some() { r = r + "localized,"; }
@@ -753,9 +788,10 @@ impl PlaylistSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsLike {
     /// The resourceId object contains information that identifies the rated resource.    
+    #[serde(alias="resourceId")]
     pub resource_id: Option<ResourceId>,
 }
 
@@ -787,7 +823,7 @@ impl ActivityContentDetailsLike {
 /// * [list live streams](struct.LiveStreamListMethodBuilder.html) (none)
 /// * [insert live streams](struct.LiveStreamInsertMethodBuilder.html) (request|response)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStream {
     /// The status object contains information about live stream's status.    
     pub status: Option<LiveStreamStatus>,
@@ -798,6 +834,7 @@ pub struct LiveStream {
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The content_details object contains information about the stream, including the closed captions ingestion URL.    
+    #[serde(alias="contentDetails")]
     pub content_details: Option<LiveStreamContentDetails>,
     /// The cdn object defines the live stream's content delivery network (CDN) settings. These settings provide details about the manner in which you stream your content to YouTube.    
     pub cdn: Option<CdnSettings>,
@@ -836,17 +873,19 @@ impl LiveStream {
 /// 
 /// * [set thumbnails](struct.ThumbnailSetMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct ThumbnailSetResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// A list of thumbnails.    
-    pub items: Vec<ThumbnailDetails>,
+    pub items: Option<Vec<ThumbnailDetails>>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#thumbnailSetResponse".    
     pub kind: Option<String>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
 }
 
@@ -857,9 +896,10 @@ impl ResponseResult for ThumbnailSetResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsUpload {
     /// The ID that YouTube uses to uniquely identify the uploaded video.    
+    #[serde(alias="videoId")]
     pub video_id: Option<String>,
 }
 
@@ -883,33 +923,43 @@ impl ActivityContentDetailsUpload {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSettings {
     /// Specifies the channel description.    
     pub description: Option<String>,
     /// Specifies the channel title.    
     pub title: Option<String>,
     /// Whether user-submitted comments left on the channel page need to be approved by the channel owner to be publicly visible.    
+    #[serde(alias="moderateComments")]
     pub moderate_comments: Option<bool>,
     /// Whether the tab to browse the videos should be displayed.    
+    #[serde(alias="showBrowseView")]
     pub show_browse_view: Option<bool>,
     /// Title for the featured channels tab.    
+    #[serde(alias="featuredChannelsTitle")]
     pub featured_channels_title: Option<String>,
     /// no description provided    
+    #[serde(alias="defaultLanguage")]
     pub default_language: Option<String>,
     /// The trailer of the channel, for users that are not subscribers.    
+    #[serde(alias="unsubscribedTrailer")]
     pub unsubscribed_trailer: Option<String>,
     /// The list of featured channels.    
-    pub featured_channels_urls: Vec<String>,
+    #[serde(alias="featuredChannelsUrls")]
+    pub featured_channels_urls: Option<Vec<String>>,
     /// A prominent color that can be rendered on this channel page.    
+    #[serde(alias="profileColor")]
     pub profile_color: Option<String>,
     /// Which content tab users should see when viewing the channel.    
+    #[serde(alias="defaultTab")]
     pub default_tab: Option<String>,
     /// Lists keywords associated with the channel, comma-separated.    
     pub keywords: Option<String>,
     /// Whether related channels should be proposed.    
+    #[serde(alias="showRelatedChannels")]
     pub show_related_channels: Option<bool>,
     /// The ID for a Google Analytics account to track and measure traffic to the channels.    
+    #[serde(alias="trackingAnalyticsAccountId")]
     pub tracking_analytics_account_id: Option<String>,
 }
 
@@ -931,7 +981,7 @@ impl ChannelSettings {
         if self.featured_channels_title.is_some() { r = r + "featuredChannelsTitle,"; }
         if self.default_language.is_some() { r = r + "defaultLanguage,"; }
         if self.unsubscribed_trailer.is_some() { r = r + "unsubscribedTrailer,"; }
-        if self.featured_channels_urls.len() > 0 { r = r + "featuredChannelsUrls,"; }
+        if self.featured_channels_urls.is_some() { r = r + "featuredChannelsUrls,"; }
         if self.profile_color.is_some() { r = r + "profileColor,"; }
         if self.default_tab.is_some() { r = r + "defaultTab,"; }
         if self.keywords.is_some() { r = r + "keywords,"; }
@@ -946,9 +996,10 @@ impl ChannelSettings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchResultSnippet {
     /// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.    
+    #[serde(alias="liveBroadcastContent")]
     pub live_broadcast_content: Option<String>,
     /// A description of the search result.    
     pub description: Option<String>,
@@ -957,10 +1008,13 @@ pub struct SearchResultSnippet {
     /// A map of thumbnail images associated with the search result. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
     pub thumbnails: Option<ThumbnailDetails>,
     /// The value that YouTube uses to uniquely identify the channel that published the resource that the search result identifies.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The creation date and time of the resource that the search result identifies. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="publishedAt")]
     pub published_at: Option<String>,
     /// The title of the channel that published the resource that the search result identifies.    
+    #[serde(alias="channelTitle")]
     pub channel_title: Option<String>,
 }
 
@@ -972,17 +1026,20 @@ impl ResponseResult for SearchResultSnippet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IngestionInfo {
     /// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.    
+    #[serde(alias="backupIngestionAddress")]
     pub backup_ingestion_address: Option<String>,
     /// The HTTP or RTMP stream name that YouTube assigns to the video stream.    
+    #[serde(alias="streamName")]
     pub stream_name: Option<String>,
     /// The primary ingestion URL that you should use to stream video to YouTube. You must stream video to this URL.
     /// 
     /// Depending on which application or tool you use to encode your video stream, you may need to enter the stream URL and stream name separately or you may need to concatenate them in the following format:
     /// 
     /// STREAM_URL/STREAM_NAME
+    #[serde(alias="ingestionAddress")]
     pub ingestion_address: Option<String>,
 }
 
@@ -1009,13 +1066,15 @@ impl IngestionInfo {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CdnSettings {
     /// The format of the video stream that you are sending to Youtube.    
     pub format: Option<String>,
     /// The ingestionInfo object contains information that YouTube provides that you need to transmit your RTMP or HTTP stream to YouTube.    
+    #[serde(alias="ingestionInfo")]
     pub ingestion_info: Option<IngestionInfo>,
     /// The method or protocol used to transmit the video stream.    
+    #[serde(alias="ingestionType")]
     pub ingestion_type: Option<String>,
 }
 
@@ -1047,17 +1106,19 @@ impl CdnSettings {
 /// 
 /// * [get rating videos](struct.VideoGetRatingMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoGetRatingResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// A list of ratings that match the request criteria.    
-    pub items: Vec<VideoRating>,
+    pub items: Option<Vec<VideoRating>>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoGetRatingResponse".    
     pub kind: Option<String>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
 }
 
@@ -1068,11 +1129,12 @@ impl ResponseResult for VideoGetRatingResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoCategorySnippet {
     /// no description provided    
     pub assignable: Option<bool>,
     /// The YouTube channel that created the video category.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The video category's title.    
     pub title: Option<String>,
@@ -1086,9 +1148,10 @@ impl ResponseResult for VideoCategorySnippet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsChannelItem {
     /// The resourceId object contains information that identifies the resource that was added to the channel.    
+    #[serde(alias="resourceId")]
     pub resource_id: Option<ResourceId>,
 }
 
@@ -1112,23 +1175,29 @@ impl ActivityContentDetailsChannelItem {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastSnippet {
     /// The date and time that the broadcast actually ended. This information is only available once the broadcast's state is complete. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="actualEndTime")]
     pub actual_end_time: Option<String>,
     /// The broadcast's description. As with the title, you can set this field by modifying the broadcast resource or by setting the description field of the corresponding video resource.    
     pub description: Option<String>,
     /// The broadcast's title. Note that the broadcast represents exactly one YouTube video. You can set this field by modifying the broadcast resource or by setting the title field of the corresponding video resource.    
     pub title: Option<String>,
     /// The ID that YouTube uses to uniquely identify the channel that is publishing the broadcast.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The date and time that the broadcast was added to YouTube's live broadcast schedule. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="publishedAt")]
     pub published_at: Option<String>,
     /// The date and time that the broadcast is scheduled to start. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="scheduledStartTime")]
     pub scheduled_start_time: Option<String>,
     /// The date and time that the broadcast actually started. This information is only available once the broadcast's state is live. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="actualStartTime")]
     pub actual_start_time: Option<String>,
     /// The date and time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="scheduledEndTime")]
     pub scheduled_end_time: Option<String>,
     /// A map of thumbnail images associated with the broadcast. For each nested object in this object, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
     pub thumbnails: Option<ThumbnailDetails>,
@@ -1163,21 +1232,25 @@ impl LiveBroadcastSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionSnippet {
     /// The subscription's details.    
     pub description: Option<String>,
     /// The subscription's title.    
     pub title: Option<String>,
     /// The id object contains information about the channel that the user subscribed to.    
+    #[serde(alias="resourceId")]
     pub resource_id: Option<ResourceId>,
     /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
     pub thumbnails: Option<ThumbnailDetails>,
     /// The ID that YouTube uses to uniquely identify the subscriber's channel.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The date and time that the subscription was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="publishedAt")]
     pub published_at: Option<String>,
     /// Channel title for the channel that the subscription belongs to.    
+    #[serde(alias="channelTitle")]
     pub channel_title: Option<String>,
 }
 
@@ -1208,12 +1281,12 @@ impl SubscriptionSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionContentDetails {
     /// The channel ids for type multiple_channels.    
-    pub channels: Vec<String>,
+    pub channels: Option<Vec<String>>,
     /// The playlist ids for type single_playlist and multiple_playlists. For singlePlaylist, only one playlistId is allowed.    
-    pub playlists: Vec<String>,
+    pub playlists: Option<Vec<String>>,
 }
 
 impl Part for ChannelSectionContentDetails {}
@@ -1227,8 +1300,8 @@ impl ChannelSectionContentDetails {
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        if self.channels.len() > 0 { r = r + "channels,"; }
-        if self.playlists.len() > 0 { r = r + "playlists,"; }
+        if self.channels.is_some() { r = r + "channels,"; }
+        if self.playlists.is_some() { r = r + "playlists,"; }
         r.pop();
         r
     }
@@ -1243,17 +1316,19 @@ impl ChannelSectionContentDetails {
 /// 
 /// * [list i18n regions](struct.I18nRegionListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nRegionListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// A list of regions where YouTube is available. In this map, the i18n region ID is the map key, and its value is the corresponding i18nRegion resource.    
-    pub items: Vec<I18nRegion>,
+    pub items: Option<Vec<I18nRegion>>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nRegionListResponse".    
     pub kind: Option<String>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
 }
 
@@ -1269,25 +1344,31 @@ impl ResponseResult for I18nRegionListResponse {}
 /// 
 /// * [list live streams](struct.LiveStreamListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct LiveStreamListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveStreamListResponse".    
     pub kind: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
     /// A list of live streams that match the request criteria.    
-    pub items: Vec<LiveStream>,
+    pub items: Option<Vec<LiveStream>>,
     /// no description provided    
+    #[serde(alias="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    #[serde(alias="prevPageToken")]
     pub prev_page_token: Option<String>,
     /// no description provided    
+    #[serde(alias="pageInfo")]
     pub page_info: Option<PageInfo>,
 }
 
@@ -1298,7 +1379,7 @@ impl ResponseResult for LiveStreamListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStreamContentDetails {
     /// Indicates whether the stream is reusable, which means that it can be bound to multiple broadcasts. It is common for broadcasters to reuse the same stream for many different broadcasts if those broadcasts occur at different times.
     /// 
@@ -1306,8 +1387,10 @@ pub struct LiveStreamContentDetails {
     /// - A non-reusable stream can only be bound to one broadcast. 
     /// - A non-reusable stream might be deleted by an automated process after the broadcast ends. 
     /// - The  liveStreams.list method does not list non-reusable streams if you call the method and set the mine parameter to true. The only way to use that method to retrieve the resource for a non-reusable stream is to use the id parameter to identify the stream.
+    #[serde(alias="isReusable")]
     pub is_reusable: Option<bool>,
     /// The ingestion URL where the closed captions of this stream are sent.    
+    #[serde(alias="closedCaptionsIngestionUrl")]
     pub closed_captions_ingestion_url: Option<String>,
 }
 
@@ -1333,7 +1416,7 @@ impl LiveStreamContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nLanguageSnippet {
     /// The human-readable name of the language in the language itself.    
     pub name: Option<String>,
@@ -1355,17 +1438,20 @@ impl cmn::Resource for I18nLanguageSnippet {}
 /// 
 /// * [set watermarks](struct.WatermarkSetMethodBuilder.html) (request)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable)]
+#[derive(Default, Clone, Debug, Serialize)]
 pub struct InvideoBranding {
     /// no description provided    
+    #[serde(alias="targetChannelId")]
     pub target_channel_id: Option<String>,
     /// no description provided    
     pub position: Option<InvideoPosition>,
     /// no description provided    
+    #[serde(alias="imageUrl")]
     pub image_url: Option<String>,
     /// no description provided    
     pub timing: Option<InvideoTiming>,
     /// no description provided    
+    #[serde(alias="imageBytes")]
     pub image_bytes: Option<String>,
 }
 
@@ -1391,9 +1477,10 @@ impl InvideoBranding {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItemStatus {
     /// This resource's privacy status.    
+    #[serde(alias="privacyStatus")]
     pub privacy_status: Option<String>,
 }
 
@@ -1418,11 +1505,12 @@ impl PlaylistItemStatus {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelConversionPing {
     /// Defines the context of the ping.    
     pub context: Option<String>,
     /// The url (without the schema) that the player shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D cview%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.    
+    #[serde(alias="conversionUrl")]
     pub conversion_url: Option<String>,
 }
 
@@ -1448,10 +1536,10 @@ impl ChannelConversionPing {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoProjectDetails {
     /// A list of project tags associated with the video during the upload.    
-    pub tags: Vec<String>,
+    pub tags: Option<Vec<String>>,
 }
 
 impl Part for VideoProjectDetails {}
@@ -1465,7 +1553,7 @@ impl VideoProjectDetails {
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        if self.tags.len() > 0 { r = r + "tags,"; }
+        if self.tags.is_some() { r = r + "tags,"; }
         r.pop();
         r
     }
@@ -1492,7 +1580,7 @@ impl VideoProjectDetails {
 /// * [list playlist items](struct.PlaylistItemListMethodBuilder.html) (none)
 /// * [delete playlist items](struct.PlaylistItemDeleteMethodBuilder.html) (none)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItem {
     /// The status object contains information about the playlist item's privacy status.    
     pub status: Option<PlaylistItemStatus>,
@@ -1503,6 +1591,7 @@ pub struct PlaylistItem {
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The contentDetails object is included in the resource if the included item is a YouTube video. The object contains additional information about the video.    
+    #[serde(alias="contentDetails")]
     pub content_details: Option<PlaylistItemContentDetails>,
     /// The ID that YouTube uses to uniquely identify the playlist item.    
     pub id: Option<String>,
@@ -1538,25 +1627,31 @@ impl PlaylistItem {
 /// 
 /// * [list guide categories](struct.GuideCategoryListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct GuideCategoryListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#guideCategoryListResponse".    
     pub kind: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
     /// A list of categories that can be associated with YouTube channels. In this map, the category ID is the map key, and its value is the corresponding guideCategory resource.    
-    pub items: Vec<GuideCategory>,
+    pub items: Option<Vec<GuideCategory>>,
     /// no description provided    
+    #[serde(alias="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    #[serde(alias="prevPageToken")]
     pub prev_page_token: Option<String>,
     /// no description provided    
+    #[serde(alias="pageInfo")]
     pub page_info: Option<PageInfo>,
 }
 
@@ -1567,7 +1662,7 @@ impl ResponseResult for GuideCategoryListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoLocalization {
     /// Localized version of the video's description.    
     pub description: Option<String>,
@@ -1597,7 +1692,7 @@ impl VideoLocalization {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionSnippet {
     /// The style of the channel section.    
     pub style: Option<String>,
@@ -1608,10 +1703,13 @@ pub struct ChannelSectionSnippet {
     /// The position of the channel section in the channel.    
     pub position: Option<u32>,
     /// The ID that YouTube uses to uniquely identify the channel that published the channel section.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The type of the channel section.    
+    #[serde(alias="type")]
     pub type_: Option<String>,
     /// The language of the channel section's default title and description.    
+    #[serde(alias="defaultLanguage")]
     pub default_language: Option<String>,
 }
 
@@ -1642,11 +1740,13 @@ impl ChannelSectionSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelContentDetails {
     /// no description provided    
+    #[serde(alias="relatedPlaylists")]
     pub related_playlists: Option<ChannelContentDetailsRelatedPlaylists>,
     /// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.    
+    #[serde(alias="googlePlusUserId")]
     pub google_plus_user_id: Option<String>,
 }
 
@@ -1672,7 +1772,7 @@ impl ChannelContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct TokenPagination;
 
 impl Part for TokenPagination {}
@@ -1688,7 +1788,7 @@ impl ResponseResult for TokenPagination {}
 /// 
 /// * [list i18n regions](struct.I18nRegionListMethodBuilder.html) (none)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nRegion {
     /// The snippet object contains basic details about the i18n region, such as region code and human-readable name.    
     pub snippet: Option<I18nRegionSnippet>,
@@ -1708,7 +1808,7 @@ impl cmn::Resource for I18nRegion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ThumbnailDetails {
     /// The default image for this resource.    
     pub default: Option<Thumbnail>,
@@ -1747,7 +1847,7 @@ impl ThumbnailDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoMonetizationDetails {
     /// The value of access indicates whether the video can be monetized or not.    
     pub access: Option<AccessPolicy>,
@@ -1774,13 +1874,15 @@ impl VideoMonetizationDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsRecommendation {
     /// The resourceId object contains information that identifies the recommended resource.    
+    #[serde(alias="resourceId")]
     pub resource_id: Option<ResourceId>,
     /// The reason that the resource is recommended to the user.    
     pub reason: Option<String>,
     /// The seedResourceId object contains information about the resource that caused the recommendation.    
+    #[serde(alias="seedResourceId")]
     pub seed_resource_id: Option<ResourceId>,
 }
 
@@ -1806,11 +1908,13 @@ impl ActivityContentDetailsRecommendation {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoRecordingDetails {
     /// The date and time when the video was recorded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.    
+    #[serde(alias="recordingDate")]
     pub recording_date: Option<String>,
     /// The text description of the location where the video was recorded.    
+    #[serde(alias="locationDescription")]
     pub location_description: Option<String>,
     /// The geolocation information associated with the video.    
     pub location: Option<GeoPoint>,
@@ -1839,9 +1943,10 @@ impl VideoRecordingDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsSubscription {
     /// The resourceId object contains information that identifies the resource that the user subscribed to.    
+    #[serde(alias="resourceId")]
     pub resource_id: Option<ResourceId>,
 }
 
@@ -1865,10 +1970,10 @@ impl ActivityContentDetailsSubscription {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelConversionPings {
     /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.    
-    pub pings: Vec<ChannelConversionPing>,
+    pub pings: Option<Vec<ChannelConversionPing>>,
 }
 
 impl Part for ChannelConversionPings {}
@@ -1882,7 +1987,7 @@ impl ChannelConversionPings {
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        if self.pings.len() > 0 { r = r + "pings,"; }
+        if self.pings.is_some() { r = r + "pings,"; }
         r.pop();
         r
     }
@@ -1892,15 +1997,17 @@ impl ChannelConversionPings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetails {
     /// The comment object contains information about a resource that received a comment. This property is only present if the snippet.type is comment.    
     pub comment: Option<ActivityContentDetailsComment>,
     /// The playlistItem object contains information about a new playlist item. This property is only present if the snippet.type is playlistItem.    
+    #[serde(alias="playlistItem")]
     pub playlist_item: Option<ActivityContentDetailsPlaylistItem>,
     /// The like object contains information about a resource that received a positive (like) rating. This property is only present if the snippet.type is like.    
     pub like: Option<ActivityContentDetailsLike>,
     /// The promotedItem object contains details about a resource which is being promoted. This property is only present if the snippet.type is promotedItem.    
+    #[serde(alias="promotedItem")]
     pub promoted_item: Option<ActivityContentDetailsPromotedItem>,
     /// The recommendation object contains information about a recommended resource. This property is only present if the snippet.type is recommendation.    
     pub recommendation: Option<ActivityContentDetailsRecommendation>,
@@ -1911,6 +2018,7 @@ pub struct ActivityContentDetails {
     /// The social object contains details about a social network post. This property is only present if the snippet.type is social.    
     pub social: Option<ActivityContentDetailsSocial>,
     /// The channelItem object contains details about a resource which was added to a channel. This property is only present if the snippet.type is channelItem.    
+    #[serde(alias="channelItem")]
     pub channel_item: Option<ActivityContentDetailsChannelItem>,
     /// The bulletin object contains details about a channel bulletin post. This object is only present if the snippet.type is bulletin.    
     pub bulletin: Option<ActivityContentDetailsBulletin>,
@@ -1953,25 +2061,31 @@ impl ActivityContentDetails {
 /// 
 /// * [list playlists](struct.PlaylistListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlaylistListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistListResponse".    
     pub kind: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
     /// A list of playlists that match the request criteria.    
-    pub items: Vec<Playlist>,
+    pub items: Option<Vec<Playlist>>,
     /// no description provided    
+    #[serde(alias="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    #[serde(alias="prevPageToken")]
     pub prev_page_token: Option<String>,
     /// no description provided    
+    #[serde(alias="pageInfo")]
     pub page_info: Option<PageInfo>,
 }
 
@@ -1982,15 +2096,18 @@ impl ResponseResult for PlaylistListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItemContentDetails {
     /// A user-generated note for this item.    
     pub note: Option<String>,
     /// The time, measured in seconds from the start of the video, when the video should start playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) The default value is 0.    
+    #[serde(alias="startAt")]
     pub start_at: Option<String>,
     /// The time, measured in seconds from the start of the video, when the video should stop playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) By default, assume that the video.endTime is the end of the video.    
+    #[serde(alias="endAt")]
     pub end_at: Option<String>,
     /// The ID that YouTube uses to uniquely identify a video. To retrieve the video resource, set the id query parameter to this value in your API request.    
+    #[serde(alias="videoId")]
     pub video_id: Option<String>,
 }
 
@@ -2018,11 +2135,13 @@ impl PlaylistItemContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelContentOwnerDetails {
     /// The ID of the content owner linked to the channel.    
+    #[serde(alias="contentOwner")]
     pub content_owner: Option<String>,
     /// The date and time of when the channel was linked to the content owner. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="timeLinked")]
     pub time_linked: Option<String>,
 }
 
@@ -2048,23 +2167,31 @@ impl ChannelContentOwnerDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoProcessingDetails {
     /// This value indicates whether file details are available for the uploaded video. You can retrieve a video's file details by requesting the fileDetails part in your videos.list() request.    
+    #[serde(alias="fileDetailsAvailability")]
     pub file_details_availability: Option<String>,
     /// This value indicates whether video editing suggestions, which might improve video quality or the playback experience, are available for the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.    
+    #[serde(alias="editorSuggestionsAvailability")]
     pub editor_suggestions_availability: Option<String>,
     /// The video's processing status. This value indicates whether YouTube was able to process the video or if the video is still being processed.    
+    #[serde(alias="processingStatus")]
     pub processing_status: Option<String>,
     /// This value indicates whether the video processing engine has generated suggestions that might improve YouTube's ability to process the the video, warnings that explain video processing problems, or errors that cause video processing problems. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.    
+    #[serde(alias="processingIssuesAvailability")]
     pub processing_issues_availability: Option<String>,
     /// The reason that YouTube failed to process the video. This property will only have a value if the processingStatus property's value is failed.    
+    #[serde(alias="processingFailureReason")]
     pub processing_failure_reason: Option<String>,
     /// This value indicates whether thumbnail images have been generated for the video.    
+    #[serde(alias="thumbnailsAvailability")]
     pub thumbnails_availability: Option<String>,
     /// The processingProgress object contains information about the progress YouTube has made in processing the video. The values are really only relevant if the video's processing status is processing.    
+    #[serde(alias="processingProgress")]
     pub processing_progress: Option<VideoProcessingDetailsProcessingProgress>,
     /// This value indicates whether keyword (tag) suggestions are available for the video. Tags can be added to a video's metadata to make it easier for other users to find the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.    
+    #[serde(alias="tagSuggestionsAvailability")]
     pub tag_suggestions_availability: Option<String>,
 }
 
@@ -2096,15 +2223,19 @@ impl VideoProcessingDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastStatus {
     /// The broadcast's recording status.    
+    #[serde(alias="recordingStatus")]
     pub recording_status: Option<String>,
     /// The broadcast's privacy status. Note that the broadcast represents exactly one YouTube video, so the privacy settings are identical to those supported for videos. In addition, you can set this field by modifying the broadcast resource or by setting the privacyStatus field of the corresponding video resource.    
+    #[serde(alias="privacyStatus")]
     pub privacy_status: Option<String>,
     /// The broadcast's status. The status can be updated using the API's liveBroadcasts.transition method.    
+    #[serde(alias="lifeCycleStatus")]
     pub life_cycle_status: Option<String>,
     /// Priority of the live broadcast event (internal state).    
+    #[serde(alias="liveBroadcastPriority")]
     pub live_broadcast_priority: Option<String>,
 }
 
@@ -2132,13 +2263,16 @@ impl LiveBroadcastStatus {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionContentDetails {
     /// The number of new items in the subscription since its content was last read.    
+    #[serde(alias="newItemCount")]
     pub new_item_count: Option<u32>,
     /// The type of activity this subscription is for (only uploads, everything).    
+    #[serde(alias="activityType")]
     pub activity_type: Option<String>,
     /// The approximate number of items that the subscription points to.    
+    #[serde(alias="totalItemCount")]
     pub total_item_count: Option<u32>,
 }
 
@@ -2175,27 +2309,32 @@ impl SubscriptionContentDetails {
 /// * [update videos](struct.VideoUpdateMethodBuilder.html) (request|response)
 /// * [delete videos](struct.VideoDeleteMethodBuilder.html) (none)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Video {
     /// The status object contains information about the video's uploading, processing, and privacy statuses.    
     pub status: Option<VideoStatus>,
     /// The topicDetails object encapsulates information about Freebase topics associated with the video.    
+    #[serde(alias="topicDetails")]
     pub topic_details: Option<VideoTopicDetails>,
     /// The monetizationDetails object encapsulates information about the monetization status of the video.    
+    #[serde(alias="monetizationDetails")]
     pub monetization_details: Option<VideoMonetizationDetails>,
     /// The suggestions object encapsulates suggestions that identify opportunities to improve the video quality or the metadata for the uploaded video. This data can only be retrieved by the video owner.    
     pub suggestions: Option<VideoSuggestions>,
     /// Age restriction details related to a video.    
+    #[serde(alias="ageGating")]
     pub age_gating: Option<VideoAgeGating>,
     /// The fileDetails object encapsulates information about the video file that was uploaded to YouTube, including the file's resolution, duration, audio and video codecs, stream bitrates, and more. This data can only be retrieved by the video owner.    
+    #[serde(alias="fileDetails")]
     pub file_details: Option<VideoFileDetails>,
     /// The player object contains information that you would use to play the video in an embedded player.    
     pub player: Option<VideoPlayer>,
     /// The ID that YouTube uses to uniquely identify the video.    
     pub id: Option<String>,
     /// List with all localizations.    
-    pub localizations: HashMap<String, VideoLocalization>,
+    pub localizations: Option<HashMap<String, VideoLocalization>>,
     /// The liveStreamingDetails object contains metadata about a live video broadcast. The object will only be present in a video resource if the video is an upcoming, live, or completed live broadcast.    
+    #[serde(alias="liveStreamingDetails")]
     pub live_streaming_details: Option<VideoLiveStreamingDetails>,
     /// The snippet object contains basic details about the video, such as its title, description, and category.    
     pub snippet: Option<VideoSnippet>,
@@ -2204,18 +2343,23 @@ pub struct Video {
     /// The statistics object contains statistics about the video.    
     pub statistics: Option<VideoStatistics>,
     /// The projectDetails object contains information about the project specific video metadata.    
+    #[serde(alias="projectDetails")]
     pub project_details: Option<VideoProjectDetails>,
     /// The conversionPings object encapsulates information about url pings that need to be respected by the App in different video contexts.    
+    #[serde(alias="conversionPings")]
     pub conversion_pings: Option<VideoConversionPings>,
     /// The processingProgress object encapsulates information about YouTube's progress in processing the uploaded video file. The properties in the object identify the current processing status and an estimate of the time remaining until YouTube finishes processing the video. This part also indicates whether different types of data or content, such as file details or thumbnail images, are available for the video.
     /// 
     /// The processingProgress object is designed to be polled so that the video uploaded can track the progress that YouTube has made in processing the uploaded video file. This data can only be retrieved by the video owner.
+    #[serde(alias="processingDetails")]
     pub processing_details: Option<VideoProcessingDetails>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The contentDetails object contains information about the video content, including the length of the video and its aspect ratio.    
+    #[serde(alias="contentDetails")]
     pub content_details: Option<VideoContentDetails>,
     /// The recordingDetails object encapsulates information about the location, date and address where the video was recorded.    
+    #[serde(alias="recordingDetails")]
     pub recording_details: Option<VideoRecordingDetails>,
 }
 
@@ -2237,7 +2381,7 @@ impl Video {
         if self.file_details.is_some() { r = r + "fileDetails,"; }
         if self.player.is_some() { r = r + "player,"; }
         if self.id.is_some() { r = r + "id,"; }
-        if self.localizations.len() > 0 { r = r + "localizations,"; }
+        if self.localizations.is_some() { r = r + "localizations,"; }
         if self.live_streaming_details.is_some() { r = r + "liveStreamingDetails,"; }
         if self.snippet.is_some() { r = r + "snippet,"; }
         if self.kind.is_some() { r = r + "kind,"; }
@@ -2257,7 +2401,7 @@ impl Video {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoPoint {
     /// Latitude in degrees.    
     pub latitude: Option<f64>,
@@ -2290,7 +2434,7 @@ impl GeoPoint {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelBrandingSettings {
     /// Branding properties for branding images.    
     pub image: Option<ImageSettings>,
@@ -2299,7 +2443,7 @@ pub struct ChannelBrandingSettings {
     /// Branding properties for the channel view.    
     pub channel: Option<ChannelSettings>,
     /// Additional experimental branding properties.    
-    pub hints: Vec<PropertyValue>,
+    pub hints: Option<Vec<PropertyValue>>,
 }
 
 impl Part for ChannelBrandingSettings {}
@@ -2316,7 +2460,7 @@ impl ChannelBrandingSettings {
         if self.image.is_some() { r = r + "image,"; }
         if self.watch.is_some() { r = r + "watch,"; }
         if self.channel.is_some() { r = r + "channel,"; }
-        if self.hints.len() > 0 { r = r + "hints,"; }
+        if self.hints.is_some() { r = r + "hints,"; }
         r.pop();
         r
     }
@@ -2326,9 +2470,10 @@ impl ChannelBrandingSettings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoPlayer {
     /// An <iframe> tag that embeds a player that will play the video.    
+    #[serde(alias="embedHtml")]
     pub embed_html: Option<String>,
 }
 
@@ -2353,9 +2498,10 @@ impl VideoPlayer {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSnippet {
     /// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="publishedAt")]
     pub published_at: Option<String>,
     /// The description of the channel.    
     pub description: Option<String>,
@@ -2364,6 +2510,7 @@ pub struct ChannelSnippet {
     /// Localized title and description, read-only.    
     pub localized: Option<ChannelLocalization>,
     /// The language of the channel's default title and description.    
+    #[serde(alias="defaultLanguage")]
     pub default_language: Option<String>,
     /// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
     pub thumbnails: Option<ThumbnailDetails>,
@@ -2395,13 +2542,16 @@ impl ChannelSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WatchSettings {
     /// The background color for the video watch page's branded area.    
+    #[serde(alias="textColor")]
     pub text_color: Option<String>,
     /// An ID that uniquely identifies a playlist that displays next to the video player.    
+    #[serde(alias="featuredPlaylistId")]
     pub featured_playlist_id: Option<String>,
     /// The text color for the video watch page's branded area.    
+    #[serde(alias="backgroundColor")]
     pub background_color: Option<String>,
 }
 
@@ -2428,7 +2578,7 @@ impl WatchSettings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionLocalization {
     /// The localized strings for channel section's title.    
     pub title: Option<String>,
@@ -2455,12 +2605,12 @@ impl ChannelSectionLocalization {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoContentDetailsRegionRestriction {
     /// A list of region codes that identify countries where the video is viewable. If this property is present and a country is not listed in its value, then the video is blocked from appearing in that country. If this property is present and contains an empty list, the video is blocked in all countries.    
-    pub allowed: Vec<String>,
+    pub allowed: Option<Vec<String>>,
     /// A list of region codes that identify countries where the video is blocked. If this property is present and a country is not listed in its value, then the video is viewable in that country. If this property is present and contains an empty list, the video is viewable in all countries.    
-    pub blocked: Vec<String>,
+    pub blocked: Option<Vec<String>>,
 }
 
 impl Part for VideoContentDetailsRegionRestriction {}
@@ -2474,8 +2624,8 @@ impl VideoContentDetailsRegionRestriction {
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        if self.allowed.len() > 0 { r = r + "allowed,"; }
-        if self.blocked.len() > 0 { r = r + "blocked,"; }
+        if self.allowed.is_some() { r = r + "allowed,"; }
+        if self.blocked.is_some() { r = r + "blocked,"; }
         r.pop();
         r
     }
@@ -2485,21 +2635,25 @@ impl VideoContentDetailsRegionRestriction {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoContentDetails {
     /// The value of definition indicates whether the video is available in high definition or only in standard definition.    
     pub definition: Option<String>,
     /// The countryRestriction object contains information about the countries where a video is (or is not) viewable.    
+    #[serde(alias="countryRestriction")]
     pub country_restriction: Option<AccessPolicy>,
     /// Specifies the ratings that the video received under various rating schemes.    
+    #[serde(alias="contentRating")]
     pub content_rating: Option<ContentRating>,
     /// The value of captions indicates whether the video has captions or not.    
     pub caption: Option<String>,
     /// The regionRestriction object contains information about the countries where a video is (or is not) viewable. The object will contain either the contentDetails.regionRestriction.allowed property or the contentDetails.regionRestriction.blocked property.    
+    #[serde(alias="regionRestriction")]
     pub region_restriction: Option<VideoContentDetailsRegionRestriction>,
     /// The length of the video. The tag value is an ISO 8601 duration in the format PT#M#S, in which the letters PT indicate that the value specifies a period of time, and the letters M and S refer to length in minutes and seconds, respectively. The # characters preceding the M and S letters are both integers that specify the number of minutes (or seconds) of the video. For example, a value of PT15M51S indicates that the video is 15 minutes and 51 seconds long.    
     pub duration: Option<String>,
     /// The value of is_license_content indicates whether the video is licensed content.    
+    #[serde(alias="licensedContent")]
     pub licensed_content: Option<bool>,
     /// The value of dimension indicates whether the video is available in 3D or in 2D.    
     pub dimension: Option<String>,
@@ -2533,15 +2687,19 @@ impl VideoContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotedItemId {
     /// If the promoted item represents a website, this field represents the url pointing to the website. This field will be present only if type has the value website.    
+    #[serde(alias="websiteUrl")]
     pub website_url: Option<String>,
     /// If type is recentUpload, this field identifies the channel from which to take the recent upload. If missing, the channel is assumed to be the same channel for which the invideoPromotion is set.    
+    #[serde(alias="recentlyUploadedBy")]
     pub recently_uploaded_by: Option<String>,
     /// Describes the type of the promoted item.    
+    #[serde(alias="type")]
     pub type_: Option<String>,
     /// If the promoted item represents a video, this field represents the unique YouTube ID identifying it. This field will be present only if type has the value video.    
+    #[serde(alias="videoId")]
     pub video_id: Option<String>,
 }
 
@@ -2576,7 +2734,7 @@ impl PromotedItemId {
 /// * [list subscriptions](struct.SubscriptionListMethodBuilder.html) (none)
 /// * [delete subscriptions](struct.SubscriptionDeleteMethodBuilder.html) (none)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
     /// The snippet object contains basic details about the subscription, including its title and the channel that the user subscribed to.    
     pub snippet: Option<SubscriptionSnippet>,
@@ -2585,8 +2743,10 @@ pub struct Subscription {
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The contentDetails object contains basic statistics about the subscription.    
+    #[serde(alias="contentDetails")]
     pub content_details: Option<SubscriptionContentDetails>,
     /// The subscriberSnippet object contains basic details about the sbuscriber.    
+    #[serde(alias="subscriberSnippet")]
     pub subscriber_snippet: Option<SubscriptionSubscriberSnippet>,
     /// The ID that YouTube uses to uniquely identify the subscription.    
     pub id: Option<String>,
@@ -2617,7 +2777,7 @@ impl Subscription {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nRegionSnippet {
     /// The region code as a 2-letter ISO country code.    
     pub gl: Option<String>,
@@ -2634,13 +2794,16 @@ impl cmn::Resource for I18nRegionSnippet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsPlaylistItem {
     /// The resourceId object contains information about the resource that was added to the playlist.    
+    #[serde(alias="resourceId")]
     pub resource_id: Option<ResourceId>,
     /// The value that YouTube uses to uniquely identify the playlist.    
+    #[serde(alias="playlistId")]
     pub playlist_id: Option<String>,
     /// ID of the item within the playlist.    
+    #[serde(alias="playlistItemId")]
     pub playlist_item_id: Option<String>,
 }
 
@@ -2666,11 +2829,13 @@ impl ActivityContentDetailsPlaylistItem {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InvideoPosition {
     /// Describes in which corner of the video the visual widget will appear.    
+    #[serde(alias="cornerPosition")]
     pub corner_position: Option<String>,
     /// Defines the position type.    
+    #[serde(alias="type")]
     pub type_: Option<String>,
 }
 
@@ -2713,13 +2878,14 @@ impl InvideoPosition {
 /// * [list playlists](struct.PlaylistListMethodBuilder.html) (none)
 /// * [update playlists](struct.PlaylistUpdateMethodBuilder.html) (request|response)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Playlist {
     /// The status object contains status information for the playlist.    
     pub status: Option<PlaylistStatus>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlist".    
     pub kind: Option<String>,
     /// The contentDetails object contains information like video count.    
+    #[serde(alias="contentDetails")]
     pub content_details: Option<PlaylistContentDetails>,
     /// The snippet object contains basic details about the playlist, such as its title and description.    
     pub snippet: Option<PlaylistSnippet>,
@@ -2730,7 +2896,7 @@ pub struct Playlist {
     /// The ID that YouTube uses to uniquely identify the playlist.    
     pub id: Option<String>,
     /// Localizations for different languages    
-    pub localizations: HashMap<String, PlaylistLocalization>,
+    pub localizations: Option<HashMap<String, PlaylistLocalization>>,
 }
 
 impl RequestValue for Playlist {}
@@ -2750,7 +2916,7 @@ impl Playlist {
         if self.player.is_some() { r = r + "player,"; }
         if self.etag.is_some() { r = r + "etag,"; }
         if self.id.is_some() { r = r + "id,"; }
-        if self.localizations.len() > 0 { r = r + "localizations,"; }
+        if self.localizations.is_some() { r = r + "localizations,"; }
         r.pop();
         r
     }
@@ -2760,9 +2926,10 @@ impl Playlist {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct GuideCategorySnippet {
     /// no description provided    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// Description of the guide category.    
     pub title: Option<String>,
@@ -2776,29 +2943,35 @@ impl ResponseResult for GuideCategorySnippet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoSnippet {
     /// The video's description.    
     pub description: Option<String>,
     /// A list of keyword tags associated with the video. Tags may contain spaces. This field is only visible to the video's uploader.    
-    pub tags: Vec<String>,
+    pub tags: Option<Vec<String>>,
     /// The ID that YouTube uses to uniquely identify the channel that the video was uploaded to.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The language of the videos's default snippet.    
+    #[serde(alias="defaultLanguage")]
     pub default_language: Option<String>,
     /// Indicates if the video is an upcoming/active live broadcast. Or it's "none" if the video is not an upcoming/active live broadcast.    
+    #[serde(alias="liveBroadcastContent")]
     pub live_broadcast_content: Option<String>,
     /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="publishedAt")]
     pub published_at: Option<String>,
     /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
     pub thumbnails: Option<ThumbnailDetails>,
     /// The video's title.    
     pub title: Option<String>,
     /// The YouTube video category associated with the video.    
+    #[serde(alias="categoryId")]
     pub category_id: Option<String>,
     /// Localized snippet selected with the hl parameter. If no such localization exists, this field is populated with the default snippet. (Read-only)    
     pub localized: Option<VideoLocalization>,
     /// Channel title for the channel that the video belongs to.    
+    #[serde(alias="channelTitle")]
     pub channel_title: Option<String>,
 }
 
@@ -2814,7 +2987,7 @@ impl VideoSnippet {
     fn to_parts(&self) -> String {
         let mut r = String::new();
         if self.description.is_some() { r = r + "description,"; }
-        if self.tags.len() > 0 { r = r + "tags,"; }
+        if self.tags.is_some() { r = r + "tags,"; }
         if self.channel_id.is_some() { r = r + "channelId,"; }
         if self.default_language.is_some() { r = r + "defaultLanguage,"; }
         if self.live_broadcast_content.is_some() { r = r + "liveBroadcastContent,"; }
@@ -2833,13 +3006,15 @@ impl VideoSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InvideoPromotion {
     /// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.    
+    #[serde(alias="defaultTiming")]
     pub default_timing: Option<InvideoTiming>,
     /// List of promoted items in decreasing priority.    
-    pub items: Vec<PromotedItem>,
+    pub items: Option<Vec<PromotedItem>>,
     /// Indicates whether the channel's promotional campaign uses "smart timing." This feature attempts to show promotions at a point in the video when they are more likely to be clicked and less likely to disrupt the viewing experience. This feature also picks up a single promotion to show on each video.    
+    #[serde(alias="useSmartTiming")]
     pub use_smart_timing: Option<bool>,
     /// The spatial position within the video where the promoted item will be displayed.    
     pub position: Option<InvideoPosition>,
@@ -2857,7 +3032,7 @@ impl InvideoPromotion {
     fn to_parts(&self) -> String {
         let mut r = String::new();
         if self.default_timing.is_some() { r = r + "defaultTiming,"; }
-        if self.items.len() > 0 { r = r + "items,"; }
+        if self.items.is_some() { r = r + "items,"; }
         if self.use_smart_timing.is_some() { r = r + "useSmartTiming,"; }
         if self.position.is_some() { r = r + "position,"; }
         r.pop();
@@ -2869,13 +3044,15 @@ impl InvideoPromotion {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotedItem {
     /// The temporal position within the video where the promoted item will be displayed. If present, it overrides the default timing.    
     pub timing: Option<InvideoTiming>,
     /// If true, the content owner's name will be used when displaying the promotion. This field can only be set when the update is made on behalf of the content owner.    
+    #[serde(alias="promotedByContentOwner")]
     pub promoted_by_content_owner: Option<bool>,
     /// A custom message to display for this promotion. This field is currently ignored unless the promoted item is a website.    
+    #[serde(alias="customMessage")]
     pub custom_message: Option<String>,
     /// Identifies the promoted item.    
     pub id: Option<PromotedItemId>,
@@ -2905,31 +3082,39 @@ impl PromotedItem {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastContentDetails {
     /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.    
+    #[serde(alias="startWithSlate")]
     pub start_with_slate: Option<bool>,
     /// This value uniquely identifies the live stream bound to the broadcast.    
+    #[serde(alias="boundStreamId")]
     pub bound_stream_id: Option<String>,
     /// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.    
+    #[serde(alias="enableEmbed")]
     pub enable_embed: Option<bool>,
     /// This setting indicates whether closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API.    
+    #[serde(alias="enableClosedCaptions")]
     pub enable_closed_captions: Option<bool>,
     /// This setting indicates whether YouTube should enable content encryption for the broadcast.    
+    #[serde(alias="enableContentEncryption")]
     pub enable_content_encryption: Option<bool>,
     /// Automatically start recording after the event goes live. The default value for this property is true.
     /// 
     /// 
     /// 
     /// Important: You must also set the enableDvr property's value to true if you want the playback to be available immediately after the broadcast ends. If you set this property's value to true but do not also set the enableDvr property to true, there may be a delay of around one day before the archived video will be available for playback.
+    #[serde(alias="recordFromStart")]
     pub record_from_start: Option<bool>,
     /// This setting determines whether viewers can access DVR controls while watching the video. DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content. The default value for this property is true.
     /// 
     /// 
     /// 
     /// Important: You must set the value to true and also set the enableArchive property's value to true if you want to make playback available immediately after the broadcast ends.
+    #[serde(alias="enableDvr")]
     pub enable_dvr: Option<bool>,
     /// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.    
+    #[serde(alias="monitorStream")]
     pub monitor_stream: Option<MonitorStreamInfo>,
 }
 
@@ -2961,23 +3146,29 @@ impl LiveBroadcastContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoStatus {
     /// The video's license.    
     pub license: Option<String>,
     /// This value indicates if the video can be embedded on another website.    
     pub embeddable: Option<bool>,
     /// The video's privacy status.    
+    #[serde(alias="privacyStatus")]
     pub privacy_status: Option<String>,
     /// The date and time when the video is scheduled to publish. It can be set only if the privacy status of the video is private. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="publishAt")]
     pub publish_at: Option<String>,
     /// This value indicates if the extended video statistics on the watch page can be viewed by everyone. Note that the view count, likes, etc will still be visible if this is disabled.    
+    #[serde(alias="publicStatsViewable")]
     pub public_stats_viewable: Option<bool>,
     /// The status of the uploaded video.    
+    #[serde(alias="uploadStatus")]
     pub upload_status: Option<String>,
     /// This value explains why YouTube rejected an uploaded video. This property is only present if the uploadStatus property indicates that the upload was rejected.    
+    #[serde(alias="rejectionReason")]
     pub rejection_reason: Option<String>,
     /// This value explains why a video failed to upload. This property is only present if the uploadStatus property indicates that the upload failed.    
+    #[serde(alias="failureReason")]
     pub failure_reason: Option<String>,
 }
 
@@ -3009,7 +3200,7 @@ impl VideoStatus {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct GuideCategory {
     /// The snippet object contains basic details about the category, such as its title.    
     pub snippet: Option<GuideCategorySnippet>,
@@ -3034,17 +3225,19 @@ impl ResponseResult for GuideCategory {}
 /// 
 /// * [list channel sections](struct.ChannelSectionListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChannelSectionListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// A list of ChannelSections that match the request criteria.    
-    pub items: Vec<ChannelSection>,
+    pub items: Option<Vec<ChannelSection>>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelSectionListResponse".    
     pub kind: Option<String>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
 }
 
@@ -3055,17 +3248,20 @@ impl ResponseResult for ChannelSectionListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonitorStreamInfo {
     /// If you have set the enableMonitorStream property to true, then this property determines the length of the live broadcast delay.    
+    #[serde(alias="broadcastStreamDelayMs")]
     pub broadcast_stream_delay_ms: Option<u32>,
     /// HTML code that embeds a player that plays the monitor stream.    
+    #[serde(alias="embedHtml")]
     pub embed_html: Option<String>,
     /// This value determines whether the monitor stream is enabled for the broadcast. If the monitor stream is enabled, then YouTube will broadcast the event content on a special stream intended only for the broadcaster's consumption. The broadcaster can use the stream to review the event content and also to identify the optimal times to insert cuepoints.
     /// 
     /// You need to set this value to true if you intend to have a broadcast delay for your event.
     /// 
     /// Note: This property cannot be updated once the broadcast is in the testing or live state.
+    #[serde(alias="enableMonitorStream")]
     pub enable_monitor_stream: Option<bool>,
 }
 
@@ -3097,17 +3293,19 @@ impl MonitorStreamInfo {
 /// 
 /// * [list i18n languages](struct.I18nLanguageListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nLanguageListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// A list of supported i18n languages. In this map, the i18n language ID is the map key, and its value is the corresponding i18nLanguage resource.    
-    pub items: Vec<I18nLanguage>,
+    pub items: Option<Vec<I18nLanguage>>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nLanguageListResponse".    
     pub kind: Option<String>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
 }
 
@@ -3118,14 +3316,15 @@ impl ResponseResult for I18nLanguageListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedProperty {
     /// no description provided    
     pub default: Option<String>,
     /// The language of the default property.    
+    #[serde(alias="defaultLanguage")]
     pub default_language: Option<LanguageTag>,
     /// no description provided    
-    pub localized: Vec<LocalizedString>,
+    pub localized: Option<Vec<LocalizedString>>,
 }
 
 impl Part for LocalizedProperty {}
@@ -3141,7 +3340,7 @@ impl LocalizedProperty {
         let mut r = String::new();
         if self.default.is_some() { r = r + "default,"; }
         if self.default_language.is_some() { r = r + "defaultLanguage,"; }
-        if self.localized.len() > 0 { r = r + "localized,"; }
+        if self.localized.is_some() { r = r + "localized,"; }
         r.pop();
         r
     }
@@ -3162,7 +3361,7 @@ impl LocalizedProperty {
 /// * [delete live broadcasts](struct.LiveBroadcastDeleteMethodBuilder.html) (none)
 /// * [bind live broadcasts](struct.LiveBroadcastBindMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcast {
     /// The status object contains information about the event's status.    
     pub status: Option<LiveBroadcastStatus>,
@@ -3173,6 +3372,7 @@ pub struct LiveBroadcast {
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The contentDetails object contains information about the event's video content, such as whether the content can be shown in an embedded video player or if it will be archived and therefore available for viewing after the event has concluded.    
+    #[serde(alias="contentDetails")]
     pub content_details: Option<LiveBroadcastContentDetails>,
     /// The ID that YouTube assigns to uniquely identify the broadcast.    
     pub id: Option<String>,
@@ -3203,23 +3403,28 @@ impl LiveBroadcast {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoFileDetailsVideoStream {
     /// The video stream's bitrate, in bits per second.    
+    #[serde(alias="bitrateBps")]
     pub bitrate_bps: Option<String>,
     /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.    
     pub vendor: Option<String>,
     /// The video codec that the stream uses.    
     pub codec: Option<String>,
     /// The encoded video content's width in pixels. You can calculate the video's encoding aspect ratio as width_pixels / height_pixels.    
+    #[serde(alias="widthPixels")]
     pub width_pixels: Option<u32>,
     /// The encoded video content's height in pixels.    
+    #[serde(alias="heightPixels")]
     pub height_pixels: Option<u32>,
     /// The video content's display aspect ratio, which specifies the aspect ratio in which the video should be displayed.    
+    #[serde(alias="aspectRatio")]
     pub aspect_ratio: Option<f64>,
     /// The amount that YouTube needs to rotate the original source content to properly display the video.    
     pub rotation: Option<String>,
     /// The video stream's frame rate, in frames per second.    
+    #[serde(alias="frameRateFps")]
     pub frame_rate_fps: Option<f64>,
 }
 
@@ -3256,7 +3461,7 @@ impl VideoFileDetailsVideoStream {
 /// 
 /// * [set thumbnails](struct.ThumbnailSetMethodBuilder.html) (none)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Thumbnail {
     /// The thumbnail image's URL.    
     pub url: Option<String>,
@@ -3295,36 +3500,43 @@ impl Thumbnail {
 /// * [list channels](struct.ChannelListMethodBuilder.html) (none)
 /// * [update channels](struct.ChannelUpdateMethodBuilder.html) (request|response)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
     /// The status object encapsulates information about the privacy status of the channel.    
     pub status: Option<ChannelStatus>,
     /// The invideoPromotion object encapsulates information about promotion campaign associated with the channel.    
+    #[serde(alias="invideoPromotion")]
     pub invideo_promotion: Option<InvideoPromotion>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#channel".    
     pub kind: Option<String>,
     /// The statistics object encapsulates statistics for the channel.    
     pub statistics: Option<ChannelStatistics>,
     /// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.    
+    #[serde(alias="contentOwnerDetails")]
     pub content_owner_details: Option<ChannelContentOwnerDetails>,
     /// The topicDetails object encapsulates information about Freebase topics associated with the channel.    
+    #[serde(alias="topicDetails")]
     pub topic_details: Option<ChannelTopicDetails>,
     /// The contentDetails object encapsulates information about the channel's content.    
+    #[serde(alias="contentDetails")]
     pub content_details: Option<ChannelContentDetails>,
     /// The brandingSettings object encapsulates information about the branding of the channel.    
+    #[serde(alias="brandingSettings")]
     pub branding_settings: Option<ChannelBrandingSettings>,
     /// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.    
+    #[serde(alias="conversionPings")]
     pub conversion_pings: Option<ChannelConversionPings>,
     /// The snippet object contains basic details about the channel, such as its title, description, and thumbnail images.    
     pub snippet: Option<ChannelSnippet>,
     /// The auditionDetails object encapsulates channel data that is relevant for YouTube Partners during the audition process.    
+    #[serde(alias="auditDetails")]
     pub audit_details: Option<ChannelAuditDetails>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The ID that YouTube uses to uniquely identify the channel.    
     pub id: Option<String>,
     /// Localizations for different languages    
-    pub localizations: HashMap<String, ChannelLocalization>,
+    pub localizations: Option<HashMap<String, ChannelLocalization>>,
 }
 
 impl RequestValue for Channel {}
@@ -3350,7 +3562,7 @@ impl Channel {
         if self.audit_details.is_some() { r = r + "auditDetails,"; }
         if self.etag.is_some() { r = r + "etag,"; }
         if self.id.is_some() { r = r + "id,"; }
-        if self.localizations.len() > 0 { r = r + "localizations,"; }
+        if self.localizations.is_some() { r = r + "localizations,"; }
         r.pop();
         r
     }
@@ -3360,17 +3572,22 @@ impl Channel {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelStatistics {
     /// The number of comments for the channel.    
+    #[serde(alias="commentCount")]
     pub comment_count: Option<i64>,
     /// The number of subscribers that the channel has.    
+    #[serde(alias="subscriberCount")]
     pub subscriber_count: Option<i64>,
     /// The number of videos uploaded to the channel.    
+    #[serde(alias="videoCount")]
     pub video_count: Option<i64>,
     /// Whether or not the number of subscribers is shown for this user.    
+    #[serde(alias="hiddenSubscriberCount")]
     pub hidden_subscriber_count: Option<bool>,
     /// The number of times the channel has been viewed.    
+    #[serde(alias="viewCount")]
     pub view_count: Option<i64>,
 }
 
@@ -3399,15 +3616,19 @@ impl ChannelStatistics {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsSocial {
     /// The resourceId object encapsulates information that identifies the resource associated with a social network post.    
+    #[serde(alias="resourceId")]
     pub resource_id: Option<ResourceId>,
     /// An image of the post's author.    
+    #[serde(alias="imageUrl")]
     pub image_url: Option<String>,
     /// The name of the social network.    
+    #[serde(alias="type")]
     pub type_: Option<String>,
     /// The URL of the social network post.    
+    #[serde(alias="referenceUrl")]
     pub reference_url: Option<String>,
     /// The author of the social network post.    
     pub author: Option<String>,
@@ -3437,7 +3658,7 @@ impl ActivityContentDetailsSocial {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelLocalization {
     /// The localized strings for channel's description.    
     pub description: Option<String>,
@@ -3467,15 +3688,18 @@ impl ChannelLocalization {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceId {
     /// The type of the API resource.    
     pub kind: Option<String>,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a channel. This property is only present if the resourceId.kind value is youtube#channel.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a playlist. This property is only present if the resourceId.kind value is youtube#playlist.    
+    #[serde(alias="playlistId")]
     pub playlist_id: Option<String>,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a video. This property is only present if the resourceId.kind value is youtube#video.    
+    #[serde(alias="videoId")]
     pub video_id: Option<String>,
 }
 
@@ -3503,7 +3727,7 @@ impl ResourceId {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchResult {
     /// The snippet object contains basic details about a search result, such as its title or description. For example, if the search result is a video, then the title will be the video's title and the description will be the video's description.    
     pub snippet: Option<SearchResultSnippet>,
@@ -3528,25 +3752,31 @@ impl ResponseResult for SearchResult {}
 /// 
 /// * [list video categories](struct.VideoCategoryListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoCategoryListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoCategoryListResponse".    
     pub kind: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
     /// A list of video categories that can be associated with YouTube videos. In this map, the video category ID is the map key, and its value is the corresponding videoCategory resource.    
-    pub items: Vec<VideoCategory>,
+    pub items: Option<Vec<VideoCategory>>,
     /// no description provided    
+    #[serde(alias="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    #[serde(alias="prevPageToken")]
     pub prev_page_token: Option<String>,
     /// no description provided    
+    #[serde(alias="pageInfo")]
     pub page_info: Option<PageInfo>,
 }
 
@@ -3557,21 +3787,26 @@ impl ResponseResult for VideoCategoryListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivitySnippet {
     /// A map of thumbnail images associated with the resource that is primarily associated with the activity. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
     pub thumbnails: Option<ThumbnailDetails>,
     /// The title of the resource primarily associated with the activity.    
     pub title: Option<String>,
     /// The ID that YouTube uses to uniquely identify the channel associated with the activity.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="publishedAt")]
     pub published_at: Option<String>,
     /// Channel title for the channel responsible for this activity    
+    #[serde(alias="channelTitle")]
     pub channel_title: Option<String>,
     /// The type of activity that the resource describes.    
+    #[serde(alias="type")]
     pub type_: Option<String>,
     /// The group ID associated with the activity. A group ID identifies user events that are associated with the same user and resource. For example, if a user rates a video and marks the same video as a favorite, the entries for those events would have the same group ID in the user's activity feed. In your user interface, you can avoid repetition by grouping events with the same groupId value.    
+    #[serde(alias="groupId")]
     pub group_id: Option<String>,
     /// The description of the resource primarily associated with the activity.    
     pub description: Option<String>,
@@ -3604,16 +3839,19 @@ impl ActivitySnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoProcessingDetailsProcessingProgress {
     /// An estimate of the amount of time, in millseconds, that YouTube needs to finish processing the video.    
+    #[serde(alias="timeLeftMs")]
     pub time_left_ms: Option<String>,
     /// The number of parts of the video that YouTube has already processed. You can estimate the percentage of the video that YouTube has already processed by calculating:
     /// 100 * parts_processed / parts_total
     /// 
     /// Note that since the estimated number of parts could increase without a corresponding increase in the number of parts that have already been processed, it is possible that the calculated progress could periodically decrease while YouTube processes a video.
+    #[serde(alias="partsProcessed")]
     pub parts_processed: Option<String>,
     /// An estimate of the total number of parts that need to be processed for the video. The number may be updated with more precise estimates while YouTube processes the video.    
+    #[serde(alias="partsTotal")]
     pub parts_total: Option<String>,
 }
 
@@ -3645,25 +3883,31 @@ impl VideoProcessingDetailsProcessingProgress {
 /// 
 /// * [list search](struct.SearchListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#searchListResponse".    
     pub kind: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
     /// A list of results that match the search criteria.    
-    pub items: Vec<SearchResult>,
+    pub items: Option<Vec<SearchResult>>,
     /// no description provided    
+    #[serde(alias="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    #[serde(alias="prevPageToken")]
     pub prev_page_token: Option<String>,
     /// no description provided    
+    #[serde(alias="pageInfo")]
     pub page_info: Option<PageInfo>,
 }
 
@@ -3674,10 +3918,11 @@ impl ResponseResult for SearchListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelTopicDetails {
     /// A list of Freebase topic IDs associated with the channel. You can retrieve information about each topic using the Freebase Topic API.    
-    pub topic_ids: Vec<String>,
+    #[serde(alias="topicIds")]
+    pub topic_ids: Option<Vec<String>>,
 }
 
 impl Part for ChannelTopicDetails {}
@@ -3691,7 +3936,7 @@ impl ChannelTopicDetails {
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        if self.topic_ids.len() > 0 { r = r + "topicIds,"; }
+        if self.topic_ids.is_some() { r = r + "topicIds,"; }
         r.pop();
         r
     }
@@ -3706,25 +3951,31 @@ impl ChannelTopicDetails {
 /// 
 /// * [list videos](struct.VideoListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoListResponse".    
     pub kind: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
     /// A list of videos that match the request criteria.    
-    pub items: Vec<Video>,
+    pub items: Option<Vec<Video>>,
     /// no description provided    
+    #[serde(alias="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    #[serde(alias="prevPageToken")]
     pub prev_page_token: Option<String>,
     /// no description provided    
+    #[serde(alias="pageInfo")]
     pub page_info: Option<PageInfo>,
 }
 
@@ -3735,7 +3986,7 @@ impl ResponseResult for VideoListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LanguageTag {
     /// no description provided    
     pub value: Option<String>,
@@ -3762,9 +4013,10 @@ impl LanguageTag {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistStatus {
     /// The playlist's privacy status.    
+    #[serde(alias="privacyStatus")]
     pub privacy_status: Option<String>,
 }
 
@@ -3789,11 +4041,12 @@ impl PlaylistStatus {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoRating {
     /// no description provided    
     pub rating: Option<String>,
     /// no description provided    
+    #[serde(alias="videoId")]
     pub video_id: Option<String>,
 }
 
@@ -3805,13 +4058,15 @@ impl ResponseResult for VideoRating {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStreamSnippet {
     /// The ID that YouTube uses to uniquely identify the channel that is transmitting the stream.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The stream's description. The value cannot be longer than 10000 characters.    
     pub description: Option<String>,
     /// The date and time that the stream was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="publishedAt")]
     pub published_at: Option<String>,
     /// The stream's title. The value must be between 1 and 128 characters long.    
     pub title: Option<String>,
@@ -3841,13 +4096,16 @@ impl LiveStreamSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelStatus {
     /// Privacy status of the channel.    
+    #[serde(alias="privacyStatus")]
     pub privacy_status: Option<String>,
     /// If true, then the user is linked to either a YouTube username or G+ account. Otherwise, the user doesn't have a public YouTube identity.    
+    #[serde(alias="isLinked")]
     pub is_linked: Option<bool>,
     /// The long uploads status of this channel. See    
+    #[serde(alias="longUploadsStatus")]
     pub long_uploads_status: Option<String>,
 }
 
@@ -3879,25 +4137,31 @@ impl ChannelStatus {
 /// 
 /// * [list channels](struct.ChannelListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChannelListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelListResponse".    
     pub kind: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
     /// A list of channels that match the request criteria.    
-    pub items: Vec<Channel>,
+    pub items: Option<Vec<Channel>>,
     /// no description provided    
+    #[serde(alias="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    #[serde(alias="prevPageToken")]
     pub prev_page_token: Option<String>,
     /// no description provided    
+    #[serde(alias="pageInfo")]
     pub page_info: Option<PageInfo>,
 }
 
@@ -3916,7 +4180,7 @@ impl ResponseResult for ChannelListResponse {}
 /// * [list channel sections](struct.ChannelSectionListMethodBuilder.html) (none)
 /// * [insert channel sections](struct.ChannelSectionInsertMethodBuilder.html) (request|response)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSection {
     /// The snippet object contains basic details about the channel section, such as its type, style and title.    
     pub snippet: Option<ChannelSectionSnippet>,
@@ -3925,11 +4189,12 @@ pub struct ChannelSection {
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The contentDetails object contains details about the channel section content, such as a list of playlists or channels featured in the section.    
+    #[serde(alias="contentDetails")]
     pub content_details: Option<ChannelSectionContentDetails>,
     /// The ID that YouTube uses to uniquely identify the channel section.    
     pub id: Option<String>,
     /// Localizations for different languages    
-    pub localizations: HashMap<String, ChannelSectionLocalization>,
+    pub localizations: Option<HashMap<String, ChannelSectionLocalization>>,
 }
 
 impl RequestValue for ChannelSection {}
@@ -3947,7 +4212,7 @@ impl ChannelSection {
         if self.etag.is_some() { r = r + "etag,"; }
         if self.content_details.is_some() { r = r + "contentDetails,"; }
         if self.id.is_some() { r = r + "id,"; }
-        if self.localizations.len() > 0 { r = r + "localizations,"; }
+        if self.localizations.is_some() { r = r + "localizations,"; }
         r.pop();
         r
     }
@@ -3962,25 +4227,31 @@ impl ChannelSection {
 /// 
 /// * [list live broadcasts](struct.LiveBroadcastListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct LiveBroadcastListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveBroadcastListResponse".    
     pub kind: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
     /// A list of broadcasts that match the request criteria.    
-    pub items: Vec<LiveBroadcast>,
+    pub items: Option<Vec<LiveBroadcast>>,
     /// no description provided    
+    #[serde(alias="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    #[serde(alias="prevPageToken")]
     pub prev_page_token: Option<String>,
     /// no description provided    
+    #[serde(alias="pageInfo")]
     pub page_info: Option<PageInfo>,
 }
 
@@ -3991,9 +4262,10 @@ impl ResponseResult for LiveBroadcastListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStreamStatus {
     /// no description provided    
+    #[serde(alias="streamStatus")]
     pub stream_status: Option<String>,
 }
 
@@ -4018,17 +4290,22 @@ impl LiveStreamStatus {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoLiveStreamingDetails {
     /// The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.    
+    #[serde(alias="concurrentViewers")]
     pub concurrent_viewers: Option<String>,
     /// The time that the broadcast is scheduled to begin. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="scheduledStartTime")]
     pub scheduled_start_time: Option<String>,
     /// The time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. If the value is empty or the property is not present, then the broadcast is scheduled to continue indefinitely.    
+    #[serde(alias="scheduledEndTime")]
     pub scheduled_end_time: Option<String>,
     /// The time that the broadcast actually started. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast begins.    
+    #[serde(alias="actualStartTime")]
     pub actual_start_time: Option<String>,
     /// The time that the broadcast actually ended. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast is over.    
+    #[serde(alias="actualEndTime")]
     pub actual_end_time: Option<String>,
 }
 
@@ -4057,135 +4334,199 @@ impl VideoLiveStreamingDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContentRating {
     /// Internal YouTube rating.    
+    #[serde(alias="ytRating")]
     pub yt_rating: Option<String>,
     /// Rating system for French Canadian TV - Regie du cinema    
+    #[serde(alias="catvfrRating")]
     pub catvfr_rating: Option<String>,
     /// Rating system in India - Central Board of Film Certification    
+    #[serde(alias="cbfcRating")]
     pub cbfc_rating: Option<String>,
     /// Rating system for Thailand - Board of Filmand Video Censors    
+    #[serde(alias="bfvcRating")]
     pub bfvc_rating: Option<String>,
     /// Rating system for Austria - Bundesministeriums f�r Unterricht, Kunst und Kultur!    
+    #[serde(alias="bmukkRating")]
     pub bmukk_rating: Option<String>,
     /// Rating system for Switzerland - Switzerland Rating System    
+    #[serde(alias="chfilmRating")]
     pub chfilm_rating: Option<String>,
     /// Rating system for Taiwan - Ministry of Culture - Tawan    
+    #[serde(alias="moctwRating")]
     pub moctw_rating: Option<String>,
     /// Rating system for Canadian TV - Canadian TV Classification System    
+    #[serde(alias="catvRating")]
     pub catv_rating: Option<String>,
     /// Rating system for Peru - Peru Rating System    
+    #[serde(alias="pefilmRating")]
     pub pefilm_rating: Option<String>,
     /// no description provided    
-    pub djctq_rating_reasons: Vec<String>,
+    #[serde(alias="djctqRatingReasons")]
+    pub djctq_rating_reasons: Option<Vec<String>>,
     /// Rating system for Argentina - Instituto Nacional de Cine y Artes Audiovisuales    
+    #[serde(alias="incaaRating")]
     pub incaa_rating: Option<String>,
     /// Rating system for Israel - Israel Rating System    
+    #[serde(alias="ilfilmRating")]
     pub ilfilm_rating: Option<String>,
     /// Rating system for Luxembourg - Commission de surveillance de la classification des films    
+    #[serde(alias="cscfRating")]
     pub cscf_rating: Option<String>,
     /// Rating system in Germany - Voluntary Self Regulation of the Movie Industry    
+    #[serde(alias="fskRating")]
     pub fsk_rating: Option<String>,
     /// Rating system in South Korea - Korea Media Rating Board    
+    #[serde(alias="kmrbRating")]
     pub kmrb_rating: Option<String>,
     /// Rating system in Brazil - Department of Justice, Rating, Titles and Qualification    
+    #[serde(alias="djctqRating")]
     pub djctq_rating: Option<String>,
     /// Rating system for Hong kong - Office for Film, Newspaper and Article Administration    
+    #[serde(alias="fcoRating")]
     pub fco_rating: Option<String>,
     /// Rating system for Norway - Medietilsynet    
+    #[serde(alias="medietilsynetRating")]
     pub medietilsynet_rating: Option<String>,
     /// Rating system for Greece - Greece Rating System    
+    #[serde(alias="grfilmRating")]
     pub grfilm_rating: Option<String>,
     /// Rating system for Chile - Consejo de Calificaci�n Cinematogr�fica    
+    #[serde(alias="cccRating")]
     pub ccc_rating: Option<String>,
     /// Rating system for Ireland - Raidi� Teilif�s �ireann    
+    #[serde(alias="rteRating")]
     pub rte_rating: Option<String>,
     /// Rating system in France - French Minister of Culture    
+    #[serde(alias="fmocRating")]
     pub fmoc_rating: Option<String>,
     /// Rating system in Japan - Eiga Rinri Kanri Iinkai    
+    #[serde(alias="eirinRating")]
     pub eirin_rating: Option<String>,
     /// Rating system for Portugal - Comiss�o de Classifica��o de Espect�culos    
+    #[serde(alias="cceRating")]
     pub cce_rating: Option<String>,
     /// Rating system for Latvia - National Film Center of Latvia    
+    #[serde(alias="nkclvRating")]
     pub nkclv_rating: Option<String>,
     /// Rating system for South africa - Film & Publication Board    
+    #[serde(alias="fpbRating")]
     pub fpb_rating: Option<String>,
     /// Rating system for Iceland - SMAIS    
+    #[serde(alias="smaisRating")]
     pub smais_rating: Option<String>,
     /// Canadian Home Video Rating System    
+    #[serde(alias="chvrsRating")]
     pub chvrs_rating: Option<String>,
     /// Rating system for Italy - Autorit� per le Garanzie nelle Comunicazioni    
+    #[serde(alias="agcomRating")]
     pub agcom_rating: Option<String>,
     /// Rating system for Colombia - MoC    
+    #[serde(alias="mocRating")]
     pub moc_rating: Option<String>,
     /// Rating system for Hungary - Rating Committee of the National Office of Film    
+    #[serde(alias="rcnofRating")]
     pub rcnof_rating: Option<String>,
     /// Rating system for Malaysia - Film Censorship Board of Malaysia    
+    #[serde(alias="fcbmRating")]
     pub fcbm_rating: Option<String>,
     /// Rating system for Netherlands - Nederlands Instituut voor de Classificatie van Audiovisuele Media    
+    #[serde(alias="kijkwijzerRating")]
     pub kijkwijzer_rating: Option<String>,
     /// Rating system for Singapore - Media Development Authority    
+    #[serde(alias="mdaRating")]
     pub mda_rating: Option<String>,
     /// Rating system for Nigeria - National Film and Video Censors Board    
+    #[serde(alias="nfvcbRating")]
     pub nfvcb_rating: Option<String>,
     /// Rating system for Venezuela - SiBCI    
+    #[serde(alias="resorteviolenciaRating")]
     pub resorteviolencia_rating: Option<String>,
     /// Rating system for France - Conseil sup�rieur de l?audiovisuel    
+    #[serde(alias="csaRating")]
     pub csa_rating: Option<String>,
     /// Rating system in New Zealand - Office of Film and Literature Classification    
+    #[serde(alias="oflcRating")]
     pub oflc_rating: Option<String>,
     /// TV Parental Guidelines rating of the content.    
+    #[serde(alias="tvpgRating")]
     pub tvpg_rating: Option<String>,
     /// Rating system for Bulgaria - National Film Centre    
+    #[serde(alias="nfrcRating")]
     pub nfrc_rating: Option<String>,
     /// Rating system for Malta - Film Age-Classification Board    
+    #[serde(alias="mccaaRating")]
     pub mccaa_rating: Option<String>,
     /// Rating system in Mexico - General Directorate of Radio, Television and Cinematography    
+    #[serde(alias="rtcRating")]
     pub rtc_rating: Option<String>,
     /// Rating system in Italy - Ministero dei Beni e delle Attivita Culturali e del Turismo    
+    #[serde(alias="mibacRating")]
     pub mibac_rating: Option<String>,
     /// British Board of Film Classification    
+    #[serde(alias="bbfcRating")]
     pub bbfc_rating: Option<String>,
     /// Rating system for Egypt - Egypt Rating System    
+    #[serde(alias="egfilmRating")]
     pub egfilm_rating: Option<String>,
     /// Rating system for Belgium - Belgium Rating System    
+    #[serde(alias="cicfRating")]
     pub cicf_rating: Option<String>,
     /// Rating system for Poland - National Broadcasting Council    
+    #[serde(alias="nbcplRating")]
     pub nbcpl_rating: Option<String>,
     /// Rating system for Maldives - National Bureau of Classification    
+    #[serde(alias="nbcRating")]
     pub nbc_rating: Option<String>,
     /// Motion Picture Association of America rating for the content.    
+    #[serde(alias="mpaaRating")]
     pub mpaa_rating: Option<String>,
     /// Rating system in Ireland - Irish Film Classification Office    
+    #[serde(alias="ifcoRating")]
     pub ifco_rating: Option<String>,
     /// Rating system in Australia - Australian Classification Board    
+    #[serde(alias="acbRating")]
     pub acb_rating: Option<String>,
     /// Rating system for Estonia - Estonia Rating System    
+    #[serde(alias="eefilmRating")]
     pub eefilm_rating: Option<String>,
     /// Rating system for Czech republic - Czech republic Rating System    
+    #[serde(alias="czfilmRating")]
     pub czfilm_rating: Option<String>,
     /// Rating system for Indonesia - Lembaga Sensor Film    
+    #[serde(alias="lsfRating")]
     pub lsf_rating: Option<String>,
     /// Rating system in Russia    
+    #[serde(alias="russiaRating")]
     pub russia_rating: Option<String>,
     /// Rating system for Kenya - Kenya Film Classification Board    
+    #[serde(alias="kfcbRating")]
     pub kfcb_rating: Option<String>,
     /// Rating system for Philippines - MOVIE AND TELEVISION REVIEW AND CLASSIFICATION BOARD    
+    #[serde(alias="mtrcbRating")]
     pub mtrcb_rating: Option<String>,
     /// Rating system for Chile - Asociaci�n Nacional de Televisi�n    
+    #[serde(alias="anatelRating")]
     pub anatel_rating: Option<String>,
     /// Rating system for Sweden - Statens medier�d (National Media Council)    
+    #[serde(alias="smsaRating")]
     pub smsa_rating: Option<String>,
     /// Rating system for Romania - CONSILIUL NATIONAL AL AUDIOVIZUALULUI - CNA    
+    #[serde(alias="cnaRating")]
     pub cna_rating: Option<String>,
     /// Rating system in Spain - Instituto de Cinematografia y de las Artes Audiovisuales    
+    #[serde(alias="icaaRating")]
     pub icaa_rating: Option<String>,
     /// Rating system for Denmark - The Media Council for Children and Young People    
+    #[serde(alias="mccypRating")]
     pub mccyp_rating: Option<String>,
     /// Rating system for Slovakia - Slovakia Rating System    
+    #[serde(alias="skfilmRating")]
     pub skfilm_rating: Option<String>,
     /// Rating system for Finland - Finnish Centre for Media Education and Audiovisual Media    
+    #[serde(alias="mekuRating")]
     pub meku_rating: Option<String>,
 }
 
@@ -4209,7 +4550,7 @@ impl ContentRating {
         if self.moctw_rating.is_some() { r = r + "moctwRating,"; }
         if self.catv_rating.is_some() { r = r + "catvRating,"; }
         if self.pefilm_rating.is_some() { r = r + "pefilmRating,"; }
-        if self.djctq_rating_reasons.len() > 0 { r = r + "djctqRatingReasons,"; }
+        if self.djctq_rating_reasons.is_some() { r = r + "djctqRatingReasons,"; }
         if self.incaa_rating.is_some() { r = r + "incaaRating,"; }
         if self.ilfilm_rating.is_some() { r = r + "ilfilmRating,"; }
         if self.cscf_rating.is_some() { r = r + "cscfRating,"; }
@@ -4278,25 +4619,31 @@ impl ContentRating {
 /// 
 /// * [list activities](struct.ActivityListMethodBuilder.html) (response)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityListResponse {
     /// Serialized EventId of the request which produced this response.    
+    #[serde(alias="eventId")]
     pub event_id: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#activityListResponse".    
     pub kind: Option<String>,
     /// The visitorId identifies the visitor.    
+    #[serde(alias="visitorId")]
     pub visitor_id: Option<String>,
     /// A list of activities, or events, that match the request criteria.    
-    pub items: Vec<Activity>,
+    pub items: Option<Vec<Activity>>,
     /// no description provided    
+    #[serde(alias="tokenPagination")]
     pub token_pagination: Option<TokenPagination>,
     /// Etag of this resource.    
     pub etag: Option<String>,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    #[serde(alias="prevPageToken")]
     pub prev_page_token: Option<String>,
     /// no description provided    
+    #[serde(alias="pageInfo")]
     pub page_info: Option<PageInfo>,
 }
 
@@ -4312,11 +4659,12 @@ impl ResponseResult for ActivityListResponse {}
 /// 
 /// * [insert activities](struct.ActivityInsertMethodBuilder.html) (request|response)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activity {
     /// The snippet object contains basic details about the activity, including the activity's type and group ID.    
     pub snippet: Option<ActivitySnippet>,
     /// The contentDetails object contains information about the content associated with the activity. For example, if the snippet.type value is videoRated, then the contentDetails object's content identifies the rated video.    
+    #[serde(alias="contentDetails")]
     pub content_details: Option<ActivityContentDetails>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#activity".    
     pub kind: Option<String>,
@@ -4349,9 +4697,10 @@ impl Activity {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionSubscriberSnippet {
     /// The channel ID of the subscriber.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The description of the subscriber.    
     pub description: Option<String>,
@@ -4385,51 +4734,73 @@ impl SubscriptionSubscriberSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImageSettings {
     /// Banner image. TV size medium resolution (1280x720).    
+    #[serde(alias="bannerTvMediumImageUrl")]
     pub banner_tv_medium_image_url: Option<String>,
     /// The image map script for the large banner image.    
+    #[serde(alias="largeBrandedBannerImageImapScript")]
     pub large_branded_banner_image_imap_script: Option<LocalizedProperty>,
     /// Banner image. Mobile size (640x175).    
+    #[serde(alias="bannerMobileImageUrl")]
     pub banner_mobile_image_url: Option<String>,
     /// The URL for the 640px by 70px banner image that appears below the video player in the default view of the video watch page.    
+    #[serde(alias="smallBrandedBannerImageUrl")]
     pub small_branded_banner_image_url: Option<LocalizedProperty>,
     /// Banner image. Tablet size high resolution (2276x377).    
+    #[serde(alias="bannerTabletHdImageUrl")]
     pub banner_tablet_hd_image_url: Option<String>,
     /// Banner image. Tablet size low resolution (1138x188).    
+    #[serde(alias="bannerTabletLowImageUrl")]
     pub banner_tablet_low_image_url: Option<String>,
     /// Banner image. Mobile size medium/high resolution (960x263).    
+    #[serde(alias="bannerMobileMediumHdImageUrl")]
     pub banner_mobile_medium_hd_image_url: Option<String>,
     /// The URL for a 1px by 1px tracking pixel that can be used to collect statistics for views of the channel or video pages.    
+    #[serde(alias="trackingImageUrl")]
     pub tracking_image_url: Option<String>,
     /// Banner image. Mobile size high resolution (1440x395).    
+    #[serde(alias="bannerMobileExtraHdImageUrl")]
     pub banner_mobile_extra_hd_image_url: Option<String>,
     /// Banner image. Tablet size (1707x283).    
+    #[serde(alias="bannerTabletImageUrl")]
     pub banner_tablet_image_url: Option<String>,
     /// Banner image. Mobile size low resolution (320x88).    
+    #[serde(alias="bannerMobileLowImageUrl")]
     pub banner_mobile_low_image_url: Option<String>,
     /// Banner image. TV size extra high resolution (2120x1192).    
+    #[serde(alias="bannerTvImageUrl")]
     pub banner_tv_image_url: Option<String>,
     /// Banner image. TV size low resolution (854x480).    
+    #[serde(alias="bannerTvLowImageUrl")]
     pub banner_tv_low_image_url: Option<String>,
     /// Banner image. Tablet size extra high resolution (2560x424).    
+    #[serde(alias="bannerTabletExtraHdImageUrl")]
     pub banner_tablet_extra_hd_image_url: Option<String>,
     /// The URL for the 854px by 70px image that appears below the video player in the expanded video view of the video watch page.    
+    #[serde(alias="largeBrandedBannerImageUrl")]
     pub large_branded_banner_image_url: Option<LocalizedProperty>,
     /// Banner image. TV size high resolution (1920x1080).    
+    #[serde(alias="bannerTvHighImageUrl")]
     pub banner_tv_high_image_url: Option<String>,
     /// The URL for the background image shown on the video watch page. The image should be 1200px by 615px, with a maximum file size of 128k.    
+    #[serde(alias="backgroundImageUrl")]
     pub background_image_url: Option<LocalizedProperty>,
     /// The image map script for the small banner image.    
+    #[serde(alias="smallBrandedBannerImageImapScript")]
     pub small_branded_banner_image_imap_script: Option<LocalizedProperty>,
     /// Banner image. Desktop size (1060x175).    
+    #[serde(alias="bannerImageUrl")]
     pub banner_image_url: Option<String>,
     /// Banner image. Mobile size high resolution (1280x360).    
+    #[serde(alias="bannerMobileHdImageUrl")]
     pub banner_mobile_hd_image_url: Option<String>,
     /// This is used only in update requests; if it's set, we use this URL to generate all of the above banner URLs.    
+    #[serde(alias="bannerExternalUrl")]
     pub banner_external_url: Option<String>,
     /// The URL for the image that appears above the top-left corner of the video player. This is a 25-pixel-high image with a flexible width that cannot exceed 170 pixels.    
+    #[serde(alias="watchIconImageUrl")]
     pub watch_icon_image_url: Option<String>,
 }
 
@@ -4475,27 +4846,37 @@ impl ImageSettings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsPromotedItem {
     /// The type of call-to-action, a message to the user indicating action that can be taken.    
+    #[serde(alias="ctaType")]
     pub cta_type: Option<String>,
     /// The URL the client should fetch to request a promoted item.    
+    #[serde(alias="adTag")]
     pub ad_tag: Option<String>,
     /// The URL the client should direct the user to, if the user chooses to visit the advertiser's website.    
+    #[serde(alias="destinationUrl")]
     pub destination_url: Option<String>,
     /// The list of forecasting URLs. The client should ping all of these URLs when a promoted item is not available, to indicate that a promoted item could have been shown.    
-    pub forecasting_url: Vec<String>,
+    #[serde(alias="forecastingUrl")]
+    pub forecasting_url: Option<Vec<String>>,
     /// The list of impression URLs. The client should ping all of these URLs to indicate that the user was shown this promoted item.    
-    pub impression_url: Vec<String>,
+    #[serde(alias="impressionUrl")]
+    pub impression_url: Option<Vec<String>>,
     /// The URL the client should ping to indicate that the user was shown this promoted item.    
+    #[serde(alias="creativeViewUrl")]
     pub creative_view_url: Option<String>,
     /// The ID that YouTube uses to uniquely identify the promoted video.    
+    #[serde(alias="videoId")]
     pub video_id: Option<String>,
     /// The text description to accompany the promoted item.    
+    #[serde(alias="descriptionText")]
     pub description_text: Option<String>,
     /// The custom call-to-action button text. If specified, it will override the default button text for the cta_type.    
+    #[serde(alias="customCtaButtonText")]
     pub custom_cta_button_text: Option<String>,
     /// The URL the client should ping to indicate that the user clicked through on this promoted item.    
+    #[serde(alias="clickTrackingUrl")]
     pub click_tracking_url: Option<String>,
 }
 
@@ -4512,8 +4893,8 @@ impl ActivityContentDetailsPromotedItem {
         if self.cta_type.is_some() { r = r + "ctaType,"; }
         if self.ad_tag.is_some() { r = r + "adTag,"; }
         if self.destination_url.is_some() { r = r + "destinationUrl,"; }
-        if self.forecasting_url.len() > 0 { r = r + "forecastingUrl,"; }
-        if self.impression_url.len() > 0 { r = r + "impressionUrl,"; }
+        if self.forecasting_url.is_some() { r = r + "forecastingUrl,"; }
+        if self.impression_url.is_some() { r = r + "impressionUrl,"; }
         if self.creative_view_url.is_some() { r = r + "creativeViewUrl,"; }
         if self.video_id.is_some() { r = r + "videoId,"; }
         if self.description_text.is_some() { r = r + "descriptionText,"; }
@@ -4528,10 +4909,10 @@ impl ActivityContentDetailsPromotedItem {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoConversionPings {
     /// Pings that the app shall fire for a video (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.    
-    pub pings: Vec<VideoConversionPing>,
+    pub pings: Option<Vec<VideoConversionPing>>,
 }
 
 impl Part for VideoConversionPings {}
@@ -4545,7 +4926,7 @@ impl VideoConversionPings {
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        if self.pings.len() > 0 { r = r + "pings,"; }
+        if self.pings.is_some() { r = r + "pings,"; }
         r.pop();
         r
     }
@@ -4555,9 +4936,10 @@ impl VideoConversionPings {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsBulletin {
     /// The resourceId object contains information that identifies the resource associated with a bulletin post.    
+    #[serde(alias="resourceId")]
     pub resource_id: Option<ResourceId>,
 }
 
@@ -4586,7 +4968,7 @@ impl ActivityContentDetailsBulletin {
 /// 
 /// * [list i18n languages](struct.I18nLanguageListMethodBuilder.html) (none)
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nLanguage {
     /// The snippet object contains basic details about the i18n language, such as language code and human-readable name.    
     pub snippet: Option<I18nLanguageSnippet>,
@@ -4606,7 +4988,7 @@ impl cmn::Resource for I18nLanguage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedString {
     /// no description provided    
     pub language: Option<String>,
@@ -4636,15 +5018,17 @@ impl LocalizedString {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoFileDetailsAudioStream {
     /// The audio stream's bitrate, in bits per second.    
+    #[serde(alias="bitrateBps")]
     pub bitrate_bps: Option<String>,
     /// The audio codec that the stream uses.    
     pub codec: Option<String>,
     /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.    
     pub vendor: Option<String>,
     /// The number of audio channels that the stream contains.    
+    #[serde(alias="channelCount")]
     pub channel_count: Option<u32>,
 }
 
@@ -4672,13 +5056,15 @@ impl VideoFileDetailsAudioStream {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoAgeGating {
     /// Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won't be present.    
     pub restricted: Option<bool>,
     /// Indicates whether or not the video has alcoholic beverage content. Only users of legal purchasing age in a particular country, as identified by ICAP, can view the content.    
+    #[serde(alias="alcoholContent")]
     pub alcohol_content: Option<bool>,
     /// Video game rating, if any.    
+    #[serde(alias="videoGameRating")]
     pub video_game_rating: Option<String>,
 }
 
@@ -4705,12 +5091,14 @@ impl VideoAgeGating {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoTopicDetails {
     /// A list of Freebase topic IDs that are centrally associated with the video. These are topics that are centrally featured in the video, and it can be said that the video is mainly about each of these. You can retrieve information about each topic using the Freebase Topic API.    
-    pub topic_ids: Vec<String>,
+    #[serde(alias="topicIds")]
+    pub topic_ids: Option<Vec<String>>,
     /// Similar to topic_id, except that these topics are merely relevant to the video. These are topics that may be mentioned in, or appear in the video. You can retrieve information about each topic using Freebase Topic API.    
-    pub relevant_topic_ids: Vec<String>,
+    #[serde(alias="relevantTopicIds")]
+    pub relevant_topic_ids: Option<Vec<String>>,
 }
 
 impl Part for VideoTopicDetails {}
@@ -4724,8 +5112,8 @@ impl VideoTopicDetails {
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        if self.topic_ids.len() > 0 { r = r + "topicIds,"; }
-        if self.relevant_topic_ids.len() > 0 { r = r + "relevantTopicIds,"; }
+        if self.topic_ids.is_some() { r = r + "topicIds,"; }
+        if self.relevant_topic_ids.is_some() { r = r + "relevantTopicIds,"; }
         r.pop();
         r
     }
@@ -4735,17 +5123,22 @@ impl VideoTopicDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoStatistics {
     /// The number of comments for the video.    
+    #[serde(alias="commentCount")]
     pub comment_count: Option<i64>,
     /// The number of times the video has been viewed.    
+    #[serde(alias="viewCount")]
     pub view_count: Option<i64>,
     /// The number of users who currently have the video marked as a favorite video.    
+    #[serde(alias="favoriteCount")]
     pub favorite_count: Option<i64>,
     /// The number of users who have indicated that they disliked the video by giving it a negative rating.    
+    #[serde(alias="dislikeCount")]
     pub dislike_count: Option<i64>,
     /// The number of users who have indicated that they liked the video by giving it a positive rating.    
+    #[serde(alias="likeCount")]
     pub like_count: Option<i64>,
 }
 
@@ -4774,11 +5167,12 @@ impl VideoStatistics {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoConversionPing {
     /// Defines the context of the ping.    
     pub context: Option<String>,
     /// The url (without the schema) that the app shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D like%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA%3Bytvid%3DUrIaJUvIQDg&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.    
+    #[serde(alias="conversionUrl")]
     pub conversion_url: Option<String>,
 }
 
@@ -4804,7 +5198,7 @@ impl VideoConversionPing {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoCategory {
     /// The snippet object contains basic details about the video category, including its title.    
     pub snippet: Option<VideoCategorySnippet>,
@@ -4824,21 +5218,26 @@ impl ResponseResult for VideoCategory {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItemSnippet {
     /// The ID that YouTube uses to uniquely identify the user that added the item to the playlist.    
+    #[serde(alias="channelId")]
     pub channel_id: Option<String>,
     /// The item's description.    
     pub description: Option<String>,
     /// The item's title.    
     pub title: Option<String>,
     /// The id object contains information that can be used to uniquely identify the resource that is included in the playlist as the playlist item.    
+    #[serde(alias="resourceId")]
     pub resource_id: Option<ResourceId>,
     /// The ID that YouTube uses to uniquely identify the playlist that the playlist item is in.    
+    #[serde(alias="playlistId")]
     pub playlist_id: Option<String>,
     /// The date and time that the item was added to the playlist. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    #[serde(alias="publishedAt")]
     pub published_at: Option<String>,
     /// Channel title for the channel that the playlist item belongs to.    
+    #[serde(alias="channelTitle")]
     pub channel_title: Option<String>,
     /// The order in which the item appears in the playlist. The value uses a zero-based index, so the first item has a position of 0, the second item has a position of 1, and so forth.    
     pub position: Option<u32>,
@@ -4875,9 +5274,10 @@ impl PlaylistItemSnippet {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsFavorite {
     /// The resourceId object contains information that identifies the resource that was marked as a favorite.    
+    #[serde(alias="resourceId")]
     pub resource_id: Option<ResourceId>,
 }
 
@@ -4901,9 +5301,10 @@ impl ActivityContentDetailsFavorite {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistPlayer {
     /// An <iframe> tag that embeds a player that will play the playlist.    
+    #[serde(alias="embedHtml")]
     pub embed_html: Option<String>,
 }
 
@@ -4928,10 +5329,11 @@ impl PlaylistPlayer {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoSuggestionsTagSuggestion {
     /// A set of video categories for which the tag is relevant. You can use this information to display appropriate tag suggestions based on the video category that the video uploader associates with the video. By default, tag suggestions are relevant for all categories if there are no restricts defined for the keyword.    
-    pub category_restricts: Vec<String>,
+    #[serde(alias="categoryRestricts")]
+    pub category_restricts: Option<Vec<String>>,
     /// The keyword tag suggested for the video.    
     pub tag: Option<String>,
 }
@@ -4947,7 +5349,7 @@ impl VideoSuggestionsTagSuggestion {
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        if self.category_restricts.len() > 0 { r = r + "categoryRestricts,"; }
+        if self.category_restricts.is_some() { r = r + "categoryRestricts,"; }
         if self.tag.is_some() { r = r + "tag,"; }
         r.pop();
         r
@@ -4958,18 +5360,23 @@ impl VideoSuggestionsTagSuggestion {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoSuggestions {
     /// A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video's current processing status, eventually, that status will almost certainly be failed.    
-    pub processing_errors: Vec<String>,
+    #[serde(alias="processingErrors")]
+    pub processing_errors: Option<Vec<String>>,
     /// A list of keyword tags that could be added to the video's metadata to increase the likelihood that users will locate your video when searching or browsing on YouTube.    
-    pub tag_suggestions: Vec<VideoSuggestionsTagSuggestion>,
+    #[serde(alias="tagSuggestions")]
+    pub tag_suggestions: Option<Vec<VideoSuggestionsTagSuggestion>>,
     /// A list of video editing operations that might improve the video quality or playback experience of the uploaded video.    
-    pub editor_suggestions: Vec<String>,
+    #[serde(alias="editorSuggestions")]
+    pub editor_suggestions: Option<Vec<String>>,
     /// A list of reasons why YouTube may have difficulty transcoding the uploaded video or that might result in an erroneous transcoding. These warnings are generated before YouTube actually processes the uploaded video file. In addition, they identify issues that are unlikely to cause the video processing to fail but that might cause problems such as sync issues, video artifacts, or a missing audio track.    
-    pub processing_warnings: Vec<String>,
+    #[serde(alias="processingWarnings")]
+    pub processing_warnings: Option<Vec<String>>,
     /// A list of suggestions that may improve YouTube's ability to process the video.    
-    pub processing_hints: Vec<String>,
+    #[serde(alias="processingHints")]
+    pub processing_hints: Option<Vec<String>>,
 }
 
 impl Part for VideoSuggestions {}
@@ -4983,11 +5390,11 @@ impl VideoSuggestions {
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        if self.processing_errors.len() > 0 { r = r + "processingErrors,"; }
-        if self.tag_suggestions.len() > 0 { r = r + "tagSuggestions,"; }
-        if self.editor_suggestions.len() > 0 { r = r + "editorSuggestions,"; }
-        if self.processing_warnings.len() > 0 { r = r + "processingWarnings,"; }
-        if self.processing_hints.len() > 0 { r = r + "processingHints,"; }
+        if self.processing_errors.is_some() { r = r + "processingErrors,"; }
+        if self.tag_suggestions.is_some() { r = r + "tagSuggestions,"; }
+        if self.editor_suggestions.is_some() { r = r + "editorSuggestions,"; }
+        if self.processing_warnings.is_some() { r = r + "processingWarnings,"; }
+        if self.processing_hints.is_some() { r = r + "processingHints,"; }
         r.pop();
         r
     }
@@ -4997,10 +5404,10 @@ impl VideoSuggestions {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessPolicy {
     /// A list of region codes that identify countries where the default policy do not apply.    
-    pub exception: Vec<String>,
+    pub exception: Option<Vec<String>>,
     /// The value of allowed indicates whether the access to the policy is allowed or denied by default.    
     pub allowed: Option<bool>,
 }
@@ -5016,7 +5423,7 @@ impl AccessPolicy {
     /// the parts you want to see in the server response.
     fn to_parts(&self) -> String {
         let mut r = String::new();
-        if self.exception.len() > 0 { r = r + "exception,"; }
+        if self.exception.is_some() { r = r + "exception,"; }
         if self.allowed.is_some() { r = r + "allowed,"; }
         r.pop();
         r
@@ -5032,7 +5439,7 @@ impl AccessPolicy {
 /// 
 /// * [insert channel banners](struct.ChannelBannerInsertMethodBuilder.html) (request|response)
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelBannerResource {
     /// The URL of this banner image.    
     pub url: Option<String>,
@@ -5063,9 +5470,10 @@ impl ChannelBannerResource {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistContentDetails {
     /// The number of videos in the playlist.    
+    #[serde(alias="itemCount")]
     pub item_count: Option<u32>,
 }
 
@@ -5090,11 +5498,13 @@ impl PlaylistContentDetails {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcDecodable)]
+#[derive(Default, Clone, Debug, Deserialize)]
 pub struct PageInfo {
     /// The number of results included in the API response.    
+    #[serde(alias="resultsPerPage")]
     pub results_per_page: Option<i32>,
     /// The total number of results in the result set.    
+    #[serde(alias="totalResults")]
     pub total_results: Option<i32>,
 }
 
@@ -5106,17 +5516,19 @@ impl ResponseResult for PageInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelContentDetailsRelatedPlaylists {
     /// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.    
     pub uploads: Option<String>,
     /// The ID of the playlist that contains the channel"s watch history. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
+    #[serde(alias="watchHistory")]
     pub watch_history: Option<String>,
     /// The ID of the playlist that contains the channel"s liked videos. Use the   playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
     pub likes: Option<String>,
     /// The ID of the playlist that contains the channel"s favorite videos. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
     pub favorites: Option<String>,
     /// The ID of the playlist that contains the channel"s watch later playlist. Use the playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
+    #[serde(alias="watchLater")]
     pub watch_later: Option<String>,
 }
 
@@ -5157,7 +5569,7 @@ impl ChannelContentDetailsRelatedPlaylists {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5213,7 +5625,7 @@ impl<'a, C, NC, A> I18nLanguageMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5273,7 +5685,7 @@ impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5377,7 +5789,7 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5435,7 +5847,7 @@ impl<'a, C, NC, A> GuideCategoryMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5542,7 +5954,7 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5598,7 +6010,7 @@ impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5740,7 +6152,7 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5832,7 +6244,7 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5916,7 +6328,7 @@ impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5972,7 +6384,7 @@ impl<'a, C, NC, A> I18nRegionMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -6080,7 +6492,7 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -6159,7 +6571,7 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -6262,7 +6674,7 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -6333,7 +6745,7 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -6495,7 +6907,7 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -6553,7 +6965,7 @@ impl<'a, C, NC, A> VideoCategoryMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate "rustc-serialize" as rustc_serialize;
+/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -6654,7 +7066,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6761,7 +7173,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -6772,7 +7184,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -6874,7 +7286,7 @@ impl<'a, C, NC, A> I18nLanguageListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::ChannelBannerResource;
 /// use std::fs;
@@ -6964,7 +7376,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -7014,7 +7426,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -7025,7 +7437,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -7157,7 +7569,7 @@ impl<'a, C, NC, A> ChannelBannerInsertMethodBuilder<'a, C, NC, A> where NC: hype
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -7279,7 +7691,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -7290,7 +7702,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -7430,7 +7842,7 @@ impl<'a, C, NC, A> ChannelSectionListMethodBuilder<'a, C, NC, A> where NC: hyper
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::ChannelSection;
 /// # #[test] fn egal() {
@@ -7524,7 +7936,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -7562,7 +7974,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -7573,7 +7985,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -7704,7 +8116,7 @@ impl<'a, C, NC, A> ChannelSectionInsertMethodBuilder<'a, C, NC, A> where NC: hyp
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -7810,7 +8222,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -7925,7 +8337,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteMethodBuilder<'a, C, NC, A> where NC: hyp
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::ChannelSection;
 /// # #[test] fn egal() {
@@ -8014,7 +8426,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -8052,7 +8464,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -8063,7 +8475,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -8196,7 +8608,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateMethodBuilder<'a, C, NC, A> where NC: hyp
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -8313,7 +8725,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -8324,7 +8736,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -8453,7 +8865,7 @@ impl<'a, C, NC, A> GuideCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Playlist;
 /// # #[test] fn egal() {
@@ -8547,7 +8959,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -8585,7 +8997,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -8596,7 +9008,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -8743,7 +9155,7 @@ impl<'a, C, NC, A> PlaylistInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -8880,7 +9292,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -8891,7 +9303,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -9047,7 +9459,7 @@ impl<'a, C, NC, A> PlaylistListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9153,7 +9565,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -9268,7 +9680,7 @@ impl<'a, C, NC, A> PlaylistDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Playlist;
 /// # #[test] fn egal() {
@@ -9357,7 +9769,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -9395,7 +9807,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -9406,7 +9818,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -9527,7 +9939,7 @@ impl<'a, C, NC, A> PlaylistUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use std::fs;
 /// # #[test] fn egal() {
@@ -9649,7 +10061,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -9660,7 +10072,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -9801,7 +10213,7 @@ impl<'a, C, NC, A> ThumbnailSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9953,7 +10365,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -9964,7 +10376,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -10153,7 +10565,7 @@ impl<'a, C, NC, A> VideoListMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -10261,7 +10673,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -10373,7 +10785,7 @@ impl<'a, C, NC, A> VideoRateMethodBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -10480,7 +10892,7 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -10491,7 +10903,7 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -10586,7 +10998,7 @@ impl<'a, C, NC, A> VideoGetRatingMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -10692,7 +11104,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -10817,7 +11229,7 @@ impl<'a, C, NC, A> VideoDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Video;
 /// # #[test] fn egal() {
@@ -10916,7 +11328,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -10954,7 +11366,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -10965,7 +11377,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -11132,7 +11544,7 @@ impl<'a, C, NC, A> VideoUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Video;
 /// use std::fs;
@@ -11259,7 +11671,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -11309,7 +11721,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -11320,7 +11732,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -11531,7 +11943,7 @@ impl<'a, C, NC, A> VideoInsertMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Subscription;
 /// # #[test] fn egal() {
@@ -11615,7 +12027,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -11653,7 +12065,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -11664,7 +12076,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -11788,7 +12200,7 @@ impl<'a, C, NC, A> SubscriptionInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -11940,7 +12352,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -11951,7 +12363,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -12130,7 +12542,7 @@ impl<'a, C, NC, A> SubscriptionListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -12231,7 +12643,7 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -12337,7 +12749,7 @@ impl<'a, C, NC, A> SubscriptionDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -12584,7 +12996,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -12595,7 +13007,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -12937,7 +13349,7 @@ impl<'a, C, NC, A> SearchListMethodBuilder<'a, C, NC, A> where NC: hyper::net::N
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -13044,7 +13456,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -13055,7 +13467,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -13167,7 +13579,7 @@ impl<'a, C, NC, A> I18nRegionListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::LiveStream;
 /// # #[test] fn egal() {
@@ -13263,7 +13675,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -13301,7 +13713,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -13312,7 +13724,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -13449,7 +13861,7 @@ impl<'a, C, NC, A> LiveStreamUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -13560,7 +13972,7 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -13689,7 +14101,7 @@ impl<'a, C, NC, A> LiveStreamDeleteMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -13821,7 +14233,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -13832,7 +14244,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -13992,7 +14404,7 @@ impl<'a, C, NC, A> LiveStreamListMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::LiveStream;
 /// # #[test] fn egal() {
@@ -14088,7 +14500,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -14126,7 +14538,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -14137,7 +14549,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -14285,7 +14697,7 @@ impl<'a, C, NC, A> LiveStreamInsertMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Channel;
 /// # #[test] fn egal() {
@@ -14374,7 +14786,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -14412,7 +14824,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -14423,7 +14835,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -14561,7 +14973,7 @@ impl<'a, C, NC, A> ChannelUpdateMethodBuilder<'a, C, NC, A> where NC: hyper::net
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -14708,7 +15120,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -14719,7 +15131,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -14887,7 +15299,7 @@ impl<'a, C, NC, A> ChannelListMethodBuilder<'a, C, NC, A> where NC: hyper::net::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -14988,7 +15400,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -15096,7 +15508,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteMethodBuilder<'a, C, NC, A> where NC: hyper
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -15228,7 +15640,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -15239,7 +15651,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -15397,7 +15809,7 @@ impl<'a, C, NC, A> PlaylistItemListMethodBuilder<'a, C, NC, A> where NC: hyper::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::PlaylistItem;
 /// # #[test] fn egal() {
@@ -15487,7 +15899,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -15525,7 +15937,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -15536,7 +15948,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -15671,7 +16083,7 @@ impl<'a, C, NC, A> PlaylistItemInsertMethodBuilder<'a, C, NC, A> where NC: hyper
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::PlaylistItem;
 /// # #[test] fn egal() {
@@ -15756,7 +16168,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -15794,7 +16206,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -15805,7 +16217,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -15918,7 +16330,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateMethodBuilder<'a, C, NC, A> where NC: hyper
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::InvideoBranding;
 /// use std::fs;
@@ -16009,7 +16421,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -16059,7 +16471,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -16191,7 +16603,7 @@ impl<'a, C, NC, A> WatermarkSetMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -16297,7 +16709,7 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -16411,7 +16823,7 @@ impl<'a, C, NC, A> WatermarkUnsetMethodBuilder<'a, C, NC, A> where NC: hyper::ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -16540,7 +16952,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -16551,7 +16963,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -16717,7 +17129,7 @@ impl<'a, C, NC, A> LiveBroadcastControlMethodBuilder<'a, C, NC, A> where NC: hyp
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::LiveBroadcast;
 /// # #[test] fn egal() {
@@ -16813,7 +17225,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -16851,7 +17263,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -16862,7 +17274,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -17013,7 +17425,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateMethodBuilder<'a, C, NC, A> where NC: hype
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::LiveBroadcast;
 /// # #[test] fn egal() {
@@ -17109,7 +17521,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -17147,7 +17559,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -17158,7 +17570,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -17307,7 +17719,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertMethodBuilder<'a, C, NC, A> where NC: hype
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -17426,7 +17838,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -17437,7 +17849,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -17584,7 +17996,7 @@ impl<'a, C, NC, A> LiveBroadcastBindMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -17721,7 +18133,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -17732,7 +18144,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -17886,7 +18298,7 @@ impl<'a, C, NC, A> LiveBroadcastListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -17997,7 +18409,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -18125,7 +18537,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteMethodBuilder<'a, C, NC, A> where NC: hype
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -18241,7 +18653,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -18252,7 +18664,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -18400,7 +18812,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionMethodBuilder<'a, C, NC, A> where NC: 
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -18517,7 +18929,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -18528,7 +18940,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -18656,7 +19068,7 @@ impl<'a, C, NC, A> VideoCategoryListMethodBuilder<'a, C, NC, A> where NC: hyper:
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -18798,7 +19210,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -18809,7 +19221,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
@@ -18980,7 +19392,7 @@ impl<'a, C, NC, A> ActivityListMethodBuilder<'a, C, NC, A> where NC: hyper::net:
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "rustc-serialize" as rustc_serialize;
+/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Activity;
 /// # #[test] fn egal() {
@@ -19064,7 +19476,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self._request).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -19102,7 +19514,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -19113,7 +19525,7 @@ impl<'a, C, NC, A> ActivityInsertMethodBuilder<'a, C, NC, A> where NC: hyper::ne
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     };
                     dlg.finished();
                     return Result::Success(result_value)
