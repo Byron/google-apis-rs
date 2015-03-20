@@ -36,7 +36,7 @@ ${util.test_prelude()}\
 <%block filter="rust_test_fn_invisible">\
 ${lib.test_hub(hub_type_name, comments=False)}\
 
-// Usually you wouldn't bind this to a variable, but keep calling *MethodBuilders*
+// Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 // like ${put_and(sorted('`%s(...)`' % mangle_ident(f) for f in c.rta_map[resource]))}
 // to build up your call.
 let rb = hub.${mangle_ident(resource)}();

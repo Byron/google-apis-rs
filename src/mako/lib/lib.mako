@@ -1,7 +1,7 @@
 <%! from util import (activity_split, put_and, md_italic, split_camelcase_s, canonical_type_name, hub_type,
                       rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment, markdown_rust_block,
                       unindent_first_by, mangle_ident, mb_type, singular, scope_url_to_variant,
-                      PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, METHOD_BUILDER_MARKERT_TRAIT, 
+                      PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, CALL_BUILDER_MARKERT_TRAIT, 
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
                       REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
                       to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
@@ -18,7 +18,7 @@
     # fr == fattest resource, the fatter, the more important, right ?
     fr = find_fattest_resource(c)
     hub_url = 'struct.' + hub_type(c.schemas, util.canonical_name()) + '.html'
-    method_builder_url = 'cmn/trait.' + METHOD_BUILDER_MARKERT_TRAIT + '.html'
+    method_builder_url = 'cmn/trait.' + CALL_BUILDER_MARKERT_TRAIT + '.html'
     delegate_url = 'cmn/trait.Delegate.html'
     request_trait_url = 'cmn/trait.' + REQUEST_MARKER_TRAIT + '.html'
     response_trait_url = 'cmn/trait.' + RESPONSE_MARKER_TRAIT + '.html'

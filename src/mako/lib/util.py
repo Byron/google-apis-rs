@@ -66,7 +66,7 @@ REQUEST_PRIORITY = 100
 REQUEST_MARKER_TRAIT = 'RequestValue'
 RESPONSE_MARKER_TRAIT = 'ResponseResult'
 RESOURCE_MARKER_TRAIT = 'Resource'
-METHOD_BUILDER_MARKERT_TRAIT = 'MethodBuilder'
+CALL_BUILDER_MARKERT_TRAIT = 'CallBuilder'
 PART_MARKER_TRAIT = 'Part'
 NESTED_MARKER_TRAIT = 'NestedType'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
@@ -823,7 +823,7 @@ def unique_type_name(type_name):
 
 # return type name for a method on the given resource
 def mb_type(r, m):
-    return "%s%sMethodBuilder" % (singular(canonical_type_name(r)), dot_sep_to_canonical_type_name(m))
+    return "%s%sCallBuilder" % (singular(canonical_type_name(r)), dot_sep_to_canonical_type_name(m))
 
 # canonicalName = util.canonical_name()
 def hub_type(schemas, canonicalName):

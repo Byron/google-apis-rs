@@ -19,7 +19,7 @@ pub trait Hub: MarkerTrait {}
 pub trait ResourceMethodsBuilder: MarkerTrait {}
 
 /// Identifies types which represent builders for a particular resource method
-pub trait MethodBuilder: MarkerTrait {}
+pub trait CallBuilder: MarkerTrait {}
 
 /// Identifies types which can be inserted and deleted.
 /// Types with this trait are most commonly used by clients of this API.

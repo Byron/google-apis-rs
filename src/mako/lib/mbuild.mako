@@ -7,7 +7,7 @@
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
                       hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response,
-                      METHOD_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
+                      CALL_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
                       method_name_to_variant, unique_type_name)
@@ -125,7 +125,7 @@ pub struct ${ThisType}
     % endif
 }
 
-impl${mb_tparams} ${METHOD_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
+impl${mb_tparams} ${CALL_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
 
 impl${mb_tparams} ${ThisType} where ${', '.join(mb_type_bounds())} {
 

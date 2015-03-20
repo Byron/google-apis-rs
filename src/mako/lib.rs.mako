@@ -51,7 +51,7 @@ use std::io;
 use std::fs;
 use std::old_io::timer::sleep;
 
-pub use cmn::{MultiPartReader, MethodInfo, Result, MethodBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
+pub use cmn::{MultiPartReader, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
 
 
 // ##############
@@ -124,7 +124,7 @@ ${schema.new(s, c)}
 % endif
 
 // ###################
-// MethodBuilders ###
+// CallBuilders ###
 // #################
 
 % for resource in c.rta_map:

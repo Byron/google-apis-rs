@@ -9,35 +9,52 @@ The `youtube3` library allows access to all features of *YouTube*.
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-youtube3/struct.YouTube.html) ... 
 
-* [activities](http://byron.github.io/google-apis-rs/google-youtube3/struct.Activity.html) ([*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ActivityInsertMethodBuilder.html) and [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ActivityListMethodBuilder.html))
-* channel banners ([*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelBannerInsertMethodBuilder.html))
-* [channel sections](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelSection.html) ([*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelSectionDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelSectionInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelSectionListMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelSectionUpdateMethodBuilder.html))
-* [channels](http://byron.github.io/google-apis-rs/google-youtube3/struct.Channel.html) ([*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelListMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelUpdateMethodBuilder.html))
-* [guide categories](http://byron.github.io/google-apis-rs/google-youtube3/struct.GuideCategory.html) ([*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.GuideCategoryListMethodBuilder.html))
-* [i18n languages](http://byron.github.io/google-apis-rs/google-youtube3/struct.I18nLanguage.html) ([*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.I18nLanguageListMethodBuilder.html))
-* [i18n regions](http://byron.github.io/google-apis-rs/google-youtube3/struct.I18nRegion.html) ([*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.I18nRegionListMethodBuilder.html))
-* [live broadcasts](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcast.html) ([*bind*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastBindMethodBuilder.html), [*control*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastControlMethodBuilder.html), [*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastListMethodBuilder.html), [*transition*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastTransitionMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastUpdateMethodBuilder.html))
-* [live streams](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveStream.html) ([*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveStreamDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveStreamInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveStreamListMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveStreamUpdateMethodBuilder.html))
-* [playlist items](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItem.html) ([*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItemDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItemInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItemListMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItemUpdateMethodBuilder.html))
-* [playlists](http://byron.github.io/google-apis-rs/google-youtube3/struct.Playlist.html) ([*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistListMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistUpdateMethodBuilder.html))
-* search ([*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.SearchListMethodBuilder.html))
-* [subscriptions](http://byron.github.io/google-apis-rs/google-youtube3/struct.Subscription.html) ([*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.SubscriptionDeleteMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.SubscriptionInsertMethodBuilder.html) and [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.SubscriptionListMethodBuilder.html))
-* [thumbnails](http://byron.github.io/google-apis-rs/google-youtube3/struct.Thumbnail.html) ([*set*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ThumbnailSetMethodBuilder.html))
-* [video categories](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoCategory.html) ([*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoCategoryListMethodBuilder.html))
-* [videos](http://byron.github.io/google-apis-rs/google-youtube3/struct.Video.html) ([*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoDeleteMethodBuilder.html), [*get rating*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoGetRatingMethodBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoInsertMethodBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoListMethodBuilder.html), [*rate*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoRateMethodBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoUpdateMethodBuilder.html))
-* watermarks ([*set*](http://byron.github.io/google-apis-rs/google-youtube3/struct.WatermarkSetMethodBuilder.html) and [*unset*](http://byron.github.io/google-apis-rs/google-youtube3/struct.WatermarkUnsetMethodBuilder.html))
+* [activities](http://byron.github.io/google-apis-rs/google-youtube3/struct.Activity.html)
+ * [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ActivityInsertCallBuilder.html) and [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ActivityListCallBuilder.html)
+* channel banners
+ * [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelBannerInsertCallBuilder.html)
+* [channel sections](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelSection.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelSectionDeleteCallBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelSectionInsertCallBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelSectionListCallBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelSectionUpdateCallBuilder.html)
+* [channels](http://byron.github.io/google-apis-rs/google-youtube3/struct.Channel.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelListCallBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelUpdateCallBuilder.html)
+* [guide categories](http://byron.github.io/google-apis-rs/google-youtube3/struct.GuideCategory.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.GuideCategoryListCallBuilder.html)
+* [i18n languages](http://byron.github.io/google-apis-rs/google-youtube3/struct.I18nLanguage.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.I18nLanguageListCallBuilder.html)
+* [i18n regions](http://byron.github.io/google-apis-rs/google-youtube3/struct.I18nRegion.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.I18nRegionListCallBuilder.html)
+* [live broadcasts](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcast.html)
+ * [*bind*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastBindCallBuilder.html), [*control*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastControlCallBuilder.html), [*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastDeleteCallBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastInsertCallBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastListCallBuilder.html), [*transition*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastTransitionCallBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveBroadcastUpdateCallBuilder.html)
+* [live streams](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveStream.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveStreamDeleteCallBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveStreamInsertCallBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveStreamListCallBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.LiveStreamUpdateCallBuilder.html)
+* [playlist items](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItem.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItemDeleteCallBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItemInsertCallBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItemListCallBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItemUpdateCallBuilder.html)
+* [playlists](http://byron.github.io/google-apis-rs/google-youtube3/struct.Playlist.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistDeleteCallBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistInsertCallBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistListCallBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistUpdateCallBuilder.html)
+* search
+ * [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.SearchListCallBuilder.html)
+* [subscriptions](http://byron.github.io/google-apis-rs/google-youtube3/struct.Subscription.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.SubscriptionDeleteCallBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.SubscriptionInsertCallBuilder.html) and [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.SubscriptionListCallBuilder.html)
+* [thumbnails](http://byron.github.io/google-apis-rs/google-youtube3/struct.Thumbnail.html)
+ * [*set*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ThumbnailSetCallBuilder.html)
+* [video categories](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoCategory.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoCategoryListCallBuilder.html)
+* [videos](http://byron.github.io/google-apis-rs/google-youtube3/struct.Video.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoDeleteCallBuilder.html), [*get rating*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoGetRatingCallBuilder.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoInsertCallBuilder.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoListCallBuilder.html), [*rate*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoRateCallBuilder.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoUpdateCallBuilder.html)
+* watermarks
+ * [*set*](http://byron.github.io/google-apis-rs/google-youtube3/struct.WatermarkSetCallBuilder.html) and [*unset*](http://byron.github.io/google-apis-rs/google-youtube3/struct.WatermarkUnsetCallBuilder.html)
 
 
 Upload supported by ...
 
-* [*set watermarks*](http://byron.github.io/google-apis-rs/google-youtube3/struct.WatermarkSetMethodBuilder.html)
-* [*insert channel banners*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelBannerInsertMethodBuilder.html)
-* [*set thumbnails*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ThumbnailSetMethodBuilder.html)
-* [*insert videos*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoInsertMethodBuilder.html)
+* [*set watermarks*](http://byron.github.io/google-apis-rs/google-youtube3/struct.WatermarkSetCallBuilder.html)
+* [*insert channel banners*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelBannerInsertCallBuilder.html)
+* [*set thumbnails*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ThumbnailSetCallBuilder.html)
+* [*insert videos*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoInsertCallBuilder.html)
 
 Subscription supported by ...
 
-* [*list playlist items*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItemListMethodBuilder.html)
+* [*list playlist items*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItemListCallBuilder.html)
 
 
 Everything else about the *YouTube* *v3* API can be found at the
@@ -55,7 +72,7 @@ The API is structured into the following primary items:
     * **[Parts](http://byron.github.io/google-apis-rs/google-youtube3/cmn/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](http://byron.github.io/google-apis-rs/google-youtube3/cmn/trait.MethodBuilder.html)**
+* **[Activities](http://byron.github.io/google-apis-rs/google-youtube3/cmn/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 Generally speaking, you can invoke *Activities* like this:
@@ -162,7 +179,7 @@ Methods supporting uploads can do so using up to 2 different protocols:
 ## About Customization/Callbacks
 
 You may alter the way an `doit()` method is called by providing a [delegate](http://byron.github.io/google-apis-rs/google-youtube3/cmn/trait.Delegate.html) to the 
-[Method Builder](http://byron.github.io/google-apis-rs/google-youtube3/cmn/trait.MethodBuilder.html) before making the final `doit()` call. 
+[Method Builder](http://byron.github.io/google-apis-rs/google-youtube3/cmn/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
@@ -177,7 +194,7 @@ the server to indicate either the set parts of the request or the desired parts 
 
 ## About Builder Arguments
 
-Using [method builders](http://byron.github.io/google-apis-rs/google-youtube3/cmn/trait.MethodBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](http://byron.github.io/google-apis-rs/google-youtube3/cmn/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
