@@ -305,8 +305,8 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True):
 
     def wrap_type(tn):
         if allow_optionals:
-            tn = "Option<%s>" % tn
-        return unique_type_name(tn)
+            tn = "Option<%s>" % unique_type_name(tn)
+        return tn
 
     # unconditionally handle $ref types, which should point to another schema.
     if TREF in t:
@@ -320,7 +320,7 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True):
     try:
         rust_type = TYPE_MAP[t.type]
         if t.type == 'array':
-            return "%s<%s>" % (rust_type, nested_type(t))
+            return "%s<%s>" % (rust_type, unique_type_name((nested_type(t))))
         elif t.type == 'object':
             if _is_map_prop(t):
                 return "%s<String, %s>" % (rust_type, nested_type(t))
