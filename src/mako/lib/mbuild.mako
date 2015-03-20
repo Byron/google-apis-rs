@@ -649,7 +649,7 @@ else {
 
         % if request_value:
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::encode(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap().into_bytes());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
         % endif
@@ -727,7 +727,7 @@ else {
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::decode(&json_err).unwrap();
+                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
                             sleep(d);
                             continue;
@@ -744,7 +744,7 @@ if enable_resource_parsing \
 {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::decode(&json_response).unwrap())
+                        (res, json::from_str(&json_response).unwrap())
                     }\
                     % if supports_download:
  else { (res, Default::default()) }\

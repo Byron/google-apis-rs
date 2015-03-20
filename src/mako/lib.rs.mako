@@ -28,10 +28,12 @@ ${lib.docs(c)}
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut)]
-
+// Required for serde annotations
+#![feature(custom_derive, custom_attribute, plugin)]
+#![plugin(serde_macros)]
 
 extern crate hyper;
-extern crate "rustc-serialize" as rustc_serialize;
+extern crate serde;
 extern crate "yup-oauth2" as oauth2;
 extern crate mime;
 extern crate url;
@@ -44,7 +46,7 @@ use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use std::marker::PhantomData;
-use rustc_serialize::json;
+use serde::json;
 use std::io;
 use std::fs;
 use std::old_io::timer::sleep;

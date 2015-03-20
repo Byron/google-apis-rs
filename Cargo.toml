@@ -18,8 +18,9 @@ path = "src/rust/lib.rs"
 [dependencies]
 hyper = "*"
 mime = "*"
-rustc-serialize = "*"
 yup-oauth2 = "*"
+serde = "*"
+serde_macros = "*"
 
 [dev-dependencies]
 yup-hyper-mock = "*"

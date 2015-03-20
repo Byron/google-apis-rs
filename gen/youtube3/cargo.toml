@@ -17,5 +17,6 @@ keywords = ["youtube", "google", "protocol", "web", "api"]
 hyper = "*"
 mime = "*"
 url = "*"
-rustc-serialize = "*"
+serde = "*"
+serde_macros = "*"
 yup-oauth2 = "*"

@@ -320,10 +320,10 @@ def to_rust_type(schemas, sn, pn, t, allow_optionals=True):
     try:
         rust_type = TYPE_MAP[t.type]
         if t.type == 'array':
-            return "%s<%s>" % (rust_type, unique_type_name((nested_type(t))))
+            return wrap_type("%s<%s>" % (rust_type, unique_type_name((nested_type(t)))))
         elif t.type == 'object':
             if _is_map_prop(t):
-                return "%s<String, %s>" % (rust_type, nested_type(t))
+                return wrap_type("%s<String, %s>" % (rust_type, nested_type(t)))
             else:
                 return wrap_type(nested_type(t))
         elif t.type == 'string' and 'Count' in pn:
