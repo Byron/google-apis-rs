@@ -1,10 +1,11 @@
-#![feature(core,io,old_path)]
+#![feature(core,io,old_path, custom_derive, plugin)]
 #![allow(dead_code, deprecated, unused_features)]
 //! library with code shared by all generated implementations
+#![plugin(serde_macros)]
 extern crate hyper;
 extern crate mime;
-extern crate "rustc-serialize" as rustc_serialize;
 extern crate "yup-oauth2" as oauth2;
+extern crate serde;
 
 // just pull it in the check if it compiles
 mod cmn;

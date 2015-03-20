@@ -43,7 +43,7 @@ impl<T: Seek + Read> ReadSeek for T {}
 
 
 /// A utility type which can decode a server response that indicates error
-#[derive(RustcDecodable)]
+#[derive(Deserialize)]
 pub struct JsonServerError {
     error: String,
     error_description: Option<String>

@@ -34,9 +34,9 @@ ${struct};
     traits = ['Default', 'Clone', 'Debug']
     
     if REQUEST_MARKER_TRAIT in markers:
-        traits.append('RustcEncodable')
+        traits.append('Serialize')
     if RESPONSE_MARKER_TRAIT in markers:
-        traits.append('RustcDecodable')
+        traits.append('Deserialize')
     
     ## waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
     if s.type == 'any':
@@ -58,11 +58,11 @@ ${_new_object(s, s.items.get('properties'), c)}\
 % endif ## array item != 'object'
 % elif s.type == 'any':
 ## waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
-pub struct ${s_type}(rustc_serialize::json::Json);
+pub struct ${s_type}(json::Value);
 
 impl Default for ${s_type} {
     fn default() -> ${s_type} {
-        ${s_type}(rustc_serialize::json::Json::Null)
+        ${s_type}(json::Value::Null)
     }
 }
 % else:

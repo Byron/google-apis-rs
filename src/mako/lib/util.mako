@@ -32,7 +32,7 @@ ${util.library_to_crate_name(util.library_name(name, version))}\
 <%def name="test_prelude()">\
 extern crate hyper;
 extern crate "yup-oauth2" as oauth2;
-extern crate "rustc-serialize" as rustc_serialize;
+extern crate serde;
 extern crate "${self.crate_name()}" as ${self.library_name()};
 </%def>
 
