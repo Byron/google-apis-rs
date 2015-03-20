@@ -649,7 +649,7 @@ else {
 
         % if request_value:
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap());
+        let mut request_value_reader = io::Cursor::new(json::to_vec(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}));
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
         % endif
