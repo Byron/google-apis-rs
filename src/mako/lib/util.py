@@ -412,6 +412,9 @@ def schema_markers(s, c, transitive=True):
     if len(c.sta_map.get(s.id, dict())) == 0:
         res.add(PART_MARKER_TRAIT)
 
+    if len(res) == 1 and PART_MARKER_TRAIT in res and len(s.used_by) == 0:
+        res.add('UnusedType')
+
     return sorted(res)
 
 ## -- End Rust TypeSystem -- @}

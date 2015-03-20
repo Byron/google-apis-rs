@@ -51,7 +51,7 @@ use std::io;
 use std::fs;
 use std::old_io::timer::sleep;
 
-pub use cmn::{MultiPartReader, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
+pub use cmn::{MultiPartReader, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, UnusedType};
 
 
 // ##############

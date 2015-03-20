@@ -29,6 +29,10 @@ pub trait ResponseResult: MarkerTrait {}
 /// Identifies types which are used in API requests.
 pub trait RequestValue: MarkerTrait {}
 
+/// Identifies types which are not actually used by the API
+/// This might be a bug within the google API schema.
+pub trait UnusedType: MarkerTrait {}
+
 /// Identifies types which are only used as part of other types, which 
 /// usually are carrying the `Resource` trait.
 pub trait Part: MarkerTrait {}
