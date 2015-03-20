@@ -80,7 +80,8 @@ It seems there is nothing you can do here ... .
     if sn in schemas:
         md_resource = link(md_resource, schema_doc_format(schemas[sn]) % unique_type_name(sn))
 %>\
-* ${md_resource} (${put_and(md_methods)})
+* ${md_resource}
+ * ${put_and(md_methods)}
 % endfor ## each resource activity
 
 % if METHODS_RESOURCE in c.rta_map:
@@ -100,7 +101,7 @@ ${method_type} supported by ...
 % for m in methods:
 <% 
     _, resource, method = activity_split(m.id)
-    name_parts = [split_camelcase_s(method)]
+    name_parts = [' '.join(split_camelcase_s(method).split('.'))]
     if resource != METHODS_RESOURCE:
         name_parts.append(split_camelcase_s(resource))
 %>\
