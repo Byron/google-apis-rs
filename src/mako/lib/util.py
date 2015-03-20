@@ -506,6 +506,13 @@ def rust_copy_value_s(n, tn, p):
 def schema_to_required_property(s, n):
     return type(s)({'name': n, TREF: s.id, 'priority': REQUEST_PRIORITY, 'is_query_param': False})
 
+# Return relative URL format to the given schema. Handles structs and enums accordingly
+def schema_doc_format(s):
+    prefix = 'struct.'
+    if 'variant' in s:
+        prefix = 'enum.'
+    return prefix + '%s.html'
+
 def is_required_property(p):
     return p.get('required', False) or p.get('priority', 0) > 0
 
@@ -689,6 +696,9 @@ def new_context(schemas, resources, methods):
                 elif 'items' in p:
                     recurse_properties(nested_type_name(prefix, pn), rs, 
                                                         p.items, append_unique(parent_ids, rs.id))
+                elif 'variant' in p:
+                    for enum in p.variant.map:
+                        recurse_properties(prefix, rs, enum, parent_ids)
                 # end handle prop itself
             # end for each property
         # end utility

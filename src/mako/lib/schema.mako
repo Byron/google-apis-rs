@@ -2,7 +2,7 @@
     from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
                       NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE, unique_type_name, 
-                      PART_MARKER_TRAIT) 
+                      PART_MARKER_TRAIT, canonical_type_name)
 
     default_traits = ('RustcEncodable', 'Clone', 'Default')
 %>\
@@ -23,6 +23,26 @@ ${struct} {
 }
 % elif 'additionalProperties' in s:
 ${struct}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s, allow_optionals=allow_optionals)});
+% elif 'variant' in s:
+<% 
+    et = unique_type_name(s.id)
+    variant_type = lambda p: canonical_type_name(p.type_value)
+%>
+pub enum ${et} {
+% for p in s.variant.map:
+    ${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
+    % if variant_type(p) != p.type_value:
+    #[serde(alias="${p.type_value}")]
+    % endif
+    ${variant_type(p)}(${to_rust_type(schemas, s.id, None, p, allow_optionals=allow_optionals)}),
+% endfor
+}
+
+impl Default for ${et} {
+    fn default() -> ${et} {
+        ${et}::${variant_type(s.variant.map[0])}(Default::default())
+    }
+}
 % else: ## it's an empty struct, i.e. struct Foo;
 ${struct};
 % endif ## 'properties' in s
@@ -35,7 +55,11 @@ ${struct};
 <%def name="new(s, c)">\
 <% 
     markers = schema_markers(s, c, transitive=True)
-    traits = ['Default', 'Clone', 'Debug']
+    traits = ['Clone', 'Debug']
+
+    # default only works for structs, and 'variant' will be an enum
+    if 'variant' not in s:
+        traits.insert(0, 'Default')
     
     allow_optionals = True
     if REQUEST_MARKER_TRAIT in markers:
