@@ -368,44 +368,49 @@ def is_pod_property(p):
 # Return sorted type names of all markers applicable to the given schema
 # This list is transitive. Thus, if the schema is used as child of someone with a trait, it 
 # inherits this trait
-def schema_markers(s, c):
+def schema_markers(s, c, transitive=True):
     res = set()
     ids = [s.id]
-    used_by = s.used_by + s.parents
 
-    seen = set() # protect against loops, just to be sure ... 
-    while used_by:
-        id = used_by.pop()
-        if id in seen:
-            continue
-        seen.add(id)
-        ids.append(id)
+    if transitive:
+        used_by = s.used_by + s.parents
 
-        oid = c.schemas[id]
-        used_by.extend(oid.used_by)
-        used_by.extend(oid.parents)
-    # end gather usages
+        seen = set() # protect against loops, just to be sure ... 
+        while used_by:
+            id = used_by.pop()
+            if id in seen:
+                continue
+            seen.add(id)
+            ids.append(id)
+
+            oid = c.schemas[id]
+            used_by.extend(oid.used_by)
+            used_by.extend(oid.parents)
+        # end gather usages
+    # end is transitive
 
     for sid in ids:
         activities = c.sta_map.get(sid, dict())
         if len(activities) == 0:
-            res.add(PART_MARKER_TRAIT)
-        else:
-            # it should have at least one activity that matches it's type to qualify for the Resource trait
-            for fqan, iot in activities.iteritems():
-                _, resource, _ = activity_split(fqan)
-                if resource and activity_name_to_type_name(resource).lower() == sid.lower():
-                    res.add('cmn::%s' % RESOURCE_MARKER_TRAIT)
-                if IO_RESPONSE in iot:
-                    res.add(RESPONSE_MARKER_TRAIT)
-                if IO_REQUEST in iot:
-                    res.add(REQUEST_MARKER_TRAIT)
-            # end for each activity
+            continue
+        # it should have at least one activity that matches it's type to qualify for the Resource trait
+        for fqan, iot in activities.iteritems():
+            _, resource, _ = activity_split(fqan)
+            if resource and activity_name_to_type_name(resource).lower() == sid.lower():
+                res.add('cmn::%s' % RESOURCE_MARKER_TRAIT)
+            if IO_RESPONSE in iot:
+                res.add(RESPONSE_MARKER_TRAIT)
+            if IO_REQUEST in iot:
+                res.add(REQUEST_MARKER_TRAIT)
+        # end for each activity
         # end handle activites
-
-        if is_nested_type(s):
-            res.add(NESTED_MARKER_TRAIT)
     # end for each parent ... transitively
+
+    if is_nested_type(s):
+        res.add(NESTED_MARKER_TRAIT)
+    # if len(s.used_by) + len(s.parents) > 0:
+    if len(c.sta_map.get(s.id, dict())) == 0:
+        res.add(PART_MARKER_TRAIT)
 
     return sorted(res)
 

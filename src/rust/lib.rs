@@ -111,5 +111,14 @@ bar\r\n\
         let j = "{\"snooSnoo\":\"foo\"}";
         let b: Bar = json::from_str(&j).unwrap();
         assert_eq!(b.snoo_snoo, "foo");
+
+        // We can't have unknown fields with structs.
+        // #[derive(Default, Serialize, Deserialize)]
+        // struct BarOpt {
+        //     #[serde(alias="snooSnoo")]
+        //     snoo_snoo: Option<String>
+        // }
+        // let j = "{\"snooSnoo\":\"foo\",\"foo\":\"bar\"}";
+        // let b: BarOpt = json::from_str(&j).unwrap();
     }
 }

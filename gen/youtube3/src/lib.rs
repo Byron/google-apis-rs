@@ -433,28 +433,28 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
 pub struct SubscriptionListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
     #[serde(alias="nextPageToken")]
-    pub next_page_token: Option<String>,
+    pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#subscriptionListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
     /// A list of subscriptions that match the request criteria.    
-    pub items: Option<Vec<Subscription>>,
+    pub items: Vec<Subscription>,
     /// no description provided    
     #[serde(alias="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub token_pagination: TokenPagination,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
     #[serde(alias="prevPageToken")]
-    pub prev_page_token: Option<String>,
+    pub prev_page_token: String,
     /// no description provided    
     #[serde(alias="pageInfo")]
-    pub page_info: Option<PageInfo>,
+    pub page_info: PageInfo,
 }
 
 impl ResponseResult for SubscriptionListResponse {}
@@ -468,37 +468,20 @@ impl ResponseResult for SubscriptionListResponse {}
 pub struct ChannelAuditDetails {
     /// Whether or not the channel has any copyright strikes.    
     #[serde(alias="copyrightStrikesGoodStanding")]
-    pub copyright_strikes_good_standing: Option<bool>,
+    pub copyright_strikes_good_standing: bool,
     /// Whether or not the channel respects the community guidelines.    
     #[serde(alias="communityGuidelinesGoodStanding")]
-    pub community_guidelines_good_standing: Option<bool>,
+    pub community_guidelines_good_standing: bool,
     /// Whether or not the channel has any unresolved claims.    
     #[serde(alias="contentIdClaimsGoodStanding")]
-    pub content_id_claims_good_standing: Option<bool>,
+    pub content_id_claims_good_standing: bool,
     /// Describes the general state of the channel. This field will always show if there are any issues whatsoever with the channel. Currently this field represents the result of the logical and operation over the community guidelines good standing, the copyright strikes good standing and the content ID claims good standing, but this may change in the future.    
     #[serde(alias="overallGoodStanding")]
-    pub overall_good_standing: Option<bool>,
+    pub overall_good_standing: bool,
 }
 
 impl Part for ChannelAuditDetails {}
-impl RequestValue for ChannelAuditDetails {}
-impl ResponseResult for ChannelAuditDetails {}
-impl cmn::Resource for ChannelAuditDetails {}
 
-impl ChannelAuditDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.copyright_strikes_good_standing.is_some() { r = r + "copyrightStrikesGoodStanding,"; }
-        if self.community_guidelines_good_standing.is_some() { r = r + "communityGuidelinesGoodStanding,"; }
-        if self.content_id_claims_good_standing.is_some() { r = r + "contentIdClaimsGoodStanding,"; }
-        if self.overall_good_standing.is_some() { r = r + "overallGoodStanding,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Describes original video file properties, including technical details about audio and video streams, but also metadata information like content length, digitization time, or geotagging information.
 /// 
@@ -508,63 +491,40 @@ impl ChannelAuditDetails {
 pub struct VideoFileDetails {
     /// The uploaded video file's combined (video and audio) bitrate in bits per second.    
     #[serde(alias="bitrateBps")]
-    pub bitrate_bps: Option<String>,
+    pub bitrate_bps: String,
     /// The uploaded video file's container format.    
-    pub container: Option<String>,
+    pub container: String,
     /// Geographic coordinates that identify the place where the uploaded video was recorded. Coordinates are defined using WGS 84.    
     #[serde(alias="recordingLocation")]
-    pub recording_location: Option<GeoPoint>,
+    pub recording_location: GeoPoint,
     /// The uploaded file's type as detected by YouTube's video processing engine. Currently, YouTube only processes video files, but this field is present whether a video file or another type of file was uploaded.    
     #[serde(alias="fileType")]
-    pub file_type: Option<String>,
+    pub file_type: String,
     /// The date and time when the uploaded video file was created. The value is specified in ISO 8601 format. Currently, the following ISO 8601 formats are supported:  
     /// - Date only: YYYY-MM-DD 
     /// - Naive time: YYYY-MM-DDTHH:MM:SS 
     /// - Time with timezone: YYYY-MM-DDTHH:MM:SS+HH:MM
     #[serde(alias="creationTime")]
-    pub creation_time: Option<String>,
+    pub creation_time: String,
     /// The length of the uploaded video in milliseconds.    
     #[serde(alias="durationMs")]
-    pub duration_ms: Option<String>,
+    pub duration_ms: String,
     /// The uploaded file's name. This field is present whether a video file or another type of file was uploaded.    
     #[serde(alias="fileName")]
-    pub file_name: Option<String>,
+    pub file_name: String,
     /// The uploaded file's size in bytes. This field is present whether a video file or another type of file was uploaded.    
     #[serde(alias="fileSize")]
-    pub file_size: Option<String>,
+    pub file_size: String,
     /// A list of video streams contained in the uploaded video file. Each item in the list contains detailed metadata about a video stream.    
     #[serde(alias="videoStreams")]
-    pub video_streams: Option<Vec<VideoFileDetailsVideoStream>>,
+    pub video_streams: Vec<VideoFileDetailsVideoStream>,
     /// A list of audio streams contained in the uploaded video file. Each item in the list contains detailed metadata about an audio stream.    
     #[serde(alias="audioStreams")]
-    pub audio_streams: Option<Vec<VideoFileDetailsAudioStream>>,
+    pub audio_streams: Vec<VideoFileDetailsAudioStream>,
 }
 
 impl Part for VideoFileDetails {}
-impl RequestValue for VideoFileDetails {}
-impl ResponseResult for VideoFileDetails {}
-impl cmn::Resource for VideoFileDetails {}
 
-impl VideoFileDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.bitrate_bps.is_some() { r = r + "bitrateBps,"; }
-        if self.container.is_some() { r = r + "container,"; }
-        if self.recording_location.is_some() { r = r + "recordingLocation,"; }
-        if self.file_type.is_some() { r = r + "fileType,"; }
-        if self.creation_time.is_some() { r = r + "creationTime,"; }
-        if self.duration_ms.is_some() { r = r + "durationMs,"; }
-        if self.file_name.is_some() { r = r + "fileName,"; }
-        if self.file_size.is_some() { r = r + "fileSize,"; }
-        if self.video_streams.is_some() { r = r + "videoStreams,"; }
-        if self.audio_streams.is_some() { r = r + "audioStreams,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Playlist localization setting
 /// 
@@ -573,28 +533,13 @@ impl VideoFileDetails {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistLocalization {
     /// The localized strings for playlist's description.    
-    pub description: Option<String>,
+    pub description: String,
     /// The localized strings for playlist's title.    
-    pub title: Option<String>,
+    pub title: String,
 }
 
 impl Part for PlaylistLocalization {}
-impl RequestValue for PlaylistLocalization {}
-impl ResponseResult for PlaylistLocalization {}
-impl cmn::Resource for PlaylistLocalization {}
 
-impl PlaylistLocalization {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.description.is_some() { r = r + "description,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Information about a resource that received a comment.
 /// 
@@ -604,24 +549,11 @@ impl PlaylistLocalization {
 pub struct ActivityContentDetailsComment {
     /// The resourceId object contains information that identifies the resource associated with the comment.    
     #[serde(alias="resourceId")]
-    pub resource_id: Option<ResourceId>,
+    pub resource_id: ResourceId,
 }
 
 impl Part for ActivityContentDetailsComment {}
-impl RequestValue for ActivityContentDetailsComment {}
-impl ResponseResult for ActivityContentDetailsComment {}
 
-impl ActivityContentDetailsComment {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.resource_id.is_some() { r = r + "resourceId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -636,28 +568,28 @@ impl ActivityContentDetailsComment {
 pub struct PlaylistItemListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
     #[serde(alias="nextPageToken")]
-    pub next_page_token: Option<String>,
+    pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistItemListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
     /// A list of playlist items that match the request criteria.    
-    pub items: Option<Vec<PlaylistItem>>,
+    pub items: Vec<PlaylistItem>,
     /// no description provided    
     #[serde(alias="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub token_pagination: TokenPagination,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
     #[serde(alias="prevPageToken")]
-    pub prev_page_token: Option<String>,
+    pub prev_page_token: String,
     /// no description provided    
     #[serde(alias="pageInfo")]
-    pub page_info: Option<PageInfo>,
+    pub page_info: PageInfo,
 }
 
 impl ResponseResult for PlaylistItemListResponse {}
@@ -670,28 +602,13 @@ impl ResponseResult for PlaylistItemListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PropertyValue {
     /// A property.    
-    pub property: Option<String>,
+    pub property: String,
     /// The property's value.    
-    pub value: Option<String>,
+    pub value: String,
 }
 
 impl Part for PropertyValue {}
-impl RequestValue for PropertyValue {}
-impl ResponseResult for PropertyValue {}
-impl cmn::Resource for PropertyValue {}
 
-impl PropertyValue {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.property.is_some() { r = r + "property,"; }
-        if self.value.is_some() { r = r + "value,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Describes a temporal position of a visual widget inside a video.
 /// 
@@ -701,33 +618,17 @@ impl PropertyValue {
 pub struct InvideoTiming {
     /// Defines the time at which the promotion will appear. Depending on the value of type the value of the offsetMs field will represent a time offset from the start or from the end of the video, expressed in milliseconds.    
     #[serde(alias="offsetMs")]
-    pub offset_ms: Option<String>,
+    pub offset_ms: String,
     /// Describes a timing type. If the value is offsetFromStart, then the offsetMs field represents an offset from the start of the video. If the value is offsetFromEnd, then the offsetMs field represents an offset from the end of the video.    
     #[serde(alias="type")]
-    pub type_: Option<String>,
+    pub type_: String,
     /// Defines the duration in milliseconds for which the promotion should be displayed. If missing, the client should use the default.    
     #[serde(alias="durationMs")]
-    pub duration_ms: Option<String>,
+    pub duration_ms: String,
 }
 
 impl Part for InvideoTiming {}
-impl RequestValue for InvideoTiming {}
-impl ResponseResult for InvideoTiming {}
-impl cmn::Resource for InvideoTiming {}
 
-impl InvideoTiming {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.offset_ms.is_some() { r = r + "offsetMs,"; }
-        if self.type_.is_some() { r = r + "type,"; }
-        if self.duration_ms.is_some() { r = r + "durationMs,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Basic details about a playlist, including title, description and thumbnails.
 /// 
@@ -736,53 +637,31 @@ impl InvideoTiming {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistSnippet {
     /// The playlist's description.    
-    pub description: Option<String>,
+    pub description: String,
     /// The playlist's title.    
-    pub title: Option<String>,
+    pub title: String,
     /// The ID that YouTube uses to uniquely identify the channel that published the playlist.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The date and time that the playlist was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="publishedAt")]
-    pub published_at: Option<String>,
+    pub published_at: String,
     /// Keyword tags associated with the playlist.    
-    pub tags: Option<Vec<String>>,
+    pub tags: Vec<String>,
     /// The channel title of the channel that the video belongs to.    
     #[serde(alias="channelTitle")]
-    pub channel_title: Option<String>,
+    pub channel_title: String,
     /// The language of the playlist's default title and description.    
     #[serde(alias="defaultLanguage")]
-    pub default_language: Option<String>,
+    pub default_language: String,
     /// Localized title and description, read-only.    
-    pub localized: Option<PlaylistLocalization>,
+    pub localized: PlaylistLocalization,
     /// A map of thumbnail images associated with the playlist. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
+    pub thumbnails: ThumbnailDetails,
 }
 
 impl Part for PlaylistSnippet {}
-impl RequestValue for PlaylistSnippet {}
-impl ResponseResult for PlaylistSnippet {}
-impl cmn::Resource for PlaylistSnippet {}
 
-impl PlaylistSnippet {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.description.is_some() { r = r + "description,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        if self.channel_id.is_some() { r = r + "channelId,"; }
-        if self.published_at.is_some() { r = r + "publishedAt,"; }
-        if self.tags.is_some() { r = r + "tags,"; }
-        if self.channel_title.is_some() { r = r + "channelTitle,"; }
-        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
-        if self.localized.is_some() { r = r + "localized,"; }
-        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Information about a resource that received a positive (like) rating.
 /// 
@@ -792,24 +671,11 @@ impl PlaylistSnippet {
 pub struct ActivityContentDetailsLike {
     /// The resourceId object contains information that identifies the rated resource.    
     #[serde(alias="resourceId")]
-    pub resource_id: Option<ResourceId>,
+    pub resource_id: ResourceId,
 }
 
 impl Part for ActivityContentDetailsLike {}
-impl RequestValue for ActivityContentDetailsLike {}
-impl ResponseResult for ActivityContentDetailsLike {}
 
-impl ActivityContentDetailsLike {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.resource_id.is_some() { r = r + "resourceId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A live stream describes a live ingestion point.
 /// 
@@ -877,16 +743,16 @@ impl LiveStream {
 pub struct ThumbnailSetResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// A list of thumbnails.    
-    pub items: Option<Vec<ThumbnailDetails>>,
+    pub items: Vec<ThumbnailDetails>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#thumbnailSetResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
 }
 
 impl ResponseResult for ThumbnailSetResponse {}
@@ -900,24 +766,11 @@ impl ResponseResult for ThumbnailSetResponse {}
 pub struct ActivityContentDetailsUpload {
     /// The ID that YouTube uses to uniquely identify the uploaded video.    
     #[serde(alias="videoId")]
-    pub video_id: Option<String>,
+    pub video_id: String,
 }
 
 impl Part for ActivityContentDetailsUpload {}
-impl RequestValue for ActivityContentDetailsUpload {}
-impl ResponseResult for ActivityContentDetailsUpload {}
 
-impl ActivityContentDetailsUpload {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.video_id.is_some() { r = r + "videoId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Branding properties for the channel view.
 /// 
@@ -926,71 +779,45 @@ impl ActivityContentDetailsUpload {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSettings {
     /// Specifies the channel description.    
-    pub description: Option<String>,
+    pub description: String,
     /// Specifies the channel title.    
-    pub title: Option<String>,
+    pub title: String,
     /// Whether user-submitted comments left on the channel page need to be approved by the channel owner to be publicly visible.    
     #[serde(alias="moderateComments")]
-    pub moderate_comments: Option<bool>,
+    pub moderate_comments: bool,
     /// Whether the tab to browse the videos should be displayed.    
     #[serde(alias="showBrowseView")]
-    pub show_browse_view: Option<bool>,
+    pub show_browse_view: bool,
     /// Title for the featured channels tab.    
     #[serde(alias="featuredChannelsTitle")]
-    pub featured_channels_title: Option<String>,
+    pub featured_channels_title: String,
     /// no description provided    
     #[serde(alias="defaultLanguage")]
-    pub default_language: Option<String>,
+    pub default_language: String,
     /// The trailer of the channel, for users that are not subscribers.    
     #[serde(alias="unsubscribedTrailer")]
-    pub unsubscribed_trailer: Option<String>,
+    pub unsubscribed_trailer: String,
     /// The list of featured channels.    
     #[serde(alias="featuredChannelsUrls")]
-    pub featured_channels_urls: Option<Vec<String>>,
+    pub featured_channels_urls: Vec<String>,
     /// A prominent color that can be rendered on this channel page.    
     #[serde(alias="profileColor")]
-    pub profile_color: Option<String>,
+    pub profile_color: String,
     /// Which content tab users should see when viewing the channel.    
     #[serde(alias="defaultTab")]
-    pub default_tab: Option<String>,
+    pub default_tab: String,
     /// Lists keywords associated with the channel, comma-separated.    
-    pub keywords: Option<String>,
+    pub keywords: String,
     /// Whether related channels should be proposed.    
     #[serde(alias="showRelatedChannels")]
-    pub show_related_channels: Option<bool>,
+    pub show_related_channels: bool,
     /// The ID for a Google Analytics account to track and measure traffic to the channels.    
     #[serde(alias="trackingAnalyticsAccountId")]
-    pub tracking_analytics_account_id: Option<String>,
+    pub tracking_analytics_account_id: String,
 }
 
 impl Part for ChannelSettings {}
-impl RequestValue for ChannelSettings {}
-impl ResponseResult for ChannelSettings {}
-impl cmn::Resource for ChannelSettings {}
 
-impl ChannelSettings {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.description.is_some() { r = r + "description,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        if self.moderate_comments.is_some() { r = r + "moderateComments,"; }
-        if self.show_browse_view.is_some() { r = r + "showBrowseView,"; }
-        if self.featured_channels_title.is_some() { r = r + "featuredChannelsTitle,"; }
-        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
-        if self.unsubscribed_trailer.is_some() { r = r + "unsubscribedTrailer,"; }
-        if self.featured_channels_urls.is_some() { r = r + "featuredChannelsUrls,"; }
-        if self.profile_color.is_some() { r = r + "profileColor,"; }
-        if self.default_tab.is_some() { r = r + "defaultTab,"; }
-        if self.keywords.is_some() { r = r + "keywords,"; }
-        if self.show_related_channels.is_some() { r = r + "showRelatedChannels,"; }
-        if self.tracking_analytics_account_id.is_some() { r = r + "trackingAnalyticsAccountId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Basic details about a search result, including title, description and thumbnails of the item referenced by the search result.
 /// 
@@ -1000,26 +827,25 @@ impl ChannelSettings {
 pub struct SearchResultSnippet {
     /// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.    
     #[serde(alias="liveBroadcastContent")]
-    pub live_broadcast_content: Option<String>,
+    pub live_broadcast_content: String,
     /// A description of the search result.    
-    pub description: Option<String>,
+    pub description: String,
     /// The title of the search result.    
-    pub title: Option<String>,
+    pub title: String,
     /// A map of thumbnail images associated with the search result. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
+    pub thumbnails: ThumbnailDetails,
     /// The value that YouTube uses to uniquely identify the channel that published the resource that the search result identifies.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The creation date and time of the resource that the search result identifies. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="publishedAt")]
-    pub published_at: Option<String>,
+    pub published_at: String,
     /// The title of the channel that published the resource that the search result identifies.    
     #[serde(alias="channelTitle")]
-    pub channel_title: Option<String>,
+    pub channel_title: String,
 }
 
 impl Part for SearchResultSnippet {}
-impl ResponseResult for SearchResultSnippet {}
 
 
 /// Describes information necessary for ingesting an RTMP or an HTTP stream.
@@ -1030,37 +856,21 @@ impl ResponseResult for SearchResultSnippet {}
 pub struct IngestionInfo {
     /// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.    
     #[serde(alias="backupIngestionAddress")]
-    pub backup_ingestion_address: Option<String>,
+    pub backup_ingestion_address: String,
     /// The HTTP or RTMP stream name that YouTube assigns to the video stream.    
     #[serde(alias="streamName")]
-    pub stream_name: Option<String>,
+    pub stream_name: String,
     /// The primary ingestion URL that you should use to stream video to YouTube. You must stream video to this URL.
     /// 
     /// Depending on which application or tool you use to encode your video stream, you may need to enter the stream URL and stream name separately or you may need to concatenate them in the following format:
     /// 
     /// STREAM_URL/STREAM_NAME
     #[serde(alias="ingestionAddress")]
-    pub ingestion_address: Option<String>,
+    pub ingestion_address: String,
 }
 
 impl Part for IngestionInfo {}
-impl RequestValue for IngestionInfo {}
-impl ResponseResult for IngestionInfo {}
-impl cmn::Resource for IngestionInfo {}
 
-impl IngestionInfo {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.backup_ingestion_address.is_some() { r = r + "backupIngestionAddress,"; }
-        if self.stream_name.is_some() { r = r + "streamName,"; }
-        if self.ingestion_address.is_some() { r = r + "ingestionAddress,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Brief description of the live stream cdn settings.
 /// 
@@ -1069,33 +879,17 @@ impl IngestionInfo {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CdnSettings {
     /// The format of the video stream that you are sending to Youtube.    
-    pub format: Option<String>,
+    pub format: String,
     /// The ingestionInfo object contains information that YouTube provides that you need to transmit your RTMP or HTTP stream to YouTube.    
     #[serde(alias="ingestionInfo")]
-    pub ingestion_info: Option<IngestionInfo>,
+    pub ingestion_info: IngestionInfo,
     /// The method or protocol used to transmit the video stream.    
     #[serde(alias="ingestionType")]
-    pub ingestion_type: Option<String>,
+    pub ingestion_type: String,
 }
 
 impl Part for CdnSettings {}
-impl RequestValue for CdnSettings {}
-impl ResponseResult for CdnSettings {}
-impl cmn::Resource for CdnSettings {}
 
-impl CdnSettings {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.format.is_some() { r = r + "format,"; }
-        if self.ingestion_info.is_some() { r = r + "ingestionInfo,"; }
-        if self.ingestion_type.is_some() { r = r + "ingestionType,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -1110,16 +904,16 @@ impl CdnSettings {
 pub struct VideoGetRatingResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// A list of ratings that match the request criteria.    
-    pub items: Option<Vec<VideoRating>>,
+    pub items: Vec<VideoRating>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoGetRatingResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
 }
 
 impl ResponseResult for VideoGetRatingResponse {}
@@ -1132,16 +926,15 @@ impl ResponseResult for VideoGetRatingResponse {}
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoCategorySnippet {
     /// no description provided    
-    pub assignable: Option<bool>,
+    pub assignable: bool,
     /// The YouTube channel that created the video category.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The video category's title.    
-    pub title: Option<String>,
+    pub title: String,
 }
 
 impl Part for VideoCategorySnippet {}
-impl ResponseResult for VideoCategorySnippet {}
 
 
 /// Details about a resource which was added to a channel.
@@ -1152,24 +945,11 @@ impl ResponseResult for VideoCategorySnippet {}
 pub struct ActivityContentDetailsChannelItem {
     /// The resourceId object contains information that identifies the resource that was added to the channel.    
     #[serde(alias="resourceId")]
-    pub resource_id: Option<ResourceId>,
+    pub resource_id: ResourceId,
 }
 
 impl Part for ActivityContentDetailsChannelItem {}
-impl RequestValue for ActivityContentDetailsChannelItem {}
-impl ResponseResult for ActivityContentDetailsChannelItem {}
 
-impl ActivityContentDetailsChannelItem {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.resource_id.is_some() { r = r + "resourceId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -1179,54 +959,32 @@ impl ActivityContentDetailsChannelItem {
 pub struct LiveBroadcastSnippet {
     /// The date and time that the broadcast actually ended. This information is only available once the broadcast's state is complete. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="actualEndTime")]
-    pub actual_end_time: Option<String>,
+    pub actual_end_time: String,
     /// The broadcast's description. As with the title, you can set this field by modifying the broadcast resource or by setting the description field of the corresponding video resource.    
-    pub description: Option<String>,
+    pub description: String,
     /// The broadcast's title. Note that the broadcast represents exactly one YouTube video. You can set this field by modifying the broadcast resource or by setting the title field of the corresponding video resource.    
-    pub title: Option<String>,
+    pub title: String,
     /// The ID that YouTube uses to uniquely identify the channel that is publishing the broadcast.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The date and time that the broadcast was added to YouTube's live broadcast schedule. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="publishedAt")]
-    pub published_at: Option<String>,
+    pub published_at: String,
     /// The date and time that the broadcast is scheduled to start. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="scheduledStartTime")]
-    pub scheduled_start_time: Option<String>,
+    pub scheduled_start_time: String,
     /// The date and time that the broadcast actually started. This information is only available once the broadcast's state is live. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="actualStartTime")]
-    pub actual_start_time: Option<String>,
+    pub actual_start_time: String,
     /// The date and time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="scheduledEndTime")]
-    pub scheduled_end_time: Option<String>,
+    pub scheduled_end_time: String,
     /// A map of thumbnail images associated with the broadcast. For each nested object in this object, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
+    pub thumbnails: ThumbnailDetails,
 }
 
 impl Part for LiveBroadcastSnippet {}
-impl RequestValue for LiveBroadcastSnippet {}
-impl ResponseResult for LiveBroadcastSnippet {}
-impl cmn::Resource for LiveBroadcastSnippet {}
 
-impl LiveBroadcastSnippet {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.actual_end_time.is_some() { r = r + "actualEndTime,"; }
-        if self.description.is_some() { r = r + "description,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        if self.channel_id.is_some() { r = r + "channelId,"; }
-        if self.published_at.is_some() { r = r + "publishedAt,"; }
-        if self.scheduled_start_time.is_some() { r = r + "scheduledStartTime,"; }
-        if self.actual_start_time.is_some() { r = r + "actualStartTime,"; }
-        if self.scheduled_end_time.is_some() { r = r + "scheduledEndTime,"; }
-        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Basic details about a subscription, including title, description and thumbnails of the subscribed item.
 /// 
@@ -1235,47 +993,27 @@ impl LiveBroadcastSnippet {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionSnippet {
     /// The subscription's details.    
-    pub description: Option<String>,
+    pub description: String,
     /// The subscription's title.    
-    pub title: Option<String>,
+    pub title: String,
     /// The id object contains information about the channel that the user subscribed to.    
     #[serde(alias="resourceId")]
-    pub resource_id: Option<ResourceId>,
+    pub resource_id: ResourceId,
     /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
+    pub thumbnails: ThumbnailDetails,
     /// The ID that YouTube uses to uniquely identify the subscriber's channel.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The date and time that the subscription was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="publishedAt")]
-    pub published_at: Option<String>,
+    pub published_at: String,
     /// Channel title for the channel that the subscription belongs to.    
     #[serde(alias="channelTitle")]
-    pub channel_title: Option<String>,
+    pub channel_title: String,
 }
 
 impl Part for SubscriptionSnippet {}
-impl RequestValue for SubscriptionSnippet {}
-impl ResponseResult for SubscriptionSnippet {}
-impl cmn::Resource for SubscriptionSnippet {}
 
-impl SubscriptionSnippet {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.description.is_some() { r = r + "description,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        if self.resource_id.is_some() { r = r + "resourceId,"; }
-        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
-        if self.channel_id.is_some() { r = r + "channelId,"; }
-        if self.published_at.is_some() { r = r + "publishedAt,"; }
-        if self.channel_title.is_some() { r = r + "channelTitle,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Details about a channelsection, including playlists and channels.
 /// 
@@ -1284,28 +1022,13 @@ impl SubscriptionSnippet {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionContentDetails {
     /// The channel ids for type multiple_channels.    
-    pub channels: Option<Vec<String>>,
+    pub channels: Vec<String>,
     /// The playlist ids for type single_playlist and multiple_playlists. For singlePlaylist, only one playlistId is allowed.    
-    pub playlists: Option<Vec<String>>,
+    pub playlists: Vec<String>,
 }
 
 impl Part for ChannelSectionContentDetails {}
-impl RequestValue for ChannelSectionContentDetails {}
-impl ResponseResult for ChannelSectionContentDetails {}
-impl cmn::Resource for ChannelSectionContentDetails {}
 
-impl ChannelSectionContentDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.channels.is_some() { r = r + "channels,"; }
-        if self.playlists.is_some() { r = r + "playlists,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -1320,16 +1043,16 @@ impl ChannelSectionContentDetails {
 pub struct I18nRegionListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// A list of regions where YouTube is available. In this map, the i18n region ID is the map key, and its value is the corresponding i18nRegion resource.    
-    pub items: Option<Vec<I18nRegion>>,
+    pub items: Vec<I18nRegion>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nRegionListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
 }
 
 impl ResponseResult for I18nRegionListResponse {}
@@ -1348,28 +1071,28 @@ impl ResponseResult for I18nRegionListResponse {}
 pub struct LiveStreamListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
     #[serde(alias="nextPageToken")]
-    pub next_page_token: Option<String>,
+    pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveStreamListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
     /// A list of live streams that match the request criteria.    
-    pub items: Option<Vec<LiveStream>>,
+    pub items: Vec<LiveStream>,
     /// no description provided    
     #[serde(alias="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub token_pagination: TokenPagination,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
     #[serde(alias="prevPageToken")]
-    pub prev_page_token: Option<String>,
+    pub prev_page_token: String,
     /// no description provided    
     #[serde(alias="pageInfo")]
-    pub page_info: Option<PageInfo>,
+    pub page_info: PageInfo,
 }
 
 impl ResponseResult for LiveStreamListResponse {}
@@ -1388,29 +1111,14 @@ pub struct LiveStreamContentDetails {
     /// - A non-reusable stream might be deleted by an automated process after the broadcast ends. 
     /// - The  liveStreams.list method does not list non-reusable streams if you call the method and set the mine parameter to true. The only way to use that method to retrieve the resource for a non-reusable stream is to use the id parameter to identify the stream.
     #[serde(alias="isReusable")]
-    pub is_reusable: Option<bool>,
+    pub is_reusable: bool,
     /// The ingestion URL where the closed captions of this stream are sent.    
     #[serde(alias="closedCaptionsIngestionUrl")]
-    pub closed_captions_ingestion_url: Option<String>,
+    pub closed_captions_ingestion_url: String,
 }
 
 impl Part for LiveStreamContentDetails {}
-impl RequestValue for LiveStreamContentDetails {}
-impl ResponseResult for LiveStreamContentDetails {}
-impl cmn::Resource for LiveStreamContentDetails {}
 
-impl LiveStreamContentDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.is_reusable.is_some() { r = r + "isReusable,"; }
-        if self.closed_captions_ingestion_url.is_some() { r = r + "closedCaptionsIngestionUrl,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Basic details about an i18n language, such as language code and human-readable name.
 /// 
@@ -1419,14 +1127,12 @@ impl LiveStreamContentDetails {
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nLanguageSnippet {
     /// The human-readable name of the language in the language itself.    
-    pub name: Option<String>,
+    pub name: String,
     /// A short BCP-47 code that uniquely identifies a language.    
-    pub hl: Option<String>,
+    pub hl: String,
 }
 
 impl Part for I18nLanguageSnippet {}
-impl ResponseResult for I18nLanguageSnippet {}
-impl cmn::Resource for I18nLanguageSnippet {}
 
 
 /// There is no detailed description.
@@ -1481,25 +1187,11 @@ impl InvideoBranding {
 pub struct PlaylistItemStatus {
     /// This resource's privacy status.    
     #[serde(alias="privacyStatus")]
-    pub privacy_status: Option<String>,
+    pub privacy_status: String,
 }
 
 impl Part for PlaylistItemStatus {}
-impl RequestValue for PlaylistItemStatus {}
-impl ResponseResult for PlaylistItemStatus {}
-impl cmn::Resource for PlaylistItemStatus {}
 
-impl PlaylistItemStatus {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.privacy_status.is_some() { r = r + "privacyStatus,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
 /// 
@@ -1508,29 +1200,14 @@ impl PlaylistItemStatus {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelConversionPing {
     /// Defines the context of the ping.    
-    pub context: Option<String>,
+    pub context: String,
     /// The url (without the schema) that the player shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D cview%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.    
     #[serde(alias="conversionUrl")]
-    pub conversion_url: Option<String>,
+    pub conversion_url: String,
 }
 
 impl Part for ChannelConversionPing {}
-impl RequestValue for ChannelConversionPing {}
-impl ResponseResult for ChannelConversionPing {}
-impl cmn::Resource for ChannelConversionPing {}
 
-impl ChannelConversionPing {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.context.is_some() { r = r + "context,"; }
-        if self.conversion_url.is_some() { r = r + "conversionUrl,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Project specific details about the content of a YouTube Video.
 /// 
@@ -1539,25 +1216,11 @@ impl ChannelConversionPing {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoProjectDetails {
     /// A list of project tags associated with the video during the upload.    
-    pub tags: Option<Vec<String>>,
+    pub tags: Vec<String>,
 }
 
 impl Part for VideoProjectDetails {}
-impl RequestValue for VideoProjectDetails {}
-impl ResponseResult for VideoProjectDetails {}
-impl cmn::Resource for VideoProjectDetails {}
 
-impl VideoProjectDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.tags.is_some() { r = r + "tags,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A playlistItem resource identifies another resource, such as a video, that is included in a playlist. In addition, the playlistItem  resource contains details about the included resource that pertain specifically to how that resource is used in that playlist.
 /// 
@@ -1631,28 +1294,28 @@ impl PlaylistItem {
 pub struct GuideCategoryListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
     #[serde(alias="nextPageToken")]
-    pub next_page_token: Option<String>,
+    pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#guideCategoryListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
     /// A list of categories that can be associated with YouTube channels. In this map, the category ID is the map key, and its value is the corresponding guideCategory resource.    
-    pub items: Option<Vec<GuideCategory>>,
+    pub items: Vec<GuideCategory>,
     /// no description provided    
     #[serde(alias="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub token_pagination: TokenPagination,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
     #[serde(alias="prevPageToken")]
-    pub prev_page_token: Option<String>,
+    pub prev_page_token: String,
     /// no description provided    
     #[serde(alias="pageInfo")]
-    pub page_info: Option<PageInfo>,
+    pub page_info: PageInfo,
 }
 
 impl ResponseResult for GuideCategoryListResponse {}
@@ -1665,28 +1328,13 @@ impl ResponseResult for GuideCategoryListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoLocalization {
     /// Localized version of the video's description.    
-    pub description: Option<String>,
+    pub description: String,
     /// Localized version of the video's title.    
-    pub title: Option<String>,
+    pub title: String,
 }
 
 impl Part for VideoLocalization {}
-impl RequestValue for VideoLocalization {}
-impl ResponseResult for VideoLocalization {}
-impl cmn::Resource for VideoLocalization {}
 
-impl VideoLocalization {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.description.is_some() { r = r + "description,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Basic details about a channel section, including title, style and position.
 /// 
@@ -1695,46 +1343,26 @@ impl VideoLocalization {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionSnippet {
     /// The style of the channel section.    
-    pub style: Option<String>,
+    pub style: String,
     /// Localized title, read-only.    
-    pub localized: Option<ChannelSectionLocalization>,
+    pub localized: ChannelSectionLocalization,
     /// The channel section's title for multiple_playlists and multiple_channels.    
-    pub title: Option<String>,
+    pub title: String,
     /// The position of the channel section in the channel.    
-    pub position: Option<u32>,
+    pub position: u32,
     /// The ID that YouTube uses to uniquely identify the channel that published the channel section.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The type of the channel section.    
     #[serde(alias="type")]
-    pub type_: Option<String>,
+    pub type_: String,
     /// The language of the channel section's default title and description.    
     #[serde(alias="defaultLanguage")]
-    pub default_language: Option<String>,
+    pub default_language: String,
 }
 
 impl Part for ChannelSectionSnippet {}
-impl RequestValue for ChannelSectionSnippet {}
-impl ResponseResult for ChannelSectionSnippet {}
-impl cmn::Resource for ChannelSectionSnippet {}
 
-impl ChannelSectionSnippet {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.style.is_some() { r = r + "style,"; }
-        if self.localized.is_some() { r = r + "localized,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        if self.position.is_some() { r = r + "position,"; }
-        if self.channel_id.is_some() { r = r + "channelId,"; }
-        if self.type_.is_some() { r = r + "type,"; }
-        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Details about the content of a channel.
 /// 
@@ -1744,29 +1372,14 @@ impl ChannelSectionSnippet {
 pub struct ChannelContentDetails {
     /// no description provided    
     #[serde(alias="relatedPlaylists")]
-    pub related_playlists: Option<ChannelContentDetailsRelatedPlaylists>,
+    pub related_playlists: ChannelContentDetailsRelatedPlaylists,
     /// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.    
     #[serde(alias="googlePlusUserId")]
-    pub google_plus_user_id: Option<String>,
+    pub google_plus_user_id: String,
 }
 
 impl Part for ChannelContentDetails {}
-impl RequestValue for ChannelContentDetails {}
-impl ResponseResult for ChannelContentDetails {}
-impl cmn::Resource for ChannelContentDetails {}
 
-impl ChannelContentDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.related_playlists.is_some() { r = r + "relatedPlaylists,"; }
-        if self.google_plus_user_id.is_some() { r = r + "googlePlusUserId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Stub token pagination template to suppress results.
 /// 
@@ -1776,7 +1389,6 @@ impl ChannelContentDetails {
 pub struct TokenPagination;
 
 impl Part for TokenPagination {}
-impl ResponseResult for TokenPagination {}
 
 
 /// A i18nRegion resource identifies a region where YouTube is available.
@@ -1800,7 +1412,6 @@ pub struct I18nRegion {
     pub id: Option<String>,
 }
 
-impl ResponseResult for I18nRegion {}
 impl cmn::Resource for I18nRegion {}
 
 
@@ -1811,37 +1422,19 @@ impl cmn::Resource for I18nRegion {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ThumbnailDetails {
     /// The default image for this resource.    
-    pub default: Option<Thumbnail>,
+    pub default: Thumbnail,
     /// The high quality image for this resource.    
-    pub high: Option<Thumbnail>,
+    pub high: Thumbnail,
     /// The medium quality image for this resource.    
-    pub medium: Option<Thumbnail>,
+    pub medium: Thumbnail,
     /// The maximum resolution quality image for this resource.    
-    pub maxres: Option<Thumbnail>,
+    pub maxres: Thumbnail,
     /// The standard quality image for this resource.    
-    pub standard: Option<Thumbnail>,
+    pub standard: Thumbnail,
 }
 
 impl Part for ThumbnailDetails {}
-impl RequestValue for ThumbnailDetails {}
-impl ResponseResult for ThumbnailDetails {}
-impl cmn::Resource for ThumbnailDetails {}
 
-impl ThumbnailDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.default.is_some() { r = r + "default,"; }
-        if self.high.is_some() { r = r + "high,"; }
-        if self.medium.is_some() { r = r + "medium,"; }
-        if self.maxres.is_some() { r = r + "maxres,"; }
-        if self.standard.is_some() { r = r + "standard,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Details about monetization of a YouTube Video.
 /// 
@@ -1850,25 +1443,11 @@ impl ThumbnailDetails {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoMonetizationDetails {
     /// The value of access indicates whether the video can be monetized or not.    
-    pub access: Option<AccessPolicy>,
+    pub access: AccessPolicy,
 }
 
 impl Part for VideoMonetizationDetails {}
-impl RequestValue for VideoMonetizationDetails {}
-impl ResponseResult for VideoMonetizationDetails {}
-impl cmn::Resource for VideoMonetizationDetails {}
 
-impl VideoMonetizationDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.access.is_some() { r = r + "access,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Information that identifies the recommended resource.
 /// 
@@ -1878,31 +1457,16 @@ impl VideoMonetizationDetails {
 pub struct ActivityContentDetailsRecommendation {
     /// The resourceId object contains information that identifies the recommended resource.    
     #[serde(alias="resourceId")]
-    pub resource_id: Option<ResourceId>,
+    pub resource_id: ResourceId,
     /// The reason that the resource is recommended to the user.    
-    pub reason: Option<String>,
+    pub reason: String,
     /// The seedResourceId object contains information about the resource that caused the recommendation.    
     #[serde(alias="seedResourceId")]
-    pub seed_resource_id: Option<ResourceId>,
+    pub seed_resource_id: ResourceId,
 }
 
 impl Part for ActivityContentDetailsRecommendation {}
-impl RequestValue for ActivityContentDetailsRecommendation {}
-impl ResponseResult for ActivityContentDetailsRecommendation {}
 
-impl ActivityContentDetailsRecommendation {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.resource_id.is_some() { r = r + "resourceId,"; }
-        if self.reason.is_some() { r = r + "reason,"; }
-        if self.seed_resource_id.is_some() { r = r + "seedResourceId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Recording information associated with the video.
 /// 
@@ -1912,32 +1476,16 @@ impl ActivityContentDetailsRecommendation {
 pub struct VideoRecordingDetails {
     /// The date and time when the video was recorded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.    
     #[serde(alias="recordingDate")]
-    pub recording_date: Option<String>,
+    pub recording_date: String,
     /// The text description of the location where the video was recorded.    
     #[serde(alias="locationDescription")]
-    pub location_description: Option<String>,
+    pub location_description: String,
     /// The geolocation information associated with the video.    
-    pub location: Option<GeoPoint>,
+    pub location: GeoPoint,
 }
 
 impl Part for VideoRecordingDetails {}
-impl RequestValue for VideoRecordingDetails {}
-impl ResponseResult for VideoRecordingDetails {}
-impl cmn::Resource for VideoRecordingDetails {}
 
-impl VideoRecordingDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.recording_date.is_some() { r = r + "recordingDate,"; }
-        if self.location_description.is_some() { r = r + "locationDescription,"; }
-        if self.location.is_some() { r = r + "location,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Information about a channel that a user subscribed to.
 /// 
@@ -1947,24 +1495,11 @@ impl VideoRecordingDetails {
 pub struct ActivityContentDetailsSubscription {
     /// The resourceId object contains information that identifies the resource that the user subscribed to.    
     #[serde(alias="resourceId")]
-    pub resource_id: Option<ResourceId>,
+    pub resource_id: ResourceId,
 }
 
 impl Part for ActivityContentDetailsSubscription {}
-impl RequestValue for ActivityContentDetailsSubscription {}
-impl ResponseResult for ActivityContentDetailsSubscription {}
 
-impl ActivityContentDetailsSubscription {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.resource_id.is_some() { r = r + "resourceId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.
 /// 
@@ -1973,25 +1508,11 @@ impl ActivityContentDetailsSubscription {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelConversionPings {
     /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.    
-    pub pings: Option<Vec<ChannelConversionPing>>,
+    pub pings: Vec<ChannelConversionPing>,
 }
 
 impl Part for ChannelConversionPings {}
-impl RequestValue for ChannelConversionPings {}
-impl ResponseResult for ChannelConversionPings {}
-impl cmn::Resource for ChannelConversionPings {}
 
-impl ChannelConversionPings {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.pings.is_some() { r = r + "pings,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Details about the content of an activity: the video that was shared, the channel that was subscribed to, etc.
 /// 
@@ -2000,57 +1521,34 @@ impl ChannelConversionPings {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetails {
     /// The comment object contains information about a resource that received a comment. This property is only present if the snippet.type is comment.    
-    pub comment: Option<ActivityContentDetailsComment>,
+    pub comment: ActivityContentDetailsComment,
     /// The playlistItem object contains information about a new playlist item. This property is only present if the snippet.type is playlistItem.    
     #[serde(alias="playlistItem")]
-    pub playlist_item: Option<ActivityContentDetailsPlaylistItem>,
+    pub playlist_item: ActivityContentDetailsPlaylistItem,
     /// The like object contains information about a resource that received a positive (like) rating. This property is only present if the snippet.type is like.    
-    pub like: Option<ActivityContentDetailsLike>,
+    pub like: ActivityContentDetailsLike,
     /// The promotedItem object contains details about a resource which is being promoted. This property is only present if the snippet.type is promotedItem.    
     #[serde(alias="promotedItem")]
-    pub promoted_item: Option<ActivityContentDetailsPromotedItem>,
+    pub promoted_item: ActivityContentDetailsPromotedItem,
     /// The recommendation object contains information about a recommended resource. This property is only present if the snippet.type is recommendation.    
-    pub recommendation: Option<ActivityContentDetailsRecommendation>,
+    pub recommendation: ActivityContentDetailsRecommendation,
     /// The favorite object contains information about a video that was marked as a favorite video. This property is only present if the snippet.type is favorite.    
-    pub favorite: Option<ActivityContentDetailsFavorite>,
+    pub favorite: ActivityContentDetailsFavorite,
     /// The upload object contains information about the uploaded video. This property is only present if the snippet.type is upload.    
-    pub upload: Option<ActivityContentDetailsUpload>,
+    pub upload: ActivityContentDetailsUpload,
     /// The social object contains details about a social network post. This property is only present if the snippet.type is social.    
-    pub social: Option<ActivityContentDetailsSocial>,
+    pub social: ActivityContentDetailsSocial,
     /// The channelItem object contains details about a resource which was added to a channel. This property is only present if the snippet.type is channelItem.    
     #[serde(alias="channelItem")]
-    pub channel_item: Option<ActivityContentDetailsChannelItem>,
+    pub channel_item: ActivityContentDetailsChannelItem,
     /// The bulletin object contains details about a channel bulletin post. This object is only present if the snippet.type is bulletin.    
-    pub bulletin: Option<ActivityContentDetailsBulletin>,
+    pub bulletin: ActivityContentDetailsBulletin,
     /// The subscription object contains information about a channel that a user subscribed to. This property is only present if the snippet.type is subscription.    
-    pub subscription: Option<ActivityContentDetailsSubscription>,
+    pub subscription: ActivityContentDetailsSubscription,
 }
 
 impl Part for ActivityContentDetails {}
-impl RequestValue for ActivityContentDetails {}
-impl ResponseResult for ActivityContentDetails {}
 
-impl ActivityContentDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.comment.is_some() { r = r + "comment,"; }
-        if self.playlist_item.is_some() { r = r + "playlistItem,"; }
-        if self.like.is_some() { r = r + "like,"; }
-        if self.promoted_item.is_some() { r = r + "promotedItem,"; }
-        if self.recommendation.is_some() { r = r + "recommendation,"; }
-        if self.favorite.is_some() { r = r + "favorite,"; }
-        if self.upload.is_some() { r = r + "upload,"; }
-        if self.social.is_some() { r = r + "social,"; }
-        if self.channel_item.is_some() { r = r + "channelItem,"; }
-        if self.bulletin.is_some() { r = r + "bulletin,"; }
-        if self.subscription.is_some() { r = r + "subscription,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -2065,28 +1563,28 @@ impl ActivityContentDetails {
 pub struct PlaylistListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
     #[serde(alias="nextPageToken")]
-    pub next_page_token: Option<String>,
+    pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
     /// A list of playlists that match the request criteria.    
-    pub items: Option<Vec<Playlist>>,
+    pub items: Vec<Playlist>,
     /// no description provided    
     #[serde(alias="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub token_pagination: TokenPagination,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
     #[serde(alias="prevPageToken")]
-    pub prev_page_token: Option<String>,
+    pub prev_page_token: String,
     /// no description provided    
     #[serde(alias="pageInfo")]
-    pub page_info: Option<PageInfo>,
+    pub page_info: PageInfo,
 }
 
 impl ResponseResult for PlaylistListResponse {}
@@ -2099,37 +1597,20 @@ impl ResponseResult for PlaylistListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItemContentDetails {
     /// A user-generated note for this item.    
-    pub note: Option<String>,
+    pub note: String,
     /// The time, measured in seconds from the start of the video, when the video should start playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) The default value is 0.    
     #[serde(alias="startAt")]
-    pub start_at: Option<String>,
+    pub start_at: String,
     /// The time, measured in seconds from the start of the video, when the video should stop playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) By default, assume that the video.endTime is the end of the video.    
     #[serde(alias="endAt")]
-    pub end_at: Option<String>,
+    pub end_at: String,
     /// The ID that YouTube uses to uniquely identify a video. To retrieve the video resource, set the id query parameter to this value in your API request.    
     #[serde(alias="videoId")]
-    pub video_id: Option<String>,
+    pub video_id: String,
 }
 
 impl Part for PlaylistItemContentDetails {}
-impl RequestValue for PlaylistItemContentDetails {}
-impl ResponseResult for PlaylistItemContentDetails {}
-impl cmn::Resource for PlaylistItemContentDetails {}
 
-impl PlaylistItemContentDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.note.is_some() { r = r + "note,"; }
-        if self.start_at.is_some() { r = r + "startAt,"; }
-        if self.end_at.is_some() { r = r + "endAt,"; }
-        if self.video_id.is_some() { r = r + "videoId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.
 /// 
@@ -2139,29 +1620,14 @@ impl PlaylistItemContentDetails {
 pub struct ChannelContentOwnerDetails {
     /// The ID of the content owner linked to the channel.    
     #[serde(alias="contentOwner")]
-    pub content_owner: Option<String>,
+    pub content_owner: String,
     /// The date and time of when the channel was linked to the content owner. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="timeLinked")]
-    pub time_linked: Option<String>,
+    pub time_linked: String,
 }
 
 impl Part for ChannelContentOwnerDetails {}
-impl RequestValue for ChannelContentOwnerDetails {}
-impl ResponseResult for ChannelContentOwnerDetails {}
-impl cmn::Resource for ChannelContentOwnerDetails {}
 
-impl ChannelContentOwnerDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.content_owner.is_some() { r = r + "contentOwner,"; }
-        if self.time_linked.is_some() { r = r + "timeLinked,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Describes processing status and progress and availability of some other Video resource parts.
 /// 
@@ -2171,53 +1637,32 @@ impl ChannelContentOwnerDetails {
 pub struct VideoProcessingDetails {
     /// This value indicates whether file details are available for the uploaded video. You can retrieve a video's file details by requesting the fileDetails part in your videos.list() request.    
     #[serde(alias="fileDetailsAvailability")]
-    pub file_details_availability: Option<String>,
+    pub file_details_availability: String,
     /// This value indicates whether video editing suggestions, which might improve video quality or the playback experience, are available for the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.    
     #[serde(alias="editorSuggestionsAvailability")]
-    pub editor_suggestions_availability: Option<String>,
+    pub editor_suggestions_availability: String,
     /// The video's processing status. This value indicates whether YouTube was able to process the video or if the video is still being processed.    
     #[serde(alias="processingStatus")]
-    pub processing_status: Option<String>,
+    pub processing_status: String,
     /// This value indicates whether the video processing engine has generated suggestions that might improve YouTube's ability to process the the video, warnings that explain video processing problems, or errors that cause video processing problems. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.    
     #[serde(alias="processingIssuesAvailability")]
-    pub processing_issues_availability: Option<String>,
+    pub processing_issues_availability: String,
     /// The reason that YouTube failed to process the video. This property will only have a value if the processingStatus property's value is failed.    
     #[serde(alias="processingFailureReason")]
-    pub processing_failure_reason: Option<String>,
+    pub processing_failure_reason: String,
     /// This value indicates whether thumbnail images have been generated for the video.    
     #[serde(alias="thumbnailsAvailability")]
-    pub thumbnails_availability: Option<String>,
+    pub thumbnails_availability: String,
     /// The processingProgress object contains information about the progress YouTube has made in processing the video. The values are really only relevant if the video's processing status is processing.    
     #[serde(alias="processingProgress")]
-    pub processing_progress: Option<VideoProcessingDetailsProcessingProgress>,
+    pub processing_progress: VideoProcessingDetailsProcessingProgress,
     /// This value indicates whether keyword (tag) suggestions are available for the video. Tags can be added to a video's metadata to make it easier for other users to find the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.    
     #[serde(alias="tagSuggestionsAvailability")]
-    pub tag_suggestions_availability: Option<String>,
+    pub tag_suggestions_availability: String,
 }
 
 impl Part for VideoProcessingDetails {}
-impl RequestValue for VideoProcessingDetails {}
-impl ResponseResult for VideoProcessingDetails {}
-impl cmn::Resource for VideoProcessingDetails {}
 
-impl VideoProcessingDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.file_details_availability.is_some() { r = r + "fileDetailsAvailability,"; }
-        if self.editor_suggestions_availability.is_some() { r = r + "editorSuggestionsAvailability,"; }
-        if self.processing_status.is_some() { r = r + "processingStatus,"; }
-        if self.processing_issues_availability.is_some() { r = r + "processingIssuesAvailability,"; }
-        if self.processing_failure_reason.is_some() { r = r + "processingFailureReason,"; }
-        if self.thumbnails_availability.is_some() { r = r + "thumbnailsAvailability,"; }
-        if self.processing_progress.is_some() { r = r + "processingProgress,"; }
-        if self.tag_suggestions_availability.is_some() { r = r + "tagSuggestionsAvailability,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -2227,37 +1672,20 @@ impl VideoProcessingDetails {
 pub struct LiveBroadcastStatus {
     /// The broadcast's recording status.    
     #[serde(alias="recordingStatus")]
-    pub recording_status: Option<String>,
+    pub recording_status: String,
     /// The broadcast's privacy status. Note that the broadcast represents exactly one YouTube video, so the privacy settings are identical to those supported for videos. In addition, you can set this field by modifying the broadcast resource or by setting the privacyStatus field of the corresponding video resource.    
     #[serde(alias="privacyStatus")]
-    pub privacy_status: Option<String>,
+    pub privacy_status: String,
     /// The broadcast's status. The status can be updated using the API's liveBroadcasts.transition method.    
     #[serde(alias="lifeCycleStatus")]
-    pub life_cycle_status: Option<String>,
+    pub life_cycle_status: String,
     /// Priority of the live broadcast event (internal state).    
     #[serde(alias="liveBroadcastPriority")]
-    pub live_broadcast_priority: Option<String>,
+    pub live_broadcast_priority: String,
 }
 
 impl Part for LiveBroadcastStatus {}
-impl RequestValue for LiveBroadcastStatus {}
-impl ResponseResult for LiveBroadcastStatus {}
-impl cmn::Resource for LiveBroadcastStatus {}
 
-impl LiveBroadcastStatus {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.recording_status.is_some() { r = r + "recordingStatus,"; }
-        if self.privacy_status.is_some() { r = r + "privacyStatus,"; }
-        if self.life_cycle_status.is_some() { r = r + "lifeCycleStatus,"; }
-        if self.live_broadcast_priority.is_some() { r = r + "liveBroadcastPriority,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Details about the content to witch a subscription refers.
 /// 
@@ -2267,33 +1695,17 @@ impl LiveBroadcastStatus {
 pub struct SubscriptionContentDetails {
     /// The number of new items in the subscription since its content was last read.    
     #[serde(alias="newItemCount")]
-    pub new_item_count: Option<u32>,
+    pub new_item_count: u32,
     /// The type of activity this subscription is for (only uploads, everything).    
     #[serde(alias="activityType")]
-    pub activity_type: Option<String>,
+    pub activity_type: String,
     /// The approximate number of items that the subscription points to.    
     #[serde(alias="totalItemCount")]
-    pub total_item_count: Option<u32>,
+    pub total_item_count: u32,
 }
 
 impl Part for SubscriptionContentDetails {}
-impl RequestValue for SubscriptionContentDetails {}
-impl ResponseResult for SubscriptionContentDetails {}
-impl cmn::Resource for SubscriptionContentDetails {}
 
-impl SubscriptionContentDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.new_item_count.is_some() { r = r + "newItemCount,"; }
-        if self.activity_type.is_some() { r = r + "activityType,"; }
-        if self.total_item_count.is_some() { r = r + "totalItemCount,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A video resource represents a YouTube video.
 /// 
@@ -2404,31 +1816,15 @@ impl Video {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoPoint {
     /// Latitude in degrees.    
-    pub latitude: Option<f64>,
+    pub latitude: f64,
     /// Altitude above the reference ellipsoid, in meters.    
-    pub altitude: Option<f64>,
+    pub altitude: f64,
     /// Longitude in degrees.    
-    pub longitude: Option<f64>,
+    pub longitude: f64,
 }
 
 impl Part for GeoPoint {}
-impl RequestValue for GeoPoint {}
-impl ResponseResult for GeoPoint {}
-impl cmn::Resource for GeoPoint {}
 
-impl GeoPoint {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.latitude.is_some() { r = r + "latitude,"; }
-        if self.altitude.is_some() { r = r + "altitude,"; }
-        if self.longitude.is_some() { r = r + "longitude,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Branding properties of a YouTube channel.
 /// 
@@ -2437,34 +1833,17 @@ impl GeoPoint {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelBrandingSettings {
     /// Branding properties for branding images.    
-    pub image: Option<ImageSettings>,
+    pub image: ImageSettings,
     /// Branding properties for the watch page.    
-    pub watch: Option<WatchSettings>,
+    pub watch: WatchSettings,
     /// Branding properties for the channel view.    
-    pub channel: Option<ChannelSettings>,
+    pub channel: ChannelSettings,
     /// Additional experimental branding properties.    
-    pub hints: Option<Vec<PropertyValue>>,
+    pub hints: Vec<PropertyValue>,
 }
 
 impl Part for ChannelBrandingSettings {}
-impl RequestValue for ChannelBrandingSettings {}
-impl ResponseResult for ChannelBrandingSettings {}
-impl cmn::Resource for ChannelBrandingSettings {}
 
-impl ChannelBrandingSettings {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.image.is_some() { r = r + "image,"; }
-        if self.watch.is_some() { r = r + "watch,"; }
-        if self.channel.is_some() { r = r + "channel,"; }
-        if self.hints.is_some() { r = r + "hints,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Player to be used for a video playback.
 /// 
@@ -2474,25 +1853,11 @@ impl ChannelBrandingSettings {
 pub struct VideoPlayer {
     /// An <iframe> tag that embeds a player that will play the video.    
     #[serde(alias="embedHtml")]
-    pub embed_html: Option<String>,
+    pub embed_html: String,
 }
 
 impl Part for VideoPlayer {}
-impl RequestValue for VideoPlayer {}
-impl ResponseResult for VideoPlayer {}
-impl cmn::Resource for VideoPlayer {}
 
-impl VideoPlayer {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.embed_html.is_some() { r = r + "embedHtml,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Basic details about a channel, including title, description and thumbnails.
 /// 
@@ -2502,41 +1867,22 @@ impl VideoPlayer {
 pub struct ChannelSnippet {
     /// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="publishedAt")]
-    pub published_at: Option<String>,
+    pub published_at: String,
     /// The description of the channel.    
-    pub description: Option<String>,
+    pub description: String,
     /// The channel's title.    
-    pub title: Option<String>,
+    pub title: String,
     /// Localized title and description, read-only.    
-    pub localized: Option<ChannelLocalization>,
+    pub localized: ChannelLocalization,
     /// The language of the channel's default title and description.    
     #[serde(alias="defaultLanguage")]
-    pub default_language: Option<String>,
+    pub default_language: String,
     /// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
+    pub thumbnails: ThumbnailDetails,
 }
 
 impl Part for ChannelSnippet {}
-impl RequestValue for ChannelSnippet {}
-impl ResponseResult for ChannelSnippet {}
-impl cmn::Resource for ChannelSnippet {}
 
-impl ChannelSnippet {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.published_at.is_some() { r = r + "publishedAt,"; }
-        if self.description.is_some() { r = r + "description,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        if self.localized.is_some() { r = r + "localized,"; }
-        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
-        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Branding properties for the watch.
 /// 
@@ -2546,33 +1892,17 @@ impl ChannelSnippet {
 pub struct WatchSettings {
     /// The background color for the video watch page's branded area.    
     #[serde(alias="textColor")]
-    pub text_color: Option<String>,
+    pub text_color: String,
     /// An ID that uniquely identifies a playlist that displays next to the video player.    
     #[serde(alias="featuredPlaylistId")]
-    pub featured_playlist_id: Option<String>,
+    pub featured_playlist_id: String,
     /// The text color for the video watch page's branded area.    
     #[serde(alias="backgroundColor")]
-    pub background_color: Option<String>,
+    pub background_color: String,
 }
 
 impl Part for WatchSettings {}
-impl RequestValue for WatchSettings {}
-impl ResponseResult for WatchSettings {}
-impl cmn::Resource for WatchSettings {}
 
-impl WatchSettings {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.text_color.is_some() { r = r + "textColor,"; }
-        if self.featured_playlist_id.is_some() { r = r + "featuredPlaylistId,"; }
-        if self.background_color.is_some() { r = r + "backgroundColor,"; }
-        r.pop();
-        r
-    }
-}
 
 /// ChannelSection localization setting
 /// 
@@ -2581,25 +1911,11 @@ impl WatchSettings {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionLocalization {
     /// The localized strings for channel section's title.    
-    pub title: Option<String>,
+    pub title: String,
 }
 
 impl Part for ChannelSectionLocalization {}
-impl RequestValue for ChannelSectionLocalization {}
-impl ResponseResult for ChannelSectionLocalization {}
-impl cmn::Resource for ChannelSectionLocalization {}
 
-impl ChannelSectionLocalization {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.title.is_some() { r = r + "title,"; }
-        r.pop();
-        r
-    }
-}
 
 /// DEPRECATED Region restriction of the video.
 /// 
@@ -2608,28 +1924,13 @@ impl ChannelSectionLocalization {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoContentDetailsRegionRestriction {
     /// A list of region codes that identify countries where the video is viewable. If this property is present and a country is not listed in its value, then the video is blocked from appearing in that country. If this property is present and contains an empty list, the video is blocked in all countries.    
-    pub allowed: Option<Vec<String>>,
+    pub allowed: Vec<String>,
     /// A list of region codes that identify countries where the video is blocked. If this property is present and a country is not listed in its value, then the video is viewable in that country. If this property is present and contains an empty list, the video is viewable in all countries.    
-    pub blocked: Option<Vec<String>>,
+    pub blocked: Vec<String>,
 }
 
 impl Part for VideoContentDetailsRegionRestriction {}
-impl RequestValue for VideoContentDetailsRegionRestriction {}
-impl ResponseResult for VideoContentDetailsRegionRestriction {}
-impl cmn::Resource for VideoContentDetailsRegionRestriction {}
 
-impl VideoContentDetailsRegionRestriction {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.allowed.is_some() { r = r + "allowed,"; }
-        if self.blocked.is_some() { r = r + "blocked,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Details about the content of a YouTube Video.
 /// 
@@ -2638,50 +1939,29 @@ impl VideoContentDetailsRegionRestriction {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoContentDetails {
     /// The value of definition indicates whether the video is available in high definition or only in standard definition.    
-    pub definition: Option<String>,
+    pub definition: String,
     /// The countryRestriction object contains information about the countries where a video is (or is not) viewable.    
     #[serde(alias="countryRestriction")]
-    pub country_restriction: Option<AccessPolicy>,
+    pub country_restriction: AccessPolicy,
     /// Specifies the ratings that the video received under various rating schemes.    
     #[serde(alias="contentRating")]
-    pub content_rating: Option<ContentRating>,
+    pub content_rating: ContentRating,
     /// The value of captions indicates whether the video has captions or not.    
-    pub caption: Option<String>,
+    pub caption: String,
     /// The regionRestriction object contains information about the countries where a video is (or is not) viewable. The object will contain either the contentDetails.regionRestriction.allowed property or the contentDetails.regionRestriction.blocked property.    
     #[serde(alias="regionRestriction")]
-    pub region_restriction: Option<VideoContentDetailsRegionRestriction>,
+    pub region_restriction: VideoContentDetailsRegionRestriction,
     /// The length of the video. The tag value is an ISO 8601 duration in the format PT#M#S, in which the letters PT indicate that the value specifies a period of time, and the letters M and S refer to length in minutes and seconds, respectively. The # characters preceding the M and S letters are both integers that specify the number of minutes (or seconds) of the video. For example, a value of PT15M51S indicates that the video is 15 minutes and 51 seconds long.    
-    pub duration: Option<String>,
+    pub duration: String,
     /// The value of is_license_content indicates whether the video is licensed content.    
     #[serde(alias="licensedContent")]
-    pub licensed_content: Option<bool>,
+    pub licensed_content: bool,
     /// The value of dimension indicates whether the video is available in 3D or in 2D.    
-    pub dimension: Option<String>,
+    pub dimension: String,
 }
 
 impl Part for VideoContentDetails {}
-impl RequestValue for VideoContentDetails {}
-impl ResponseResult for VideoContentDetails {}
-impl cmn::Resource for VideoContentDetails {}
 
-impl VideoContentDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.definition.is_some() { r = r + "definition,"; }
-        if self.country_restriction.is_some() { r = r + "countryRestriction,"; }
-        if self.content_rating.is_some() { r = r + "contentRating,"; }
-        if self.caption.is_some() { r = r + "caption,"; }
-        if self.region_restriction.is_some() { r = r + "regionRestriction,"; }
-        if self.duration.is_some() { r = r + "duration,"; }
-        if self.licensed_content.is_some() { r = r + "licensedContent,"; }
-        if self.dimension.is_some() { r = r + "dimension,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Describes a single promoted item id. It is a union of various possible types.
 /// 
@@ -2691,37 +1971,20 @@ impl VideoContentDetails {
 pub struct PromotedItemId {
     /// If the promoted item represents a website, this field represents the url pointing to the website. This field will be present only if type has the value website.    
     #[serde(alias="websiteUrl")]
-    pub website_url: Option<String>,
+    pub website_url: String,
     /// If type is recentUpload, this field identifies the channel from which to take the recent upload. If missing, the channel is assumed to be the same channel for which the invideoPromotion is set.    
     #[serde(alias="recentlyUploadedBy")]
-    pub recently_uploaded_by: Option<String>,
+    pub recently_uploaded_by: String,
     /// Describes the type of the promoted item.    
     #[serde(alias="type")]
-    pub type_: Option<String>,
+    pub type_: String,
     /// If the promoted item represents a video, this field represents the unique YouTube ID identifying it. This field will be present only if type has the value video.    
     #[serde(alias="videoId")]
-    pub video_id: Option<String>,
+    pub video_id: String,
 }
 
 impl Part for PromotedItemId {}
-impl RequestValue for PromotedItemId {}
-impl ResponseResult for PromotedItemId {}
-impl cmn::Resource for PromotedItemId {}
 
-impl PromotedItemId {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.website_url.is_some() { r = r + "websiteUrl,"; }
-        if self.recently_uploaded_by.is_some() { r = r + "recentlyUploadedBy,"; }
-        if self.type_.is_some() { r = r + "type,"; }
-        if self.video_id.is_some() { r = r + "videoId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A subscription resource contains information about a YouTube user subscription. A subscription notifies a user when new videos are added to a channel or when another user takes one of several actions on YouTube, such as uploading a video, rating a video, or commenting on a video.
 /// 
@@ -2780,14 +2043,12 @@ impl Subscription {
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nRegionSnippet {
     /// The region code as a 2-letter ISO country code.    
-    pub gl: Option<String>,
+    pub gl: String,
     /// The human-readable name of the region.    
-    pub name: Option<String>,
+    pub name: String,
 }
 
 impl Part for I18nRegionSnippet {}
-impl ResponseResult for I18nRegionSnippet {}
-impl cmn::Resource for I18nRegionSnippet {}
 
 
 /// Information about a new playlist item.
@@ -2798,32 +2059,17 @@ impl cmn::Resource for I18nRegionSnippet {}
 pub struct ActivityContentDetailsPlaylistItem {
     /// The resourceId object contains information about the resource that was added to the playlist.    
     #[serde(alias="resourceId")]
-    pub resource_id: Option<ResourceId>,
+    pub resource_id: ResourceId,
     /// The value that YouTube uses to uniquely identify the playlist.    
     #[serde(alias="playlistId")]
-    pub playlist_id: Option<String>,
+    pub playlist_id: String,
     /// ID of the item within the playlist.    
     #[serde(alias="playlistItemId")]
-    pub playlist_item_id: Option<String>,
+    pub playlist_item_id: String,
 }
 
 impl Part for ActivityContentDetailsPlaylistItem {}
-impl RequestValue for ActivityContentDetailsPlaylistItem {}
-impl ResponseResult for ActivityContentDetailsPlaylistItem {}
 
-impl ActivityContentDetailsPlaylistItem {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.resource_id.is_some() { r = r + "resourceId,"; }
-        if self.playlist_id.is_some() { r = r + "playlistId,"; }
-        if self.playlist_item_id.is_some() { r = r + "playlistItemId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Describes the spatial position of a visual widget inside a video. It is a union of various position types, out of which only will be set one.
 /// 
@@ -2833,29 +2079,14 @@ impl ActivityContentDetailsPlaylistItem {
 pub struct InvideoPosition {
     /// Describes in which corner of the video the visual widget will appear.    
     #[serde(alias="cornerPosition")]
-    pub corner_position: Option<String>,
+    pub corner_position: String,
     /// Defines the position type.    
     #[serde(alias="type")]
-    pub type_: Option<String>,
+    pub type_: String,
 }
 
 impl Part for InvideoPosition {}
-impl RequestValue for InvideoPosition {}
-impl ResponseResult for InvideoPosition {}
-impl cmn::Resource for InvideoPosition {}
 
-impl InvideoPosition {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.corner_position.is_some() { r = r + "cornerPosition,"; }
-        if self.type_.is_some() { r = r + "type,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A playlist resource represents a YouTube playlist. A playlist is a collection of videos that can be viewed sequentially and shared with other users. A playlist can contain up to 200 videos, and YouTube does not limit the number of playlists that each user creates. By default, playlists are publicly visible to other users, but playlists can be public or private.
 /// 
@@ -2930,13 +2161,12 @@ impl Playlist {
 pub struct GuideCategorySnippet {
     /// no description provided    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// Description of the guide category.    
-    pub title: Option<String>,
+    pub title: String,
 }
 
 impl Part for GuideCategorySnippet {}
-impl ResponseResult for GuideCategorySnippet {}
 
 
 /// Basic details about a video, including title, description, uploader, thumbnails and category.
@@ -2946,61 +2176,37 @@ impl ResponseResult for GuideCategorySnippet {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoSnippet {
     /// The video's description.    
-    pub description: Option<String>,
+    pub description: String,
     /// A list of keyword tags associated with the video. Tags may contain spaces. This field is only visible to the video's uploader.    
-    pub tags: Option<Vec<String>>,
+    pub tags: Vec<String>,
     /// The ID that YouTube uses to uniquely identify the channel that the video was uploaded to.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The language of the videos's default snippet.    
     #[serde(alias="defaultLanguage")]
-    pub default_language: Option<String>,
+    pub default_language: String,
     /// Indicates if the video is an upcoming/active live broadcast. Or it's "none" if the video is not an upcoming/active live broadcast.    
     #[serde(alias="liveBroadcastContent")]
-    pub live_broadcast_content: Option<String>,
+    pub live_broadcast_content: String,
     /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="publishedAt")]
-    pub published_at: Option<String>,
+    pub published_at: String,
     /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
+    pub thumbnails: ThumbnailDetails,
     /// The video's title.    
-    pub title: Option<String>,
+    pub title: String,
     /// The YouTube video category associated with the video.    
     #[serde(alias="categoryId")]
-    pub category_id: Option<String>,
+    pub category_id: String,
     /// Localized snippet selected with the hl parameter. If no such localization exists, this field is populated with the default snippet. (Read-only)    
-    pub localized: Option<VideoLocalization>,
+    pub localized: VideoLocalization,
     /// Channel title for the channel that the video belongs to.    
     #[serde(alias="channelTitle")]
-    pub channel_title: Option<String>,
+    pub channel_title: String,
 }
 
 impl Part for VideoSnippet {}
-impl RequestValue for VideoSnippet {}
-impl ResponseResult for VideoSnippet {}
-impl cmn::Resource for VideoSnippet {}
 
-impl VideoSnippet {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.description.is_some() { r = r + "description,"; }
-        if self.tags.is_some() { r = r + "tags,"; }
-        if self.channel_id.is_some() { r = r + "channelId,"; }
-        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
-        if self.live_broadcast_content.is_some() { r = r + "liveBroadcastContent,"; }
-        if self.published_at.is_some() { r = r + "publishedAt,"; }
-        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        if self.category_id.is_some() { r = r + "categoryId,"; }
-        if self.localized.is_some() { r = r + "localized,"; }
-        if self.channel_title.is_some() { r = r + "channelTitle,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Describes an invideo promotion campaign consisting of multiple promoted items. A campaign belongs to a single channel_id.
 /// 
@@ -3010,35 +2216,18 @@ impl VideoSnippet {
 pub struct InvideoPromotion {
     /// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.    
     #[serde(alias="defaultTiming")]
-    pub default_timing: Option<InvideoTiming>,
+    pub default_timing: InvideoTiming,
     /// List of promoted items in decreasing priority.    
-    pub items: Option<Vec<PromotedItem>>,
+    pub items: Vec<PromotedItem>,
     /// Indicates whether the channel's promotional campaign uses "smart timing." This feature attempts to show promotions at a point in the video when they are more likely to be clicked and less likely to disrupt the viewing experience. This feature also picks up a single promotion to show on each video.    
     #[serde(alias="useSmartTiming")]
-    pub use_smart_timing: Option<bool>,
+    pub use_smart_timing: bool,
     /// The spatial position within the video where the promoted item will be displayed.    
-    pub position: Option<InvideoPosition>,
+    pub position: InvideoPosition,
 }
 
 impl Part for InvideoPromotion {}
-impl RequestValue for InvideoPromotion {}
-impl ResponseResult for InvideoPromotion {}
-impl cmn::Resource for InvideoPromotion {}
 
-impl InvideoPromotion {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.default_timing.is_some() { r = r + "defaultTiming,"; }
-        if self.items.is_some() { r = r + "items,"; }
-        if self.use_smart_timing.is_some() { r = r + "useSmartTiming,"; }
-        if self.position.is_some() { r = r + "position,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Describes a single promoted item.
 /// 
@@ -3047,36 +2236,19 @@ impl InvideoPromotion {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotedItem {
     /// The temporal position within the video where the promoted item will be displayed. If present, it overrides the default timing.    
-    pub timing: Option<InvideoTiming>,
+    pub timing: InvideoTiming,
     /// If true, the content owner's name will be used when displaying the promotion. This field can only be set when the update is made on behalf of the content owner.    
     #[serde(alias="promotedByContentOwner")]
-    pub promoted_by_content_owner: Option<bool>,
+    pub promoted_by_content_owner: bool,
     /// A custom message to display for this promotion. This field is currently ignored unless the promoted item is a website.    
     #[serde(alias="customMessage")]
-    pub custom_message: Option<String>,
+    pub custom_message: String,
     /// Identifies the promoted item.    
-    pub id: Option<PromotedItemId>,
+    pub id: PromotedItemId,
 }
 
 impl Part for PromotedItem {}
-impl RequestValue for PromotedItem {}
-impl ResponseResult for PromotedItem {}
-impl cmn::Resource for PromotedItem {}
 
-impl PromotedItem {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.timing.is_some() { r = r + "timing,"; }
-        if self.promoted_by_content_owner.is_some() { r = r + "promotedByContentOwner,"; }
-        if self.custom_message.is_some() { r = r + "customMessage,"; }
-        if self.id.is_some() { r = r + "id,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Detailed settings of a broadcast.
 /// 
@@ -3086,61 +2258,40 @@ impl PromotedItem {
 pub struct LiveBroadcastContentDetails {
     /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.    
     #[serde(alias="startWithSlate")]
-    pub start_with_slate: Option<bool>,
+    pub start_with_slate: bool,
     /// This value uniquely identifies the live stream bound to the broadcast.    
     #[serde(alias="boundStreamId")]
-    pub bound_stream_id: Option<String>,
+    pub bound_stream_id: String,
     /// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.    
     #[serde(alias="enableEmbed")]
-    pub enable_embed: Option<bool>,
+    pub enable_embed: bool,
     /// This setting indicates whether closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API.    
     #[serde(alias="enableClosedCaptions")]
-    pub enable_closed_captions: Option<bool>,
+    pub enable_closed_captions: bool,
     /// This setting indicates whether YouTube should enable content encryption for the broadcast.    
     #[serde(alias="enableContentEncryption")]
-    pub enable_content_encryption: Option<bool>,
+    pub enable_content_encryption: bool,
     /// Automatically start recording after the event goes live. The default value for this property is true.
     /// 
     /// 
     /// 
     /// Important: You must also set the enableDvr property's value to true if you want the playback to be available immediately after the broadcast ends. If you set this property's value to true but do not also set the enableDvr property to true, there may be a delay of around one day before the archived video will be available for playback.
     #[serde(alias="recordFromStart")]
-    pub record_from_start: Option<bool>,
+    pub record_from_start: bool,
     /// This setting determines whether viewers can access DVR controls while watching the video. DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content. The default value for this property is true.
     /// 
     /// 
     /// 
     /// Important: You must set the value to true and also set the enableArchive property's value to true if you want to make playback available immediately after the broadcast ends.
     #[serde(alias="enableDvr")]
-    pub enable_dvr: Option<bool>,
+    pub enable_dvr: bool,
     /// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.    
     #[serde(alias="monitorStream")]
-    pub monitor_stream: Option<MonitorStreamInfo>,
+    pub monitor_stream: MonitorStreamInfo,
 }
 
 impl Part for LiveBroadcastContentDetails {}
-impl RequestValue for LiveBroadcastContentDetails {}
-impl ResponseResult for LiveBroadcastContentDetails {}
-impl cmn::Resource for LiveBroadcastContentDetails {}
 
-impl LiveBroadcastContentDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.start_with_slate.is_some() { r = r + "startWithSlate,"; }
-        if self.bound_stream_id.is_some() { r = r + "boundStreamId,"; }
-        if self.enable_embed.is_some() { r = r + "enableEmbed,"; }
-        if self.enable_closed_captions.is_some() { r = r + "enableClosedCaptions,"; }
-        if self.enable_content_encryption.is_some() { r = r + "enableContentEncryption,"; }
-        if self.record_from_start.is_some() { r = r + "recordFromStart,"; }
-        if self.enable_dvr.is_some() { r = r + "enableDvr,"; }
-        if self.monitor_stream.is_some() { r = r + "monitorStream,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Basic details about a video category, such as its localized title.
 /// 
@@ -3149,52 +2300,31 @@ impl LiveBroadcastContentDetails {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoStatus {
     /// The video's license.    
-    pub license: Option<String>,
+    pub license: String,
     /// This value indicates if the video can be embedded on another website.    
-    pub embeddable: Option<bool>,
+    pub embeddable: bool,
     /// The video's privacy status.    
     #[serde(alias="privacyStatus")]
-    pub privacy_status: Option<String>,
+    pub privacy_status: String,
     /// The date and time when the video is scheduled to publish. It can be set only if the privacy status of the video is private. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="publishAt")]
-    pub publish_at: Option<String>,
+    pub publish_at: String,
     /// This value indicates if the extended video statistics on the watch page can be viewed by everyone. Note that the view count, likes, etc will still be visible if this is disabled.    
     #[serde(alias="publicStatsViewable")]
-    pub public_stats_viewable: Option<bool>,
+    pub public_stats_viewable: bool,
     /// The status of the uploaded video.    
     #[serde(alias="uploadStatus")]
-    pub upload_status: Option<String>,
+    pub upload_status: String,
     /// This value explains why YouTube rejected an uploaded video. This property is only present if the uploadStatus property indicates that the upload was rejected.    
     #[serde(alias="rejectionReason")]
-    pub rejection_reason: Option<String>,
+    pub rejection_reason: String,
     /// This value explains why a video failed to upload. This property is only present if the uploadStatus property indicates that the upload failed.    
     #[serde(alias="failureReason")]
-    pub failure_reason: Option<String>,
+    pub failure_reason: String,
 }
 
 impl Part for VideoStatus {}
-impl RequestValue for VideoStatus {}
-impl ResponseResult for VideoStatus {}
-impl cmn::Resource for VideoStatus {}
 
-impl VideoStatus {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.license.is_some() { r = r + "license,"; }
-        if self.embeddable.is_some() { r = r + "embeddable,"; }
-        if self.privacy_status.is_some() { r = r + "privacyStatus,"; }
-        if self.publish_at.is_some() { r = r + "publishAt,"; }
-        if self.public_stats_viewable.is_some() { r = r + "publicStatsViewable,"; }
-        if self.upload_status.is_some() { r = r + "uploadStatus,"; }
-        if self.rejection_reason.is_some() { r = r + "rejectionReason,"; }
-        if self.failure_reason.is_some() { r = r + "failureReason,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A guideCategory resource identifies a category that YouTube algorithmically assigns based on a channel's content or other indicators, such as the channel's popularity. The list is similar to video categories, with the difference being that a video's uploader can assign a video category but only YouTube can assign a channel category.
 /// 
@@ -3203,17 +2333,16 @@ impl VideoStatus {
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GuideCategory {
     /// The snippet object contains basic details about the category, such as its title.    
-    pub snippet: Option<GuideCategorySnippet>,
+    pub snippet: GuideCategorySnippet,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#guideCategory".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The ID that YouTube uses to uniquely identify the guide category.    
-    pub id: Option<String>,
+    pub id: String,
 }
 
 impl Part for GuideCategory {}
-impl ResponseResult for GuideCategory {}
 
 
 /// There is no detailed description.
@@ -3229,16 +2358,16 @@ impl ResponseResult for GuideCategory {}
 pub struct ChannelSectionListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// A list of ChannelSections that match the request criteria.    
-    pub items: Option<Vec<ChannelSection>>,
+    pub items: Vec<ChannelSection>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelSectionListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
 }
 
 impl ResponseResult for ChannelSectionListResponse {}
@@ -3252,37 +2381,21 @@ impl ResponseResult for ChannelSectionListResponse {}
 pub struct MonitorStreamInfo {
     /// If you have set the enableMonitorStream property to true, then this property determines the length of the live broadcast delay.    
     #[serde(alias="broadcastStreamDelayMs")]
-    pub broadcast_stream_delay_ms: Option<u32>,
+    pub broadcast_stream_delay_ms: u32,
     /// HTML code that embeds a player that plays the monitor stream.    
     #[serde(alias="embedHtml")]
-    pub embed_html: Option<String>,
+    pub embed_html: String,
     /// This value determines whether the monitor stream is enabled for the broadcast. If the monitor stream is enabled, then YouTube will broadcast the event content on a special stream intended only for the broadcaster's consumption. The broadcaster can use the stream to review the event content and also to identify the optimal times to insert cuepoints.
     /// 
     /// You need to set this value to true if you intend to have a broadcast delay for your event.
     /// 
     /// Note: This property cannot be updated once the broadcast is in the testing or live state.
     #[serde(alias="enableMonitorStream")]
-    pub enable_monitor_stream: Option<bool>,
+    pub enable_monitor_stream: bool,
 }
 
 impl Part for MonitorStreamInfo {}
-impl RequestValue for MonitorStreamInfo {}
-impl ResponseResult for MonitorStreamInfo {}
-impl cmn::Resource for MonitorStreamInfo {}
 
-impl MonitorStreamInfo {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.broadcast_stream_delay_ms.is_some() { r = r + "broadcastStreamDelayMs,"; }
-        if self.embed_html.is_some() { r = r + "embedHtml,"; }
-        if self.enable_monitor_stream.is_some() { r = r + "enableMonitorStream,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -3297,16 +2410,16 @@ impl MonitorStreamInfo {
 pub struct I18nLanguageListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// A list of supported i18n languages. In this map, the i18n language ID is the map key, and its value is the corresponding i18nLanguage resource.    
-    pub items: Option<Vec<I18nLanguage>>,
+    pub items: Vec<I18nLanguage>,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nLanguageListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
 }
 
 impl ResponseResult for I18nLanguageListResponse {}
@@ -3319,32 +2432,16 @@ impl ResponseResult for I18nLanguageListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedProperty {
     /// no description provided    
-    pub default: Option<String>,
+    pub default: String,
     /// The language of the default property.    
     #[serde(alias="defaultLanguage")]
-    pub default_language: Option<LanguageTag>,
+    pub default_language: LanguageTag,
     /// no description provided    
-    pub localized: Option<Vec<LocalizedString>>,
+    pub localized: Vec<LocalizedString>,
 }
 
 impl Part for LocalizedProperty {}
-impl RequestValue for LocalizedProperty {}
-impl ResponseResult for LocalizedProperty {}
-impl cmn::Resource for LocalizedProperty {}
 
-impl LocalizedProperty {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.default.is_some() { r = r + "default,"; }
-        if self.default_language.is_some() { r = r + "defaultLanguage,"; }
-        if self.localized.is_some() { r = r + "localized,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A liveBroadcast resource represents an event that will be streamed, via live video, on YouTube.
 /// 
@@ -3407,50 +2504,29 @@ impl LiveBroadcast {
 pub struct VideoFileDetailsVideoStream {
     /// The video stream's bitrate, in bits per second.    
     #[serde(alias="bitrateBps")]
-    pub bitrate_bps: Option<String>,
+    pub bitrate_bps: String,
     /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.    
-    pub vendor: Option<String>,
+    pub vendor: String,
     /// The video codec that the stream uses.    
-    pub codec: Option<String>,
+    pub codec: String,
     /// The encoded video content's width in pixels. You can calculate the video's encoding aspect ratio as width_pixels / height_pixels.    
     #[serde(alias="widthPixels")]
-    pub width_pixels: Option<u32>,
+    pub width_pixels: u32,
     /// The encoded video content's height in pixels.    
     #[serde(alias="heightPixels")]
-    pub height_pixels: Option<u32>,
+    pub height_pixels: u32,
     /// The video content's display aspect ratio, which specifies the aspect ratio in which the video should be displayed.    
     #[serde(alias="aspectRatio")]
-    pub aspect_ratio: Option<f64>,
+    pub aspect_ratio: f64,
     /// The amount that YouTube needs to rotate the original source content to properly display the video.    
-    pub rotation: Option<String>,
+    pub rotation: String,
     /// The video stream's frame rate, in frames per second.    
     #[serde(alias="frameRateFps")]
-    pub frame_rate_fps: Option<f64>,
+    pub frame_rate_fps: f64,
 }
 
 impl Part for VideoFileDetailsVideoStream {}
-impl RequestValue for VideoFileDetailsVideoStream {}
-impl ResponseResult for VideoFileDetailsVideoStream {}
-impl cmn::Resource for VideoFileDetailsVideoStream {}
 
-impl VideoFileDetailsVideoStream {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.bitrate_bps.is_some() { r = r + "bitrateBps,"; }
-        if self.vendor.is_some() { r = r + "vendor,"; }
-        if self.codec.is_some() { r = r + "codec,"; }
-        if self.width_pixels.is_some() { r = r + "widthPixels,"; }
-        if self.height_pixels.is_some() { r = r + "heightPixels,"; }
-        if self.aspect_ratio.is_some() { r = r + "aspectRatio,"; }
-        if self.rotation.is_some() { r = r + "rotation,"; }
-        if self.frame_rate_fps.is_some() { r = r + "frameRateFps,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A thumbnail is an image representing a YouTube resource.
 /// 
@@ -3471,24 +2547,8 @@ pub struct Thumbnail {
     pub height: Option<u32>,
 }
 
-impl Part for Thumbnail {}
-impl RequestValue for Thumbnail {}
-impl ResponseResult for Thumbnail {}
 impl cmn::Resource for Thumbnail {}
 
-impl Thumbnail {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.url.is_some() { r = r + "url,"; }
-        if self.width.is_some() { r = r + "width,"; }
-        if self.height.is_some() { r = r + "height,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A channel resource contains information about a YouTube channel.
 /// 
@@ -3576,41 +2636,23 @@ impl Channel {
 pub struct ChannelStatistics {
     /// The number of comments for the channel.    
     #[serde(alias="commentCount")]
-    pub comment_count: Option<i64>,
+    pub comment_count: i64,
     /// The number of subscribers that the channel has.    
     #[serde(alias="subscriberCount")]
-    pub subscriber_count: Option<i64>,
+    pub subscriber_count: i64,
     /// The number of videos uploaded to the channel.    
     #[serde(alias="videoCount")]
-    pub video_count: Option<i64>,
+    pub video_count: i64,
     /// Whether or not the number of subscribers is shown for this user.    
     #[serde(alias="hiddenSubscriberCount")]
-    pub hidden_subscriber_count: Option<bool>,
+    pub hidden_subscriber_count: bool,
     /// The number of times the channel has been viewed.    
     #[serde(alias="viewCount")]
-    pub view_count: Option<i64>,
+    pub view_count: i64,
 }
 
 impl Part for ChannelStatistics {}
-impl RequestValue for ChannelStatistics {}
-impl ResponseResult for ChannelStatistics {}
-impl cmn::Resource for ChannelStatistics {}
 
-impl ChannelStatistics {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.comment_count.is_some() { r = r + "commentCount,"; }
-        if self.subscriber_count.is_some() { r = r + "subscriberCount,"; }
-        if self.video_count.is_some() { r = r + "videoCount,"; }
-        if self.hidden_subscriber_count.is_some() { r = r + "hiddenSubscriberCount,"; }
-        if self.view_count.is_some() { r = r + "viewCount,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Details about a social network post.
 /// 
@@ -3620,39 +2662,22 @@ impl ChannelStatistics {
 pub struct ActivityContentDetailsSocial {
     /// The resourceId object encapsulates information that identifies the resource associated with a social network post.    
     #[serde(alias="resourceId")]
-    pub resource_id: Option<ResourceId>,
+    pub resource_id: ResourceId,
     /// An image of the post's author.    
     #[serde(alias="imageUrl")]
-    pub image_url: Option<String>,
+    pub image_url: String,
     /// The name of the social network.    
     #[serde(alias="type")]
-    pub type_: Option<String>,
+    pub type_: String,
     /// The URL of the social network post.    
     #[serde(alias="referenceUrl")]
-    pub reference_url: Option<String>,
+    pub reference_url: String,
     /// The author of the social network post.    
-    pub author: Option<String>,
+    pub author: String,
 }
 
 impl Part for ActivityContentDetailsSocial {}
-impl RequestValue for ActivityContentDetailsSocial {}
-impl ResponseResult for ActivityContentDetailsSocial {}
 
-impl ActivityContentDetailsSocial {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.resource_id.is_some() { r = r + "resourceId,"; }
-        if self.image_url.is_some() { r = r + "imageUrl,"; }
-        if self.type_.is_some() { r = r + "type,"; }
-        if self.reference_url.is_some() { r = r + "referenceUrl,"; }
-        if self.author.is_some() { r = r + "author,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Channel localization setting
 /// 
@@ -3661,28 +2686,13 @@ impl ActivityContentDetailsSocial {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelLocalization {
     /// The localized strings for channel's description.    
-    pub description: Option<String>,
+    pub description: String,
     /// The localized strings for channel's title, read-only.    
-    pub title: Option<String>,
+    pub title: String,
 }
 
 impl Part for ChannelLocalization {}
-impl RequestValue for ChannelLocalization {}
-impl ResponseResult for ChannelLocalization {}
-impl cmn::Resource for ChannelLocalization {}
 
-impl ChannelLocalization {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.description.is_some() { r = r + "description,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A resource id is a generic reference that points to another YouTube resource.
 /// 
@@ -3691,37 +2701,20 @@ impl ChannelLocalization {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceId {
     /// The type of the API resource.    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a channel. This property is only present if the resourceId.kind value is youtube#channel.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a playlist. This property is only present if the resourceId.kind value is youtube#playlist.    
     #[serde(alias="playlistId")]
-    pub playlist_id: Option<String>,
+    pub playlist_id: String,
     /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a video. This property is only present if the resourceId.kind value is youtube#video.    
     #[serde(alias="videoId")]
-    pub video_id: Option<String>,
+    pub video_id: String,
 }
 
 impl Part for ResourceId {}
-impl RequestValue for ResourceId {}
-impl ResponseResult for ResourceId {}
-impl cmn::Resource for ResourceId {}
 
-impl ResourceId {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.kind.is_some() { r = r + "kind,"; }
-        if self.channel_id.is_some() { r = r + "channelId,"; }
-        if self.playlist_id.is_some() { r = r + "playlistId,"; }
-        if self.video_id.is_some() { r = r + "videoId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A search result contains information about a YouTube video, channel, or playlist that matches the search parameters specified in an API request. While a search result points to a uniquely identifiable resource, like a video, it does not have its own persistent data.
 /// 
@@ -3730,17 +2723,16 @@ impl ResourceId {
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchResult {
     /// The snippet object contains basic details about a search result, such as its title or description. For example, if the search result is a video, then the title will be the video's title and the description will be the video's description.    
-    pub snippet: Option<SearchResultSnippet>,
+    pub snippet: SearchResultSnippet,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#searchResult".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The id object contains information that can be used to uniquely identify the resource that matches the search request.    
-    pub id: Option<ResourceId>,
+    pub id: ResourceId,
 }
 
 impl Part for SearchResult {}
-impl ResponseResult for SearchResult {}
 
 
 /// There is no detailed description.
@@ -3756,28 +2748,28 @@ impl ResponseResult for SearchResult {}
 pub struct VideoCategoryListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
     #[serde(alias="nextPageToken")]
-    pub next_page_token: Option<String>,
+    pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoCategoryListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
     /// A list of video categories that can be associated with YouTube videos. In this map, the video category ID is the map key, and its value is the corresponding videoCategory resource.    
-    pub items: Option<Vec<VideoCategory>>,
+    pub items: Vec<VideoCategory>,
     /// no description provided    
     #[serde(alias="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub token_pagination: TokenPagination,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
     #[serde(alias="prevPageToken")]
-    pub prev_page_token: Option<String>,
+    pub prev_page_token: String,
     /// no description provided    
     #[serde(alias="pageInfo")]
-    pub page_info: Option<PageInfo>,
+    pub page_info: PageInfo,
 }
 
 impl ResponseResult for VideoCategoryListResponse {}
@@ -3790,50 +2782,30 @@ impl ResponseResult for VideoCategoryListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivitySnippet {
     /// A map of thumbnail images associated with the resource that is primarily associated with the activity. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
+    pub thumbnails: ThumbnailDetails,
     /// The title of the resource primarily associated with the activity.    
-    pub title: Option<String>,
+    pub title: String,
     /// The ID that YouTube uses to uniquely identify the channel associated with the activity.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="publishedAt")]
-    pub published_at: Option<String>,
+    pub published_at: String,
     /// Channel title for the channel responsible for this activity    
     #[serde(alias="channelTitle")]
-    pub channel_title: Option<String>,
+    pub channel_title: String,
     /// The type of activity that the resource describes.    
     #[serde(alias="type")]
-    pub type_: Option<String>,
+    pub type_: String,
     /// The group ID associated with the activity. A group ID identifies user events that are associated with the same user and resource. For example, if a user rates a video and marks the same video as a favorite, the entries for those events would have the same group ID in the user's activity feed. In your user interface, you can avoid repetition by grouping events with the same groupId value.    
     #[serde(alias="groupId")]
-    pub group_id: Option<String>,
+    pub group_id: String,
     /// The description of the resource primarily associated with the activity.    
-    pub description: Option<String>,
+    pub description: String,
 }
 
 impl Part for ActivitySnippet {}
-impl RequestValue for ActivitySnippet {}
-impl ResponseResult for ActivitySnippet {}
 
-impl ActivitySnippet {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        if self.channel_id.is_some() { r = r + "channelId,"; }
-        if self.published_at.is_some() { r = r + "publishedAt,"; }
-        if self.channel_title.is_some() { r = r + "channelTitle,"; }
-        if self.type_.is_some() { r = r + "type,"; }
-        if self.group_id.is_some() { r = r + "groupId,"; }
-        if self.description.is_some() { r = r + "description,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Video processing progress and completion time estimate.
 /// 
@@ -3843,36 +2815,20 @@ impl ActivitySnippet {
 pub struct VideoProcessingDetailsProcessingProgress {
     /// An estimate of the amount of time, in millseconds, that YouTube needs to finish processing the video.    
     #[serde(alias="timeLeftMs")]
-    pub time_left_ms: Option<String>,
+    pub time_left_ms: String,
     /// The number of parts of the video that YouTube has already processed. You can estimate the percentage of the video that YouTube has already processed by calculating:
     /// 100 * parts_processed / parts_total
     /// 
     /// Note that since the estimated number of parts could increase without a corresponding increase in the number of parts that have already been processed, it is possible that the calculated progress could periodically decrease while YouTube processes a video.
     #[serde(alias="partsProcessed")]
-    pub parts_processed: Option<String>,
+    pub parts_processed: String,
     /// An estimate of the total number of parts that need to be processed for the video. The number may be updated with more precise estimates while YouTube processes the video.    
     #[serde(alias="partsTotal")]
-    pub parts_total: Option<String>,
+    pub parts_total: String,
 }
 
 impl Part for VideoProcessingDetailsProcessingProgress {}
-impl RequestValue for VideoProcessingDetailsProcessingProgress {}
-impl ResponseResult for VideoProcessingDetailsProcessingProgress {}
-impl cmn::Resource for VideoProcessingDetailsProcessingProgress {}
 
-impl VideoProcessingDetailsProcessingProgress {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.time_left_ms.is_some() { r = r + "timeLeftMs,"; }
-        if self.parts_processed.is_some() { r = r + "partsProcessed,"; }
-        if self.parts_total.is_some() { r = r + "partsTotal,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -3887,28 +2843,28 @@ impl VideoProcessingDetailsProcessingProgress {
 pub struct SearchListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
     #[serde(alias="nextPageToken")]
-    pub next_page_token: Option<String>,
+    pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#searchListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
     /// A list of results that match the search criteria.    
-    pub items: Option<Vec<SearchResult>>,
+    pub items: Vec<SearchResult>,
     /// no description provided    
     #[serde(alias="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub token_pagination: TokenPagination,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
     #[serde(alias="prevPageToken")]
-    pub prev_page_token: Option<String>,
+    pub prev_page_token: String,
     /// no description provided    
     #[serde(alias="pageInfo")]
-    pub page_info: Option<PageInfo>,
+    pub page_info: PageInfo,
 }
 
 impl ResponseResult for SearchListResponse {}
@@ -3922,25 +2878,11 @@ impl ResponseResult for SearchListResponse {}
 pub struct ChannelTopicDetails {
     /// A list of Freebase topic IDs associated with the channel. You can retrieve information about each topic using the Freebase Topic API.    
     #[serde(alias="topicIds")]
-    pub topic_ids: Option<Vec<String>>,
+    pub topic_ids: Vec<String>,
 }
 
 impl Part for ChannelTopicDetails {}
-impl RequestValue for ChannelTopicDetails {}
-impl ResponseResult for ChannelTopicDetails {}
-impl cmn::Resource for ChannelTopicDetails {}
 
-impl ChannelTopicDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.topic_ids.is_some() { r = r + "topicIds,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -3955,28 +2897,28 @@ impl ChannelTopicDetails {
 pub struct VideoListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
     #[serde(alias="nextPageToken")]
-    pub next_page_token: Option<String>,
+    pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
     /// A list of videos that match the request criteria.    
-    pub items: Option<Vec<Video>>,
+    pub items: Vec<Video>,
     /// no description provided    
     #[serde(alias="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub token_pagination: TokenPagination,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
     #[serde(alias="prevPageToken")]
-    pub prev_page_token: Option<String>,
+    pub prev_page_token: String,
     /// no description provided    
     #[serde(alias="pageInfo")]
-    pub page_info: Option<PageInfo>,
+    pub page_info: PageInfo,
 }
 
 impl ResponseResult for VideoListResponse {}
@@ -3989,25 +2931,11 @@ impl ResponseResult for VideoListResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LanguageTag {
     /// no description provided    
-    pub value: Option<String>,
+    pub value: String,
 }
 
 impl Part for LanguageTag {}
-impl RequestValue for LanguageTag {}
-impl ResponseResult for LanguageTag {}
-impl cmn::Resource for LanguageTag {}
 
-impl LanguageTag {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.value.is_some() { r = r + "value,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -4017,25 +2945,11 @@ impl LanguageTag {
 pub struct PlaylistStatus {
     /// The playlist's privacy status.    
     #[serde(alias="privacyStatus")]
-    pub privacy_status: Option<String>,
+    pub privacy_status: String,
 }
 
 impl Part for PlaylistStatus {}
-impl RequestValue for PlaylistStatus {}
-impl ResponseResult for PlaylistStatus {}
-impl cmn::Resource for PlaylistStatus {}
 
-impl PlaylistStatus {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.privacy_status.is_some() { r = r + "privacyStatus,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -4044,14 +2958,13 @@ impl PlaylistStatus {
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoRating {
     /// no description provided    
-    pub rating: Option<String>,
+    pub rating: String,
     /// no description provided    
     #[serde(alias="videoId")]
-    pub video_id: Option<String>,
+    pub video_id: String,
 }
 
 impl Part for VideoRating {}
-impl ResponseResult for VideoRating {}
 
 
 /// There is no detailed description.
@@ -4062,35 +2975,18 @@ impl ResponseResult for VideoRating {}
 pub struct LiveStreamSnippet {
     /// The ID that YouTube uses to uniquely identify the channel that is transmitting the stream.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The stream's description. The value cannot be longer than 10000 characters.    
-    pub description: Option<String>,
+    pub description: String,
     /// The date and time that the stream was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="publishedAt")]
-    pub published_at: Option<String>,
+    pub published_at: String,
     /// The stream's title. The value must be between 1 and 128 characters long.    
-    pub title: Option<String>,
+    pub title: String,
 }
 
 impl Part for LiveStreamSnippet {}
-impl RequestValue for LiveStreamSnippet {}
-impl ResponseResult for LiveStreamSnippet {}
-impl cmn::Resource for LiveStreamSnippet {}
 
-impl LiveStreamSnippet {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.channel_id.is_some() { r = r + "channelId,"; }
-        if self.description.is_some() { r = r + "description,"; }
-        if self.published_at.is_some() { r = r + "publishedAt,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        r.pop();
-        r
-    }
-}
 
 /// JSON template for the status part of a channel.
 /// 
@@ -4100,33 +2996,17 @@ impl LiveStreamSnippet {
 pub struct ChannelStatus {
     /// Privacy status of the channel.    
     #[serde(alias="privacyStatus")]
-    pub privacy_status: Option<String>,
+    pub privacy_status: String,
     /// If true, then the user is linked to either a YouTube username or G+ account. Otherwise, the user doesn't have a public YouTube identity.    
     #[serde(alias="isLinked")]
-    pub is_linked: Option<bool>,
+    pub is_linked: bool,
     /// The long uploads status of this channel. See    
     #[serde(alias="longUploadsStatus")]
-    pub long_uploads_status: Option<String>,
+    pub long_uploads_status: String,
 }
 
 impl Part for ChannelStatus {}
-impl RequestValue for ChannelStatus {}
-impl ResponseResult for ChannelStatus {}
-impl cmn::Resource for ChannelStatus {}
 
-impl ChannelStatus {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.privacy_status.is_some() { r = r + "privacyStatus,"; }
-        if self.is_linked.is_some() { r = r + "isLinked,"; }
-        if self.long_uploads_status.is_some() { r = r + "longUploadsStatus,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -4141,28 +3021,28 @@ impl ChannelStatus {
 pub struct ChannelListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
     #[serde(alias="nextPageToken")]
-    pub next_page_token: Option<String>,
+    pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
     /// A list of channels that match the request criteria.    
-    pub items: Option<Vec<Channel>>,
+    pub items: Vec<Channel>,
     /// no description provided    
     #[serde(alias="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub token_pagination: TokenPagination,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
     #[serde(alias="prevPageToken")]
-    pub prev_page_token: Option<String>,
+    pub prev_page_token: String,
     /// no description provided    
     #[serde(alias="pageInfo")]
-    pub page_info: Option<PageInfo>,
+    pub page_info: PageInfo,
 }
 
 impl ResponseResult for ChannelListResponse {}
@@ -4231,28 +3111,28 @@ impl ChannelSection {
 pub struct LiveBroadcastListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
     #[serde(alias="nextPageToken")]
-    pub next_page_token: Option<String>,
+    pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveBroadcastListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
     /// A list of broadcasts that match the request criteria.    
-    pub items: Option<Vec<LiveBroadcast>>,
+    pub items: Vec<LiveBroadcast>,
     /// no description provided    
     #[serde(alias="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub token_pagination: TokenPagination,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
     #[serde(alias="prevPageToken")]
-    pub prev_page_token: Option<String>,
+    pub prev_page_token: String,
     /// no description provided    
     #[serde(alias="pageInfo")]
-    pub page_info: Option<PageInfo>,
+    pub page_info: PageInfo,
 }
 
 impl ResponseResult for LiveBroadcastListResponse {}
@@ -4266,25 +3146,11 @@ impl ResponseResult for LiveBroadcastListResponse {}
 pub struct LiveStreamStatus {
     /// no description provided    
     #[serde(alias="streamStatus")]
-    pub stream_status: Option<String>,
+    pub stream_status: String,
 }
 
 impl Part for LiveStreamStatus {}
-impl RequestValue for LiveStreamStatus {}
-impl ResponseResult for LiveStreamStatus {}
-impl cmn::Resource for LiveStreamStatus {}
 
-impl LiveStreamStatus {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.stream_status.is_some() { r = r + "streamStatus,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Details about the live streaming metadata.
 /// 
@@ -4294,41 +3160,23 @@ impl LiveStreamStatus {
 pub struct VideoLiveStreamingDetails {
     /// The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.    
     #[serde(alias="concurrentViewers")]
-    pub concurrent_viewers: Option<String>,
+    pub concurrent_viewers: String,
     /// The time that the broadcast is scheduled to begin. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="scheduledStartTime")]
-    pub scheduled_start_time: Option<String>,
+    pub scheduled_start_time: String,
     /// The time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. If the value is empty or the property is not present, then the broadcast is scheduled to continue indefinitely.    
     #[serde(alias="scheduledEndTime")]
-    pub scheduled_end_time: Option<String>,
+    pub scheduled_end_time: String,
     /// The time that the broadcast actually started. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast begins.    
     #[serde(alias="actualStartTime")]
-    pub actual_start_time: Option<String>,
+    pub actual_start_time: String,
     /// The time that the broadcast actually ended. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast is over.    
     #[serde(alias="actualEndTime")]
-    pub actual_end_time: Option<String>,
+    pub actual_end_time: String,
 }
 
 impl Part for VideoLiveStreamingDetails {}
-impl RequestValue for VideoLiveStreamingDetails {}
-impl ResponseResult for VideoLiveStreamingDetails {}
-impl cmn::Resource for VideoLiveStreamingDetails {}
 
-impl VideoLiveStreamingDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.concurrent_viewers.is_some() { r = r + "concurrentViewers,"; }
-        if self.scheduled_start_time.is_some() { r = r + "scheduledStartTime,"; }
-        if self.scheduled_end_time.is_some() { r = r + "scheduledEndTime,"; }
-        if self.actual_start_time.is_some() { r = r + "actualStartTime,"; }
-        if self.actual_end_time.is_some() { r = r + "actualEndTime,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 65
 /// 
@@ -4338,277 +3186,200 @@ impl VideoLiveStreamingDetails {
 pub struct ContentRating {
     /// Internal YouTube rating.    
     #[serde(alias="ytRating")]
-    pub yt_rating: Option<String>,
+    pub yt_rating: String,
     /// Rating system for French Canadian TV - Regie du cinema    
     #[serde(alias="catvfrRating")]
-    pub catvfr_rating: Option<String>,
+    pub catvfr_rating: String,
     /// Rating system in India - Central Board of Film Certification    
     #[serde(alias="cbfcRating")]
-    pub cbfc_rating: Option<String>,
+    pub cbfc_rating: String,
     /// Rating system for Thailand - Board of Filmand Video Censors    
     #[serde(alias="bfvcRating")]
-    pub bfvc_rating: Option<String>,
+    pub bfvc_rating: String,
     /// Rating system for Austria - Bundesministeriums f�r Unterricht, Kunst und Kultur!    
     #[serde(alias="bmukkRating")]
-    pub bmukk_rating: Option<String>,
+    pub bmukk_rating: String,
     /// Rating system for Switzerland - Switzerland Rating System    
     #[serde(alias="chfilmRating")]
-    pub chfilm_rating: Option<String>,
+    pub chfilm_rating: String,
     /// Rating system for Taiwan - Ministry of Culture - Tawan    
     #[serde(alias="moctwRating")]
-    pub moctw_rating: Option<String>,
+    pub moctw_rating: String,
     /// Rating system for Canadian TV - Canadian TV Classification System    
     #[serde(alias="catvRating")]
-    pub catv_rating: Option<String>,
+    pub catv_rating: String,
     /// Rating system for Peru - Peru Rating System    
     #[serde(alias="pefilmRating")]
-    pub pefilm_rating: Option<String>,
+    pub pefilm_rating: String,
     /// no description provided    
     #[serde(alias="djctqRatingReasons")]
-    pub djctq_rating_reasons: Option<Vec<String>>,
+    pub djctq_rating_reasons: Vec<String>,
     /// Rating system for Argentina - Instituto Nacional de Cine y Artes Audiovisuales    
     #[serde(alias="incaaRating")]
-    pub incaa_rating: Option<String>,
+    pub incaa_rating: String,
     /// Rating system for Israel - Israel Rating System    
     #[serde(alias="ilfilmRating")]
-    pub ilfilm_rating: Option<String>,
+    pub ilfilm_rating: String,
     /// Rating system for Luxembourg - Commission de surveillance de la classification des films    
     #[serde(alias="cscfRating")]
-    pub cscf_rating: Option<String>,
+    pub cscf_rating: String,
     /// Rating system in Germany - Voluntary Self Regulation of the Movie Industry    
     #[serde(alias="fskRating")]
-    pub fsk_rating: Option<String>,
+    pub fsk_rating: String,
     /// Rating system in South Korea - Korea Media Rating Board    
     #[serde(alias="kmrbRating")]
-    pub kmrb_rating: Option<String>,
+    pub kmrb_rating: String,
     /// Rating system in Brazil - Department of Justice, Rating, Titles and Qualification    
     #[serde(alias="djctqRating")]
-    pub djctq_rating: Option<String>,
+    pub djctq_rating: String,
     /// Rating system for Hong kong - Office for Film, Newspaper and Article Administration    
     #[serde(alias="fcoRating")]
-    pub fco_rating: Option<String>,
+    pub fco_rating: String,
     /// Rating system for Norway - Medietilsynet    
     #[serde(alias="medietilsynetRating")]
-    pub medietilsynet_rating: Option<String>,
+    pub medietilsynet_rating: String,
     /// Rating system for Greece - Greece Rating System    
     #[serde(alias="grfilmRating")]
-    pub grfilm_rating: Option<String>,
+    pub grfilm_rating: String,
     /// Rating system for Chile - Consejo de Calificaci�n Cinematogr�fica    
     #[serde(alias="cccRating")]
-    pub ccc_rating: Option<String>,
+    pub ccc_rating: String,
     /// Rating system for Ireland - Raidi� Teilif�s �ireann    
     #[serde(alias="rteRating")]
-    pub rte_rating: Option<String>,
+    pub rte_rating: String,
     /// Rating system in France - French Minister of Culture    
     #[serde(alias="fmocRating")]
-    pub fmoc_rating: Option<String>,
+    pub fmoc_rating: String,
     /// Rating system in Japan - Eiga Rinri Kanri Iinkai    
     #[serde(alias="eirinRating")]
-    pub eirin_rating: Option<String>,
+    pub eirin_rating: String,
     /// Rating system for Portugal - Comiss�o de Classifica��o de Espect�culos    
     #[serde(alias="cceRating")]
-    pub cce_rating: Option<String>,
+    pub cce_rating: String,
     /// Rating system for Latvia - National Film Center of Latvia    
     #[serde(alias="nkclvRating")]
-    pub nkclv_rating: Option<String>,
+    pub nkclv_rating: String,
     /// Rating system for South africa - Film & Publication Board    
     #[serde(alias="fpbRating")]
-    pub fpb_rating: Option<String>,
+    pub fpb_rating: String,
     /// Rating system for Iceland - SMAIS    
     #[serde(alias="smaisRating")]
-    pub smais_rating: Option<String>,
+    pub smais_rating: String,
     /// Canadian Home Video Rating System    
     #[serde(alias="chvrsRating")]
-    pub chvrs_rating: Option<String>,
+    pub chvrs_rating: String,
     /// Rating system for Italy - Autorit� per le Garanzie nelle Comunicazioni    
     #[serde(alias="agcomRating")]
-    pub agcom_rating: Option<String>,
+    pub agcom_rating: String,
     /// Rating system for Colombia - MoC    
     #[serde(alias="mocRating")]
-    pub moc_rating: Option<String>,
+    pub moc_rating: String,
     /// Rating system for Hungary - Rating Committee of the National Office of Film    
     #[serde(alias="rcnofRating")]
-    pub rcnof_rating: Option<String>,
+    pub rcnof_rating: String,
     /// Rating system for Malaysia - Film Censorship Board of Malaysia    
     #[serde(alias="fcbmRating")]
-    pub fcbm_rating: Option<String>,
+    pub fcbm_rating: String,
     /// Rating system for Netherlands - Nederlands Instituut voor de Classificatie van Audiovisuele Media    
     #[serde(alias="kijkwijzerRating")]
-    pub kijkwijzer_rating: Option<String>,
+    pub kijkwijzer_rating: String,
     /// Rating system for Singapore - Media Development Authority    
     #[serde(alias="mdaRating")]
-    pub mda_rating: Option<String>,
+    pub mda_rating: String,
     /// Rating system for Nigeria - National Film and Video Censors Board    
     #[serde(alias="nfvcbRating")]
-    pub nfvcb_rating: Option<String>,
+    pub nfvcb_rating: String,
     /// Rating system for Venezuela - SiBCI    
     #[serde(alias="resorteviolenciaRating")]
-    pub resorteviolencia_rating: Option<String>,
+    pub resorteviolencia_rating: String,
     /// Rating system for France - Conseil sup�rieur de l?audiovisuel    
     #[serde(alias="csaRating")]
-    pub csa_rating: Option<String>,
+    pub csa_rating: String,
     /// Rating system in New Zealand - Office of Film and Literature Classification    
     #[serde(alias="oflcRating")]
-    pub oflc_rating: Option<String>,
+    pub oflc_rating: String,
     /// TV Parental Guidelines rating of the content.    
     #[serde(alias="tvpgRating")]
-    pub tvpg_rating: Option<String>,
+    pub tvpg_rating: String,
     /// Rating system for Bulgaria - National Film Centre    
     #[serde(alias="nfrcRating")]
-    pub nfrc_rating: Option<String>,
+    pub nfrc_rating: String,
     /// Rating system for Malta - Film Age-Classification Board    
     #[serde(alias="mccaaRating")]
-    pub mccaa_rating: Option<String>,
+    pub mccaa_rating: String,
     /// Rating system in Mexico - General Directorate of Radio, Television and Cinematography    
     #[serde(alias="rtcRating")]
-    pub rtc_rating: Option<String>,
+    pub rtc_rating: String,
     /// Rating system in Italy - Ministero dei Beni e delle Attivita Culturali e del Turismo    
     #[serde(alias="mibacRating")]
-    pub mibac_rating: Option<String>,
+    pub mibac_rating: String,
     /// British Board of Film Classification    
     #[serde(alias="bbfcRating")]
-    pub bbfc_rating: Option<String>,
+    pub bbfc_rating: String,
     /// Rating system for Egypt - Egypt Rating System    
     #[serde(alias="egfilmRating")]
-    pub egfilm_rating: Option<String>,
+    pub egfilm_rating: String,
     /// Rating system for Belgium - Belgium Rating System    
     #[serde(alias="cicfRating")]
-    pub cicf_rating: Option<String>,
+    pub cicf_rating: String,
     /// Rating system for Poland - National Broadcasting Council    
     #[serde(alias="nbcplRating")]
-    pub nbcpl_rating: Option<String>,
+    pub nbcpl_rating: String,
     /// Rating system for Maldives - National Bureau of Classification    
     #[serde(alias="nbcRating")]
-    pub nbc_rating: Option<String>,
+    pub nbc_rating: String,
     /// Motion Picture Association of America rating for the content.    
     #[serde(alias="mpaaRating")]
-    pub mpaa_rating: Option<String>,
+    pub mpaa_rating: String,
     /// Rating system in Ireland - Irish Film Classification Office    
     #[serde(alias="ifcoRating")]
-    pub ifco_rating: Option<String>,
+    pub ifco_rating: String,
     /// Rating system in Australia - Australian Classification Board    
     #[serde(alias="acbRating")]
-    pub acb_rating: Option<String>,
+    pub acb_rating: String,
     /// Rating system for Estonia - Estonia Rating System    
     #[serde(alias="eefilmRating")]
-    pub eefilm_rating: Option<String>,
+    pub eefilm_rating: String,
     /// Rating system for Czech republic - Czech republic Rating System    
     #[serde(alias="czfilmRating")]
-    pub czfilm_rating: Option<String>,
+    pub czfilm_rating: String,
     /// Rating system for Indonesia - Lembaga Sensor Film    
     #[serde(alias="lsfRating")]
-    pub lsf_rating: Option<String>,
+    pub lsf_rating: String,
     /// Rating system in Russia    
     #[serde(alias="russiaRating")]
-    pub russia_rating: Option<String>,
+    pub russia_rating: String,
     /// Rating system for Kenya - Kenya Film Classification Board    
     #[serde(alias="kfcbRating")]
-    pub kfcb_rating: Option<String>,
+    pub kfcb_rating: String,
     /// Rating system for Philippines - MOVIE AND TELEVISION REVIEW AND CLASSIFICATION BOARD    
     #[serde(alias="mtrcbRating")]
-    pub mtrcb_rating: Option<String>,
+    pub mtrcb_rating: String,
     /// Rating system for Chile - Asociaci�n Nacional de Televisi�n    
     #[serde(alias="anatelRating")]
-    pub anatel_rating: Option<String>,
+    pub anatel_rating: String,
     /// Rating system for Sweden - Statens medier�d (National Media Council)    
     #[serde(alias="smsaRating")]
-    pub smsa_rating: Option<String>,
+    pub smsa_rating: String,
     /// Rating system for Romania - CONSILIUL NATIONAL AL AUDIOVIZUALULUI - CNA    
     #[serde(alias="cnaRating")]
-    pub cna_rating: Option<String>,
+    pub cna_rating: String,
     /// Rating system in Spain - Instituto de Cinematografia y de las Artes Audiovisuales    
     #[serde(alias="icaaRating")]
-    pub icaa_rating: Option<String>,
+    pub icaa_rating: String,
     /// Rating system for Denmark - The Media Council for Children and Young People    
     #[serde(alias="mccypRating")]
-    pub mccyp_rating: Option<String>,
+    pub mccyp_rating: String,
     /// Rating system for Slovakia - Slovakia Rating System    
     #[serde(alias="skfilmRating")]
-    pub skfilm_rating: Option<String>,
+    pub skfilm_rating: String,
     /// Rating system for Finland - Finnish Centre for Media Education and Audiovisual Media    
     #[serde(alias="mekuRating")]
-    pub meku_rating: Option<String>,
+    pub meku_rating: String,
 }
 
 impl Part for ContentRating {}
-impl RequestValue for ContentRating {}
-impl ResponseResult for ContentRating {}
-impl cmn::Resource for ContentRating {}
 
-impl ContentRating {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.yt_rating.is_some() { r = r + "ytRating,"; }
-        if self.catvfr_rating.is_some() { r = r + "catvfrRating,"; }
-        if self.cbfc_rating.is_some() { r = r + "cbfcRating,"; }
-        if self.bfvc_rating.is_some() { r = r + "bfvcRating,"; }
-        if self.bmukk_rating.is_some() { r = r + "bmukkRating,"; }
-        if self.chfilm_rating.is_some() { r = r + "chfilmRating,"; }
-        if self.moctw_rating.is_some() { r = r + "moctwRating,"; }
-        if self.catv_rating.is_some() { r = r + "catvRating,"; }
-        if self.pefilm_rating.is_some() { r = r + "pefilmRating,"; }
-        if self.djctq_rating_reasons.is_some() { r = r + "djctqRatingReasons,"; }
-        if self.incaa_rating.is_some() { r = r + "incaaRating,"; }
-        if self.ilfilm_rating.is_some() { r = r + "ilfilmRating,"; }
-        if self.cscf_rating.is_some() { r = r + "cscfRating,"; }
-        if self.fsk_rating.is_some() { r = r + "fskRating,"; }
-        if self.kmrb_rating.is_some() { r = r + "kmrbRating,"; }
-        if self.djctq_rating.is_some() { r = r + "djctqRating,"; }
-        if self.fco_rating.is_some() { r = r + "fcoRating,"; }
-        if self.medietilsynet_rating.is_some() { r = r + "medietilsynetRating,"; }
-        if self.grfilm_rating.is_some() { r = r + "grfilmRating,"; }
-        if self.ccc_rating.is_some() { r = r + "cccRating,"; }
-        if self.rte_rating.is_some() { r = r + "rteRating,"; }
-        if self.fmoc_rating.is_some() { r = r + "fmocRating,"; }
-        if self.eirin_rating.is_some() { r = r + "eirinRating,"; }
-        if self.cce_rating.is_some() { r = r + "cceRating,"; }
-        if self.nkclv_rating.is_some() { r = r + "nkclvRating,"; }
-        if self.fpb_rating.is_some() { r = r + "fpbRating,"; }
-        if self.smais_rating.is_some() { r = r + "smaisRating,"; }
-        if self.chvrs_rating.is_some() { r = r + "chvrsRating,"; }
-        if self.agcom_rating.is_some() { r = r + "agcomRating,"; }
-        if self.moc_rating.is_some() { r = r + "mocRating,"; }
-        if self.rcnof_rating.is_some() { r = r + "rcnofRating,"; }
-        if self.fcbm_rating.is_some() { r = r + "fcbmRating,"; }
-        if self.kijkwijzer_rating.is_some() { r = r + "kijkwijzerRating,"; }
-        if self.mda_rating.is_some() { r = r + "mdaRating,"; }
-        if self.nfvcb_rating.is_some() { r = r + "nfvcbRating,"; }
-        if self.resorteviolencia_rating.is_some() { r = r + "resorteviolenciaRating,"; }
-        if self.csa_rating.is_some() { r = r + "csaRating,"; }
-        if self.oflc_rating.is_some() { r = r + "oflcRating,"; }
-        if self.tvpg_rating.is_some() { r = r + "tvpgRating,"; }
-        if self.nfrc_rating.is_some() { r = r + "nfrcRating,"; }
-        if self.mccaa_rating.is_some() { r = r + "mccaaRating,"; }
-        if self.rtc_rating.is_some() { r = r + "rtcRating,"; }
-        if self.mibac_rating.is_some() { r = r + "mibacRating,"; }
-        if self.bbfc_rating.is_some() { r = r + "bbfcRating,"; }
-        if self.egfilm_rating.is_some() { r = r + "egfilmRating,"; }
-        if self.cicf_rating.is_some() { r = r + "cicfRating,"; }
-        if self.nbcpl_rating.is_some() { r = r + "nbcplRating,"; }
-        if self.nbc_rating.is_some() { r = r + "nbcRating,"; }
-        if self.mpaa_rating.is_some() { r = r + "mpaaRating,"; }
-        if self.ifco_rating.is_some() { r = r + "ifcoRating,"; }
-        if self.acb_rating.is_some() { r = r + "acbRating,"; }
-        if self.eefilm_rating.is_some() { r = r + "eefilmRating,"; }
-        if self.czfilm_rating.is_some() { r = r + "czfilmRating,"; }
-        if self.lsf_rating.is_some() { r = r + "lsfRating,"; }
-        if self.russia_rating.is_some() { r = r + "russiaRating,"; }
-        if self.kfcb_rating.is_some() { r = r + "kfcbRating,"; }
-        if self.mtrcb_rating.is_some() { r = r + "mtrcbRating,"; }
-        if self.anatel_rating.is_some() { r = r + "anatelRating,"; }
-        if self.smsa_rating.is_some() { r = r + "smsaRating,"; }
-        if self.cna_rating.is_some() { r = r + "cnaRating,"; }
-        if self.icaa_rating.is_some() { r = r + "icaaRating,"; }
-        if self.mccyp_rating.is_some() { r = r + "mccypRating,"; }
-        if self.skfilm_rating.is_some() { r = r + "skfilmRating,"; }
-        if self.meku_rating.is_some() { r = r + "mekuRating,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -4623,28 +3394,28 @@ impl ContentRating {
 pub struct ActivityListResponse {
     /// Serialized EventId of the request which produced this response.    
     #[serde(alias="eventId")]
-    pub event_id: Option<String>,
+    pub event_id: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
     #[serde(alias="nextPageToken")]
-    pub next_page_token: Option<String>,
+    pub next_page_token: String,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#activityListResponse".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// The visitorId identifies the visitor.    
     #[serde(alias="visitorId")]
-    pub visitor_id: Option<String>,
+    pub visitor_id: String,
     /// A list of activities, or events, that match the request criteria.    
-    pub items: Option<Vec<Activity>>,
+    pub items: Vec<Activity>,
     /// no description provided    
     #[serde(alias="tokenPagination")]
-    pub token_pagination: Option<TokenPagination>,
+    pub token_pagination: TokenPagination,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
     #[serde(alias="prevPageToken")]
-    pub prev_page_token: Option<String>,
+    pub prev_page_token: String,
     /// no description provided    
     #[serde(alias="pageInfo")]
-    pub page_info: Option<PageInfo>,
+    pub page_info: PageInfo,
 }
 
 impl ResponseResult for ActivityListResponse {}
@@ -4701,34 +3472,17 @@ impl Activity {
 pub struct SubscriptionSubscriberSnippet {
     /// The channel ID of the subscriber.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The description of the subscriber.    
-    pub description: Option<String>,
+    pub description: String,
     /// Thumbnails for this subscriber.    
-    pub thumbnails: Option<ThumbnailDetails>,
+    pub thumbnails: ThumbnailDetails,
     /// The title of the subscriber.    
-    pub title: Option<String>,
+    pub title: String,
 }
 
 impl Part for SubscriptionSubscriberSnippet {}
-impl RequestValue for SubscriptionSubscriberSnippet {}
-impl ResponseResult for SubscriptionSubscriberSnippet {}
-impl cmn::Resource for SubscriptionSubscriberSnippet {}
 
-impl SubscriptionSubscriberSnippet {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.channel_id.is_some() { r = r + "channelId,"; }
-        if self.description.is_some() { r = r + "description,"; }
-        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Branding properties for images associated with the channel.
 /// 
@@ -4738,109 +3492,74 @@ impl SubscriptionSubscriberSnippet {
 pub struct ImageSettings {
     /// Banner image. TV size medium resolution (1280x720).    
     #[serde(alias="bannerTvMediumImageUrl")]
-    pub banner_tv_medium_image_url: Option<String>,
+    pub banner_tv_medium_image_url: String,
     /// The image map script for the large banner image.    
     #[serde(alias="largeBrandedBannerImageImapScript")]
-    pub large_branded_banner_image_imap_script: Option<LocalizedProperty>,
+    pub large_branded_banner_image_imap_script: LocalizedProperty,
     /// Banner image. Mobile size (640x175).    
     #[serde(alias="bannerMobileImageUrl")]
-    pub banner_mobile_image_url: Option<String>,
+    pub banner_mobile_image_url: String,
     /// The URL for the 640px by 70px banner image that appears below the video player in the default view of the video watch page.    
     #[serde(alias="smallBrandedBannerImageUrl")]
-    pub small_branded_banner_image_url: Option<LocalizedProperty>,
+    pub small_branded_banner_image_url: LocalizedProperty,
     /// Banner image. Tablet size high resolution (2276x377).    
     #[serde(alias="bannerTabletHdImageUrl")]
-    pub banner_tablet_hd_image_url: Option<String>,
+    pub banner_tablet_hd_image_url: String,
     /// Banner image. Tablet size low resolution (1138x188).    
     #[serde(alias="bannerTabletLowImageUrl")]
-    pub banner_tablet_low_image_url: Option<String>,
+    pub banner_tablet_low_image_url: String,
     /// Banner image. Mobile size medium/high resolution (960x263).    
     #[serde(alias="bannerMobileMediumHdImageUrl")]
-    pub banner_mobile_medium_hd_image_url: Option<String>,
+    pub banner_mobile_medium_hd_image_url: String,
     /// The URL for a 1px by 1px tracking pixel that can be used to collect statistics for views of the channel or video pages.    
     #[serde(alias="trackingImageUrl")]
-    pub tracking_image_url: Option<String>,
+    pub tracking_image_url: String,
     /// Banner image. Mobile size high resolution (1440x395).    
     #[serde(alias="bannerMobileExtraHdImageUrl")]
-    pub banner_mobile_extra_hd_image_url: Option<String>,
+    pub banner_mobile_extra_hd_image_url: String,
     /// Banner image. Tablet size (1707x283).    
     #[serde(alias="bannerTabletImageUrl")]
-    pub banner_tablet_image_url: Option<String>,
+    pub banner_tablet_image_url: String,
     /// Banner image. Mobile size low resolution (320x88).    
     #[serde(alias="bannerMobileLowImageUrl")]
-    pub banner_mobile_low_image_url: Option<String>,
+    pub banner_mobile_low_image_url: String,
     /// Banner image. TV size extra high resolution (2120x1192).    
     #[serde(alias="bannerTvImageUrl")]
-    pub banner_tv_image_url: Option<String>,
+    pub banner_tv_image_url: String,
     /// Banner image. TV size low resolution (854x480).    
     #[serde(alias="bannerTvLowImageUrl")]
-    pub banner_tv_low_image_url: Option<String>,
+    pub banner_tv_low_image_url: String,
     /// Banner image. Tablet size extra high resolution (2560x424).    
     #[serde(alias="bannerTabletExtraHdImageUrl")]
-    pub banner_tablet_extra_hd_image_url: Option<String>,
+    pub banner_tablet_extra_hd_image_url: String,
     /// The URL for the 854px by 70px image that appears below the video player in the expanded video view of the video watch page.    
     #[serde(alias="largeBrandedBannerImageUrl")]
-    pub large_branded_banner_image_url: Option<LocalizedProperty>,
+    pub large_branded_banner_image_url: LocalizedProperty,
     /// Banner image. TV size high resolution (1920x1080).    
     #[serde(alias="bannerTvHighImageUrl")]
-    pub banner_tv_high_image_url: Option<String>,
+    pub banner_tv_high_image_url: String,
     /// The URL for the background image shown on the video watch page. The image should be 1200px by 615px, with a maximum file size of 128k.    
     #[serde(alias="backgroundImageUrl")]
-    pub background_image_url: Option<LocalizedProperty>,
+    pub background_image_url: LocalizedProperty,
     /// The image map script for the small banner image.    
     #[serde(alias="smallBrandedBannerImageImapScript")]
-    pub small_branded_banner_image_imap_script: Option<LocalizedProperty>,
+    pub small_branded_banner_image_imap_script: LocalizedProperty,
     /// Banner image. Desktop size (1060x175).    
     #[serde(alias="bannerImageUrl")]
-    pub banner_image_url: Option<String>,
+    pub banner_image_url: String,
     /// Banner image. Mobile size high resolution (1280x360).    
     #[serde(alias="bannerMobileHdImageUrl")]
-    pub banner_mobile_hd_image_url: Option<String>,
+    pub banner_mobile_hd_image_url: String,
     /// This is used only in update requests; if it's set, we use this URL to generate all of the above banner URLs.    
     #[serde(alias="bannerExternalUrl")]
-    pub banner_external_url: Option<String>,
+    pub banner_external_url: String,
     /// The URL for the image that appears above the top-left corner of the video player. This is a 25-pixel-high image with a flexible width that cannot exceed 170 pixels.    
     #[serde(alias="watchIconImageUrl")]
-    pub watch_icon_image_url: Option<String>,
+    pub watch_icon_image_url: String,
 }
 
 impl Part for ImageSettings {}
-impl RequestValue for ImageSettings {}
-impl ResponseResult for ImageSettings {}
-impl cmn::Resource for ImageSettings {}
 
-impl ImageSettings {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.banner_tv_medium_image_url.is_some() { r = r + "bannerTvMediumImageUrl,"; }
-        if self.large_branded_banner_image_imap_script.is_some() { r = r + "largeBrandedBannerImageImapScript,"; }
-        if self.banner_mobile_image_url.is_some() { r = r + "bannerMobileImageUrl,"; }
-        if self.small_branded_banner_image_url.is_some() { r = r + "smallBrandedBannerImageUrl,"; }
-        if self.banner_tablet_hd_image_url.is_some() { r = r + "bannerTabletHdImageUrl,"; }
-        if self.banner_tablet_low_image_url.is_some() { r = r + "bannerTabletLowImageUrl,"; }
-        if self.banner_mobile_medium_hd_image_url.is_some() { r = r + "bannerMobileMediumHdImageUrl,"; }
-        if self.tracking_image_url.is_some() { r = r + "trackingImageUrl,"; }
-        if self.banner_mobile_extra_hd_image_url.is_some() { r = r + "bannerMobileExtraHdImageUrl,"; }
-        if self.banner_tablet_image_url.is_some() { r = r + "bannerTabletImageUrl,"; }
-        if self.banner_mobile_low_image_url.is_some() { r = r + "bannerMobileLowImageUrl,"; }
-        if self.banner_tv_image_url.is_some() { r = r + "bannerTvImageUrl,"; }
-        if self.banner_tv_low_image_url.is_some() { r = r + "bannerTvLowImageUrl,"; }
-        if self.banner_tablet_extra_hd_image_url.is_some() { r = r + "bannerTabletExtraHdImageUrl,"; }
-        if self.large_branded_banner_image_url.is_some() { r = r + "largeBrandedBannerImageUrl,"; }
-        if self.banner_tv_high_image_url.is_some() { r = r + "bannerTvHighImageUrl,"; }
-        if self.background_image_url.is_some() { r = r + "backgroundImageUrl,"; }
-        if self.small_branded_banner_image_imap_script.is_some() { r = r + "smallBrandedBannerImageImapScript,"; }
-        if self.banner_image_url.is_some() { r = r + "bannerImageUrl,"; }
-        if self.banner_mobile_hd_image_url.is_some() { r = r + "bannerMobileHdImageUrl,"; }
-        if self.banner_external_url.is_some() { r = r + "bannerExternalUrl,"; }
-        if self.watch_icon_image_url.is_some() { r = r + "watchIconImageUrl,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Details about a resource which is being promoted.
 /// 
@@ -4850,60 +3569,38 @@ impl ImageSettings {
 pub struct ActivityContentDetailsPromotedItem {
     /// The type of call-to-action, a message to the user indicating action that can be taken.    
     #[serde(alias="ctaType")]
-    pub cta_type: Option<String>,
+    pub cta_type: String,
     /// The URL the client should fetch to request a promoted item.    
     #[serde(alias="adTag")]
-    pub ad_tag: Option<String>,
+    pub ad_tag: String,
     /// The URL the client should direct the user to, if the user chooses to visit the advertiser's website.    
     #[serde(alias="destinationUrl")]
-    pub destination_url: Option<String>,
+    pub destination_url: String,
     /// The list of forecasting URLs. The client should ping all of these URLs when a promoted item is not available, to indicate that a promoted item could have been shown.    
     #[serde(alias="forecastingUrl")]
-    pub forecasting_url: Option<Vec<String>>,
+    pub forecasting_url: Vec<String>,
     /// The list of impression URLs. The client should ping all of these URLs to indicate that the user was shown this promoted item.    
     #[serde(alias="impressionUrl")]
-    pub impression_url: Option<Vec<String>>,
+    pub impression_url: Vec<String>,
     /// The URL the client should ping to indicate that the user was shown this promoted item.    
     #[serde(alias="creativeViewUrl")]
-    pub creative_view_url: Option<String>,
+    pub creative_view_url: String,
     /// The ID that YouTube uses to uniquely identify the promoted video.    
     #[serde(alias="videoId")]
-    pub video_id: Option<String>,
+    pub video_id: String,
     /// The text description to accompany the promoted item.    
     #[serde(alias="descriptionText")]
-    pub description_text: Option<String>,
+    pub description_text: String,
     /// The custom call-to-action button text. If specified, it will override the default button text for the cta_type.    
     #[serde(alias="customCtaButtonText")]
-    pub custom_cta_button_text: Option<String>,
+    pub custom_cta_button_text: String,
     /// The URL the client should ping to indicate that the user clicked through on this promoted item.    
     #[serde(alias="clickTrackingUrl")]
-    pub click_tracking_url: Option<String>,
+    pub click_tracking_url: String,
 }
 
 impl Part for ActivityContentDetailsPromotedItem {}
-impl RequestValue for ActivityContentDetailsPromotedItem {}
-impl ResponseResult for ActivityContentDetailsPromotedItem {}
 
-impl ActivityContentDetailsPromotedItem {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.cta_type.is_some() { r = r + "ctaType,"; }
-        if self.ad_tag.is_some() { r = r + "adTag,"; }
-        if self.destination_url.is_some() { r = r + "destinationUrl,"; }
-        if self.forecasting_url.is_some() { r = r + "forecastingUrl,"; }
-        if self.impression_url.is_some() { r = r + "impressionUrl,"; }
-        if self.creative_view_url.is_some() { r = r + "creativeViewUrl,"; }
-        if self.video_id.is_some() { r = r + "videoId,"; }
-        if self.description_text.is_some() { r = r + "descriptionText,"; }
-        if self.custom_cta_button_text.is_some() { r = r + "customCtaButtonText,"; }
-        if self.click_tracking_url.is_some() { r = r + "clickTrackingUrl,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -4912,25 +3609,11 @@ impl ActivityContentDetailsPromotedItem {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoConversionPings {
     /// Pings that the app shall fire for a video (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.    
-    pub pings: Option<Vec<VideoConversionPing>>,
+    pub pings: Vec<VideoConversionPing>,
 }
 
 impl Part for VideoConversionPings {}
-impl RequestValue for VideoConversionPings {}
-impl ResponseResult for VideoConversionPings {}
-impl cmn::Resource for VideoConversionPings {}
 
-impl VideoConversionPings {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.pings.is_some() { r = r + "pings,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Details about a channel bulletin post.
 /// 
@@ -4940,24 +3623,11 @@ impl VideoConversionPings {
 pub struct ActivityContentDetailsBulletin {
     /// The resourceId object contains information that identifies the resource associated with a bulletin post.    
     #[serde(alias="resourceId")]
-    pub resource_id: Option<ResourceId>,
+    pub resource_id: ResourceId,
 }
 
 impl Part for ActivityContentDetailsBulletin {}
-impl RequestValue for ActivityContentDetailsBulletin {}
-impl ResponseResult for ActivityContentDetailsBulletin {}
 
-impl ActivityContentDetailsBulletin {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.resource_id.is_some() { r = r + "resourceId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// An i18nLanguage resource identifies a UI language currently supported by YouTube.
 /// 
@@ -4980,7 +3650,6 @@ pub struct I18nLanguage {
     pub id: Option<String>,
 }
 
-impl ResponseResult for I18nLanguage {}
 impl cmn::Resource for I18nLanguage {}
 
 
@@ -4991,28 +3660,13 @@ impl cmn::Resource for I18nLanguage {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedString {
     /// no description provided    
-    pub language: Option<String>,
+    pub language: String,
     /// no description provided    
-    pub value: Option<String>,
+    pub value: String,
 }
 
 impl Part for LocalizedString {}
-impl RequestValue for LocalizedString {}
-impl ResponseResult for LocalizedString {}
-impl cmn::Resource for LocalizedString {}
 
-impl LocalizedString {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.language.is_some() { r = r + "language,"; }
-        if self.value.is_some() { r = r + "value,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Information about an audio stream.
 /// 
@@ -5022,35 +3676,18 @@ impl LocalizedString {
 pub struct VideoFileDetailsAudioStream {
     /// The audio stream's bitrate, in bits per second.    
     #[serde(alias="bitrateBps")]
-    pub bitrate_bps: Option<String>,
+    pub bitrate_bps: String,
     /// The audio codec that the stream uses.    
-    pub codec: Option<String>,
+    pub codec: String,
     /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.    
-    pub vendor: Option<String>,
+    pub vendor: String,
     /// The number of audio channels that the stream contains.    
     #[serde(alias="channelCount")]
-    pub channel_count: Option<u32>,
+    pub channel_count: u32,
 }
 
 impl Part for VideoFileDetailsAudioStream {}
-impl RequestValue for VideoFileDetailsAudioStream {}
-impl ResponseResult for VideoFileDetailsAudioStream {}
-impl cmn::Resource for VideoFileDetailsAudioStream {}
 
-impl VideoFileDetailsAudioStream {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.bitrate_bps.is_some() { r = r + "bitrateBps,"; }
-        if self.codec.is_some() { r = r + "codec,"; }
-        if self.vendor.is_some() { r = r + "vendor,"; }
-        if self.channel_count.is_some() { r = r + "channelCount,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -5059,33 +3696,17 @@ impl VideoFileDetailsAudioStream {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoAgeGating {
     /// Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won't be present.    
-    pub restricted: Option<bool>,
+    pub restricted: bool,
     /// Indicates whether or not the video has alcoholic beverage content. Only users of legal purchasing age in a particular country, as identified by ICAP, can view the content.    
     #[serde(alias="alcoholContent")]
-    pub alcohol_content: Option<bool>,
+    pub alcohol_content: bool,
     /// Video game rating, if any.    
     #[serde(alias="videoGameRating")]
-    pub video_game_rating: Option<String>,
+    pub video_game_rating: String,
 }
 
 impl Part for VideoAgeGating {}
-impl RequestValue for VideoAgeGating {}
-impl ResponseResult for VideoAgeGating {}
-impl cmn::Resource for VideoAgeGating {}
 
-impl VideoAgeGating {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.restricted.is_some() { r = r + "restricted,"; }
-        if self.alcohol_content.is_some() { r = r + "alcoholContent,"; }
-        if self.video_game_rating.is_some() { r = r + "videoGameRating,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Freebase topic information related to the video.
 /// 
@@ -5095,29 +3716,14 @@ impl VideoAgeGating {
 pub struct VideoTopicDetails {
     /// A list of Freebase topic IDs that are centrally associated with the video. These are topics that are centrally featured in the video, and it can be said that the video is mainly about each of these. You can retrieve information about each topic using the Freebase Topic API.    
     #[serde(alias="topicIds")]
-    pub topic_ids: Option<Vec<String>>,
+    pub topic_ids: Vec<String>,
     /// Similar to topic_id, except that these topics are merely relevant to the video. These are topics that may be mentioned in, or appear in the video. You can retrieve information about each topic using Freebase Topic API.    
     #[serde(alias="relevantTopicIds")]
-    pub relevant_topic_ids: Option<Vec<String>>,
+    pub relevant_topic_ids: Vec<String>,
 }
 
 impl Part for VideoTopicDetails {}
-impl RequestValue for VideoTopicDetails {}
-impl ResponseResult for VideoTopicDetails {}
-impl cmn::Resource for VideoTopicDetails {}
 
-impl VideoTopicDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.topic_ids.is_some() { r = r + "topicIds,"; }
-        if self.relevant_topic_ids.is_some() { r = r + "relevantTopicIds,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Statistics about the video, such as the number of times the video was viewed or liked.
 /// 
@@ -5127,41 +3733,23 @@ impl VideoTopicDetails {
 pub struct VideoStatistics {
     /// The number of comments for the video.    
     #[serde(alias="commentCount")]
-    pub comment_count: Option<i64>,
+    pub comment_count: i64,
     /// The number of times the video has been viewed.    
     #[serde(alias="viewCount")]
-    pub view_count: Option<i64>,
+    pub view_count: i64,
     /// The number of users who currently have the video marked as a favorite video.    
     #[serde(alias="favoriteCount")]
-    pub favorite_count: Option<i64>,
+    pub favorite_count: i64,
     /// The number of users who have indicated that they disliked the video by giving it a negative rating.    
     #[serde(alias="dislikeCount")]
-    pub dislike_count: Option<i64>,
+    pub dislike_count: i64,
     /// The number of users who have indicated that they liked the video by giving it a positive rating.    
     #[serde(alias="likeCount")]
-    pub like_count: Option<i64>,
+    pub like_count: i64,
 }
 
 impl Part for VideoStatistics {}
-impl RequestValue for VideoStatistics {}
-impl ResponseResult for VideoStatistics {}
-impl cmn::Resource for VideoStatistics {}
 
-impl VideoStatistics {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.comment_count.is_some() { r = r + "commentCount,"; }
-        if self.view_count.is_some() { r = r + "viewCount,"; }
-        if self.favorite_count.is_some() { r = r + "favoriteCount,"; }
-        if self.dislike_count.is_some() { r = r + "dislikeCount,"; }
-        if self.like_count.is_some() { r = r + "likeCount,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -5170,29 +3758,14 @@ impl VideoStatistics {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoConversionPing {
     /// Defines the context of the ping.    
-    pub context: Option<String>,
+    pub context: String,
     /// The url (without the schema) that the app shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D like%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA%3Bytvid%3DUrIaJUvIQDg&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.    
     #[serde(alias="conversionUrl")]
-    pub conversion_url: Option<String>,
+    pub conversion_url: String,
 }
 
 impl Part for VideoConversionPing {}
-impl RequestValue for VideoConversionPing {}
-impl ResponseResult for VideoConversionPing {}
-impl cmn::Resource for VideoConversionPing {}
 
-impl VideoConversionPing {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.context.is_some() { r = r + "context,"; }
-        if self.conversion_url.is_some() { r = r + "conversionUrl,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A videoCategory resource identifies a category that has been or could be associated with uploaded videos.
 /// 
@@ -5201,17 +3774,16 @@ impl VideoConversionPing {
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoCategory {
     /// The snippet object contains basic details about the video category, including its title.    
-    pub snippet: Option<VideoCategorySnippet>,
+    pub snippet: VideoCategorySnippet,
     /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoCategory".    
-    pub kind: Option<String>,
+    pub kind: String,
     /// Etag of this resource.    
-    pub etag: Option<String>,
+    pub etag: String,
     /// The ID that YouTube uses to uniquely identify the video category.    
-    pub id: Option<String>,
+    pub id: String,
 }
 
 impl Part for VideoCategory {}
-impl ResponseResult for VideoCategory {}
 
 
 /// Basic details about a playlist, including title, description and thumbnails.
@@ -5222,53 +3794,31 @@ impl ResponseResult for VideoCategory {}
 pub struct PlaylistItemSnippet {
     /// The ID that YouTube uses to uniquely identify the user that added the item to the playlist.    
     #[serde(alias="channelId")]
-    pub channel_id: Option<String>,
+    pub channel_id: String,
     /// The item's description.    
-    pub description: Option<String>,
+    pub description: String,
     /// The item's title.    
-    pub title: Option<String>,
+    pub title: String,
     /// The id object contains information that can be used to uniquely identify the resource that is included in the playlist as the playlist item.    
     #[serde(alias="resourceId")]
-    pub resource_id: Option<ResourceId>,
+    pub resource_id: ResourceId,
     /// The ID that YouTube uses to uniquely identify the playlist that the playlist item is in.    
     #[serde(alias="playlistId")]
-    pub playlist_id: Option<String>,
+    pub playlist_id: String,
     /// The date and time that the item was added to the playlist. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
     #[serde(alias="publishedAt")]
-    pub published_at: Option<String>,
+    pub published_at: String,
     /// Channel title for the channel that the playlist item belongs to.    
     #[serde(alias="channelTitle")]
-    pub channel_title: Option<String>,
+    pub channel_title: String,
     /// The order in which the item appears in the playlist. The value uses a zero-based index, so the first item has a position of 0, the second item has a position of 1, and so forth.    
-    pub position: Option<u32>,
+    pub position: u32,
     /// A map of thumbnail images associated with the playlist item. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
-    pub thumbnails: Option<ThumbnailDetails>,
+    pub thumbnails: ThumbnailDetails,
 }
 
 impl Part for PlaylistItemSnippet {}
-impl RequestValue for PlaylistItemSnippet {}
-impl ResponseResult for PlaylistItemSnippet {}
-impl cmn::Resource for PlaylistItemSnippet {}
 
-impl PlaylistItemSnippet {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.channel_id.is_some() { r = r + "channelId,"; }
-        if self.description.is_some() { r = r + "description,"; }
-        if self.title.is_some() { r = r + "title,"; }
-        if self.resource_id.is_some() { r = r + "resourceId,"; }
-        if self.playlist_id.is_some() { r = r + "playlistId,"; }
-        if self.published_at.is_some() { r = r + "publishedAt,"; }
-        if self.channel_title.is_some() { r = r + "channelTitle,"; }
-        if self.position.is_some() { r = r + "position,"; }
-        if self.thumbnails.is_some() { r = r + "thumbnails,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Information about a video that was marked as a favorite video.
 /// 
@@ -5278,24 +3828,11 @@ impl PlaylistItemSnippet {
 pub struct ActivityContentDetailsFavorite {
     /// The resourceId object contains information that identifies the resource that was marked as a favorite.    
     #[serde(alias="resourceId")]
-    pub resource_id: Option<ResourceId>,
+    pub resource_id: ResourceId,
 }
 
 impl Part for ActivityContentDetailsFavorite {}
-impl RequestValue for ActivityContentDetailsFavorite {}
-impl ResponseResult for ActivityContentDetailsFavorite {}
 
-impl ActivityContentDetailsFavorite {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.resource_id.is_some() { r = r + "resourceId,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -5305,25 +3842,11 @@ impl ActivityContentDetailsFavorite {
 pub struct PlaylistPlayer {
     /// An <iframe> tag that embeds a player that will play the playlist.    
     #[serde(alias="embedHtml")]
-    pub embed_html: Option<String>,
+    pub embed_html: String,
 }
 
 impl Part for PlaylistPlayer {}
-impl RequestValue for PlaylistPlayer {}
-impl ResponseResult for PlaylistPlayer {}
-impl cmn::Resource for PlaylistPlayer {}
 
-impl PlaylistPlayer {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.embed_html.is_some() { r = r + "embedHtml,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A single tag suggestion with it's relevance information.
 /// 
@@ -5333,28 +3856,13 @@ impl PlaylistPlayer {
 pub struct VideoSuggestionsTagSuggestion {
     /// A set of video categories for which the tag is relevant. You can use this information to display appropriate tag suggestions based on the video category that the video uploader associates with the video. By default, tag suggestions are relevant for all categories if there are no restricts defined for the keyword.    
     #[serde(alias="categoryRestricts")]
-    pub category_restricts: Option<Vec<String>>,
+    pub category_restricts: Vec<String>,
     /// The keyword tag suggested for the video.    
-    pub tag: Option<String>,
+    pub tag: String,
 }
 
 impl Part for VideoSuggestionsTagSuggestion {}
-impl RequestValue for VideoSuggestionsTagSuggestion {}
-impl ResponseResult for VideoSuggestionsTagSuggestion {}
-impl cmn::Resource for VideoSuggestionsTagSuggestion {}
 
-impl VideoSuggestionsTagSuggestion {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.category_restricts.is_some() { r = r + "categoryRestricts,"; }
-        if self.tag.is_some() { r = r + "tag,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Specifies suggestions on how to improve video content, including encoding hints, tag suggestions, and editor suggestions.
 /// 
@@ -5364,41 +3872,23 @@ impl VideoSuggestionsTagSuggestion {
 pub struct VideoSuggestions {
     /// A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video's current processing status, eventually, that status will almost certainly be failed.    
     #[serde(alias="processingErrors")]
-    pub processing_errors: Option<Vec<String>>,
+    pub processing_errors: Vec<String>,
     /// A list of keyword tags that could be added to the video's metadata to increase the likelihood that users will locate your video when searching or browsing on YouTube.    
     #[serde(alias="tagSuggestions")]
-    pub tag_suggestions: Option<Vec<VideoSuggestionsTagSuggestion>>,
+    pub tag_suggestions: Vec<VideoSuggestionsTagSuggestion>,
     /// A list of video editing operations that might improve the video quality or playback experience of the uploaded video.    
     #[serde(alias="editorSuggestions")]
-    pub editor_suggestions: Option<Vec<String>>,
+    pub editor_suggestions: Vec<String>,
     /// A list of reasons why YouTube may have difficulty transcoding the uploaded video or that might result in an erroneous transcoding. These warnings are generated before YouTube actually processes the uploaded video file. In addition, they identify issues that are unlikely to cause the video processing to fail but that might cause problems such as sync issues, video artifacts, or a missing audio track.    
     #[serde(alias="processingWarnings")]
-    pub processing_warnings: Option<Vec<String>>,
+    pub processing_warnings: Vec<String>,
     /// A list of suggestions that may improve YouTube's ability to process the video.    
     #[serde(alias="processingHints")]
-    pub processing_hints: Option<Vec<String>>,
+    pub processing_hints: Vec<String>,
 }
 
 impl Part for VideoSuggestions {}
-impl RequestValue for VideoSuggestions {}
-impl ResponseResult for VideoSuggestions {}
-impl cmn::Resource for VideoSuggestions {}
 
-impl VideoSuggestions {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.processing_errors.is_some() { r = r + "processingErrors,"; }
-        if self.tag_suggestions.is_some() { r = r + "tagSuggestions,"; }
-        if self.editor_suggestions.is_some() { r = r + "editorSuggestions,"; }
-        if self.processing_warnings.is_some() { r = r + "processingWarnings,"; }
-        if self.processing_hints.is_some() { r = r + "processingHints,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Rights management policy for YouTube resources.
 /// 
@@ -5407,28 +3897,13 @@ impl VideoSuggestions {
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessPolicy {
     /// A list of region codes that identify countries where the default policy do not apply.    
-    pub exception: Option<Vec<String>>,
+    pub exception: Vec<String>,
     /// The value of allowed indicates whether the access to the policy is allowed or denied by default.    
-    pub allowed: Option<bool>,
+    pub allowed: bool,
 }
 
 impl Part for AccessPolicy {}
-impl RequestValue for AccessPolicy {}
-impl ResponseResult for AccessPolicy {}
-impl cmn::Resource for AccessPolicy {}
 
-impl AccessPolicy {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.exception.is_some() { r = r + "exception,"; }
-        if self.allowed.is_some() { r = r + "allowed,"; }
-        r.pop();
-        r
-    }
-}
 
 /// A channel banner returned as the response to a channel_banner.insert call.
 /// 
@@ -5474,25 +3949,11 @@ impl ChannelBannerResource {
 pub struct PlaylistContentDetails {
     /// The number of videos in the playlist.    
     #[serde(alias="itemCount")]
-    pub item_count: Option<u32>,
+    pub item_count: u32,
 }
 
 impl Part for PlaylistContentDetails {}
-impl RequestValue for PlaylistContentDetails {}
-impl ResponseResult for PlaylistContentDetails {}
-impl cmn::Resource for PlaylistContentDetails {}
 
-impl PlaylistContentDetails {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.item_count.is_some() { r = r + "itemCount,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Paging details for lists of resources, including total number of items available and number of resources returned in a single page.
 /// 
@@ -5502,14 +3963,13 @@ impl PlaylistContentDetails {
 pub struct PageInfo {
     /// The number of results included in the API response.    
     #[serde(alias="resultsPerPage")]
-    pub results_per_page: Option<i32>,
+    pub results_per_page: i32,
     /// The total number of results in the result set.    
     #[serde(alias="totalResults")]
-    pub total_results: Option<i32>,
+    pub total_results: i32,
 }
 
 impl Part for PageInfo {}
-impl ResponseResult for PageInfo {}
 
 
 /// There is no detailed description.
@@ -5519,40 +3979,22 @@ impl ResponseResult for PageInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelContentDetailsRelatedPlaylists {
     /// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.    
-    pub uploads: Option<String>,
+    pub uploads: String,
     /// The ID of the playlist that contains the channel"s watch history. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
     #[serde(alias="watchHistory")]
-    pub watch_history: Option<String>,
+    pub watch_history: String,
     /// The ID of the playlist that contains the channel"s liked videos. Use the   playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
-    pub likes: Option<String>,
+    pub likes: String,
     /// The ID of the playlist that contains the channel"s favorite videos. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
-    pub favorites: Option<String>,
+    pub favorites: String,
     /// The ID of the playlist that contains the channel"s watch later playlist. Use the playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
     #[serde(alias="watchLater")]
-    pub watch_later: Option<String>,
+    pub watch_later: String,
 }
 
 impl NestedType for ChannelContentDetailsRelatedPlaylists {}
 impl Part for ChannelContentDetailsRelatedPlaylists {}
-impl RequestValue for ChannelContentDetailsRelatedPlaylists {}
-impl ResponseResult for ChannelContentDetailsRelatedPlaylists {}
-impl cmn::Resource for ChannelContentDetailsRelatedPlaylists {}
 
-impl ChannelContentDetailsRelatedPlaylists {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.uploads.is_some() { r = r + "uploads,"; }
-        if self.watch_history.is_some() { r = r + "watchHistory,"; }
-        if self.likes.is_some() { r = r + "likes,"; }
-        if self.favorites.is_some() { r = r + "favorites,"; }
-        if self.watch_later.is_some() { r = r + "watchLater,"; }
-        r.pop();
-        r
-    }
-}
 
 
 // ###################

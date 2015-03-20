@@ -1,14 +1,15 @@
 <%!
     from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
-                      NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE, unique_type_name) 
+                      NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE, unique_type_name, 
+                      PART_MARKER_TRAIT) 
 
     default_traits = ('RustcEncodable', 'Clone', 'Default')
 %>\
 ## Build a schema which must be an object
 ###################################################################################################################
 ###################################################################################################################
-<%def name="_new_object(s, properties, c)">\
+<%def name="_new_object(s, properties, c, allow_optionals)">\
 <% struct = 'pub struct ' + unique_type_name(s.id) %>\
 % if properties:
 ${struct} {
@@ -17,11 +18,11 @@ ${struct} {
     % if pn != mangle_ident(pn):
     #[serde(alias="${pn}")]
     % endif
-    pub ${mangle_ident(pn)}: ${to_rust_type(schemas, s.id, pn, p)},
+    pub ${mangle_ident(pn)}: ${to_rust_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)},
 % endfor
 }
 % elif 'additionalProperties' in s:
-${struct}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s)});
+${struct}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s, allow_optionals=allow_optionals)});
 % else: ## it's an empty struct, i.e. struct Foo;
 ${struct};
 % endif ## 'properties' in s
@@ -33,13 +34,20 @@ ${struct};
 ###################################################################################################################
 <%def name="new(s, c)">\
 <% 
-    markers = schema_markers(s, c)
+    markers = schema_markers(s, c, transitive=True)
     traits = ['Default', 'Clone', 'Debug']
     
+    allow_optionals = True
     if REQUEST_MARKER_TRAIT in markers:
         traits.append('Serialize')
     if RESPONSE_MARKER_TRAIT in markers:
         traits.append('Deserialize')
+
+    nt_markers = schema_markers(s, c, transitive=False)
+    if (   PART_MARKER_TRAIT in nt_markers
+        or RESPONSE_MARKER_TRAIT in nt_markers and REQUEST_MARKER_TRAIT not in nt_markers):
+        allow_optionals = False
+    # use optionals only when needed
     
     ## waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
     if s.type == 'any':
@@ -52,12 +60,12 @@ ${doc(s, c)}\
 </%block>
 #[derive(${', '.join(traits)})]
 % if s.type == 'object':
-${_new_object(s, s.get('properties'), c)}\
+${_new_object(s, s.get('properties'), c, allow_optionals)}\
 % elif s.type == 'array':
 % if s.items.get('type') != 'object':
-pub struct ${s_type}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s)});
+pub struct ${s_type}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s, allow_optionals=allow_optionals)});
 % else:
-${_new_object(s, s.items.get('properties'), c)}\
+${_new_object(s, s.items.get('properties'), c, allow_optionals)}\
 % endif ## array item != 'object'
 % elif s.type == 'any':
 ## waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
@@ -72,11 +80,11 @@ impl Default for ${s_type} {
 <% assert False, "Object not handled: %s" % str(s) %>\
 % endif ## type == ?
 
-% for marker_trait in markers:
+% for marker_trait in nt_markers:
 impl ${marker_trait} for ${s_type} {}
 % endfor
 
-% if REQUEST_MARKER_TRAIT in markers and 'properties' in s:
+% if REQUEST_MARKER_TRAIT in nt_markers and 'properties' in s:
 impl ${s_type} {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
@@ -86,7 +94,7 @@ impl ${s_type} {
         % for pn, p in s.properties.iteritems():
 <%
             mn = 'self.' + mangle_ident(pn)
-            rt = to_rust_type(schemas, s.id, pn, p)
+            rt = to_rust_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)
             check = 'is_some()'
             if rt.startswith('Vec') or rt.startswith('HashMap'):
                 check = 'len() > 0'
