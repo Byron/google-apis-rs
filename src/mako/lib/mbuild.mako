@@ -363,6 +363,7 @@ match result {
     Result::MissingToken => println!("Missing Token"),
     Result::Failure(_) => println!("General Failure (Response doesn't print)"),
     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
+    Result::JsonDecodeError(err) => println!("Json failed to decode: {:?}", err),
     Result::Success(_) => println!("Success (value doesn't print)"),
 }
 % endif
@@ -744,7 +745,10 @@ if enable_resource_parsing \
 {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
-                        (res, json::from_str(&json_response).unwrap())
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => return Result::JsonDecodeError(err),
+                        }
                     }\
                     % if supports_download:
  else { (res, Default::default()) }\

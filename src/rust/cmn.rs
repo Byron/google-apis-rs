@@ -1,5 +1,6 @@
 use std::marker::MarkerTrait;
 use std::io::{self, Read, Seek, Cursor, Write, SeekFrom};
+use std;
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2;
@@ -7,6 +8,8 @@ use hyper;
 use hyper::header::{ContentType, ContentLength, Headers};
 use hyper::http::LINE_ENDING;
 use hyper::method::Method;
+
+use serde;
 
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
@@ -90,6 +93,11 @@ pub trait Delegate {
         None
     }
 
+    /// Called whenever a server response could not be decoded from json.
+    /// It's for informational purposes only, the caller will return with an error
+    /// accordingly.
+    fn response_json_decode_error(&mut self, json_encoded_value: &str) {}
+
     /// Called whenever the http request returns with a non-success status code.
     /// This can involve authentication issues, or anything else that very much 
     /// depends on the used API method.
@@ -133,6 +141,10 @@ pub enum Result<T = ()> {
 
     /// An additional, free form field clashed with one of the built-in optional ones
     FieldClash(&'static str),
+
+    /// Shows that we failed to decode the server response.
+    /// This can happen if the protocol changes in conjunction with strict json decoding.
+    JsonDecodeError(serde::json::Error),
 
     /// Indicates an HTTP repsonse with a non-success status code
     Failure(hyper::client::Response),
