@@ -404,7 +404,7 @@ def schema_markers(s, c, transitive=True):
             _, resource, _ = activity_split(fqan)
             if resource and activity_name_to_type_name(resource).lower() == sid.lower():
                 res.add('cmn::%s' % RESOURCE_MARKER_TRAIT)
-            m = c.fqan_map[fqan]
+            m = c.fqan_map[to_fqan(*activity_split(fqan))]
             params, _ = build_all_params(c, m)
             part_prop, _ = parts_from_params(params)
             if part_prop is not None and 'properties' in s:
