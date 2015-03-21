@@ -63,6 +63,31 @@ pub struct JsonServerError {
     pub error_description: Option<String>
 }
 
+#[derive(Copy, Clone)]
+pub struct DummyNetworkStream;
+
+impl Read for DummyNetworkStream {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        Ok(0)
+    }
+}
+
+impl Write for DummyNetworkStream {
+    fn write(&mut self, msg: &[u8]) -> io::Result<usize> {
+        Ok(0)
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+impl hyper::net::NetworkStream for DummyNetworkStream {
+    fn peer_addr(&mut self) -> io::Result<std::net::SocketAddr> {
+        Ok("127.0.0.1:1337".parse().unwrap())
+    }
+}
+
 
 /// A trait specifying functionality to help controlling any request performed by the API.
 /// The trait has a conservative default implementation.
@@ -100,13 +125,36 @@ pub trait Delegate {
         None
     }
 
+    /// Called during resumable uploads to provide a URL for the impending upload.
+    /// It was saved after a previous call to `store_upload_url(...)`, and if not None,
+    /// will be used instead of asking the server for a new upload URL.
+    /// This is useful in case a previous resumable upload was aborted/cancelled, but should now
+    /// be resumed.
+    /// The returned URL will be used exactly once - if it fails again and the delegate allows
+    /// to retry, we will ask the server for a new upload URL.
+    fn upload_url(&mut self) -> Option<String> {
+        None
+    }
+
+    /// Called after we have retrieved a new upload URL for a resumable upload to store it
+    /// in case we fail or cancel. That way, we can attempt to resume the upload later, 
+    /// see `upload_url()`.
+    fn store_upload_url(&mut self, url: &str) {
+        let _ = url;
+    }
+
     /// Called whenever a server response could not be decoded from json.
     /// It's for informational purposes only, the caller will return with an error
     /// accordingly.
+    /// 
     /// # Arguments
-    /// `&str` - The json-encoded value which failed to decode.
-    /// `Error` - The decoder error
-    fn response_json_decode_error(&mut self, _: &str, _: &serde::json::Error) {}
+    ///
+    /// `json_encoded_value` - The json-encoded value which failed to decode.
+    /// `json_decode_error` - The decoder error
+    fn response_json_decode_error(&mut self, json_encoded_value: &str, json_decode_error: &serde::json::Error) {
+        let _ = json_encoded_value;
+        let _ = json_decode_error;
+    }
 
     /// Called whenever the http request returns with a non-success status code.
     /// This can involve authentication issues, or anything else that very much 
@@ -126,7 +174,13 @@ pub trait Delegate {
     /// Called before the API request method returns, in every case. It can be used to clean up
     /// internal state between calls to the API.
     /// This call always has a matching call to `begin(...)`.
-    fn finished(&mut self) {}
+    ///
+    /// # Arguments
+    /// 
+    /// `is_success` - a true value indicates the operation was successful
+    fn finished(&mut self, is_success: bool) {
+        let _ = is_success;
+    }
 }
 
 /// A delegate with a conservative default implementation, which is used if no other delegate is

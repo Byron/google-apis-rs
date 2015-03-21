@@ -419,7 +419,7 @@ match result {
     paddfields = 'self.' + api.properties.params
 
     delegate = 'self.' + property(DELEGATE_PROPERTY_NAME)
-    delegate_finish = 'dlg.finished();'
+    delegate_finish = 'dlg.finished'
     auth_call = 'self.hub.auth.borrow_mut()'
 
     if supports_scopes(auth):
@@ -479,7 +479,7 @@ match result {
         ## "the trait `core::marker::Sized` is not implemented for the type `std::io::Read`"
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match ${delegate} {
             Some(d) => d,
@@ -523,7 +523,7 @@ match result {
         ## Additional params - may not overlap with optional params
         for &field in [${', '.join(enclose_in('"', reserved_params + [p.name for p in field_params]))}].iter() {
             if ${paddfields}.contains_key(field) {
-                ${delegate_finish}
+                ${delegate_finish}(false);
                 return Result::FieldClash(field);
             }
         }
@@ -585,7 +585,7 @@ else {
         match key {
             Some(value) => params.push(("key", value)),
             None => {
-                ${delegate_finish}
+                ${delegate_finish}(false);
                 return Result::MissingAPIKey
             }
         }
@@ -651,6 +651,11 @@ else {
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
         % endif
 
+        % if resumable_media_param:
+        let mut should_ask_dlg_for_url = false;
+        let mut upload_url: Option<String> = None;
+        % endif
+
         loop {
             % if supports_scopes(auth):
             let mut token = ${auth_call}.token(self.${api.properties.scopes}.keys());
@@ -658,7 +663,7 @@ else {
                 token = dlg.token();
             }
             if token.is_none() {
-                ${delegate_finish}
+                ${delegate_finish}(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
@@ -667,6 +672,21 @@ else {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             % endif
             let mut req_result = {
+            % if resumable_media_param:
+                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
+                    should_ask_dlg_for_url = false;
+                    let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
+                    match response {
+                        Ok(ref mut res) => {
+                            res.status = hyper::status::StatusCode::Ok;
+                            res.headers.set(Location(upload_url.as_ref().unwrap().clone()))
+                        }
+                        _ => unreachable!(),
+                    }
+                    response
+                } else {
+            % endif
+<%block filter="indent_by(resumable_media_param and 4 or 0)">\
             % if request_value and simple_media_param:
                 let mut mp_reader: MultiPartReader = Default::default();
                 let (mut body_reader, content_type) = match protocol {
@@ -681,7 +701,6 @@ else {
                     _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
                 };
             % endif
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(${method_name_to_variant(m.httpMethod)}, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))\
@@ -718,6 +737,10 @@ else {
 
                 dlg.pre_request();
                 req.send()
+</%block>
+                % if resumable_media_param:
+                }
+                % endif
             };
 
             match req_result {
@@ -726,7 +749,7 @@ else {
                         sleep(d);
                         continue;
                     }
-                    ${delegate_finish}
+                    ${delegate_finish}(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -738,7 +761,7 @@ else {
                             sleep(d);
                             continue;
                         }
-                        ${delegate_finish}
+                        ${delegate_finish}(false);
                         return Result::Failure(res)
                     }
                     % if resumable_media_param:
@@ -749,14 +772,14 @@ else {
                             client: &mut client.borrow_mut(),
                             delegate: dlg,
                             auth: &mut *self.hub.auth.borrow_mut(),
-                            url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
+                            url: &res.headers.get::<Location>().expect("Location header is part of protocol").0,
                             reader: &mut reader,
                             media_type: reader_mime_type.clone(),
                             content_size: size
                         }.upload()) {
                             Err(err) => {
                                 ## Do not ask the delgate again, as it was asked by the helper !
-                                ${delegate_finish}
+                                ${delegate_finish}(false);
                                 return Result::HttpError(err)
                             }
                             ## Now the result contains the actual resource, if any ... it will be 
@@ -790,7 +813,7 @@ if enable_resource_parsing \
                     let result_value = res;
                 % endif
 
-                    ${delegate_finish}
+                    ${delegate_finish}(true);
                     return Result::Success(result_value)
                 }
             }

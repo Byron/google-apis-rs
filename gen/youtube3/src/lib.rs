@@ -5567,7 +5567,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
     pub fn doit(mut self) -> Result<(hyper::client::Response, I18nLanguageListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -5582,7 +5582,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
         }
         for &field in ["alt", "part", "hl"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -5604,18 +5604,18 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -5623,6 +5623,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -5631,7 +5632,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -5643,7 +5644,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -5658,7 +5659,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -5806,7 +5807,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
 		where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -5820,7 +5821,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
         }
         for &field in ["alt", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -5853,44 +5854,57 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+        let mut should_ask_dlg_for_url = false;
+        let mut upload_url: Option<String> = None;
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut mp_reader: MultiPartReader = Default::default();
-                let (mut body_reader, content_type) = match protocol {
-                    "simple" => {
-                        mp_reader.reserve_exact(2);
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
-                                 .add_part(&mut reader, size, reader_mime_type.clone());
-                        let mime_type = mp_reader.mime_type();
-                        (&mut mp_reader as &mut io::Read, ContentType(mime_type))
-                    },
-                    _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
-                };
-
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
-                    .header(content_type)
-                    .body(body_reader.into_body());
-                if protocol == "resumable" {
-                    req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
+                    should_ask_dlg_for_url = false;
+                    let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
+                    match response {
+                        Ok(ref mut res) => res.headers.set(Location(upload_url.as_ref().unwrap().clone())),
+                        _ => unreachable!(),
+                    }
+                    response
+                } else {
+                    let mut mp_reader: MultiPartReader = Default::default();
+                    let (mut body_reader, content_type) = match protocol {
+                        "simple" => {
+                            mp_reader.reserve_exact(2);
+                            let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                            mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
+                                     .add_part(&mut reader, size, reader_mime_type.clone());
+                            let mime_type = mp_reader.mime_type();
+                            (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                        },
+                        _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                    };
+                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                        .header(UserAgent(self.hub._user_agent.clone()))
+                        .header(auth_header)
+                        .header(content_type)
+                        .body(body_reader.into_body());
+                    if protocol == "resumable" {
+                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                    }
+    
+                    dlg.pre_request();
+                    req.send()
+    
                 }
-
-                dlg.pre_request();
-                req.send()
             };
 
             match req_result {
@@ -5899,7 +5913,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -5911,7 +5925,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     if protocol == "resumable" {
@@ -5922,13 +5936,13 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             client: &mut client.borrow_mut(),
                             delegate: dlg,
                             auth: &mut *self.hub.auth.borrow_mut(),
-                            url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
+                            url: &res.headers.get::<Location>().expect("Location header is part of protocol").0,
                             reader: &mut reader,
                             media_type: reader_mime_type.clone(),
                             content_size: size
                         }.upload()) {
                             Err(err) => {
-                                dlg.finished();
+                                dlg.finished(false);
                                 return Result::HttpError(err)
                             }
                             Ok(upload_result) => res = upload_result,
@@ -5946,7 +5960,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -6122,7 +6136,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
     pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelSectionListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -6146,7 +6160,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner", "mine", "id", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -6168,18 +6182,18 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -6187,6 +6201,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -6195,7 +6210,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -6207,7 +6222,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -6222,7 +6237,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -6411,7 +6426,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
     pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelSection)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -6432,7 +6447,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -6458,19 +6473,19 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -6481,6 +6496,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -6489,7 +6505,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -6501,7 +6517,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -6516,7 +6532,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -6685,7 +6701,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
     pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -6700,7 +6716,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
         }
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -6721,18 +6737,18 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -6740,6 +6756,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -6748,7 +6765,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -6760,12 +6777,12 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = res;
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -6920,7 +6937,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
     pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelSection)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -6938,7 +6955,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -6964,19 +6981,19 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -6987,6 +7004,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -6995,7 +7013,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -7007,7 +7025,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -7022,7 +7040,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -7197,7 +7215,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
     pub fn doit(mut self) -> Result<(hyper::client::Response, GuideCategoryListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -7218,7 +7236,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
         }
         for &field in ["alt", "part", "regionCode", "id", "hl"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -7240,18 +7258,18 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -7259,6 +7277,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -7267,7 +7286,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -7279,7 +7298,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -7294,7 +7313,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -7472,7 +7491,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     pub fn doit(mut self) -> Result<(hyper::client::Response, Playlist)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -7493,7 +7512,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -7519,19 +7538,19 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -7542,6 +7561,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -7550,7 +7570,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -7562,7 +7582,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -7577,7 +7597,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -7774,7 +7794,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -7807,7 +7827,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         }
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -7829,18 +7849,18 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -7848,6 +7868,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -7856,7 +7877,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -7868,7 +7889,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -7883,7 +7904,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -8077,7 +8098,7 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -8092,7 +8113,7 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -8113,18 +8134,18 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -8132,6 +8153,7 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -8140,7 +8162,7 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -8152,12 +8174,12 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = res;
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -8312,7 +8334,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     pub fn doit(mut self) -> Result<(hyper::client::Response, Playlist)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -8330,7 +8352,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -8356,19 +8378,19 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -8379,6 +8401,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -8387,7 +8410,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -8399,7 +8422,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -8414,7 +8437,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -8575,7 +8598,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 		where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -8590,7 +8613,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         }
         for &field in ["alt", "videoId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -8619,35 +8642,48 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         }
 
 
+        let mut should_ask_dlg_for_url = false;
+        let mut upload_url: Option<String> = None;
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
-                if protocol == "simple" {
-                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    req = req.header(ContentType(reader_mime_type.clone()))
-                             .header(ContentLength(size))
-                             .body(reader.into_body());
+                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
+                    should_ask_dlg_for_url = false;
+                    let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
+                    match response {
+                        Ok(ref mut res) => res.headers.set(Location(upload_url.as_ref().unwrap().clone())),
+                        _ => unreachable!(),
+                    }
+                    response
+                } else {
+                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                        .header(UserAgent(self.hub._user_agent.clone()))
+                        .header(auth_header);
+                    if protocol == "simple" {
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        req = req.header(ContentType(reader_mime_type.clone()))
+                                 .header(ContentLength(size))
+                                 .body(reader.into_body());
+                    }
+                    if protocol == "resumable" {
+                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                    }
+    
+                    dlg.pre_request();
+                    req.send()
+    
                 }
-                if protocol == "resumable" {
-                    req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
-                }
-
-                dlg.pre_request();
-                req.send()
             };
 
             match req_result {
@@ -8656,7 +8692,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -8668,7 +8704,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     if protocol == "resumable" {
@@ -8679,13 +8715,13 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             client: &mut client.borrow_mut(),
                             delegate: dlg,
                             auth: &mut *self.hub.auth.borrow_mut(),
-                            url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
+                            url: &res.headers.get::<Location>().expect("Location header is part of protocol").0,
                             reader: &mut reader,
                             media_type: reader_mime_type.clone(),
                             content_size: size
                         }.upload()) {
                             Err(err) => {
-                                dlg.finished();
+                                dlg.finished(false);
                                 return Result::HttpError(err)
                             }
                             Ok(upload_result) => res = upload_result,
@@ -8703,7 +8739,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -8900,7 +8936,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     pub fn doit(mut self) -> Result<(hyper::client::Response, VideoListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -8942,7 +8978,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         }
         for &field in ["alt", "part", "videoCategoryId", "regionCode", "pageToken", "onBehalfOfContentOwner", "myRating", "maxResults", "locale", "id", "hl", "chart"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -8964,18 +9000,18 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -8983,6 +9019,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -8991,7 +9028,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -9003,7 +9040,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -9018,7 +9055,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -9246,7 +9283,7 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -9262,7 +9299,7 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         }
         for &field in ["id", "rating", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -9283,18 +9320,18 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -9302,6 +9339,7 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -9310,7 +9348,7 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -9322,12 +9360,12 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = res;
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -9470,7 +9508,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
     pub fn doit(mut self) -> Result<(hyper::client::Response, VideoGetRatingResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -9485,7 +9523,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
         for &field in ["alt", "id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -9507,18 +9545,18 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -9526,6 +9564,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -9534,7 +9573,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -9546,7 +9585,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -9561,7 +9600,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -9694,7 +9733,7 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -9709,7 +9748,7 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         }
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -9730,18 +9769,18 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -9749,6 +9788,7 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -9757,7 +9797,7 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -9769,12 +9809,12 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = res;
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -9949,7 +9989,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     pub fn doit(mut self) -> Result<(hyper::client::Response, Video)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -9967,7 +10007,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -9993,19 +10033,19 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -10016,6 +10056,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -10024,7 +10065,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -10036,7 +10077,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -10051,7 +10092,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -10285,7 +10326,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 		where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -10315,7 +10356,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         }
         for &field in ["alt", "part", "stabilize", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "notifySubscribers", "autoLevels"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -10348,44 +10389,57 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+        let mut should_ask_dlg_for_url = false;
+        let mut upload_url: Option<String> = None;
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut mp_reader: MultiPartReader = Default::default();
-                let (mut body_reader, content_type) = match protocol {
-                    "simple" => {
-                        mp_reader.reserve_exact(2);
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
-                                 .add_part(&mut reader, size, reader_mime_type.clone());
-                        let mime_type = mp_reader.mime_type();
-                        (&mut mp_reader as &mut io::Read, ContentType(mime_type))
-                    },
-                    _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
-                };
-
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
-                    .header(content_type)
-                    .body(body_reader.into_body());
-                if protocol == "resumable" {
-                    req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
+                    should_ask_dlg_for_url = false;
+                    let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
+                    match response {
+                        Ok(ref mut res) => res.headers.set(Location(upload_url.as_ref().unwrap().clone())),
+                        _ => unreachable!(),
+                    }
+                    response
+                } else {
+                    let mut mp_reader: MultiPartReader = Default::default();
+                    let (mut body_reader, content_type) = match protocol {
+                        "simple" => {
+                            mp_reader.reserve_exact(2);
+                            let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                            mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
+                                     .add_part(&mut reader, size, reader_mime_type.clone());
+                            let mime_type = mp_reader.mime_type();
+                            (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                        },
+                        _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                    };
+                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                        .header(UserAgent(self.hub._user_agent.clone()))
+                        .header(auth_header)
+                        .header(content_type)
+                        .body(body_reader.into_body());
+                    if protocol == "resumable" {
+                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                    }
+    
+                    dlg.pre_request();
+                    req.send()
+    
                 }
-
-                dlg.pre_request();
-                req.send()
             };
 
             match req_result {
@@ -10394,7 +10448,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -10406,7 +10460,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     if protocol == "resumable" {
@@ -10417,13 +10471,13 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             client: &mut client.borrow_mut(),
                             delegate: dlg,
                             auth: &mut *self.hub.auth.borrow_mut(),
-                            url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
+                            url: &res.headers.get::<Location>().expect("Location header is part of protocol").0,
                             reader: &mut reader,
                             media_type: reader_mime_type.clone(),
                             content_size: size
                         }.upload()) {
                             Err(err) => {
-                                dlg.finished();
+                                dlg.finished(false);
                                 return Result::HttpError(err)
                             }
                             Ok(upload_result) => res = upload_result,
@@ -10441,7 +10495,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -10697,7 +10751,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     pub fn doit(mut self) -> Result<(hyper::client::Response, Subscription)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -10712,7 +10766,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
         params.push(("part", self._part.to_string()));
         for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -10738,19 +10792,19 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -10761,6 +10815,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -10769,7 +10824,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -10781,7 +10836,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -10796,7 +10851,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -10976,7 +11031,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     pub fn doit(mut self) -> Result<(hyper::client::Response, SubscriptionListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -11018,7 +11073,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
         }
         for &field in ["alt", "part", "pageToken", "order", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "id", "forChannelId", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -11040,18 +11095,18 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -11059,6 +11114,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -11067,7 +11123,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -11079,7 +11135,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -11094,7 +11150,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -11309,7 +11365,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -11321,7 +11377,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -11342,18 +11398,18 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -11361,6 +11417,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -11369,7 +11426,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -11381,12 +11438,12 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = res;
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -11579,7 +11636,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     pub fn doit(mut self) -> Result<(hyper::client::Response, SearchListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -11678,7 +11735,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         }
         for &field in ["alt", "part", "videoType", "videoSyndicated", "videoLicense", "videoEmbeddable", "videoDuration", "videoDimension", "videoDefinition", "videoCategoryId", "videoCaption", "type", "topicId", "safeSearch", "relevanceLanguage", "relatedToVideoId", "regionCode", "q", "publishedBefore", "publishedAfter", "pageToken", "order", "onBehalfOfContentOwner", "maxResults", "locationRadius", "location", "forMine", "forContentOwner", "eventType", "channelType", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -11700,18 +11757,18 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -11719,6 +11776,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -11727,7 +11785,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -11739,7 +11797,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -11754,7 +11812,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -12134,7 +12192,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
     pub fn doit(mut self) -> Result<(hyper::client::Response, I18nRegionListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -12149,7 +12207,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
         for &field in ["alt", "part", "hl"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -12171,18 +12229,18 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -12190,6 +12248,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -12198,7 +12257,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -12210,7 +12269,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -12225,7 +12284,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -12388,7 +12447,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveStream)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -12409,7 +12468,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -12435,19 +12494,19 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -12458,6 +12517,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -12466,7 +12526,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -12478,7 +12538,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -12493,7 +12553,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -12670,7 +12730,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -12688,7 +12748,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         }
         for &field in ["id", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -12709,18 +12769,18 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -12728,6 +12788,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -12736,7 +12797,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -12748,12 +12809,12 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = res;
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -12923,7 +12984,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveStreamListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -12953,7 +13014,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -12975,18 +13036,18 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -12994,6 +13055,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -13002,7 +13064,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -13014,7 +13076,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -13029,7 +13091,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -13240,7 +13302,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveStream)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -13261,7 +13323,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -13287,19 +13349,19 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -13310,6 +13372,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -13318,7 +13381,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -13330,7 +13393,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -13345,7 +13408,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -13540,7 +13603,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -13558,7 +13621,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -13584,19 +13647,19 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -13607,6 +13670,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -13615,7 +13679,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -13627,7 +13691,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -13642,7 +13706,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -13834,7 +13898,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -13873,7 +13937,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         }
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "managedByMe", "id", "forUsername", "categoryId"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -13895,18 +13959,18 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -13914,6 +13978,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -13922,7 +13987,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -13934,7 +13999,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -13949,7 +14014,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -14153,7 +14218,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -14165,7 +14230,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         params.push(("id", self._id.to_string()));
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -14186,18 +14251,18 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -14205,6 +14270,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -14213,7 +14279,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -14225,12 +14291,12 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = res;
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -14379,7 +14445,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
     pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistItemListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -14409,7 +14475,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
         }
         for &field in ["alt", "part", "videoId", "playlistId", "pageToken", "onBehalfOfContentOwner", "maxResults", "id"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -14431,18 +14497,18 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -14450,6 +14516,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -14458,7 +14525,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -14470,7 +14537,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -14485,7 +14552,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -14691,7 +14758,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistItem)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -14709,7 +14776,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
         }
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -14735,19 +14802,19 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -14758,6 +14825,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -14766,7 +14834,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -14778,7 +14846,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -14793,7 +14861,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -14974,7 +15042,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistItem)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -14989,7 +15057,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
         params.push(("part", self._part.to_string()));
         for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -15015,19 +15083,19 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -15038,6 +15106,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -15046,7 +15115,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -15058,7 +15127,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -15073,7 +15142,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -15233,7 +15302,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 		where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -15248,7 +15317,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         }
         for &field in ["channelId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -15280,44 +15349,57 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+        let mut should_ask_dlg_for_url = false;
+        let mut upload_url: Option<String> = None;
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut mp_reader: MultiPartReader = Default::default();
-                let (mut body_reader, content_type) = match protocol {
-                    "simple" => {
-                        mp_reader.reserve_exact(2);
-                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
-                                 .add_part(&mut reader, size, reader_mime_type.clone());
-                        let mime_type = mp_reader.mime_type();
-                        (&mut mp_reader as &mut io::Read, ContentType(mime_type))
-                    },
-                    _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
-                };
-
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
-                    .header(content_type)
-                    .body(body_reader.into_body());
-                if protocol == "resumable" {
-                    req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
+                    should_ask_dlg_for_url = false;
+                    let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
+                    match response {
+                        Ok(ref mut res) => res.headers.set(Location(upload_url.as_ref().unwrap().clone())),
+                        _ => unreachable!(),
+                    }
+                    response
+                } else {
+                    let mut mp_reader: MultiPartReader = Default::default();
+                    let (mut body_reader, content_type) = match protocol {
+                        "simple" => {
+                            mp_reader.reserve_exact(2);
+                            let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                            mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
+                                     .add_part(&mut reader, size, reader_mime_type.clone());
+                            let mime_type = mp_reader.mime_type();
+                            (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                        },
+                        _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                    };
+                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                        .header(UserAgent(self.hub._user_agent.clone()))
+                        .header(auth_header)
+                        .header(content_type)
+                        .body(body_reader.into_body());
+                    if protocol == "resumable" {
+                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                    }
+    
+                    dlg.pre_request();
+                    req.send()
+    
                 }
-
-                dlg.pre_request();
-                req.send()
             };
 
             match req_result {
@@ -15326,7 +15408,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -15338,7 +15420,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     if protocol == "resumable" {
@@ -15349,13 +15431,13 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             client: &mut client.borrow_mut(),
                             delegate: dlg,
                             auth: &mut *self.hub.auth.borrow_mut(),
-                            url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
+                            url: &res.headers.get::<Location>().expect("Location header is part of protocol").0,
                             reader: &mut reader,
                             media_type: reader_mime_type.clone(),
                             content_size: size
                         }.upload()) {
                             Err(err) => {
-                                dlg.finished();
+                                dlg.finished(false);
                                 return Result::HttpError(err)
                             }
                             Ok(upload_result) => res = upload_result,
@@ -15363,7 +15445,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                     }
                     let result_value = res;
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -15526,7 +15608,7 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
     pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -15541,7 +15623,7 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
         for &field in ["channelId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -15562,18 +15644,18 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -15581,6 +15663,7 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -15589,7 +15672,7 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -15601,12 +15684,12 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = res;
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -15760,7 +15843,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -15788,7 +15871,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
         }
         for &field in ["alt", "id", "part", "walltime", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "offsetTimeMs", "displaySlate"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -15810,18 +15893,18 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -15829,6 +15912,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -15837,7 +15921,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -15849,7 +15933,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -15864,7 +15948,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -16081,7 +16165,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -16102,7 +16186,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -16128,19 +16212,19 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -16151,6 +16235,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -16159,7 +16244,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -16171,7 +16256,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -16186,7 +16271,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -16388,7 +16473,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -16409,7 +16494,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
         }
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -16435,19 +16520,19 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -16458,6 +16543,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -16466,7 +16552,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -16478,7 +16564,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -16493,7 +16579,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -16685,7 +16771,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -16707,7 +16793,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
         }
         for &field in ["alt", "id", "part", "streamId", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -16729,18 +16815,18 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -16748,6 +16834,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -16756,7 +16843,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -16768,7 +16855,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -16783,7 +16870,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -16980,7 +17067,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcastListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -17013,7 +17100,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
         }
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "broadcastStatus"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -17035,18 +17122,18 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -17054,6 +17141,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -17062,7 +17150,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -17074,7 +17162,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -17089,7 +17177,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -17283,7 +17371,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     pub fn doit(mut self) -> Result<hyper::client::Response> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -17301,7 +17389,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
         }
         for &field in ["id", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -17322,18 +17410,18 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -17341,6 +17429,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -17349,7 +17438,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -17361,12 +17450,12 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = res;
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -17529,7 +17618,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -17549,7 +17638,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
         }
         for &field in ["alt", "broadcastStatus", "id", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -17571,18 +17660,18 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -17590,6 +17679,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -17598,7 +17688,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -17610,7 +17700,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -17625,7 +17715,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -17815,7 +17905,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
     pub fn doit(mut self) -> Result<(hyper::client::Response, VideoCategoryListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -17836,7 +17926,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
         }
         for &field in ["alt", "part", "regionCode", "id", "hl"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -17858,18 +17948,18 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -17877,6 +17967,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -17885,7 +17976,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -17897,7 +17988,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -17912,7 +18003,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -18092,7 +18183,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     pub fn doit(mut self) -> Result<(hyper::client::Response, ActivityListResponse)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -18128,7 +18219,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         }
         for &field in ["alt", "part", "regionCode", "publishedBefore", "publishedAfter", "pageToken", "mine", "maxResults", "home", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -18150,18 +18241,18 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         }
 
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -18169,6 +18260,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -18177,7 +18269,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -18189,7 +18281,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -18204,7 +18296,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
@@ -18420,7 +18512,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     pub fn doit(mut self) -> Result<(hyper::client::Response, Activity)> {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -18435,7 +18527,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         params.push(("part", self._part.to_string()));
         for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::FieldClash(field);
             }
         }
@@ -18461,19 +18553,19 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
+
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
                 token = dlg.token();
             }
             if token.is_none() {
-                dlg.finished();
+                dlg.finished(false);
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
@@ -18484,6 +18576,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
+
             };
 
             match req_result {
@@ -18492,7 +18585,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         sleep(d);
                         continue;
                     }
-                    dlg.finished();
+                    dlg.finished(false);
                     return Result::HttpError(err)
                 }
                 Ok(mut res) => {
@@ -18504,7 +18597,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             sleep(d);
                             continue;
                         }
-                        dlg.finished();
+                        dlg.finished(false);
                         return Result::Failure(res)
                     }
                     let result_value = {
@@ -18519,7 +18612,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         }
                     };
 
-                    dlg.finished();
+                    dlg.finished(true);
                     return Result::Success(result_value)
                 }
             }
