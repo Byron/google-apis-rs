@@ -50,6 +50,11 @@ pub trait NestedType: MarkerTrait {}
 pub trait ReadSeek: Seek + Read {}
 impl<T: Seek + Read> ReadSeek for T {}
 
+/// A trait for all types that can convert themselves into a *parts* string
+pub trait ToParts {
+    fn to_parts(&self) -> String;
+}
+
 
 /// A utility type which can decode a server response that indicates error
 #[derive(Deserialize)]
@@ -98,7 +103,10 @@ pub trait Delegate {
     /// Called whenever a server response could not be decoded from json.
     /// It's for informational purposes only, the caller will return with an error
     /// accordingly.
-    fn response_json_decode_error(&mut self, json_encoded_value: &str) {}
+    /// # Arguments
+    /// `&str` - The json-encoded value which failed to decode.
+    /// `Error` - The decoder error
+    fn response_json_decode_error(&mut self, _: &str, _: &serde::json::Error) {}
 
     /// Called whenever the http request returns with a non-success status code.
     /// This can involve authentication issues, or anything else that very much 

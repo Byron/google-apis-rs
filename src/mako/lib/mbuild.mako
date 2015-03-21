@@ -747,7 +747,10 @@ if enable_resource_parsing \
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     }\
                     % if supports_download:

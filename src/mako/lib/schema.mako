@@ -2,7 +2,7 @@
     from util import (schema_markers, rust_doc_comment, mangle_ident, to_rust_type, put_and, 
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
                       NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE, unique_type_name, 
-                      PART_MARKER_TRAIT, canonical_type_name)
+                      PART_MARKER_TRAIT, canonical_type_name, TO_PARTS_MARKER, UNUSED_TYPE_MARKER)
 
     default_traits = ('RustcEncodable', 'Clone', 'Default')
 %>\
@@ -27,7 +27,7 @@ ${struct}(${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s, allow_optionals=a
 <% 
     et = unique_type_name(s.id)
     variant_type = lambda p: canonical_type_name(p.type_value)
-%>
+%>\
 pub enum ${et} {
 % for p in s.variant.map:
     ${p.get('description', 'no description provided') | rust_doc_comment, indent_all_but_first_by(1)}
@@ -73,7 +73,7 @@ ${struct};
         allow_optionals = False
     # use optionals only when needed
     
-    ## waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
+    # waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
     if s.type == 'any':
         traits.remove('Default')
 
@@ -105,11 +105,13 @@ impl Default for ${s_type} {
 % endif ## type == ?
 
 % for marker_trait in nt_markers:
+% if marker_trait not in (TO_PARTS_MARKER, UNUSED_TYPE_MARKER):
 impl ${marker_trait} for ${s_type} {}
+% endif
 % endfor
 
-% if REQUEST_MARKER_TRAIT in nt_markers and 'properties' in s:
-impl ${s_type} {
+% if TO_PARTS_MARKER in nt_markers and allow_optionals:
+impl ${TO_PARTS_MARKER} for ${s_type} {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.

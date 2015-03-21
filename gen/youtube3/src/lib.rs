@@ -211,9 +211,8 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io, old_io)]
-// DEBUG !! TODO: Remove this
-#![allow(dead_code, deprecated)]
+#![feature(core,io,thread_sleep)]
+// Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
@@ -239,9 +238,9 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::old_io::timer::sleep;
+use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, UnusedType};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
 
 
 // ##############
@@ -731,7 +730,7 @@ impl RequestValue for LiveStream {}
 impl ResponseResult for LiveStream {}
 impl cmn::Resource for LiveStream {}
 
-impl LiveStream {
+impl ToParts for LiveStream {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
@@ -1182,21 +1181,6 @@ pub struct InvideoBranding {
 
 impl RequestValue for InvideoBranding {}
 
-impl InvideoBranding {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.target_channel_id.is_some() { r = r + "targetChannelId,"; }
-        if self.position.is_some() { r = r + "position,"; }
-        if self.image_url.is_some() { r = r + "imageUrl,"; }
-        if self.timing.is_some() { r = r + "timing,"; }
-        if self.image_bytes.is_some() { r = r + "imageBytes,"; }
-        r.pop();
-        r
-    }
-}
 
 /// Information about the playlist item's privacy status.
 /// 
@@ -1283,7 +1267,7 @@ impl RequestValue for PlaylistItem {}
 impl ResponseResult for PlaylistItem {}
 impl cmn::Resource for PlaylistItem {}
 
-impl PlaylistItem {
+impl ToParts for PlaylistItem {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
@@ -1433,6 +1417,20 @@ pub struct I18nRegion {
 
 impl cmn::Resource for I18nRegion {}
 
+impl ToParts for I18nRegion {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.snippet.is_some() { r = r + "snippet,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.id.is_some() { r = r + "id,"; }
+        r.pop();
+        r
+    }
+}
 
 /// Internal representation of thumbnails for a YouTube resource.
 /// 
@@ -1798,7 +1796,7 @@ impl RequestValue for Video {}
 impl ResponseResult for Video {}
 impl cmn::Resource for Video {}
 
-impl Video {
+impl ToParts for Video {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
@@ -2038,7 +2036,7 @@ impl RequestValue for Subscription {}
 impl ResponseResult for Subscription {}
 impl cmn::Resource for Subscription {}
 
-impl Subscription {
+impl ToParts for Subscription {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
@@ -2153,7 +2151,7 @@ impl RequestValue for Playlist {}
 impl ResponseResult for Playlist {}
 impl cmn::Resource for Playlist {}
 
-impl Playlist {
+impl ToParts for Playlist {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
@@ -2498,7 +2496,7 @@ impl RequestValue for LiveBroadcast {}
 impl ResponseResult for LiveBroadcast {}
 impl cmn::Resource for LiveBroadcast {}
 
-impl LiveBroadcast {
+impl ToParts for LiveBroadcast {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
@@ -2622,7 +2620,7 @@ impl RequestValue for Channel {}
 impl ResponseResult for Channel {}
 impl cmn::Resource for Channel {}
 
-impl Channel {
+impl ToParts for Channel {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
@@ -3100,7 +3098,7 @@ impl RequestValue for ChannelSection {}
 impl ResponseResult for ChannelSection {}
 impl cmn::Resource for ChannelSection {}
 
-impl ChannelSection {
+impl ToParts for ChannelSection {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
@@ -3467,7 +3465,7 @@ pub struct Activity {
 impl RequestValue for Activity {}
 impl ResponseResult for Activity {}
 
-impl Activity {
+impl ToParts for Activity {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
     /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
     /// the parts you want to see in the server response.
@@ -3671,6 +3669,20 @@ pub struct I18nLanguage {
 
 impl cmn::Resource for I18nLanguage {}
 
+impl ToParts for I18nLanguage {
+    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
+    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
+    /// the parts you want to see in the server response.
+    fn to_parts(&self) -> String {
+        let mut r = String::new();
+        if self.snippet.is_some() { r = r + "snippet,"; }
+        if self.kind.is_some() { r = r + "kind,"; }
+        if self.etag.is_some() { r = r + "etag,"; }
+        if self.id.is_some() { r = r + "id,"; }
+        r.pop();
+        r
+    }
+}
 
 /// There is no detailed description.
 /// 
@@ -3946,19 +3958,6 @@ pub struct ChannelBannerResource {
 impl RequestValue for ChannelBannerResource {}
 impl ResponseResult for ChannelBannerResource {}
 
-impl ChannelBannerResource {
-    /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
-    /// The produced string is suitable for use as a parts list that indicates the parts you are sending, and/or
-    /// the parts you want to see in the server response.
-    fn to_parts(&self) -> String {
-        let mut r = String::new();
-        if self.url.is_some() { r = r + "url,"; }
-        if self.kind.is_some() { r = r + "kind,"; }
-        if self.etag.is_some() { r = r + "etag,"; }
-        r.pop();
-        r
-    }
-}
 
 /// There is no detailed description.
 /// 
@@ -5647,7 +5646,10 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -5903,7 +5905,10 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -6171,7 +6176,10 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -6457,7 +6465,10 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -6950,7 +6961,10 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -7214,7 +7228,10 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -7489,7 +7506,10 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -7787,7 +7807,10 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -8305,7 +8328,10 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -8562,7 +8588,10 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -8869,7 +8898,10 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -9399,7 +9431,10 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -9876,7 +9911,10 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -10234,7 +10272,10 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -10581,7 +10622,10 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -10871,7 +10915,10 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -11518,7 +11565,10 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -11981,7 +12031,10 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -12241,7 +12294,10 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -12764,7 +12820,10 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -13072,7 +13131,10 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -13361,7 +13423,10 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -13660,7 +13725,10 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -14183,7 +14251,10 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -14483,7 +14554,10 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -14755,7 +14829,10 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -15504,7 +15581,10 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -15818,7 +15898,10 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -16117,7 +16200,10 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -16399,7 +16485,10 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -16697,7 +16786,10 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -17220,7 +17312,10 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -17499,7 +17594,10 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -17783,7 +17881,10 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();
@@ -18090,7 +18191,10 @@ impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
-                            Err(err) => return Result::JsonDecodeError(err),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Result::JsonDecodeError(err);
+                            }
                         }
                     };
                     dlg.finished();

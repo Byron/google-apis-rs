@@ -6,7 +6,8 @@
 <%  
     from util import (new_context, rust_comment, rust_doc_comment, rust_module_doc_comment, 
                       rb_type, hub_type, mangle_ident, hub_type_params_s, hub_type_bounds, 
-                      rb_type_params_s, find_fattest_resource, HUB_TYPE_PARAMETERS, METHODS_RESOURCE)
+                      rb_type_params_s, find_fattest_resource, HUB_TYPE_PARAMETERS, METHODS_RESOURCE,
+                      UNUSED_TYPE_MARKER, schema_markers)
 
     c = new_context(schemas, resources, context.get('methods'))
     hub_type = hub_type(c.schemas, util.canonical_name())
@@ -21,9 +22,8 @@
 <%block filter="rust_module_doc_comment">\
 ${lib.docs(c)}
 </%block>
-#![feature(core,io, old_io)]
-// DEBUG !! TODO: Remove this
-#![allow(dead_code, deprecated)]
+#![feature(core,io,thread_sleep)]
+// Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
@@ -49,9 +49,9 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::old_io::timer::sleep;
+use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, UnusedType};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
 
 
 // ##############
@@ -119,7 +119,9 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params}
 // SCHEMAS ###
 // ##########
 % for s in c.schemas.values():
+% if UNUSED_TYPE_MARKER not in schema_markers(s, c, transitive=True):
 ${schema.new(s, c)}
+% endif
 % endfor
 % endif
 
