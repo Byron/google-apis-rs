@@ -653,6 +653,7 @@ else {
 
         % if resumable_media_param:
         let mut should_ask_dlg_for_url = false;
+        let mut upload_url_from_server = true;
         let mut upload_url: Option<String> = None;
         % endif
 
@@ -675,6 +676,7 @@ else {
             % if resumable_media_param:
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
+                    upload_url_from_server = false;
                     let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
                     match response {
                         Ok(ref mut res) => {
@@ -730,6 +732,7 @@ else {
                 }
                 % endif ## media upload handling
                 % if resumable_media_param:
+                upload_url_from_server = true;
                 if protocol == "${resumable_media_param.protocol}" {
                     req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
                 }
@@ -768,15 +771,23 @@ else {
                     if protocol == "${resumable_media_param.protocol}" {
                         ${READER_SEEK | indent_all_but_first_by(6)}
                         let mut client = &mut *self.hub.client.borrow_mut();
-                        match (cmn::ResumableUploadHelper {
-                            client: &mut client.borrow_mut(),
-                            delegate: dlg,
-                            auth: &mut *self.hub.auth.borrow_mut(),
-                            url: &res.headers.get::<Location>().expect("Location header is part of protocol").0,
-                            reader: &mut reader,
-                            media_type: reader_mime_type.clone(),
-                            content_size: size
-                        }.upload()) {
+                        let upload_result = {
+                            let url = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            if upload_url_from_server {
+                                dlg.store_upload_url(url);
+                            }
+
+                            cmn::ResumableUploadHelper {
+                                client: &mut client.borrow_mut(),
+                                delegate: dlg,
+                                auth: &mut *self.hub.auth.borrow_mut(),
+                                url: url,
+                                reader: &mut reader,
+                                media_type: reader_mime_type.clone(),
+                                content_size: size
+                            }.upload()
+                        };
+                        match upload_result {
                             Err(err) => {
                                 ## Do not ask the delgate again, as it was asked by the helper !
                                 ${delegate_finish}(false);
