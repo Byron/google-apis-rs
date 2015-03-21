@@ -787,7 +787,7 @@ def library_to_crate_name(name):
 
 # return type name of a resource method builder, from a resource name
 def rb_type(r):
-    return "%sMethodsBuilder" % singular(canonical_type_name(r))
+    return "%sMethods" % singular(canonical_type_name(r))
 
 def _to_type_params_s(p):
     return '<%s>' % ', '.join(p)
@@ -837,7 +837,7 @@ def unique_type_name(type_name):
 
 # return type name for a method on the given resource
 def mb_type(r, m):
-    return "%s%sCallBuilder" % (singular(canonical_type_name(r)), dot_sep_to_canonical_type_name(m))
+    return "%s%sCall" % (singular(canonical_type_name(r)), dot_sep_to_canonical_type_name(m))
 
 # canonicalName = util.canonical_name()
 def hub_type(schemas, canonicalName):

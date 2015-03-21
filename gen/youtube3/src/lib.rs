@@ -9,51 +9,51 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.YouTube.html) ... 
 //! 
 //! * [activities](struct.Activity.html)
-//!  * [*insert*](struct.ActivityInsertCallBuilder.html) and [*list*](struct.ActivityListCallBuilder.html)
+//!  * [*insert*](struct.ActivityInsertCall.html) and [*list*](struct.ActivityListCall.html)
 //! * channel banners
-//!  * [*insert*](struct.ChannelBannerInsertCallBuilder.html)
+//!  * [*insert*](struct.ChannelBannerInsertCall.html)
 //! * [channel sections](struct.ChannelSection.html)
-//!  * [*delete*](struct.ChannelSectionDeleteCallBuilder.html), [*insert*](struct.ChannelSectionInsertCallBuilder.html), [*list*](struct.ChannelSectionListCallBuilder.html) and [*update*](struct.ChannelSectionUpdateCallBuilder.html)
+//!  * [*delete*](struct.ChannelSectionDeleteCall.html), [*insert*](struct.ChannelSectionInsertCall.html), [*list*](struct.ChannelSectionListCall.html) and [*update*](struct.ChannelSectionUpdateCall.html)
 //! * [channels](struct.Channel.html)
-//!  * [*list*](struct.ChannelListCallBuilder.html) and [*update*](struct.ChannelUpdateCallBuilder.html)
+//!  * [*list*](struct.ChannelListCall.html) and [*update*](struct.ChannelUpdateCall.html)
 //! * [guide categories](struct.GuideCategory.html)
-//!  * [*list*](struct.GuideCategoryListCallBuilder.html)
+//!  * [*list*](struct.GuideCategoryListCall.html)
 //! * [i18n languages](struct.I18nLanguage.html)
-//!  * [*list*](struct.I18nLanguageListCallBuilder.html)
+//!  * [*list*](struct.I18nLanguageListCall.html)
 //! * [i18n regions](struct.I18nRegion.html)
-//!  * [*list*](struct.I18nRegionListCallBuilder.html)
+//!  * [*list*](struct.I18nRegionListCall.html)
 //! * [live broadcasts](struct.LiveBroadcast.html)
-//!  * [*bind*](struct.LiveBroadcastBindCallBuilder.html), [*control*](struct.LiveBroadcastControlCallBuilder.html), [*delete*](struct.LiveBroadcastDeleteCallBuilder.html), [*insert*](struct.LiveBroadcastInsertCallBuilder.html), [*list*](struct.LiveBroadcastListCallBuilder.html), [*transition*](struct.LiveBroadcastTransitionCallBuilder.html) and [*update*](struct.LiveBroadcastUpdateCallBuilder.html)
+//!  * [*bind*](struct.LiveBroadcastBindCall.html), [*control*](struct.LiveBroadcastControlCall.html), [*delete*](struct.LiveBroadcastDeleteCall.html), [*insert*](struct.LiveBroadcastInsertCall.html), [*list*](struct.LiveBroadcastListCall.html), [*transition*](struct.LiveBroadcastTransitionCall.html) and [*update*](struct.LiveBroadcastUpdateCall.html)
 //! * [live streams](struct.LiveStream.html)
-//!  * [*delete*](struct.LiveStreamDeleteCallBuilder.html), [*insert*](struct.LiveStreamInsertCallBuilder.html), [*list*](struct.LiveStreamListCallBuilder.html) and [*update*](struct.LiveStreamUpdateCallBuilder.html)
+//!  * [*delete*](struct.LiveStreamDeleteCall.html), [*insert*](struct.LiveStreamInsertCall.html), [*list*](struct.LiveStreamListCall.html) and [*update*](struct.LiveStreamUpdateCall.html)
 //! * [playlist items](struct.PlaylistItem.html)
-//!  * [*delete*](struct.PlaylistItemDeleteCallBuilder.html), [*insert*](struct.PlaylistItemInsertCallBuilder.html), [*list*](struct.PlaylistItemListCallBuilder.html) and [*update*](struct.PlaylistItemUpdateCallBuilder.html)
+//!  * [*delete*](struct.PlaylistItemDeleteCall.html), [*insert*](struct.PlaylistItemInsertCall.html), [*list*](struct.PlaylistItemListCall.html) and [*update*](struct.PlaylistItemUpdateCall.html)
 //! * [playlists](struct.Playlist.html)
-//!  * [*delete*](struct.PlaylistDeleteCallBuilder.html), [*insert*](struct.PlaylistInsertCallBuilder.html), [*list*](struct.PlaylistListCallBuilder.html) and [*update*](struct.PlaylistUpdateCallBuilder.html)
+//!  * [*delete*](struct.PlaylistDeleteCall.html), [*insert*](struct.PlaylistInsertCall.html), [*list*](struct.PlaylistListCall.html) and [*update*](struct.PlaylistUpdateCall.html)
 //! * search
-//!  * [*list*](struct.SearchListCallBuilder.html)
+//!  * [*list*](struct.SearchListCall.html)
 //! * [subscriptions](struct.Subscription.html)
-//!  * [*delete*](struct.SubscriptionDeleteCallBuilder.html), [*insert*](struct.SubscriptionInsertCallBuilder.html) and [*list*](struct.SubscriptionListCallBuilder.html)
+//!  * [*delete*](struct.SubscriptionDeleteCall.html), [*insert*](struct.SubscriptionInsertCall.html) and [*list*](struct.SubscriptionListCall.html)
 //! * [thumbnails](struct.Thumbnail.html)
-//!  * [*set*](struct.ThumbnailSetCallBuilder.html)
+//!  * [*set*](struct.ThumbnailSetCall.html)
 //! * [video categories](struct.VideoCategory.html)
-//!  * [*list*](struct.VideoCategoryListCallBuilder.html)
+//!  * [*list*](struct.VideoCategoryListCall.html)
 //! * [videos](struct.Video.html)
-//!  * [*delete*](struct.VideoDeleteCallBuilder.html), [*get rating*](struct.VideoGetRatingCallBuilder.html), [*insert*](struct.VideoInsertCallBuilder.html), [*list*](struct.VideoListCallBuilder.html), [*rate*](struct.VideoRateCallBuilder.html) and [*update*](struct.VideoUpdateCallBuilder.html)
+//!  * [*delete*](struct.VideoDeleteCall.html), [*get rating*](struct.VideoGetRatingCall.html), [*insert*](struct.VideoInsertCall.html), [*list*](struct.VideoListCall.html), [*rate*](struct.VideoRateCall.html) and [*update*](struct.VideoUpdateCall.html)
 //! * watermarks
-//!  * [*set*](struct.WatermarkSetCallBuilder.html) and [*unset*](struct.WatermarkUnsetCallBuilder.html)
+//!  * [*set*](struct.WatermarkSetCall.html) and [*unset*](struct.WatermarkUnsetCall.html)
 //! 
 //! 
 //! Upload supported by ...
 //! 
-//! * [*set watermarks*](struct.WatermarkSetCallBuilder.html)
-//! * [*insert channel banners*](struct.ChannelBannerInsertCallBuilder.html)
-//! * [*set thumbnails*](struct.ThumbnailSetCallBuilder.html)
-//! * [*insert videos*](struct.VideoInsertCallBuilder.html)
+//! * [*set watermarks*](struct.WatermarkSetCall.html)
+//! * [*insert channel banners*](struct.ChannelBannerInsertCall.html)
+//! * [*set thumbnails*](struct.ThumbnailSetCall.html)
+//! * [*insert videos*](struct.VideoInsertCall.html)
 //! 
 //! Subscription supported by ...
 //! 
-//! * [*list playlist items*](struct.PlaylistItemListCallBuilder.html)
+//! * [*list playlist items*](struct.PlaylistItemListCall.html)
 //! 
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
@@ -372,56 +372,56 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
         }
     }
 
-    pub fn activities(&'a self) -> ActivityMethodsBuilder<'a, C, NC, A> {
-        ActivityMethodsBuilder { hub: &self }
+    pub fn activities(&'a self) -> ActivityMethods<'a, C, NC, A> {
+        ActivityMethods { hub: &self }
     }
-    pub fn channel_banners(&'a self) -> ChannelBannerMethodsBuilder<'a, C, NC, A> {
-        ChannelBannerMethodsBuilder { hub: &self }
+    pub fn channel_banners(&'a self) -> ChannelBannerMethods<'a, C, NC, A> {
+        ChannelBannerMethods { hub: &self }
     }
-    pub fn channel_sections(&'a self) -> ChannelSectionMethodsBuilder<'a, C, NC, A> {
-        ChannelSectionMethodsBuilder { hub: &self }
+    pub fn channel_sections(&'a self) -> ChannelSectionMethods<'a, C, NC, A> {
+        ChannelSectionMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethodsBuilder<'a, C, NC, A> {
-        ChannelMethodsBuilder { hub: &self }
+    pub fn channels(&'a self) -> ChannelMethods<'a, C, NC, A> {
+        ChannelMethods { hub: &self }
     }
-    pub fn guide_categories(&'a self) -> GuideCategoryMethodsBuilder<'a, C, NC, A> {
-        GuideCategoryMethodsBuilder { hub: &self }
+    pub fn guide_categories(&'a self) -> GuideCategoryMethods<'a, C, NC, A> {
+        GuideCategoryMethods { hub: &self }
     }
-    pub fn i18n_languages(&'a self) -> I18nLanguageMethodsBuilder<'a, C, NC, A> {
-        I18nLanguageMethodsBuilder { hub: &self }
+    pub fn i18n_languages(&'a self) -> I18nLanguageMethods<'a, C, NC, A> {
+        I18nLanguageMethods { hub: &self }
     }
-    pub fn i18n_regions(&'a self) -> I18nRegionMethodsBuilder<'a, C, NC, A> {
-        I18nRegionMethodsBuilder { hub: &self }
+    pub fn i18n_regions(&'a self) -> I18nRegionMethods<'a, C, NC, A> {
+        I18nRegionMethods { hub: &self }
     }
-    pub fn live_broadcasts(&'a self) -> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
-        LiveBroadcastMethodsBuilder { hub: &self }
+    pub fn live_broadcasts(&'a self) -> LiveBroadcastMethods<'a, C, NC, A> {
+        LiveBroadcastMethods { hub: &self }
     }
-    pub fn live_streams(&'a self) -> LiveStreamMethodsBuilder<'a, C, NC, A> {
-        LiveStreamMethodsBuilder { hub: &self }
+    pub fn live_streams(&'a self) -> LiveStreamMethods<'a, C, NC, A> {
+        LiveStreamMethods { hub: &self }
     }
-    pub fn playlist_items(&'a self) -> PlaylistItemMethodsBuilder<'a, C, NC, A> {
-        PlaylistItemMethodsBuilder { hub: &self }
+    pub fn playlist_items(&'a self) -> PlaylistItemMethods<'a, C, NC, A> {
+        PlaylistItemMethods { hub: &self }
     }
-    pub fn playlists(&'a self) -> PlaylistMethodsBuilder<'a, C, NC, A> {
-        PlaylistMethodsBuilder { hub: &self }
+    pub fn playlists(&'a self) -> PlaylistMethods<'a, C, NC, A> {
+        PlaylistMethods { hub: &self }
     }
-    pub fn search(&'a self) -> SearchMethodsBuilder<'a, C, NC, A> {
-        SearchMethodsBuilder { hub: &self }
+    pub fn search(&'a self) -> SearchMethods<'a, C, NC, A> {
+        SearchMethods { hub: &self }
     }
-    pub fn subscriptions(&'a self) -> SubscriptionMethodsBuilder<'a, C, NC, A> {
-        SubscriptionMethodsBuilder { hub: &self }
+    pub fn subscriptions(&'a self) -> SubscriptionMethods<'a, C, NC, A> {
+        SubscriptionMethods { hub: &self }
     }
-    pub fn thumbnails(&'a self) -> ThumbnailMethodsBuilder<'a, C, NC, A> {
-        ThumbnailMethodsBuilder { hub: &self }
+    pub fn thumbnails(&'a self) -> ThumbnailMethods<'a, C, NC, A> {
+        ThumbnailMethods { hub: &self }
     }
-    pub fn video_categories(&'a self) -> VideoCategoryMethodsBuilder<'a, C, NC, A> {
-        VideoCategoryMethodsBuilder { hub: &self }
+    pub fn video_categories(&'a self) -> VideoCategoryMethods<'a, C, NC, A> {
+        VideoCategoryMethods { hub: &self }
     }
-    pub fn videos(&'a self) -> VideoMethodsBuilder<'a, C, NC, A> {
-        VideoMethodsBuilder { hub: &self }
+    pub fn videos(&'a self) -> VideoMethods<'a, C, NC, A> {
+        VideoMethods { hub: &self }
     }
-    pub fn watermarks(&'a self) -> WatermarkMethodsBuilder<'a, C, NC, A> {
-        WatermarkMethodsBuilder { hub: &self }
+    pub fn watermarks(&'a self) -> WatermarkMethods<'a, C, NC, A> {
+        WatermarkMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
@@ -446,7 +446,7 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list subscriptions](struct.SubscriptionListCallBuilder.html) (response)
+/// * [list subscriptions](struct.SubscriptionListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SubscriptionListResponse {
@@ -581,7 +581,7 @@ impl Part for ActivityContentDetailsComment {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list playlist items](struct.PlaylistItemListCallBuilder.html) (response)
+/// * [list playlist items](struct.PlaylistItemListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlaylistItemListResponse {
@@ -703,10 +703,10 @@ impl Part for ActivityContentDetailsLike {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [delete live streams](struct.LiveStreamDeleteCallBuilder.html) (none)
-/// * [update live streams](struct.LiveStreamUpdateCallBuilder.html) (request|response)
-/// * [list live streams](struct.LiveStreamListCallBuilder.html) (none)
-/// * [insert live streams](struct.LiveStreamInsertCallBuilder.html) (request|response)
+/// * [delete live streams](struct.LiveStreamDeleteCall.html) (none)
+/// * [update live streams](struct.LiveStreamUpdateCall.html) (request|response)
+/// * [list live streams](struct.LiveStreamListCall.html) (none)
+/// * [insert live streams](struct.LiveStreamInsertCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStream {
@@ -756,7 +756,7 @@ impl ToParts for LiveStream {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set thumbnails](struct.ThumbnailSetCallBuilder.html) (response)
+/// * [set thumbnails](struct.ThumbnailSetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ThumbnailSetResponse {
@@ -917,7 +917,7 @@ impl Part for CdnSettings {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [get rating videos](struct.VideoGetRatingCallBuilder.html) (response)
+/// * [get rating videos](struct.VideoGetRatingCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoGetRatingResponse {
@@ -1056,7 +1056,7 @@ impl Part for ChannelSectionContentDetails {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list i18n regions](struct.I18nRegionListCallBuilder.html) (response)
+/// * [list i18n regions](struct.I18nRegionListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nRegionListResponse {
@@ -1084,7 +1084,7 @@ impl ResponseResult for I18nRegionListResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list live streams](struct.LiveStreamListCallBuilder.html) (response)
+/// * [list live streams](struct.LiveStreamListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LiveStreamListResponse {
@@ -1161,7 +1161,7 @@ impl Part for I18nLanguageSnippet {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set watermarks](struct.WatermarkSetCallBuilder.html) (request)
+/// * [set watermarks](struct.WatermarkSetCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InvideoBranding {
@@ -1242,10 +1242,10 @@ impl Part for VideoProjectDetails {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert playlist items](struct.PlaylistItemInsertCallBuilder.html) (request|response)
-/// * [update playlist items](struct.PlaylistItemUpdateCallBuilder.html) (request|response)
-/// * [list playlist items](struct.PlaylistItemListCallBuilder.html) (none)
-/// * [delete playlist items](struct.PlaylistItemDeleteCallBuilder.html) (none)
+/// * [insert playlist items](struct.PlaylistItemInsertCall.html) (request|response)
+/// * [update playlist items](struct.PlaylistItemUpdateCall.html) (request|response)
+/// * [list playlist items](struct.PlaylistItemListCall.html) (none)
+/// * [delete playlist items](struct.PlaylistItemDeleteCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItem {
@@ -1292,7 +1292,7 @@ impl ToParts for PlaylistItem {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list guide categories](struct.GuideCategoryListCallBuilder.html) (response)
+/// * [list guide categories](struct.GuideCategoryListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GuideCategoryListResponse {
@@ -1402,7 +1402,7 @@ impl Part for TokenPagination {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list i18n regions](struct.I18nRegionListCallBuilder.html) (none)
+/// * [list i18n regions](struct.I18nRegionListCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nRegion {
@@ -1575,7 +1575,7 @@ impl Part for ActivityContentDetails {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list playlists](struct.PlaylistListCallBuilder.html) (response)
+/// * [list playlists](struct.PlaylistListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlaylistListResponse {
@@ -1732,12 +1732,12 @@ impl Part for SubscriptionContentDetails {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [rate videos](struct.VideoRateCallBuilder.html) (none)
-/// * [get rating videos](struct.VideoGetRatingCallBuilder.html) (none)
-/// * [list videos](struct.VideoListCallBuilder.html) (none)
-/// * [insert videos](struct.VideoInsertCallBuilder.html) (request|response)
-/// * [update videos](struct.VideoUpdateCallBuilder.html) (request|response)
-/// * [delete videos](struct.VideoDeleteCallBuilder.html) (none)
+/// * [rate videos](struct.VideoRateCall.html) (none)
+/// * [get rating videos](struct.VideoGetRatingCall.html) (none)
+/// * [list videos](struct.VideoListCall.html) (none)
+/// * [insert videos](struct.VideoInsertCall.html) (request|response)
+/// * [update videos](struct.VideoUpdateCall.html) (request|response)
+/// * [delete videos](struct.VideoDeleteCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Video {
@@ -2011,9 +2011,9 @@ impl Part for PromotedItemId {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert subscriptions](struct.SubscriptionInsertCallBuilder.html) (request|response)
-/// * [list subscriptions](struct.SubscriptionListCallBuilder.html) (none)
-/// * [delete subscriptions](struct.SubscriptionDeleteCallBuilder.html) (none)
+/// * [insert subscriptions](struct.SubscriptionInsertCall.html) (request|response)
+/// * [list subscriptions](struct.SubscriptionListCall.html) (none)
+/// * [delete subscriptions](struct.SubscriptionDeleteCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
@@ -2122,10 +2122,10 @@ impl Part for InvideoPosition {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert playlists](struct.PlaylistInsertCallBuilder.html) (request|response)
-/// * [delete playlists](struct.PlaylistDeleteCallBuilder.html) (none)
-/// * [list playlists](struct.PlaylistListCallBuilder.html) (none)
-/// * [update playlists](struct.PlaylistUpdateCallBuilder.html) (request|response)
+/// * [insert playlists](struct.PlaylistInsertCall.html) (request|response)
+/// * [delete playlists](struct.PlaylistDeleteCall.html) (none)
+/// * [list playlists](struct.PlaylistListCall.html) (none)
+/// * [update playlists](struct.PlaylistUpdateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Playlist {
@@ -2370,7 +2370,7 @@ impl Part for GuideCategory {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list channel sections](struct.ChannelSectionListCallBuilder.html) (response)
+/// * [list channel sections](struct.ChannelSectionListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChannelSectionListResponse {
@@ -2422,7 +2422,7 @@ impl Part for MonitorStreamInfo {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list i18n languages](struct.I18nLanguageListCallBuilder.html) (response)
+/// * [list i18n languages](struct.I18nLanguageListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nLanguageListResponse {
@@ -2468,13 +2468,13 @@ impl Part for LocalizedProperty {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [control live broadcasts](struct.LiveBroadcastControlCallBuilder.html) (response)
-/// * [insert live broadcasts](struct.LiveBroadcastInsertCallBuilder.html) (request|response)
-/// * [list live broadcasts](struct.LiveBroadcastListCallBuilder.html) (none)
-/// * [transition live broadcasts](struct.LiveBroadcastTransitionCallBuilder.html) (response)
-/// * [update live broadcasts](struct.LiveBroadcastUpdateCallBuilder.html) (request|response)
-/// * [delete live broadcasts](struct.LiveBroadcastDeleteCallBuilder.html) (none)
-/// * [bind live broadcasts](struct.LiveBroadcastBindCallBuilder.html) (response)
+/// * [control live broadcasts](struct.LiveBroadcastControlCall.html) (response)
+/// * [insert live broadcasts](struct.LiveBroadcastInsertCall.html) (request|response)
+/// * [list live broadcasts](struct.LiveBroadcastListCall.html) (none)
+/// * [transition live broadcasts](struct.LiveBroadcastTransitionCall.html) (response)
+/// * [update live broadcasts](struct.LiveBroadcastUpdateCall.html) (request|response)
+/// * [delete live broadcasts](struct.LiveBroadcastDeleteCall.html) (none)
+/// * [bind live broadcasts](struct.LiveBroadcastBindCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcast {
@@ -2553,7 +2553,7 @@ impl Part for VideoFileDetailsVideoStream {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set thumbnails](struct.ThumbnailSetCallBuilder.html) (none)
+/// * [set thumbnails](struct.ThumbnailSetCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Thumbnail {
@@ -2575,8 +2575,8 @@ impl cmn::Resource for Thumbnail {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list channels](struct.ChannelListCallBuilder.html) (none)
-/// * [update channels](struct.ChannelUpdateCallBuilder.html) (request|response)
+/// * [list channels](struct.ChannelListCall.html) (none)
+/// * [update channels](struct.ChannelUpdateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
@@ -2760,7 +2760,7 @@ impl Part for SearchResult {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list video categories](struct.VideoCategoryListCallBuilder.html) (response)
+/// * [list video categories](struct.VideoCategoryListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoCategoryListResponse {
@@ -2855,7 +2855,7 @@ impl Part for VideoProcessingDetailsProcessingProgress {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list search](struct.SearchListCallBuilder.html) (response)
+/// * [list search](struct.SearchListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchListResponse {
@@ -2909,7 +2909,7 @@ impl Part for ChannelTopicDetails {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list videos](struct.VideoListCallBuilder.html) (response)
+/// * [list videos](struct.VideoListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoListResponse {
@@ -3033,7 +3033,7 @@ impl Part for ChannelStatus {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list channels](struct.ChannelListCallBuilder.html) (response)
+/// * [list channels](struct.ChannelListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChannelListResponse {
@@ -3073,10 +3073,10 @@ impl ResponseResult for ChannelListResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [delete channel sections](struct.ChannelSectionDeleteCallBuilder.html) (none)
-/// * [update channel sections](struct.ChannelSectionUpdateCallBuilder.html) (request|response)
-/// * [list channel sections](struct.ChannelSectionListCallBuilder.html) (none)
-/// * [insert channel sections](struct.ChannelSectionInsertCallBuilder.html) (request|response)
+/// * [delete channel sections](struct.ChannelSectionDeleteCall.html) (none)
+/// * [update channel sections](struct.ChannelSectionUpdateCall.html) (request|response)
+/// * [list channel sections](struct.ChannelSectionListCall.html) (none)
+/// * [insert channel sections](struct.ChannelSectionInsertCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSection {
@@ -3123,7 +3123,7 @@ impl ToParts for ChannelSection {
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list live broadcasts](struct.LiveBroadcastListCallBuilder.html) (response)
+/// * [list live broadcasts](struct.LiveBroadcastListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LiveBroadcastListResponse {
@@ -3406,7 +3406,7 @@ impl Part for ContentRating {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list activities](struct.ActivityListCallBuilder.html) (response)
+/// * [list activities](struct.ActivityListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityListResponse {
@@ -3446,7 +3446,7 @@ impl ResponseResult for ActivityListResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert activities](struct.ActivityInsertCallBuilder.html) (request|response)
+/// * [insert activities](struct.ActivityInsertCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activity {
@@ -3654,7 +3654,7 @@ impl Part for ActivityContentDetailsBulletin {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list i18n languages](struct.I18nLanguageListCallBuilder.html) (none)
+/// * [list i18n languages](struct.I18nLanguageListCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nLanguage {
@@ -3944,7 +3944,7 @@ impl Part for AccessPolicy {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [insert channel banners](struct.ChannelBannerInsertCallBuilder.html) (request|response)
+/// * [insert channel banners](struct.ChannelBannerInsertCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelBannerResource {
@@ -4017,7 +4017,7 @@ impl Part for ChannelContentDetailsRelatedPlaylists {}
 
 
 // ###################
-// CallBuilders ###
+// MethodBuilders ###
 // #################
 
 /// A builder providing access to all methods supported on *i18nLanguage* resources.
@@ -4049,21 +4049,21 @@ impl Part for ChannelContentDetailsRelatedPlaylists {}
 /// let rb = hub.i18n_languages();
 /// # }
 /// ```
-pub struct I18nLanguageMethodsBuilder<'a, C, NC, A>
+pub struct I18nLanguageMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for I18nLanguageMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for I18nLanguageMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> I18nLanguageMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> I18nLanguageMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of supported languages.    
-    pub fn list(&self, part: &str) -> I18nLanguageListCallBuilder<'a, C, NC, A> {
-        I18nLanguageListCallBuilder {
+    pub fn list(&self, part: &str) -> I18nLanguageListCall<'a, C, NC, A> {
+        I18nLanguageListCall {
             hub: self.hub,
             _part: part.to_string(),
             _hl: Default::default(),
@@ -4105,15 +4105,15 @@ impl<'a, C, NC, A> I18nLanguageMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.channel_banners();
 /// # }
 /// ```
-pub struct ChannelBannerMethodsBuilder<'a, C, NC, A>
+pub struct ChannelBannerMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ChannelBannerMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ChannelBannerMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> ChannelBannerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4122,8 +4122,8 @@ impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
     /// - Call the channelBanners.insert method to upload the binary image data to YouTube. The image must have a 16:9 aspect ratio and be at least 2120x1192 pixels.
     /// - Extract the url property's value from the response that the API returns for step 1.
     /// - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2.
-    pub fn insert(&self, request: &ChannelBannerResource) -> ChannelBannerInsertCallBuilder<'a, C, NC, A> {
-        ChannelBannerInsertCallBuilder {
+    pub fn insert(&self, request: &ChannelBannerResource) -> ChannelBannerInsertCall<'a, C, NC, A> {
+        ChannelBannerInsertCall {
             hub: self.hub,
             _request: request.clone(),
             _on_behalf_of_content_owner: Default::default(),
@@ -4165,21 +4165,21 @@ impl<'a, C, NC, A> ChannelBannerMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.channel_sections();
 /// # }
 /// ```
-pub struct ChannelSectionMethodsBuilder<'a, C, NC, A>
+pub struct ChannelSectionMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ChannelSectionMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ChannelSectionMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> ChannelSectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns channelSection resources that match the API request criteria.    
-    pub fn list(&self, part: &str) -> ChannelSectionListCallBuilder<'a, C, NC, A> {
-        ChannelSectionListCallBuilder {
+    pub fn list(&self, part: &str) -> ChannelSectionListCall<'a, C, NC, A> {
+        ChannelSectionListCall {
             hub: self.hub,
             _part: part.to_string(),
             _on_behalf_of_content_owner: Default::default(),
@@ -4195,8 +4195,8 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Adds a channelSection for the authenticated user's channel.    
-    pub fn insert(&self, request: &ChannelSection) -> ChannelSectionInsertCallBuilder<'a, C, NC, A> {
-        ChannelSectionInsertCallBuilder {
+    pub fn insert(&self, request: &ChannelSection) -> ChannelSectionInsertCall<'a, C, NC, A> {
+        ChannelSectionInsertCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -4211,8 +4211,8 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a channelSection.    
-    pub fn delete(&self, id: &str) -> ChannelSectionDeleteCallBuilder<'a, C, NC, A> {
-        ChannelSectionDeleteCallBuilder {
+    pub fn delete(&self, id: &str) -> ChannelSectionDeleteCall<'a, C, NC, A> {
+        ChannelSectionDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
@@ -4225,8 +4225,8 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Update a channelSection.    
-    pub fn update(&self, request: &ChannelSection) -> ChannelSectionUpdateCallBuilder<'a, C, NC, A> {
-        ChannelSectionUpdateCallBuilder {
+    pub fn update(&self, request: &ChannelSection) -> ChannelSectionUpdateCall<'a, C, NC, A> {
+        ChannelSectionUpdateCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -4269,21 +4269,21 @@ impl<'a, C, NC, A> ChannelSectionMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.guide_categories();
 /// # }
 /// ```
-pub struct GuideCategoryMethodsBuilder<'a, C, NC, A>
+pub struct GuideCategoryMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for GuideCategoryMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for GuideCategoryMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> GuideCategoryMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> GuideCategoryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of categories that can be associated with YouTube channels.    
-    pub fn list(&self, part: &str) -> GuideCategoryListCallBuilder<'a, C, NC, A> {
-        GuideCategoryListCallBuilder {
+    pub fn list(&self, part: &str) -> GuideCategoryListCall<'a, C, NC, A> {
+        GuideCategoryListCall {
             hub: self.hub,
             _part: part.to_string(),
             _region_code: Default::default(),
@@ -4327,21 +4327,21 @@ impl<'a, C, NC, A> GuideCategoryMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.playlists();
 /// # }
 /// ```
-pub struct PlaylistMethodsBuilder<'a, C, NC, A>
+pub struct PlaylistMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for PlaylistMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for PlaylistMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> PlaylistMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a playlist.    
-    pub fn insert(&self, request: &Playlist) -> PlaylistInsertCallBuilder<'a, C, NC, A> {
-        PlaylistInsertCallBuilder {
+    pub fn insert(&self, request: &Playlist) -> PlaylistInsertCall<'a, C, NC, A> {
+        PlaylistInsertCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -4356,8 +4356,8 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.    
-    pub fn list(&self, part: &str) -> PlaylistListCallBuilder<'a, C, NC, A> {
-        PlaylistListCallBuilder {
+    pub fn list(&self, part: &str) -> PlaylistListCall<'a, C, NC, A> {
+        PlaylistListCall {
             hub: self.hub,
             _part: part.to_string(),
             _page_token: Default::default(),
@@ -4376,8 +4376,8 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a playlist.    
-    pub fn delete(&self, id: &str) -> PlaylistDeleteCallBuilder<'a, C, NC, A> {
-        PlaylistDeleteCallBuilder {
+    pub fn delete(&self, id: &str) -> PlaylistDeleteCall<'a, C, NC, A> {
+        PlaylistDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
@@ -4390,8 +4390,8 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.    
-    pub fn update(&self, request: &Playlist) -> PlaylistUpdateCallBuilder<'a, C, NC, A> {
-        PlaylistUpdateCallBuilder {
+    pub fn update(&self, request: &Playlist) -> PlaylistUpdateCall<'a, C, NC, A> {
+        PlaylistUpdateCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -4434,21 +4434,21 @@ impl<'a, C, NC, A> PlaylistMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.thumbnails();
 /// # }
 /// ```
-pub struct ThumbnailMethodsBuilder<'a, C, NC, A>
+pub struct ThumbnailMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ThumbnailMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ThumbnailMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> ThumbnailMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Uploads a custom video thumbnail to YouTube and sets it for a video.    
-    pub fn set(&self, video_id: &str) -> ThumbnailSetCallBuilder<'a, C, NC, A> {
-        ThumbnailSetCallBuilder {
+    pub fn set(&self, video_id: &str) -> ThumbnailSetCall<'a, C, NC, A> {
+        ThumbnailSetCall {
             hub: self.hub,
             _video_id: video_id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
@@ -4490,21 +4490,21 @@ impl<'a, C, NC, A> ThumbnailMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.videos();
 /// # }
 /// ```
-pub struct VideoMethodsBuilder<'a, C, NC, A>
+pub struct VideoMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for VideoMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for VideoMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> VideoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of videos that match the API request parameters.    
-    pub fn list(&self, part: &str) -> VideoListCallBuilder<'a, C, NC, A> {
-        VideoListCallBuilder {
+    pub fn list(&self, part: &str) -> VideoListCall<'a, C, NC, A> {
+        VideoListCall {
             hub: self.hub,
             _part: part.to_string(),
             _video_category_id: Default::default(),
@@ -4526,8 +4526,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Add a like or dislike rating to a video or remove a rating from a video.    
-    pub fn rate(&self, id: &str, rating: &str) -> VideoRateCallBuilder<'a, C, NC, A> {
-        VideoRateCallBuilder {
+    pub fn rate(&self, id: &str, rating: &str) -> VideoRateCall<'a, C, NC, A> {
+        VideoRateCall {
             hub: self.hub,
             _id: id.to_string(),
             _rating: rating.to_string(),
@@ -4541,8 +4541,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves the ratings that the authorized user gave to a list of specified videos.    
-    pub fn get_rating(&self, id: &str) -> VideoGetRatingCallBuilder<'a, C, NC, A> {
-        VideoGetRatingCallBuilder {
+    pub fn get_rating(&self, id: &str) -> VideoGetRatingCall<'a, C, NC, A> {
+        VideoGetRatingCall {
             hub: self.hub,
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
@@ -4555,8 +4555,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a YouTube video.    
-    pub fn delete(&self, id: &str) -> VideoDeleteCallBuilder<'a, C, NC, A> {
-        VideoDeleteCallBuilder {
+    pub fn delete(&self, id: &str) -> VideoDeleteCall<'a, C, NC, A> {
+        VideoDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
@@ -4569,8 +4569,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a video's metadata.    
-    pub fn update(&self, request: &Video) -> VideoUpdateCallBuilder<'a, C, NC, A> {
-        VideoUpdateCallBuilder {
+    pub fn update(&self, request: &Video) -> VideoUpdateCall<'a, C, NC, A> {
+        VideoUpdateCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -4584,8 +4584,8 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Uploads a video to YouTube and optionally sets the video's metadata.    
-    pub fn insert(&self, request: &Video) -> VideoInsertCallBuilder<'a, C, NC, A> {
-        VideoInsertCallBuilder {
+    pub fn insert(&self, request: &Video) -> VideoInsertCall<'a, C, NC, A> {
+        VideoInsertCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -4632,21 +4632,21 @@ impl<'a, C, NC, A> VideoMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.subscriptions();
 /// # }
 /// ```
-pub struct SubscriptionMethodsBuilder<'a, C, NC, A>
+pub struct SubscriptionMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for SubscriptionMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for SubscriptionMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Adds a subscription for the authenticated user's channel.    
-    pub fn insert(&self, request: &Subscription) -> SubscriptionInsertCallBuilder<'a, C, NC, A> {
-        SubscriptionInsertCallBuilder {
+    pub fn insert(&self, request: &Subscription) -> SubscriptionInsertCall<'a, C, NC, A> {
+        SubscriptionInsertCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -4659,8 +4659,8 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns subscription resources that match the API request criteria.    
-    pub fn list(&self, part: &str) -> SubscriptionListCallBuilder<'a, C, NC, A> {
-        SubscriptionListCallBuilder {
+    pub fn list(&self, part: &str) -> SubscriptionListCall<'a, C, NC, A> {
+        SubscriptionListCall {
             hub: self.hub,
             _part: part.to_string(),
             _page_token: Default::default(),
@@ -4682,8 +4682,8 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a subscription.    
-    pub fn delete(&self, id: &str) -> SubscriptionDeleteCallBuilder<'a, C, NC, A> {
-        SubscriptionDeleteCallBuilder {
+    pub fn delete(&self, id: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
+        SubscriptionDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
             _delegate: Default::default(),
@@ -4724,21 +4724,21 @@ impl<'a, C, NC, A> SubscriptionMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.search();
 /// # }
 /// ```
-pub struct SearchMethodsBuilder<'a, C, NC, A>
+pub struct SearchMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for SearchMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for SearchMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> SearchMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.    
-    pub fn list(&self, part: &str) -> SearchListCallBuilder<'a, C, NC, A> {
-        SearchListCallBuilder {
+    pub fn list(&self, part: &str) -> SearchListCall<'a, C, NC, A> {
+        SearchListCall {
             hub: self.hub,
             _part: part.to_string(),
             _video_type: Default::default(),
@@ -4808,21 +4808,21 @@ impl<'a, C, NC, A> SearchMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.i18n_regions();
 /// # }
 /// ```
-pub struct I18nRegionMethodsBuilder<'a, C, NC, A>
+pub struct I18nRegionMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for I18nRegionMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for I18nRegionMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> I18nRegionMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> I18nRegionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of supported regions.    
-    pub fn list(&self, part: &str) -> I18nRegionListCallBuilder<'a, C, NC, A> {
-        I18nRegionListCallBuilder {
+    pub fn list(&self, part: &str) -> I18nRegionListCall<'a, C, NC, A> {
+        I18nRegionListCall {
             hub: self.hub,
             _part: part.to_string(),
             _hl: Default::default(),
@@ -4864,21 +4864,21 @@ impl<'a, C, NC, A> I18nRegionMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.live_streams();
 /// # }
 /// ```
-pub struct LiveStreamMethodsBuilder<'a, C, NC, A>
+pub struct LiveStreamMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for LiveStreamMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for LiveStreamMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> LiveStreamMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.    
-    pub fn update(&self, request: &LiveStream) -> LiveStreamUpdateCallBuilder<'a, C, NC, A> {
-        LiveStreamUpdateCallBuilder {
+    pub fn update(&self, request: &LiveStream) -> LiveStreamUpdateCall<'a, C, NC, A> {
+        LiveStreamUpdateCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -4893,8 +4893,8 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a video stream.    
-    pub fn delete(&self, id: &str) -> LiveStreamDeleteCallBuilder<'a, C, NC, A> {
-        LiveStreamDeleteCallBuilder {
+    pub fn delete(&self, id: &str) -> LiveStreamDeleteCall<'a, C, NC, A> {
+        LiveStreamDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
             _on_behalf_of_content_owner_channel: Default::default(),
@@ -4908,8 +4908,8 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of video streams that match the API request parameters.    
-    pub fn list(&self, part: &str) -> LiveStreamListCallBuilder<'a, C, NC, A> {
-        LiveStreamListCallBuilder {
+    pub fn list(&self, part: &str) -> LiveStreamListCall<'a, C, NC, A> {
+        LiveStreamListCall {
             hub: self.hub,
             _part: part.to_string(),
             _page_token: Default::default(),
@@ -4927,8 +4927,8 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.    
-    pub fn insert(&self, request: &LiveStream) -> LiveStreamInsertCallBuilder<'a, C, NC, A> {
-        LiveStreamInsertCallBuilder {
+    pub fn insert(&self, request: &LiveStream) -> LiveStreamInsertCall<'a, C, NC, A> {
+        LiveStreamInsertCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -4972,21 +4972,21 @@ impl<'a, C, NC, A> LiveStreamMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethodsBuilder<'a, C, NC, A>
+pub struct ChannelMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ChannelMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ChannelMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a channel's metadata.    
-    pub fn update(&self, request: &Channel) -> ChannelUpdateCallBuilder<'a, C, NC, A> {
-        ChannelUpdateCallBuilder {
+    pub fn update(&self, request: &Channel) -> ChannelUpdateCall<'a, C, NC, A> {
+        ChannelUpdateCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -5000,8 +5000,8 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a collection of zero or more channel resources that match the request criteria.    
-    pub fn list(&self, part: &str) -> ChannelListCallBuilder<'a, C, NC, A> {
-        ChannelListCallBuilder {
+    pub fn list(&self, part: &str) -> ChannelListCall<'a, C, NC, A> {
+        ChannelListCall {
             hub: self.hub,
             _part: part.to_string(),
             _page_token: Default::default(),
@@ -5051,21 +5051,21 @@ impl<'a, C, NC, A> ChannelMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.playlist_items();
 /// # }
 /// ```
-pub struct PlaylistItemMethodsBuilder<'a, C, NC, A>
+pub struct PlaylistItemMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for PlaylistItemMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for PlaylistItemMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> PlaylistItemMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a playlist item.    
-    pub fn delete(&self, id: &str) -> PlaylistItemDeleteCallBuilder<'a, C, NC, A> {
-        PlaylistItemDeleteCallBuilder {
+    pub fn delete(&self, id: &str) -> PlaylistItemDeleteCall<'a, C, NC, A> {
+        PlaylistItemDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
             _delegate: Default::default(),
@@ -5077,8 +5077,8 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.    
-    pub fn list(&self, part: &str) -> PlaylistItemListCallBuilder<'a, C, NC, A> {
-        PlaylistItemListCallBuilder {
+    pub fn list(&self, part: &str) -> PlaylistItemListCall<'a, C, NC, A> {
+        PlaylistItemListCall {
             hub: self.hub,
             _part: part.to_string(),
             _video_id: Default::default(),
@@ -5096,8 +5096,8 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Adds a resource to a playlist.    
-    pub fn insert(&self, request: &PlaylistItem) -> PlaylistItemInsertCallBuilder<'a, C, NC, A> {
-        PlaylistItemInsertCallBuilder {
+    pub fn insert(&self, request: &PlaylistItem) -> PlaylistItemInsertCall<'a, C, NC, A> {
+        PlaylistItemInsertCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -5111,8 +5111,8 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Modifies a playlist item. For example, you could update the item's position in the playlist.    
-    pub fn update(&self, request: &PlaylistItem) -> PlaylistItemUpdateCallBuilder<'a, C, NC, A> {
-        PlaylistItemUpdateCallBuilder {
+    pub fn update(&self, request: &PlaylistItem) -> PlaylistItemUpdateCall<'a, C, NC, A> {
+        PlaylistItemUpdateCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -5154,21 +5154,21 @@ impl<'a, C, NC, A> PlaylistItemMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.watermarks();
 /// # }
 /// ```
-pub struct WatermarkMethodsBuilder<'a, C, NC, A>
+pub struct WatermarkMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for WatermarkMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for WatermarkMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> WatermarkMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Uploads a watermark image to YouTube and sets it for a channel.    
-    pub fn set(&self, request: &InvideoBranding, channel_id: &str) -> WatermarkSetCallBuilder<'a, C, NC, A> {
-        WatermarkSetCallBuilder {
+    pub fn set(&self, request: &InvideoBranding, channel_id: &str) -> WatermarkSetCall<'a, C, NC, A> {
+        WatermarkSetCall {
             hub: self.hub,
             _request: request.clone(),
             _channel_id: channel_id.to_string(),
@@ -5182,8 +5182,8 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a watermark.    
-    pub fn unset(&self, channel_id: &str) -> WatermarkUnsetCallBuilder<'a, C, NC, A> {
-        WatermarkUnsetCallBuilder {
+    pub fn unset(&self, channel_id: &str) -> WatermarkUnsetCall<'a, C, NC, A> {
+        WatermarkUnsetCall {
             hub: self.hub,
             _channel_id: channel_id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
@@ -5225,21 +5225,21 @@ impl<'a, C, NC, A> WatermarkMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.live_broadcasts();
 /// # }
 /// ```
-pub struct LiveBroadcastMethodsBuilder<'a, C, NC, A>
+pub struct LiveBroadcastMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for LiveBroadcastMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for LiveBroadcastMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> LiveBroadcastMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Controls the settings for a slate that can be displayed in the broadcast stream.    
-    pub fn control(&self, id: &str, part: &str) -> LiveBroadcastControlCallBuilder<'a, C, NC, A> {
-        LiveBroadcastControlCallBuilder {
+    pub fn control(&self, id: &str, part: &str) -> LiveBroadcastControlCall<'a, C, NC, A> {
+        LiveBroadcastControlCall {
             hub: self.hub,
             _id: id.to_string(),
             _part: part.to_string(),
@@ -5257,8 +5257,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.    
-    pub fn update(&self, request: &LiveBroadcast) -> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> {
-        LiveBroadcastUpdateCallBuilder {
+    pub fn update(&self, request: &LiveBroadcast) -> LiveBroadcastUpdateCall<'a, C, NC, A> {
+        LiveBroadcastUpdateCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -5273,8 +5273,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a broadcast.    
-    pub fn insert(&self, request: &LiveBroadcast) -> LiveBroadcastInsertCallBuilder<'a, C, NC, A> {
-        LiveBroadcastInsertCallBuilder {
+    pub fn insert(&self, request: &LiveBroadcast) -> LiveBroadcastInsertCall<'a, C, NC, A> {
+        LiveBroadcastInsertCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -5289,8 +5289,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.    
-    pub fn bind(&self, id: &str, part: &str) -> LiveBroadcastBindCallBuilder<'a, C, NC, A> {
-        LiveBroadcastBindCallBuilder {
+    pub fn bind(&self, id: &str, part: &str) -> LiveBroadcastBindCall<'a, C, NC, A> {
+        LiveBroadcastBindCall {
             hub: self.hub,
             _id: id.to_string(),
             _part: part.to_string(),
@@ -5306,8 +5306,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of YouTube broadcasts that match the API request parameters.    
-    pub fn list(&self, part: &str) -> LiveBroadcastListCallBuilder<'a, C, NC, A> {
-        LiveBroadcastListCallBuilder {
+    pub fn list(&self, part: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
+        LiveBroadcastListCall {
             hub: self.hub,
             _part: part.to_string(),
             _page_token: Default::default(),
@@ -5326,8 +5326,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a broadcast.    
-    pub fn delete(&self, id: &str) -> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> {
-        LiveBroadcastDeleteCallBuilder {
+    pub fn delete(&self, id: &str) -> LiveBroadcastDeleteCall<'a, C, NC, A> {
+        LiveBroadcastDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
             _on_behalf_of_content_owner_channel: Default::default(),
@@ -5341,8 +5341,8 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.    
-    pub fn transition(&self, broadcast_status: &str, id: &str, part: &str) -> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> {
-        LiveBroadcastTransitionCallBuilder {
+    pub fn transition(&self, broadcast_status: &str, id: &str, part: &str) -> LiveBroadcastTransitionCall<'a, C, NC, A> {
+        LiveBroadcastTransitionCall {
             hub: self.hub,
             _broadcast_status: broadcast_status.to_string(),
             _id: id.to_string(),
@@ -5387,21 +5387,21 @@ impl<'a, C, NC, A> LiveBroadcastMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.video_categories();
 /// # }
 /// ```
-pub struct VideoCategoryMethodsBuilder<'a, C, NC, A>
+pub struct VideoCategoryMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for VideoCategoryMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for VideoCategoryMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> VideoCategoryMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> VideoCategoryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of categories that can be associated with YouTube videos.    
-    pub fn list(&self, part: &str) -> VideoCategoryListCallBuilder<'a, C, NC, A> {
-        VideoCategoryListCallBuilder {
+    pub fn list(&self, part: &str) -> VideoCategoryListCall<'a, C, NC, A> {
+        VideoCategoryListCall {
             hub: self.hub,
             _part: part.to_string(),
             _region_code: Default::default(),
@@ -5445,21 +5445,21 @@ impl<'a, C, NC, A> VideoCategoryMethodsBuilder<'a, C, NC, A> {
 /// let rb = hub.activities();
 /// # }
 /// ```
-pub struct ActivityMethodsBuilder<'a, C, NC, A>
+pub struct ActivityMethods<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ActivityMethodsBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ActivityMethods<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
+impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.    
-    pub fn list(&self, part: &str) -> ActivityListCallBuilder<'a, C, NC, A> {
-        ActivityListCallBuilder {
+    pub fn list(&self, part: &str) -> ActivityListCall<'a, C, NC, A> {
+        ActivityListCall {
             hub: self.hub,
             _part: part.to_string(),
             _region_code: Default::default(),
@@ -5481,8 +5481,8 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
     /// Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
     /// 
     /// Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite.
-    pub fn insert(&self, request: &Activity) -> ActivityInsertCallBuilder<'a, C, NC, A> {
-        ActivityInsertCallBuilder {
+    pub fn insert(&self, request: &Activity) -> ActivityInsertCall<'a, C, NC, A> {
+        ActivityInsertCall {
             hub: self.hub,
             _request: request.clone(),
             _part: request.to_parts(),
@@ -5504,7 +5504,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 /// Returns a list of supported languages.
 ///
 /// A builder for the *list* method supported by a *i18nLanguage* resource.
-/// It is not used directly, but through a `I18nLanguageMethodsBuilder`.
+/// It is not used directly, but through a `I18nLanguageMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -5547,7 +5547,7 @@ impl<'a, C, NC, A> ActivityMethodsBuilder<'a, C, NC, A> {
 ///              .doit();
 /// # }
 /// ```
-pub struct I18nLanguageListCallBuilder<'a, C, NC, A>
+pub struct I18nLanguageListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -5558,9 +5558,9 @@ pub struct I18nLanguageListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for I18nLanguageListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for I18nLanguageListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5614,15 +5614,15 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -5677,7 +5677,7 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *snippet*
     /// 
     /// The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
-    pub fn part(mut self, new_value: &str) -> I18nLanguageListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> I18nLanguageListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -5685,7 +5685,7 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The hl parameter specifies the language that should be used for text values in the API response.    
-    pub fn hl(mut self, new_value: &str) -> I18nLanguageListCallBuilder<'a, C, NC, A> {
+    pub fn hl(mut self, new_value: &str) -> I18nLanguageListCall<'a, C, NC, A> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -5696,7 +5696,7 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> I18nLanguageListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> I18nLanguageListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5717,7 +5717,7 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> I18nLanguageListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> I18nLanguageListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -5734,7 +5734,7 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> I18nLanguageListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> I18nLanguageListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -5749,7 +5749,7 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
 /// - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2.
 ///
 /// A builder for the *insert* method supported by a *channelBanner* resource.
-/// It is not used directly, but through a `ChannelBannerMethodsBuilder`.
+/// It is not used directly, but through a `ChannelBannerMethods`.
 ///
 /// # Example
 ///
@@ -5785,7 +5785,7 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct ChannelBannerInsertCallBuilder<'a, C, NC, A>
+pub struct ChannelBannerInsertCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -5796,13 +5796,14 @@ pub struct ChannelBannerInsertCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChannelBannerInsertCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for ChannelBannerInsertCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> Result<(hyper::client::Response, ChannelBannerResource)> where RS: ReadSeek {
+    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, ChannelBannerResource)>
+		where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
@@ -5829,10 +5830,10 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
 
         params.push(("alt", "json".to_string()));
 
-        let (mut url, protocol) = if stream.is_some() {
-                ("https://www.googleapis.com/upload/youtube/v3/channelBanners/insert".to_string(), "simple")
-            } else if resumeable_stream.is_some() {
-                ("https://www.googleapis.com/resumable/upload/youtube/v3/channelBanners/insert".to_string(), "resumable")
+        let mut url = if protocol == "simple" {
+                "https://www.googleapis.com/upload/youtube/v3/channelBanners/insert".to_string()
+            } else if protocol == "resumable" {
+                "https://www.googleapis.com/resumable/upload/youtube/v3/channelBanners/insert".to_string()
             } else { 
                 unreachable!() 
         };
@@ -5863,33 +5864,33 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut mp_reader: MultiPartReader = Default::default();
-            let (mut body_reader, content_type) = match stream.as_mut() {
-                Some(&mut (ref mut reader, ref mime)) => {
-                    mp_reader.reserve_exact(2);
-                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
-                             .add_part(reader, size, mime.clone());
-                    let mime_type = mp_reader.mime_type();
-                    (&mut mp_reader as &mut io::Read, ContentType(mime_type))
-                },
-                None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
-            };
-
             let mut req_result = {
+                let mut mp_reader: MultiPartReader = Default::default();
+                let (mut body_reader, content_type) = match protocol {
+                    "simple" => {
+                        mp_reader.reserve_exact(2);
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
+                                 .add_part(&mut reader, size, reader_mime_type.clone());
+                        let mime_type = mp_reader.mime_type();
+                        (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                    },
+                    _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                };
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(content_type)
-                    .body(body_reader.into_body())    ;
-                if let Some(&mut (_, ref mime)) = resumeable_stream.as_mut() {
-                    req = req.header(cmn::XUploadContentType(mime.clone()));
+                    .body(body_reader.into_body());
+                if protocol == "resumable" {
+                    req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
                 }
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -5913,17 +5914,18 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
                         dlg.finished();
                         return Result::Failure(res)
                     }
-                    if let Some((ref mut reader, ref mime)) = resumeable_stream {
-                        let request_size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    if protocol == "resumable" {
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         let mut client = &mut *self.hub.client.borrow_mut();
                         match (cmn::ResumableUploadHelper {
                             client: &mut client.borrow_mut(),
                             delegate: dlg,
+                            auth: &mut *self.hub.auth.borrow_mut(),
                             url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
-                            reader: reader,
-                            media_type: mime.clone(),
-                            content_size: request_size
+                            reader: &mut reader,
+                            media_type: reader_mime_type.clone(),
+                            content_size: size
                         }.upload()) {
                             Err(err) => {
                                 dlg.finished();
@@ -5959,7 +5961,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ChannelBannerResource)>
                 where RS: ReadSeek {
-        self.doit(Some((stream, mime_type)), None, )
+        self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumeable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
@@ -5972,7 +5974,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ChannelBannerResource)>
                 where RS: ReadSeek {
-        self.doit(None, Some((resumeable_stream, mime_type)), )
+        self.doit(resumeable_stream, mime_type, "resumable")
     }
 
     /// Sets the *request* property to the given value.
@@ -5980,7 +5982,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &ChannelBannerResource) -> ChannelBannerInsertCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ChannelBannerResource) -> ChannelBannerInsertCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -5990,7 +5992,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelBannerInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelBannerInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -6001,7 +6003,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelBannerInsertCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelBannerInsertCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6022,7 +6024,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelBannerInsertCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelBannerInsertCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -6039,7 +6041,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelBannerInsertCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelBannerInsertCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -6050,7 +6052,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
 /// Returns channelSection resources that match the API request criteria.
 ///
 /// A builder for the *list* method supported by a *channelSection* resource.
-/// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
+/// It is not used directly, but through a `ChannelSectionMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -6097,7 +6099,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct ChannelSectionListCallBuilder<'a, C, NC, A>
+pub struct ChannelSectionListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -6111,9 +6113,9 @@ pub struct ChannelSectionListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChannelSectionListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for ChannelSectionListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6176,15 +6178,15 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -6242,7 +6244,7 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
     /// The part parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set part=snippet, the API response will also contain all of those nested properties.
-    pub fn part(mut self, new_value: &str) -> ChannelSectionListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> ChannelSectionListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -6252,7 +6254,7 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -6260,7 +6262,7 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's channelSections.    
-    pub fn mine(mut self, new_value: bool) -> ChannelSectionListCallBuilder<'a, C, NC, A> {
+    pub fn mine(mut self, new_value: bool) -> ChannelSectionListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
     }
@@ -6268,7 +6270,7 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The id parameter specifies a comma-separated list of the YouTube channelSection ID(s) for the resource(s) that are being retrieved. In a channelSection resource, the id property specifies the YouTube channelSection ID.    
-    pub fn id(mut self, new_value: &str) -> ChannelSectionListCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> ChannelSectionListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
     }
@@ -6276,7 +6278,7 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
     ///
     /// 
     /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's channelSections.    
-    pub fn channel_id(mut self, new_value: &str) -> ChannelSectionListCallBuilder<'a, C, NC, A> {
+    pub fn channel_id(mut self, new_value: &str) -> ChannelSectionListCall<'a, C, NC, A> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -6287,7 +6289,7 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6308,7 +6310,7 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -6325,7 +6327,7 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -6336,7 +6338,7 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
 /// Adds a channelSection for the authenticated user's channel.
 ///
 /// A builder for the *insert* method supported by a *channelSection* resource.
-/// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
+/// It is not used directly, but through a `ChannelSectionMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -6387,7 +6389,7 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct ChannelSectionInsertCallBuilder<'a, C, NC, A>
+pub struct ChannelSectionInsertCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -6400,9 +6402,9 @@ pub struct ChannelSectionInsertCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChannelSectionInsertCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for ChannelSectionInsertCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6467,18 +6469,18 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -6532,7 +6534,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
     /// * *snippet*
     /// * *contentDetails*
     /// 
-    pub fn request(mut self, new_value: &ChannelSection) -> ChannelSectionInsertCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ChannelSection) -> ChannelSectionInsertCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -6552,7 +6554,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
-    pub fn part(mut self, new_value: &str) -> ChannelSectionInsertCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -6564,7 +6566,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> ChannelSectionInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -6574,7 +6576,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -6585,7 +6587,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionInsertCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionInsertCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6606,7 +6608,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionInsertCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionInsertCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -6623,7 +6625,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionInsertCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionInsertCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -6634,7 +6636,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
 /// Deletes a channelSection.
 ///
 /// A builder for the *delete* method supported by a *channelSection* resource.
-/// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
+/// It is not used directly, but through a `ChannelSectionMethods`.
 ///
 /// # Example
 ///
@@ -6663,7 +6665,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct ChannelSectionDeleteCallBuilder<'a, C, NC, A>
+pub struct ChannelSectionDeleteCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -6674,9 +6676,9 @@ pub struct ChannelSectionDeleteCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChannelSectionDeleteCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for ChannelSectionDeleteCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6729,15 +6731,15 @@ impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -6777,7 +6779,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID.    
-    pub fn id(mut self, new_value: &str) -> ChannelSectionDeleteCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -6787,7 +6789,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionDeleteCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -6798,7 +6800,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionDeleteCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionDeleteCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6819,7 +6821,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionDeleteCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionDeleteCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -6836,7 +6838,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionDeleteCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionDeleteCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -6847,7 +6849,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper
 /// Update a channelSection.
 ///
 /// A builder for the *update* method supported by a *channelSection* resource.
-/// It is not used directly, but through a `ChannelSectionMethodsBuilder`.
+/// It is not used directly, but through a `ChannelSectionMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -6897,7 +6899,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct ChannelSectionUpdateCallBuilder<'a, C, NC, A>
+pub struct ChannelSectionUpdateCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -6909,9 +6911,9 @@ pub struct ChannelSectionUpdateCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChannelSectionUpdateCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for ChannelSectionUpdateCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -6973,18 +6975,18 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -7038,7 +7040,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
     /// * *snippet*
     /// * *contentDetails*
     /// 
-    pub fn request(mut self, new_value: &ChannelSection) -> ChannelSectionUpdateCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &ChannelSection) -> ChannelSectionUpdateCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -7058,7 +7060,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
-    pub fn part(mut self, new_value: &str) -> ChannelSectionUpdateCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -7068,7 +7070,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionUpdateCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -7079,7 +7081,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionUpdateCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelSectionUpdateCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7100,7 +7102,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionUpdateCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionUpdateCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -7117,7 +7119,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionUpdateCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelSectionUpdateCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -7128,7 +7130,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
 /// Returns a list of categories that can be associated with YouTube channels.
 ///
 /// A builder for the *list* method supported by a *guideCategory* resource.
-/// It is not used directly, but through a `GuideCategoryMethodsBuilder`.
+/// It is not used directly, but through a `GuideCategoryMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -7173,7 +7175,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct GuideCategoryListCallBuilder<'a, C, NC, A>
+pub struct GuideCategoryListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -7186,9 +7188,9 @@ pub struct GuideCategoryListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for GuideCategoryListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for GuideCategoryListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7248,15 +7250,15 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -7313,7 +7315,7 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// The part parameter specifies a comma-separated list of one or more guideCategory resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a guideCategory resource, the snippet property contains other properties, such as the category's title. If you set part=snippet, the API response will also contain all of those nested properties.
-    pub fn part(mut self, new_value: &str) -> GuideCategoryListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> GuideCategoryListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -7321,7 +7323,7 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The regionCode parameter instructs the API to return the list of guide categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
-    pub fn region_code(mut self, new_value: &str) -> GuideCategoryListCallBuilder<'a, C, NC, A> {
+    pub fn region_code(mut self, new_value: &str) -> GuideCategoryListCall<'a, C, NC, A> {
         self._region_code = Some(new_value.to_string());
         self
     }
@@ -7329,7 +7331,7 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The id parameter specifies a comma-separated list of the YouTube channel category ID(s) for the resource(s) that are being retrieved. In a guideCategory resource, the id property specifies the YouTube channel category ID.    
-    pub fn id(mut self, new_value: &str) -> GuideCategoryListCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> GuideCategoryListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
     }
@@ -7337,7 +7339,7 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The hl parameter specifies the language that will be used for text values in the API response.    
-    pub fn hl(mut self, new_value: &str) -> GuideCategoryListCallBuilder<'a, C, NC, A> {
+    pub fn hl(mut self, new_value: &str) -> GuideCategoryListCall<'a, C, NC, A> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -7348,7 +7350,7 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GuideCategoryListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GuideCategoryListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7369,7 +7371,7 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GuideCategoryListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GuideCategoryListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -7386,7 +7388,7 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> GuideCategoryListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> GuideCategoryListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -7397,7 +7399,7 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
 /// Creates a playlist.
 ///
 /// A builder for the *insert* method supported by a *playlist* resource.
-/// It is not used directly, but through a `PlaylistMethodsBuilder`.
+/// It is not used directly, but through a `PlaylistMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -7448,7 +7450,7 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct PlaylistInsertCallBuilder<'a, C, NC, A>
+pub struct PlaylistInsertCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -7461,9 +7463,9 @@ pub struct PlaylistInsertCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PlaylistInsertCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for PlaylistInsertCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7528,18 +7530,18 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -7593,7 +7595,7 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *snippet*
     /// * *status*
     /// 
-    pub fn request(mut self, new_value: &Playlist) -> PlaylistInsertCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Playlist) -> PlaylistInsertCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -7613,7 +7615,7 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet and status.
-    pub fn part(mut self, new_value: &str) -> PlaylistInsertCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> PlaylistInsertCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -7625,7 +7627,7 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -7635,7 +7637,7 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -7646,7 +7648,7 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistInsertCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistInsertCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7667,7 +7669,7 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistInsertCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistInsertCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -7684,7 +7686,7 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PlaylistInsertCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistInsertCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -7695,7 +7697,7 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
 /// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.
 ///
 /// A builder for the *list* method supported by a *playlist* resource.
-/// It is not used directly, but through a `PlaylistMethodsBuilder`.
+/// It is not used directly, but through a `PlaylistMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -7746,7 +7748,7 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct PlaylistListCallBuilder<'a, C, NC, A>
+pub struct PlaylistListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -7763,9 +7765,9 @@ pub struct PlaylistListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PlaylistListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for PlaylistListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7837,15 +7839,15 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -7904,7 +7906,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, status, and contentDetails.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set part=snippet, the API response will contain all of those properties.
-    pub fn part(mut self, new_value: &str) -> PlaylistListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> PlaylistListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -7912,7 +7914,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-    pub fn page_token(mut self, new_value: &str) -> PlaylistListCallBuilder<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> PlaylistListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -7924,7 +7926,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -7934,7 +7936,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -7942,7 +7944,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// Set this parameter's value to true to instruct the API to only return playlists owned by the authenticated user.    
-    pub fn mine(mut self, new_value: bool) -> PlaylistListCallBuilder<'a, C, NC, A> {
+    pub fn mine(mut self, new_value: bool) -> PlaylistListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
     }
@@ -7950,7 +7952,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> PlaylistListCallBuilder<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> PlaylistListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -7958,7 +7960,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The id parameter specifies a comma-separated list of the YouTube playlist ID(s) for the resource(s) that are being retrieved. In a playlist resource, the id property specifies the playlist's YouTube playlist ID.    
-    pub fn id(mut self, new_value: &str) -> PlaylistListCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> PlaylistListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
     }
@@ -7966,7 +7968,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// This value indicates that the API should only return the specified channel's playlists.    
-    pub fn channel_id(mut self, new_value: &str) -> PlaylistListCallBuilder<'a, C, NC, A> {
+    pub fn channel_id(mut self, new_value: &str) -> PlaylistListCall<'a, C, NC, A> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -7977,7 +7979,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7998,7 +8000,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -8015,7 +8017,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PlaylistListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -8026,7 +8028,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
 /// Deletes a playlist.
 ///
 /// A builder for the *delete* method supported by a *playlist* resource.
-/// It is not used directly, but through a `PlaylistMethodsBuilder`.
+/// It is not used directly, but through a `PlaylistMethods`.
 ///
 /// # Example
 ///
@@ -8055,7 +8057,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct PlaylistDeleteCallBuilder<'a, C, NC, A>
+pub struct PlaylistDeleteCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -8066,9 +8068,9 @@ pub struct PlaylistDeleteCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PlaylistDeleteCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for PlaylistDeleteCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8121,15 +8123,15 @@ impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net:
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -8169,7 +8171,7 @@ impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID.    
-    pub fn id(mut self, new_value: &str) -> PlaylistDeleteCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> PlaylistDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -8179,7 +8181,7 @@ impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistDeleteCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistDeleteCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -8190,7 +8192,7 @@ impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistDeleteCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistDeleteCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8211,7 +8213,7 @@ impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistDeleteCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistDeleteCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -8228,7 +8230,7 @@ impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PlaylistDeleteCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistDeleteCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -8239,7 +8241,7 @@ impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net:
 /// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.
 ///
 /// A builder for the *update* method supported by a *playlist* resource.
-/// It is not used directly, but through a `PlaylistMethodsBuilder`.
+/// It is not used directly, but through a `PlaylistMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -8289,7 +8291,7 @@ impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct PlaylistUpdateCallBuilder<'a, C, NC, A>
+pub struct PlaylistUpdateCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -8301,9 +8303,9 @@ pub struct PlaylistUpdateCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PlaylistUpdateCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for PlaylistUpdateCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8365,18 +8367,18 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -8430,7 +8432,7 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *snippet*
     /// * *status*
     /// 
-    pub fn request(mut self, new_value: &Playlist) -> PlaylistUpdateCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Playlist) -> PlaylistUpdateCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -8452,7 +8454,7 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// The part names that you can include in the parameter value are snippet and status.
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist's privacy setting is contained in the status part. As such, if your request is updating a private playlist, and the request's part parameter value includes the status part, the playlist's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the playlist will revert to the default privacy setting.
-    pub fn part(mut self, new_value: &str) -> PlaylistUpdateCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> PlaylistUpdateCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -8462,7 +8464,7 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistUpdateCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistUpdateCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -8473,7 +8475,7 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistUpdateCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistUpdateCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8494,7 +8496,7 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistUpdateCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistUpdateCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -8511,7 +8513,7 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PlaylistUpdateCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistUpdateCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -8522,7 +8524,7 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
 /// Uploads a custom video thumbnail to YouTube and sets it for a video.
 ///
 /// A builder for the *set* method supported by a *thumbnail* resource.
-/// It is not used directly, but through a `ThumbnailMethodsBuilder`.
+/// It is not used directly, but through a `ThumbnailMethods`.
 ///
 /// # Example
 ///
@@ -8552,7 +8554,7 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct ThumbnailSetCallBuilder<'a, C, NC, A>
+pub struct ThumbnailSetCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -8563,13 +8565,14 @@ pub struct ThumbnailSetCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ThumbnailSetCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for ThumbnailSetCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> Result<(hyper::client::Response, ThumbnailSetResponse)> where RS: ReadSeek {
+    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, ThumbnailSetResponse)>
+		where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
@@ -8597,10 +8600,10 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
 
         params.push(("alt", "json".to_string()));
 
-        let (mut url, protocol) = if stream.is_some() {
-                ("https://www.googleapis.com/upload/youtube/v3/thumbnails/set".to_string(), "simple")
-            } else if resumeable_stream.is_some() {
-                ("https://www.googleapis.com/resumable/upload/youtube/v3/thumbnails/set".to_string(), "resumable")
+        let mut url = if protocol == "simple" {
+                "https://www.googleapis.com/upload/youtube/v3/thumbnails/set".to_string()
+            } else if protocol == "resumable" {
+                "https://www.googleapis.com/resumable/upload/youtube/v3/thumbnails/set".to_string()
             } else { 
                 unreachable!() 
         };
@@ -8626,25 +8629,25 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
-                if let Some(&mut (ref mut reader, ref mime)) = stream.as_mut() {
+                    .header(auth_header);
+                if protocol == "simple" {
                     let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                 reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    req = req.header(ContentType(mime.clone()))
+                    req = req.header(ContentType(reader_mime_type.clone()))
                              .header(ContentLength(size))
                              .body(reader.into_body());
                 }
-                if let Some(&mut (_, ref mime)) = resumeable_stream.as_mut() {
-                    req = req.header(cmn::XUploadContentType(mime.clone()));
+                if protocol == "resumable" {
+                    req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
                 }
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -8668,17 +8671,18 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                         dlg.finished();
                         return Result::Failure(res)
                     }
-                    if let Some((ref mut reader, ref mime)) = resumeable_stream {
-                        let request_size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    if protocol == "resumable" {
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         let mut client = &mut *self.hub.client.borrow_mut();
                         match (cmn::ResumableUploadHelper {
                             client: &mut client.borrow_mut(),
                             delegate: dlg,
+                            auth: &mut *self.hub.auth.borrow_mut(),
                             url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
-                            reader: reader,
-                            media_type: mime.clone(),
-                            content_size: request_size
+                            reader: &mut reader,
+                            media_type: reader_mime_type.clone(),
+                            content_size: size
                         }.upload()) {
                             Err(err) => {
                                 dlg.finished();
@@ -8714,7 +8718,7 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ThumbnailSetResponse)>
                 where RS: ReadSeek {
-        self.doit(Some((stream, mime_type)), None, )
+        self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumeable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
@@ -8727,7 +8731,7 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, ThumbnailSetResponse)>
                 where RS: ReadSeek {
-        self.doit(None, Some((resumeable_stream, mime_type)), )
+        self.doit(resumeable_stream, mime_type, "resumable")
     }
 
     /// Sets the *video id* query property to the given value.
@@ -8736,7 +8740,7 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided.    
-    pub fn video_id(mut self, new_value: &str) -> ThumbnailSetCallBuilder<'a, C, NC, A> {
+    pub fn video_id(mut self, new_value: &str) -> ThumbnailSetCall<'a, C, NC, A> {
         self._video_id = new_value.to_string();
         self
     }
@@ -8744,7 +8748,7 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ThumbnailSetCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ThumbnailSetCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -8755,7 +8759,7 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ThumbnailSetCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ThumbnailSetCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8776,7 +8780,7 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ThumbnailSetCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ThumbnailSetCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -8793,7 +8797,7 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ThumbnailSetCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ThumbnailSetCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -8804,7 +8808,7 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
 /// Returns a list of videos that match the API request parameters.
 ///
 /// A builder for the *list* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethodsBuilder`.
+/// It is not used directly, but through a `VideoMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -8867,7 +8871,7 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct VideoListCallBuilder<'a, C, NC, A>
+pub struct VideoListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -8887,9 +8891,9 @@ pub struct VideoListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VideoListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for VideoListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -8970,15 +8974,15 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -9046,7 +9050,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set part=snippet, the API response will contain all of those properties.
-    pub fn part(mut self, new_value: &str) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -9054,7 +9058,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The videoCategoryId parameter identifies the video category for which the chart should be retrieved. This parameter can only be used in conjunction with the chart parameter. By default, charts are not restricted to a particular category.    
-    pub fn video_category_id(mut self, new_value: &str) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn video_category_id(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._video_category_id = Some(new_value.to_string());
         self
     }
@@ -9062,7 +9066,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The regionCode parameter instructs the API to select a video chart available in the specified region. This parameter can only be used in conjunction with the chart parameter. The parameter value is an ISO 3166-1 alpha-2 country code.    
-    pub fn region_code(mut self, new_value: &str) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn region_code(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._region_code = Some(new_value.to_string());
         self
     }
@@ -9072,7 +9076,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     /// 
     /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
-    pub fn page_token(mut self, new_value: &str) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -9082,7 +9086,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -9090,7 +9094,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// Set this parameter's value to like or dislike to instruct the API to only return videos liked or disliked by the authenticated user.    
-    pub fn my_rating(mut self, new_value: &str) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn my_rating(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._my_rating = Some(new_value.to_string());
         self
     }
@@ -9100,7 +9104,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     /// 
     /// Note: This parameter is supported for use in conjunction with the myRating parameter, but it is not supported for use in conjunction with the id parameter.
-    pub fn max_results(mut self, new_value: u32) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> VideoListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -9108,7 +9112,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// DEPRECATED    
-    pub fn locale(mut self, new_value: &str) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn locale(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -9116,7 +9120,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) that are being retrieved. In a video resource, the id property specifies the video's ID.    
-    pub fn id(mut self, new_value: &str) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
     }
@@ -9124,7 +9128,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The hl parameter instructs the API to return a localized version of the video details. If localized text is nor available for the requested language, the localizations object in the API response will contain the requested information in the default language instead. The parameter value is a BCP-47 language code. Your application can determine whether the requested localization was returned by checking the value of the snippet.localized.language property in the API response.    
-    pub fn hl(mut self, new_value: &str) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn hl(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -9132,7 +9136,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     ///
     /// 
     /// The chart parameter identifies the chart that you want to retrieve.    
-    pub fn chart(mut self, new_value: &str) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn chart(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._chart = Some(new_value.to_string());
         self
     }
@@ -9143,7 +9147,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9164,7 +9168,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VideoListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -9181,7 +9185,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VideoListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -9192,7 +9196,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
 /// Add a like or dislike rating to a video or remove a rating from a video.
 ///
 /// A builder for the *rate* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethodsBuilder`.
+/// It is not used directly, but through a `VideoMethods`.
 ///
 /// # Example
 ///
@@ -9221,7 +9225,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct VideoRateCallBuilder<'a, C, NC, A>
+pub struct VideoRateCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -9233,9 +9237,9 @@ pub struct VideoRateCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VideoRateCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for VideoRateCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9289,15 +9293,15 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -9337,7 +9341,7 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed.    
-    pub fn id(mut self, new_value: &str) -> VideoRateCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> VideoRateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -9347,7 +9351,7 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// we provide this method for API completeness.
     /// 
     /// Specifies the rating to record.    
-    pub fn rating(mut self, new_value: &str) -> VideoRateCallBuilder<'a, C, NC, A> {
+    pub fn rating(mut self, new_value: &str) -> VideoRateCall<'a, C, NC, A> {
         self._rating = new_value.to_string();
         self
     }
@@ -9357,7 +9361,7 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoRateCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoRateCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -9368,7 +9372,7 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoRateCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoRateCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9389,7 +9393,7 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VideoRateCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoRateCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -9406,7 +9410,7 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VideoRateCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoRateCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -9417,7 +9421,7 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
 /// Retrieves the ratings that the authorized user gave to a list of specified videos.
 ///
 /// A builder for the *getRating* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethodsBuilder`.
+/// It is not used directly, but through a `VideoMethods`.
 ///
 /// # Example
 ///
@@ -9446,7 +9450,7 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
 ///              .doit();
 /// # }
 /// ```
-pub struct VideoGetRatingCallBuilder<'a, C, NC, A>
+pub struct VideoGetRatingCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -9457,9 +9461,9 @@ pub struct VideoGetRatingCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VideoGetRatingCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for VideoGetRatingCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9513,15 +9517,15 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -9571,7 +9575,7 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID.    
-    pub fn id(mut self, new_value: &str) -> VideoGetRatingCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> VideoGetRatingCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -9581,7 +9585,7 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoGetRatingCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoGetRatingCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -9592,7 +9596,7 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoGetRatingCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoGetRatingCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9613,7 +9617,7 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VideoGetRatingCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoGetRatingCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -9630,7 +9634,7 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VideoGetRatingCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoGetRatingCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -9641,7 +9645,7 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
 /// Deletes a YouTube video.
 ///
 /// A builder for the *delete* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethodsBuilder`.
+/// It is not used directly, but through a `VideoMethods`.
 ///
 /// # Example
 ///
@@ -9670,7 +9674,7 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct VideoDeleteCallBuilder<'a, C, NC, A>
+pub struct VideoDeleteCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -9681,9 +9685,9 @@ pub struct VideoDeleteCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VideoDeleteCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for VideoDeleteCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9736,15 +9740,15 @@ impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -9784,7 +9788,7 @@ impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID.    
-    pub fn id(mut self, new_value: &str) -> VideoDeleteCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> VideoDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -9794,7 +9798,7 @@ impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoDeleteCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoDeleteCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -9805,7 +9809,7 @@ impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoDeleteCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoDeleteCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9826,7 +9830,7 @@ impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VideoDeleteCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoDeleteCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -9843,7 +9847,7 @@ impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VideoDeleteCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoDeleteCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -9854,7 +9858,7 @@ impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// Updates a video's metadata.
 ///
 /// A builder for the *update* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethodsBuilder`.
+/// It is not used directly, but through a `VideoMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -9924,7 +9928,7 @@ impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct VideoUpdateCallBuilder<'a, C, NC, A>
+pub struct VideoUpdateCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -9936,9 +9940,9 @@ pub struct VideoUpdateCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VideoUpdateCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for VideoUpdateCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10000,18 +10004,18 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -10075,7 +10079,7 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *suggestions*
     /// * *topicDetails*
     /// 
-    pub fn request(mut self, new_value: &Video) -> VideoUpdateCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Video) -> VideoUpdateCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -10109,7 +10113,7 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a video's privacy setting is contained in the status part. As such, if your request is updating a private video, and the request's part parameter value includes the status part, the video's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the video will revert to the default privacy setting.
     /// 
     /// In addition, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
-    pub fn part(mut self, new_value: &str) -> VideoUpdateCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> VideoUpdateCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -10119,7 +10123,7 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoUpdateCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoUpdateCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -10130,7 +10134,7 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoUpdateCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoUpdateCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10151,7 +10155,7 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VideoUpdateCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoUpdateCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -10168,7 +10172,7 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VideoUpdateCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoUpdateCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -10179,7 +10183,7 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// Uploads a video to YouTube and optionally sets the video's metadata.
 ///
 /// A builder for the *insert* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethodsBuilder`.
+/// It is not used directly, but through a `VideoMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -10255,7 +10259,7 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct VideoInsertCallBuilder<'a, C, NC, A>
+pub struct VideoInsertCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -10271,13 +10275,14 @@ pub struct VideoInsertCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VideoInsertCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for VideoInsertCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> Result<(hyper::client::Response, Video)> where RS: ReadSeek {
+    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, Video)>
+		where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
@@ -10320,10 +10325,10 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 
         params.push(("alt", "json".to_string()));
 
-        let (mut url, protocol) = if stream.is_some() {
-                ("https://www.googleapis.com/upload/youtube/v3/videos".to_string(), "simple")
-            } else if resumeable_stream.is_some() {
-                ("https://www.googleapis.com/resumable/upload/youtube/v3/videos".to_string(), "resumable")
+        let mut url = if protocol == "simple" {
+                "https://www.googleapis.com/upload/youtube/v3/videos".to_string()
+            } else if protocol == "resumable" {
+                "https://www.googleapis.com/resumable/upload/youtube/v3/videos".to_string()
             } else { 
                 unreachable!() 
         };
@@ -10354,33 +10359,33 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut mp_reader: MultiPartReader = Default::default();
-            let (mut body_reader, content_type) = match stream.as_mut() {
-                Some(&mut (ref mut reader, ref mime)) => {
-                    mp_reader.reserve_exact(2);
-                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
-                             .add_part(reader, size, mime.clone());
-                    let mime_type = mp_reader.mime_type();
-                    (&mut mp_reader as &mut io::Read, ContentType(mime_type))
-                },
-                None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
-            };
-
             let mut req_result = {
+                let mut mp_reader: MultiPartReader = Default::default();
+                let (mut body_reader, content_type) = match protocol {
+                    "simple" => {
+                        mp_reader.reserve_exact(2);
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
+                                 .add_part(&mut reader, size, reader_mime_type.clone());
+                        let mime_type = mp_reader.mime_type();
+                        (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                    },
+                    _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                };
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(content_type)
-                    .body(body_reader.into_body())    ;
-                if let Some(&mut (_, ref mime)) = resumeable_stream.as_mut() {
-                    req = req.header(cmn::XUploadContentType(mime.clone()));
+                    .body(body_reader.into_body());
+                if protocol == "resumable" {
+                    req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
                 }
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -10404,17 +10409,18 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                         dlg.finished();
                         return Result::Failure(res)
                     }
-                    if let Some((ref mut reader, ref mime)) = resumeable_stream {
-                        let request_size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    if protocol == "resumable" {
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         let mut client = &mut *self.hub.client.borrow_mut();
                         match (cmn::ResumableUploadHelper {
                             client: &mut client.borrow_mut(),
                             delegate: dlg,
+                            auth: &mut *self.hub.auth.borrow_mut(),
                             url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
-                            reader: reader,
-                            media_type: mime.clone(),
-                            content_size: request_size
+                            reader: &mut reader,
+                            media_type: reader_mime_type.clone(),
+                            content_size: size
                         }.upload()) {
                             Err(err) => {
                                 dlg.finished();
@@ -10450,7 +10456,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *valid mime types*: 'application/octet-stream' and 'video/*'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Video)>
                 where RS: ReadSeek {
-        self.doit(Some((stream, mime_type)), None, )
+        self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumeable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
@@ -10463,7 +10469,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *valid mime types*: 'application/octet-stream' and 'video/*'
     pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Video)>
                 where RS: ReadSeek {
-        self.doit(None, Some((resumeable_stream, mime_type)), )
+        self.doit(resumeable_stream, mime_type, "resumable")
     }
 
     /// Sets the *request* property to the given value.
@@ -10486,7 +10492,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *suggestions*
     /// * *topicDetails*
     /// 
-    pub fn request(mut self, new_value: &Video) -> VideoInsertCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Video) -> VideoInsertCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -10516,7 +10522,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails. However, not all of those parts contain properties that can be set when setting or updating a video's metadata. For example, the statistics object encapsulates statistics that YouTube calculates for a video and does not contain values that you can set or modify. If the parameter value specifies a part that does not contain mutable values, that part will still be included in the API response.
-    pub fn part(mut self, new_value: &str) -> VideoInsertCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> VideoInsertCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -10524,7 +10530,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The stabilize parameter indicates whether YouTube should adjust the video to remove shaky camera motions.    
-    pub fn stabilize(mut self, new_value: bool) -> VideoInsertCallBuilder<'a, C, NC, A> {
+    pub fn stabilize(mut self, new_value: bool) -> VideoInsertCall<'a, C, NC, A> {
         self._stabilize = Some(new_value);
         self
     }
@@ -10536,7 +10542,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> VideoInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> VideoInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -10546,7 +10552,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -10554,7 +10560,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The notifySubscribers parameter indicates whether YouTube should send notification to subscribers about the inserted video.    
-    pub fn notify_subscribers(mut self, new_value: bool) -> VideoInsertCallBuilder<'a, C, NC, A> {
+    pub fn notify_subscribers(mut self, new_value: bool) -> VideoInsertCall<'a, C, NC, A> {
         self._notify_subscribers = Some(new_value);
         self
     }
@@ -10562,7 +10568,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The autoLevels parameter indicates whether YouTube should automatically enhance the video's lighting and color.    
-    pub fn auto_levels(mut self, new_value: bool) -> VideoInsertCallBuilder<'a, C, NC, A> {
+    pub fn auto_levels(mut self, new_value: bool) -> VideoInsertCall<'a, C, NC, A> {
         self._auto_levels = Some(new_value);
         self
     }
@@ -10573,7 +10579,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoInsertCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoInsertCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10594,7 +10600,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VideoInsertCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoInsertCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -10611,7 +10617,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VideoInsertCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoInsertCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -10622,7 +10628,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// Adds a subscription for the authenticated user's channel.
 ///
 /// A builder for the *insert* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethodsBuilder`.
+/// It is not used directly, but through a `SubscriptionMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -10671,7 +10677,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionInsertCallBuilder<'a, C, NC, A>
+pub struct SubscriptionInsertCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -10682,9 +10688,9 @@ pub struct SubscriptionInsertCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionInsertCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for SubscriptionInsertCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -10743,18 +10749,18 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -10808,7 +10814,7 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
     /// * *snippet*
     /// * *contentDetails*
     /// 
-    pub fn request(mut self, new_value: &Subscription) -> SubscriptionInsertCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Subscription) -> SubscriptionInsertCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -10828,7 +10834,7 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
-    pub fn part(mut self, new_value: &str) -> SubscriptionInsertCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -10839,7 +10845,7 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionInsertCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionInsertCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10860,7 +10866,7 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -10877,7 +10883,7 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionInsertCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionInsertCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -10888,7 +10894,7 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
 /// Returns subscription resources that match the API request criteria.
 ///
 /// A builder for the *list* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethodsBuilder`.
+/// It is not used directly, but through a `SubscriptionMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -10941,7 +10947,7 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionListCallBuilder<'a, C, NC, A>
+pub struct SubscriptionListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -10961,9 +10967,9 @@ pub struct SubscriptionListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for SubscriptionListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11044,15 +11050,15 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -11110,7 +11116,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set part=snippet, the API response will also contain all of those nested properties.
-    pub fn part(mut self, new_value: &str) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -11118,7 +11124,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-    pub fn page_token(mut self, new_value: &str) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -11126,7 +11132,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The order parameter specifies the method that will be used to sort resources in the API response.    
-    pub fn order(mut self, new_value: &str) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn order(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._order = Some(new_value.to_string());
         self
     }
@@ -11138,7 +11144,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -11148,7 +11154,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -11156,7 +11162,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user.    
-    pub fn my_subscribers(mut self, new_value: bool) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn my_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a, C, NC, A> {
         self._my_subscribers = Some(new_value);
         self
     }
@@ -11164,7 +11170,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's subscriptions.    
-    pub fn mine(mut self, new_value: bool) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn mine(mut self, new_value: bool) -> SubscriptionListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
     }
@@ -11172,7 +11178,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -11180,7 +11186,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The id parameter specifies a comma-separated list of the YouTube subscription ID(s) for the resource(s) that are being retrieved. In a subscription resource, the id property specifies the YouTube subscription ID.    
-    pub fn id(mut self, new_value: &str) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
     }
@@ -11188,7 +11194,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The forChannelId parameter specifies a comma-separated list of channel IDs. The API response will then only contain subscriptions matching those channels.    
-    pub fn for_channel_id(mut self, new_value: &str) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn for_channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._for_channel_id = Some(new_value.to_string());
         self
     }
@@ -11196,7 +11202,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's subscriptions.    
-    pub fn channel_id(mut self, new_value: &str) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -11207,7 +11213,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11228,7 +11234,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -11245,7 +11251,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -11256,7 +11262,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
 /// Deletes a subscription.
 ///
 /// A builder for the *delete* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethodsBuilder`.
+/// It is not used directly, but through a `SubscriptionMethods`.
 ///
 /// # Example
 ///
@@ -11284,7 +11290,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct SubscriptionDeleteCallBuilder<'a, C, NC, A>
+pub struct SubscriptionDeleteCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -11294,9 +11300,9 @@ pub struct SubscriptionDeleteCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SubscriptionDeleteCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for SubscriptionDeleteCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> SubscriptionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11346,15 +11352,15 @@ impl<'a, C, NC, A> SubscriptionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -11394,7 +11400,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID.    
-    pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -11405,7 +11411,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionDeleteCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SubscriptionDeleteCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11426,7 +11432,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -11443,7 +11449,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionDeleteCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SubscriptionDeleteCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -11454,7 +11460,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
 /// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.
 ///
 /// A builder for the *list* method supported by a *search* resource.
-/// It is not used directly, but through a `SearchMethodsBuilder`.
+/// It is not used directly, but through a `SearchMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -11525,7 +11531,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct SearchListCallBuilder<'a, C, NC, A>
+pub struct SearchListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -11564,9 +11570,9 @@ pub struct SearchListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for SearchListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for SearchListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11704,15 +11710,15 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -11769,7 +11775,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     /// The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a search result, the snippet property contains other properties that identify the result's title, description, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
-    pub fn part(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -11777,7 +11783,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The videoType parameter lets you restrict a search to a particular type of videos.    
-    pub fn video_type(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn video_type(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_type = Some(new_value.to_string());
         self
     }
@@ -11785,7 +11791,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The videoSyndicated parameter lets you to restrict a search to only videos that can be played outside youtube.com.    
-    pub fn video_syndicated(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn video_syndicated(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_syndicated = Some(new_value.to_string());
         self
     }
@@ -11793,7 +11799,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The videoLicense parameter filters search results to only include videos with a particular license. YouTube lets video uploaders choose to attach either the Creative Commons license or the standard YouTube license to each of their videos.    
-    pub fn video_license(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn video_license(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_license = Some(new_value.to_string());
         self
     }
@@ -11801,7 +11807,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The videoEmbeddable parameter lets you to restrict a search to only videos that can be embedded into a webpage.    
-    pub fn video_embeddable(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn video_embeddable(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_embeddable = Some(new_value.to_string());
         self
     }
@@ -11809,7 +11815,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The videoDuration parameter filters video search results based on their duration.    
-    pub fn video_duration(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn video_duration(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_duration = Some(new_value.to_string());
         self
     }
@@ -11817,7 +11823,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The videoDimension parameter lets you restrict a search to only retrieve 2D or 3D videos.    
-    pub fn video_dimension(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn video_dimension(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_dimension = Some(new_value.to_string());
         self
     }
@@ -11825,7 +11831,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The videoDefinition parameter lets you restrict a search to only include either high definition (HD) or standard definition (SD) videos. HD videos are available for playback in at least 720p, though higher resolutions, like 1080p, might also be available.    
-    pub fn video_definition(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn video_definition(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_definition = Some(new_value.to_string());
         self
     }
@@ -11833,7 +11839,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The videoCategoryId parameter filters video search results based on their category.    
-    pub fn video_category_id(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn video_category_id(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_category_id = Some(new_value.to_string());
         self
     }
@@ -11841,7 +11847,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The videoCaption parameter indicates whether the API should filter video search results based on whether they have captions.    
-    pub fn video_caption(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn video_caption(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_caption = Some(new_value.to_string());
         self
     }
@@ -11849,7 +11855,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The type parameter restricts a search query to only retrieve a particular type of resource. The value is a comma-separated list of resource types.    
-    pub fn type_(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn type_(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._type_ = Some(new_value.to_string());
         self
     }
@@ -11857,7 +11863,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The topicId parameter indicates that the API response should only contain resources associated with the specified topic. The value identifies a Freebase topic ID.    
-    pub fn topic_id(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn topic_id(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._topic_id = Some(new_value.to_string());
         self
     }
@@ -11865,7 +11871,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The safeSearch parameter indicates whether the search results should include restricted content as well as standard content.    
-    pub fn safe_search(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn safe_search(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._safe_search = Some(new_value.to_string());
         self
     }
@@ -11873,7 +11879,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The relevanceLanguage parameter instructs the API to return search results that are most relevant to the specified language. The parameter value is typically an ISO 639-1 two-letter language code. However, you should use the values zh-Hans for simplified Chinese and zh-Hant for traditional Chinese. Please note that results in other languages will still be returned if they are highly relevant to the search query term.    
-    pub fn relevance_language(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn relevance_language(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._relevance_language = Some(new_value.to_string());
         self
     }
@@ -11881,7 +11887,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The relatedToVideoId parameter retrieves a list of videos that are related to the video that the parameter value identifies. The parameter value must be set to a YouTube video ID and, if you are using this parameter, the type parameter must be set to video.    
-    pub fn related_to_video_id(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn related_to_video_id(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._related_to_video_id = Some(new_value.to_string());
         self
     }
@@ -11889,7 +11895,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The regionCode parameter instructs the API to return search results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
-    pub fn region_code(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn region_code(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._region_code = Some(new_value.to_string());
         self
     }
@@ -11897,7 +11903,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The q parameter specifies the query term to search for.    
-    pub fn q(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn q(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -11905,7 +11911,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The publishedBefore parameter indicates that the API response should only contain resources created before the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
-    pub fn published_before(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn published_before(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._published_before = Some(new_value.to_string());
         self
     }
@@ -11913,7 +11919,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The publishedAfter parameter indicates that the API response should only contain resources created after the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
-    pub fn published_after(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn published_after(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._published_after = Some(new_value.to_string());
         self
     }
@@ -11921,7 +11927,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-    pub fn page_token(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -11929,7 +11935,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The order parameter specifies the method that will be used to order resources in the API response.    
-    pub fn order(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn order(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._order = Some(new_value.to_string());
         self
     }
@@ -11939,7 +11945,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -11947,7 +11953,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> SearchListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -11955,7 +11961,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The locationRadius, in conjunction with the location parameter, defines a geographic area. If the geographic coordinates associated with a video fall within that area, then the video may be included in search results. This parameter value must be a floating point number followed by a measurement unit. Valid measurement units are m, km, ft, and mi. For example, valid parameter values include 1500m, 5km, 10000ft, and 0.75mi. The API does not support locationRadius parameter values larger than 1000 kilometers.    
-    pub fn location_radius(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn location_radius(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._location_radius = Some(new_value.to_string());
         self
     }
@@ -11963,7 +11969,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The location parameter restricts a search to videos that have a geographical location specified in their metadata. The value is a string that specifies geographic latitude/longitude coordinates e.g. (37.42307,-122.08427)    
-    pub fn location(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn location(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._location = Some(new_value.to_string());
         self
     }
@@ -11971,7 +11977,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The forMine parameter restricts the search to only retrieve videos owned by the authenticated user. If you set this parameter to true, then the type parameter's value must also be set to video.    
-    pub fn for_mine(mut self, new_value: bool) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn for_mine(mut self, new_value: bool) -> SearchListCall<'a, C, NC, A> {
         self._for_mine = Some(new_value);
         self
     }
@@ -11981,7 +11987,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The forContentOwner parameter restricts the search to only retrieve resources owned by the content owner specified by the onBehalfOfContentOwner parameter. The user must be authenticated using a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.
-    pub fn for_content_owner(mut self, new_value: bool) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn for_content_owner(mut self, new_value: bool) -> SearchListCall<'a, C, NC, A> {
         self._for_content_owner = Some(new_value);
         self
     }
@@ -11989,7 +11995,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The eventType parameter restricts a search to broadcast events.    
-    pub fn event_type(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn event_type(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._event_type = Some(new_value.to_string());
         self
     }
@@ -11997,7 +12003,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The channelType parameter lets you restrict a search to a particular type of channel.    
-    pub fn channel_type(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn channel_type(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._channel_type = Some(new_value.to_string());
         self
     }
@@ -12005,7 +12011,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     ///
     /// 
     /// The channelId parameter indicates that the API response should only contain resources created by the channel    
-    pub fn channel_id(mut self, new_value: &str) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn channel_id(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -12016,7 +12022,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SearchListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SearchListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12037,7 +12043,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SearchListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SearchListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -12054,7 +12060,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> SearchListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> SearchListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -12065,7 +12071,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
 /// Returns a list of supported regions.
 ///
 /// A builder for the *list* method supported by a *i18nRegion* resource.
-/// It is not used directly, but through a `I18nRegionMethodsBuilder`.
+/// It is not used directly, but through a `I18nRegionMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -12108,7 +12114,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
 ///              .doit();
 /// # }
 /// ```
-pub struct I18nRegionListCallBuilder<'a, C, NC, A>
+pub struct I18nRegionListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -12119,9 +12125,9 @@ pub struct I18nRegionListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for I18nRegionListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for I18nRegionListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12175,15 +12181,15 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -12238,7 +12244,7 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *snippet*
     /// 
     /// The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
-    pub fn part(mut self, new_value: &str) -> I18nRegionListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> I18nRegionListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -12246,7 +12252,7 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The hl parameter specifies the language that should be used for text values in the API response.    
-    pub fn hl(mut self, new_value: &str) -> I18nRegionListCallBuilder<'a, C, NC, A> {
+    pub fn hl(mut self, new_value: &str) -> I18nRegionListCall<'a, C, NC, A> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -12257,7 +12263,7 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> I18nRegionListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> I18nRegionListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12278,7 +12284,7 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> I18nRegionListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> I18nRegionListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -12295,7 +12301,7 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> I18nRegionListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> I18nRegionListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -12306,7 +12312,7 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
 /// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.
 ///
 /// A builder for the *update* method supported by a *liveStream* resource.
-/// It is not used directly, but through a `LiveStreamMethodsBuilder`.
+/// It is not used directly, but through a `LiveStreamMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -12360,7 +12366,7 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct LiveStreamUpdateCallBuilder<'a, C, NC, A>
+pub struct LiveStreamUpdateCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -12373,9 +12379,9 @@ pub struct LiveStreamUpdateCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LiveStreamUpdateCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for LiveStreamUpdateCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12440,18 +12446,18 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -12507,7 +12513,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *cdn*
     /// * *status*
     /// 
-    pub fn request(mut self, new_value: &LiveStream) -> LiveStreamUpdateCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LiveStream) -> LiveStreamUpdateCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -12531,7 +12537,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// The part properties that you can include in the parameter value are id, snippet, cdn, and status.
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. If the request body does not specify a value for a mutable property, the existing value for that property will be removed.
-    pub fn part(mut self, new_value: &str) -> LiveStreamUpdateCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -12543,7 +12549,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamUpdateCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -12553,7 +12559,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamUpdateCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -12564,7 +12570,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamUpdateCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamUpdateCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12585,7 +12591,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamUpdateCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamUpdateCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -12602,7 +12608,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamUpdateCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamUpdateCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -12613,7 +12619,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
 /// Deletes a video stream.
 ///
 /// A builder for the *delete* method supported by a *liveStream* resource.
-/// It is not used directly, but through a `LiveStreamMethodsBuilder`.
+/// It is not used directly, but through a `LiveStreamMethods`.
 ///
 /// # Example
 ///
@@ -12643,7 +12649,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct LiveStreamDeleteCallBuilder<'a, C, NC, A>
+pub struct LiveStreamDeleteCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -12655,9 +12661,9 @@ pub struct LiveStreamDeleteCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LiveStreamDeleteCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for LiveStreamDeleteCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12713,15 +12719,15 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -12761,7 +12767,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the YouTube live stream ID for the resource that is being deleted.    
-    pub fn id(mut self, new_value: &str) -> LiveStreamDeleteCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -12773,7 +12779,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamDeleteCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -12783,7 +12789,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamDeleteCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -12794,7 +12800,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamDeleteCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamDeleteCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12815,7 +12821,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamDeleteCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamDeleteCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -12832,7 +12838,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamDeleteCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamDeleteCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -12843,7 +12849,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
 /// Returns a list of video streams that match the API request parameters.
 ///
 /// A builder for the *list* method supported by a *liveStream* resource.
-/// It is not used directly, but through a `LiveStreamMethodsBuilder`.
+/// It is not used directly, but through a `LiveStreamMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -12892,7 +12898,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct LiveStreamListCallBuilder<'a, C, NC, A>
+pub struct LiveStreamListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -12908,9 +12914,9 @@ pub struct LiveStreamListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LiveStreamListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for LiveStreamListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12979,15 +12985,15 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -13044,7 +13050,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *status*
     /// 
     /// The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.    
-    pub fn part(mut self, new_value: &str) -> LiveStreamListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> LiveStreamListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -13052,7 +13058,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-    pub fn page_token(mut self, new_value: &str) -> LiveStreamListCallBuilder<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LiveStreamListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -13064,7 +13070,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -13074,7 +13080,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -13082,7 +13088,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The mine parameter can be used to instruct the API to only return streams owned by the authenticated user. Set the parameter value to true to only retrieve your own streams.    
-    pub fn mine(mut self, new_value: bool) -> LiveStreamListCallBuilder<'a, C, NC, A> {
+    pub fn mine(mut self, new_value: bool) -> LiveStreamListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
     }
@@ -13090,7 +13096,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set. Acceptable values are 0 to 50, inclusive. The default value is 5.    
-    pub fn max_results(mut self, new_value: u32) -> LiveStreamListCallBuilder<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LiveStreamListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -13098,7 +13104,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The id parameter specifies a comma-separated list of YouTube stream IDs that identify the streams being retrieved. In a liveStream resource, the id property specifies the stream's ID.    
-    pub fn id(mut self, new_value: &str) -> LiveStreamListCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LiveStreamListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
     }
@@ -13109,7 +13115,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13130,7 +13136,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -13147,7 +13153,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -13158,7 +13164,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
 /// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.
 ///
 /// A builder for the *insert* method supported by a *liveStream* resource.
-/// It is not used directly, but through a `LiveStreamMethodsBuilder`.
+/// It is not used directly, but through a `LiveStreamMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -13212,7 +13218,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct LiveStreamInsertCallBuilder<'a, C, NC, A>
+pub struct LiveStreamInsertCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -13225,9 +13231,9 @@ pub struct LiveStreamInsertCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LiveStreamInsertCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for LiveStreamInsertCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13292,18 +13298,18 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -13359,7 +13365,7 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *cdn*
     /// * *status*
     /// 
-    pub fn request(mut self, new_value: &LiveStream) -> LiveStreamInsertCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LiveStream) -> LiveStreamInsertCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -13381,7 +13387,7 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part properties that you can include in the parameter value are id, snippet, cdn, and status.
-    pub fn part(mut self, new_value: &str) -> LiveStreamInsertCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> LiveStreamInsertCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -13393,7 +13399,7 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -13403,7 +13409,7 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -13414,7 +13420,7 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamInsertCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveStreamInsertCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13435,7 +13441,7 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamInsertCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamInsertCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -13452,7 +13458,7 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamInsertCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveStreamInsertCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -13463,7 +13469,7 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
 /// Updates a channel's metadata.
 ///
 /// A builder for the *update* method supported by a *channel* resource.
-/// It is not used directly, but through a `ChannelMethodsBuilder`.
+/// It is not used directly, but through a `ChannelMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -13513,7 +13519,7 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct ChannelUpdateCallBuilder<'a, C, NC, A>
+pub struct ChannelUpdateCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -13525,9 +13531,9 @@ pub struct ChannelUpdateCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChannelUpdateCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for ChannelUpdateCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13589,18 +13595,18 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -13654,7 +13660,7 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *id*
     /// * *invideoPromotion*
     /// 
-    pub fn request(mut self, new_value: &Channel) -> ChannelUpdateCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Channel) -> ChannelUpdateCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -13676,7 +13682,7 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
     /// The part names that you can include in the parameter value are id and invideoPromotion.
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies.
-    pub fn part(mut self, new_value: &str) -> ChannelUpdateCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> ChannelUpdateCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -13684,7 +13690,7 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
     ///
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelUpdateCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelUpdateCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -13695,7 +13701,7 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelUpdateCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelUpdateCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13716,7 +13722,7 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelUpdateCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelUpdateCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -13733,7 +13739,7 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelUpdateCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelUpdateCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -13744,7 +13750,7 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
 /// Returns a collection of zero or more channel resources that match the request criteria.
 ///
 /// A builder for the *list* method supported by a *channel* resource.
-/// It is not used directly, but through a `ChannelMethodsBuilder`.
+/// It is not used directly, but through a `ChannelMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -13800,7 +13806,7 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
 ///              .doit();
 /// # }
 /// ```
-pub struct ChannelListCallBuilder<'a, C, NC, A>
+pub struct ChannelListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -13819,9 +13825,9 @@ pub struct ChannelListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ChannelListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for ChannelListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -13899,15 +13905,15 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -13968,7 +13974,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, statistics, topicDetails, and invideoPromotion.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set part=contentDetails, the API response will also contain all of those nested properties.
-    pub fn part(mut self, new_value: &str) -> ChannelListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> ChannelListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -13976,7 +13982,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-    pub fn page_token(mut self, new_value: &str) -> ChannelListCallBuilder<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ChannelListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -13984,7 +13990,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -13992,7 +13998,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// Set this parameter's value to true to retrieve a list of channels that subscribed to the authenticated user's channel.    
-    pub fn my_subscribers(mut self, new_value: bool) -> ChannelListCallBuilder<'a, C, NC, A> {
+    pub fn my_subscribers(mut self, new_value: bool) -> ChannelListCall<'a, C, NC, A> {
         self._my_subscribers = Some(new_value);
         self
     }
@@ -14000,7 +14006,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// Set this parameter's value to true to instruct the API to only return channels owned by the authenticated user.    
-    pub fn mine(mut self, new_value: bool) -> ChannelListCallBuilder<'a, C, NC, A> {
+    pub fn mine(mut self, new_value: bool) -> ChannelListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
     }
@@ -14008,7 +14014,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> ChannelListCallBuilder<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> ChannelListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -14016,7 +14022,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// Set this parameter's value to true to instruct the API to only return channels managed by the content owner that the onBehalfOfContentOwner parameter specifies. The user must be authenticated as a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.    
-    pub fn managed_by_me(mut self, new_value: bool) -> ChannelListCallBuilder<'a, C, NC, A> {
+    pub fn managed_by_me(mut self, new_value: bool) -> ChannelListCall<'a, C, NC, A> {
         self._managed_by_me = Some(new_value);
         self
     }
@@ -14024,7 +14030,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The id parameter specifies a comma-separated list of the YouTube channel ID(s) for the resource(s) that are being retrieved. In a channel resource, the id property specifies the channel's YouTube channel ID.    
-    pub fn id(mut self, new_value: &str) -> ChannelListCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> ChannelListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
     }
@@ -14032,7 +14038,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The forUsername parameter specifies a YouTube username, thereby requesting the channel associated with that username.    
-    pub fn for_username(mut self, new_value: &str) -> ChannelListCallBuilder<'a, C, NC, A> {
+    pub fn for_username(mut self, new_value: &str) -> ChannelListCall<'a, C, NC, A> {
         self._for_username = Some(new_value.to_string());
         self
     }
@@ -14040,7 +14046,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     ///
     /// 
     /// The categoryId parameter specifies a YouTube guide category, thereby requesting YouTube channels associated with that category.    
-    pub fn category_id(mut self, new_value: &str) -> ChannelListCallBuilder<'a, C, NC, A> {
+    pub fn category_id(mut self, new_value: &str) -> ChannelListCall<'a, C, NC, A> {
         self._category_id = Some(new_value.to_string());
         self
     }
@@ -14051,7 +14057,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14072,7 +14078,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -14089,7 +14095,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ChannelListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ChannelListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -14100,7 +14106,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 /// Deletes a playlist item.
 ///
 /// A builder for the *delete* method supported by a *playlistItem* resource.
-/// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
+/// It is not used directly, but through a `PlaylistItemMethods`.
 ///
 /// # Example
 ///
@@ -14128,7 +14134,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
 ///              .doit();
 /// # }
 /// ```
-pub struct PlaylistItemDeleteCallBuilder<'a, C, NC, A>
+pub struct PlaylistItemDeleteCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -14138,9 +14144,9 @@ pub struct PlaylistItemDeleteCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PlaylistItemDeleteCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for PlaylistItemDeleteCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> PlaylistItemDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14190,15 +14196,15 @@ impl<'a, C, NC, A> PlaylistItemDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -14238,7 +14244,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID.    
-    pub fn id(mut self, new_value: &str) -> PlaylistItemDeleteCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -14249,7 +14255,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemDeleteCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemDeleteCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14270,7 +14276,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemDeleteCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemDeleteCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -14287,7 +14293,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemDeleteCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemDeleteCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -14298,7 +14304,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
 /// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.
 ///
 /// A builder for the *list* method supported by a *playlistItem* resource.
-/// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
+/// It is not used directly, but through a `PlaylistItemMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -14348,7 +14354,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct PlaylistItemListCallBuilder<'a, C, NC, A>
+pub struct PlaylistItemListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -14364,9 +14370,9 @@ pub struct PlaylistItemListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PlaylistItemListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for PlaylistItemListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14435,15 +14441,15 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -14502,7 +14508,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set part=snippet, the API response will contain all of those properties.
-    pub fn part(mut self, new_value: &str) -> PlaylistItemListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -14510,7 +14516,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The videoId parameter specifies that the request should return only the playlist items that contain the specified video.    
-    pub fn video_id(mut self, new_value: &str) -> PlaylistItemListCallBuilder<'a, C, NC, A> {
+    pub fn video_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, NC, A> {
         self._video_id = Some(new_value.to_string());
         self
     }
@@ -14518,7 +14524,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The playlistId parameter specifies the unique ID of the playlist for which you want to retrieve playlist items. Note that even though this is an optional parameter, every request to retrieve playlist items must specify a value for either the id parameter or the playlistId parameter.    
-    pub fn playlist_id(mut self, new_value: &str) -> PlaylistItemListCallBuilder<'a, C, NC, A> {
+    pub fn playlist_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, NC, A> {
         self._playlist_id = Some(new_value.to_string());
         self
     }
@@ -14526,7 +14532,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-    pub fn page_token(mut self, new_value: &str) -> PlaylistItemListCallBuilder<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -14536,7 +14542,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -14544,7 +14550,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> PlaylistItemListCallBuilder<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> PlaylistItemListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -14552,7 +14558,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     ///
     /// 
     /// The id parameter specifies a comma-separated list of one or more unique playlist item IDs.    
-    pub fn id(mut self, new_value: &str) -> PlaylistItemListCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
     }
@@ -14563,7 +14569,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14584,7 +14590,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -14601,7 +14607,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -14612,7 +14618,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
 /// Adds a resource to a playlist.
 ///
 /// A builder for the *insert* method supported by a *playlistItem* resource.
-/// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
+/// It is not used directly, but through a `PlaylistItemMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -14664,7 +14670,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
 ///              .doit();
 /// # }
 /// ```
-pub struct PlaylistItemInsertCallBuilder<'a, C, NC, A>
+pub struct PlaylistItemInsertCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -14676,9 +14682,9 @@ pub struct PlaylistItemInsertCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PlaylistItemInsertCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for PlaylistItemInsertCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -14740,18 +14746,18 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -14806,7 +14812,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
     /// * *contentDetails*
     /// * *status*
     /// 
-    pub fn request(mut self, new_value: &PlaylistItem) -> PlaylistItemInsertCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PlaylistItem) -> PlaylistItemInsertCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -14827,7 +14833,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet, contentDetails, and status.
-    pub fn part(mut self, new_value: &str) -> PlaylistItemInsertCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> PlaylistItemInsertCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -14837,7 +14843,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -14848,7 +14854,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemInsertCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemInsertCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -14869,7 +14875,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemInsertCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemInsertCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -14886,7 +14892,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemInsertCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemInsertCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -14897,7 +14903,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
 /// Modifies a playlist item. For example, you could update the item's position in the playlist.
 ///
 /// A builder for the *update* method supported by a *playlistItem* resource.
-/// It is not used directly, but through a `PlaylistItemMethodsBuilder`.
+/// It is not used directly, but through a `PlaylistItemMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -14948,7 +14954,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
 ///              .doit();
 /// # }
 /// ```
-pub struct PlaylistItemUpdateCallBuilder<'a, C, NC, A>
+pub struct PlaylistItemUpdateCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -14959,9 +14965,9 @@ pub struct PlaylistItemUpdateCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for PlaylistItemUpdateCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for PlaylistItemUpdateCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15020,18 +15026,18 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -15086,7 +15092,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
     /// * *contentDetails*
     /// * *status*
     /// 
-    pub fn request(mut self, new_value: &PlaylistItem) -> PlaylistItemUpdateCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &PlaylistItem) -> PlaylistItemUpdateCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -15109,7 +15115,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
     /// The part names that you can include in the parameter value are snippet, contentDetails, and status.
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a playlist item can specify a start time and end time, which identify the times portion of the video that should play when users watch the video in the playlist. If your request is updating a playlist item that sets these values, and the request's part parameter value includes the contentDetails part, the playlist item's start and end times will be updated to whatever value the request body specifies. If the request body does not specify values, the existing start and end times will be removed and replaced with the default settings.
-    pub fn part(mut self, new_value: &str) -> PlaylistItemUpdateCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> PlaylistItemUpdateCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -15120,7 +15126,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemUpdateCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> PlaylistItemUpdateCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15141,7 +15147,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemUpdateCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemUpdateCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -15158,7 +15164,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemUpdateCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> PlaylistItemUpdateCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -15169,7 +15175,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
 /// Uploads a watermark image to YouTube and sets it for a channel.
 ///
 /// A builder for the *set* method supported by a *watermark* resource.
-/// It is not used directly, but through a `WatermarkMethodsBuilder`.
+/// It is not used directly, but through a `WatermarkMethods`.
 ///
 /// # Example
 ///
@@ -15205,7 +15211,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
-pub struct WatermarkSetCallBuilder<'a, C, NC, A>
+pub struct WatermarkSetCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -15217,13 +15223,14 @@ pub struct WatermarkSetCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for WatermarkSetCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for WatermarkSetCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut stream: Option<(RS, mime::Mime)>, mut resumeable_stream: Option<(RS, mime::Mime)>) -> Result<hyper::client::Response> where RS: ReadSeek {
+    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<hyper::client::Response>
+		where RS: ReadSeek {
         use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent};
@@ -15250,10 +15257,10 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
         }
 
 
-        let (mut url, protocol) = if stream.is_some() {
-                ("https://www.googleapis.com/upload/youtube/v3/watermarks/set".to_string(), "simple")
-            } else if resumeable_stream.is_some() {
-                ("https://www.googleapis.com/resumable/upload/youtube/v3/watermarks/set".to_string(), "resumable")
+        let mut url = if protocol == "simple" {
+                "https://www.googleapis.com/upload/youtube/v3/watermarks/set".to_string()
+            } else if protocol == "resumable" {
+                "https://www.googleapis.com/resumable/upload/youtube/v3/watermarks/set".to_string()
             } else { 
                 unreachable!() 
         };
@@ -15284,33 +15291,33 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut mp_reader: MultiPartReader = Default::default();
-            let (mut body_reader, content_type) = match stream.as_mut() {
-                Some(&mut (ref mut reader, ref mime)) => {
-                    mp_reader.reserve_exact(2);
-                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                    reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
-                             .add_part(reader, size, mime.clone());
-                    let mime_type = mp_reader.mime_type();
-                    (&mut mp_reader as &mut io::Read, ContentType(mime_type))
-                },
-                None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
-            };
-
             let mut req_result = {
+                let mut mp_reader: MultiPartReader = Default::default();
+                let (mut body_reader, content_type) = match protocol {
+                    "simple" => {
+                        mp_reader.reserve_exact(2);
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
+                                 .add_part(&mut reader, size, reader_mime_type.clone());
+                        let mime_type = mp_reader.mime_type();
+                        (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                    },
+                    _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                };
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(content_type)
-                    .body(body_reader.into_body())    ;
-                if let Some(&mut (_, ref mime)) = resumeable_stream.as_mut() {
-                    req = req.header(cmn::XUploadContentType(mime.clone()));
+                    .body(body_reader.into_body());
+                if protocol == "resumable" {
+                    req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
                 }
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -15334,17 +15341,18 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                         dlg.finished();
                         return Result::Failure(res)
                     }
-                    if let Some((ref mut reader, ref mime)) = resumeable_stream {
-                        let request_size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    if protocol == "resumable" {
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         let mut client = &mut *self.hub.client.borrow_mut();
                         match (cmn::ResumableUploadHelper {
                             client: &mut client.borrow_mut(),
                             delegate: dlg,
+                            auth: &mut *self.hub.auth.borrow_mut(),
                             url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
-                            reader: reader,
-                            media_type: mime.clone(),
-                            content_size: request_size
+                            reader: &mut reader,
+                            media_type: reader_mime_type.clone(),
+                            content_size: size
                         }.upload()) {
                             Err(err) => {
                                 dlg.finished();
@@ -15370,7 +15378,7 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<hyper::client::Response>
                 where RS: ReadSeek {
-        self.doit(Some((stream, mime_type)), None, )
+        self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumeable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
@@ -15383,7 +15391,7 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// * *valid mime types*: 'application/octet-stream', 'image/jpeg' and 'image/png'
     pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<hyper::client::Response>
                 where RS: ReadSeek {
-        self.doit(None, Some((resumeable_stream, mime_type)), )
+        self.doit(resumeable_stream, mime_type, "resumable")
     }
 
     /// Sets the *request* property to the given value.
@@ -15391,7 +15399,7 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    pub fn request(mut self, new_value: &InvideoBranding) -> WatermarkSetCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &InvideoBranding) -> WatermarkSetCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -15401,7 +15409,7 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// we provide this method for API completeness.
     /// 
     /// The channelId parameter specifies a YouTube channel ID for which the watermark is being provided.    
-    pub fn channel_id(mut self, new_value: &str) -> WatermarkSetCallBuilder<'a, C, NC, A> {
+    pub fn channel_id(mut self, new_value: &str) -> WatermarkSetCall<'a, C, NC, A> {
         self._channel_id = new_value.to_string();
         self
     }
@@ -15409,7 +15417,7 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkSetCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkSetCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -15420,7 +15428,7 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WatermarkSetCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WatermarkSetCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15441,7 +15449,7 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> WatermarkSetCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> WatermarkSetCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -15458,7 +15466,7 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> WatermarkSetCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WatermarkSetCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -15469,7 +15477,7 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
 /// Deletes a watermark.
 ///
 /// A builder for the *unset* method supported by a *watermark* resource.
-/// It is not used directly, but through a `WatermarkMethodsBuilder`.
+/// It is not used directly, but through a `WatermarkMethods`.
 ///
 /// # Example
 ///
@@ -15498,7 +15506,7 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct WatermarkUnsetCallBuilder<'a, C, NC, A>
+pub struct WatermarkUnsetCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -15509,9 +15517,9 @@ pub struct WatermarkUnsetCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for WatermarkUnsetCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for WatermarkUnsetCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15564,15 +15572,15 @@ impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net:
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -15612,7 +15620,7 @@ impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// we provide this method for API completeness.
     /// 
     /// The channelId parameter specifies a YouTube channel ID for which the watermark is being unset.    
-    pub fn channel_id(mut self, new_value: &str) -> WatermarkUnsetCallBuilder<'a, C, NC, A> {
+    pub fn channel_id(mut self, new_value: &str) -> WatermarkUnsetCall<'a, C, NC, A> {
         self._channel_id = new_value.to_string();
         self
     }
@@ -15620,7 +15628,7 @@ impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net:
     ///
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkUnsetCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkUnsetCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -15631,7 +15639,7 @@ impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WatermarkUnsetCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> WatermarkUnsetCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15652,7 +15660,7 @@ impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> WatermarkUnsetCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> WatermarkUnsetCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -15669,7 +15677,7 @@ impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> WatermarkUnsetCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> WatermarkUnsetCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -15680,7 +15688,7 @@ impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net:
 /// Controls the settings for a slate that can be displayed in the broadcast stream.
 ///
 /// A builder for the *control* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+/// It is not used directly, but through a `LiveBroadcastMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -15727,7 +15735,7 @@ impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net:
 ///              .doit();
 /// # }
 /// ```
-pub struct LiveBroadcastControlCallBuilder<'a, C, NC, A>
+pub struct LiveBroadcastControlCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -15743,9 +15751,9 @@ pub struct LiveBroadcastControlCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LiveBroadcastControlCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for LiveBroadcastControlCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -15812,15 +15820,15 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -15870,7 +15878,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated.    
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastControlCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -15887,7 +15895,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
     /// * *status*
     /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
-    pub fn part(mut self, new_value: &str) -> LiveBroadcastControlCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -15895,7 +15903,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// The walltime parameter specifies the wall clock time at which the specified slate change will occur. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.    
-    pub fn walltime(mut self, new_value: &str) -> LiveBroadcastControlCallBuilder<'a, C, NC, A> {
+    pub fn walltime(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._walltime = Some(new_value.to_string());
         self
     }
@@ -15907,7 +15915,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastControlCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -15917,7 +15925,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastControlCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -15929,7 +15937,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
     /// If you do not specify a value for this parameter, then YouTube performs the action as soon as possible. See the Getting started guide for more details.
     /// 
     /// Important: You should only specify a value for this parameter if your broadcast stream is delayed.
-    pub fn offset_time_ms(mut self, new_value: &str) -> LiveBroadcastControlCallBuilder<'a, C, NC, A> {
+    pub fn offset_time_ms(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._offset_time_ms = Some(new_value.to_string());
         self
     }
@@ -15937,7 +15945,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
     ///
     /// 
     /// The displaySlate parameter specifies whether the slate is being enabled or disabled.    
-    pub fn display_slate(mut self, new_value: bool) -> LiveBroadcastControlCallBuilder<'a, C, NC, A> {
+    pub fn display_slate(mut self, new_value: bool) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._display_slate = Some(new_value);
         self
     }
@@ -15948,7 +15956,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastControlCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -15969,7 +15977,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastControlCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastControlCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -15986,7 +15994,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastControlCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastControlCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -15997,7 +16005,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
 /// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.
 ///
 /// A builder for the *update* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+/// It is not used directly, but through a `LiveBroadcastMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -16051,7 +16059,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
 ///              .doit();
 /// # }
 /// ```
-pub struct LiveBroadcastUpdateCallBuilder<'a, C, NC, A>
+pub struct LiveBroadcastUpdateCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -16064,9 +16072,9 @@ pub struct LiveBroadcastUpdateCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LiveBroadcastUpdateCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for LiveBroadcastUpdateCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16131,18 +16139,18 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -16198,7 +16206,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
     /// * *contentDetails*
     /// * *status*
     /// 
-    pub fn request(mut self, new_value: &LiveBroadcast) -> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LiveBroadcast) -> LiveBroadcastUpdateCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -16222,7 +16230,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
     /// The part properties that you can include in the parameter value are id, snippet, contentDetails, and status.
     /// 
     /// Note that this method will override the existing values for all of the mutable properties that are contained in any parts that the parameter value specifies. For example, a broadcast's privacy status is defined in the status part. As such, if your request is updating a private or unlisted broadcast, and the request's part parameter value includes the status part, the broadcast's privacy setting will be updated to whatever value the request body specifies. If the request body does not specify a value, the existing privacy setting will be removed and the broadcast will revert to the default privacy setting.
-    pub fn part(mut self, new_value: &str) -> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -16234,7 +16242,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -16244,7 +16252,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -16255,7 +16263,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastUpdateCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16276,7 +16284,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastUpdateCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastUpdateCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -16293,7 +16301,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastUpdateCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -16304,7 +16312,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
 /// Creates a broadcast.
 ///
 /// A builder for the *insert* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+/// It is not used directly, but through a `LiveBroadcastMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -16358,7 +16366,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct LiveBroadcastInsertCallBuilder<'a, C, NC, A>
+pub struct LiveBroadcastInsertCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -16371,9 +16379,9 @@ pub struct LiveBroadcastInsertCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LiveBroadcastInsertCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for LiveBroadcastInsertCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16438,18 +16446,18 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -16505,7 +16513,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// * *contentDetails*
     /// * *status*
     /// 
-    pub fn request(mut self, new_value: &LiveBroadcast) -> LiveBroadcastInsertCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &LiveBroadcast) -> LiveBroadcastInsertCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -16527,7 +16535,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part properties that you can include in the parameter value are id, snippet, contentDetails, and status.
-    pub fn part(mut self, new_value: &str) -> LiveBroadcastInsertCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -16539,7 +16547,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -16549,7 +16557,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastInsertCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -16560,7 +16568,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastInsertCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastInsertCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16581,7 +16589,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastInsertCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastInsertCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -16598,7 +16606,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastInsertCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastInsertCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -16609,7 +16617,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
 /// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.
 ///
 /// A builder for the *bind* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+/// It is not used directly, but through a `LiveBroadcastMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -16654,7 +16662,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct LiveBroadcastBindCallBuilder<'a, C, NC, A>
+pub struct LiveBroadcastBindCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -16668,9 +16676,9 @@ pub struct LiveBroadcastBindCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LiveBroadcastBindCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for LiveBroadcastBindCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -16731,15 +16739,15 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -16789,7 +16797,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.    
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastBindCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -16806,7 +16814,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// * *status*
     /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
-    pub fn part(mut self, new_value: &str) -> LiveBroadcastBindCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -16814,7 +16822,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The streamId parameter specifies the unique ID of the video stream that is being bound to a broadcast. If this parameter is omitted, the API will remove any existing binding between the broadcast and a video stream.    
-    pub fn stream_id(mut self, new_value: &str) -> LiveBroadcastBindCallBuilder<'a, C, NC, A> {
+    pub fn stream_id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, NC, A> {
         self._stream_id = Some(new_value.to_string());
         self
     }
@@ -16826,7 +16834,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastBindCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -16836,7 +16844,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastBindCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -16847,7 +16855,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastBindCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastBindCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16868,7 +16876,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastBindCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastBindCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -16885,7 +16893,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastBindCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastBindCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -16896,7 +16904,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
 /// Returns a list of YouTube broadcasts that match the API request parameters.
 ///
 /// A builder for the *list* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+/// It is not used directly, but through a `LiveBroadcastMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -16946,7 +16954,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct LiveBroadcastListCallBuilder<'a, C, NC, A>
+pub struct LiveBroadcastListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -16963,9 +16971,9 @@ pub struct LiveBroadcastListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LiveBroadcastListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for LiveBroadcastListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17037,15 +17045,15 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -17102,7 +17110,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// * *status*
     /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
-    pub fn part(mut self, new_value: &str) -> LiveBroadcastListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -17110,7 +17118,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-    pub fn page_token(mut self, new_value: &str) -> LiveBroadcastListCallBuilder<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -17122,7 +17130,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -17132,7 +17140,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastListCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -17140,7 +17148,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The mine parameter can be used to instruct the API to only return broadcasts owned by the authenticated user. Set the parameter value to true to only retrieve your own broadcasts.    
-    pub fn mine(mut self, new_value: bool) -> LiveBroadcastListCallBuilder<'a, C, NC, A> {
+    pub fn mine(mut self, new_value: bool) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
     }
@@ -17148,7 +17156,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> LiveBroadcastListCallBuilder<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -17156,7 +17164,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The id parameter specifies a comma-separated list of YouTube broadcast IDs that identify the broadcasts being retrieved. In a liveBroadcast resource, the id property specifies the broadcast's ID.    
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastListCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
     }
@@ -17164,7 +17172,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The broadcastStatus parameter filters the API response to only include broadcasts with the specified status.    
-    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastListCallBuilder<'a, C, NC, A> {
+    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._broadcast_status = Some(new_value.to_string());
         self
     }
@@ -17175,7 +17183,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17196,7 +17204,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -17213,7 +17221,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -17224,7 +17232,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
 /// Deletes a broadcast.
 ///
 /// A builder for the *delete* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+/// It is not used directly, but through a `LiveBroadcastMethods`.
 ///
 /// # Example
 ///
@@ -17254,7 +17262,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct LiveBroadcastDeleteCallBuilder<'a, C, NC, A>
+pub struct LiveBroadcastDeleteCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -17266,9 +17274,9 @@ pub struct LiveBroadcastDeleteCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LiveBroadcastDeleteCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for LiveBroadcastDeleteCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17324,15 +17332,15 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -17372,7 +17380,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted.    
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -17384,7 +17392,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -17394,7 +17402,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -17405,7 +17413,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastDeleteCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17426,7 +17434,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastDeleteCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastDeleteCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -17443,7 +17451,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastDeleteCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -17454,7 +17462,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
 /// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.
 ///
 /// A builder for the *transition* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethodsBuilder`.
+/// It is not used directly, but through a `LiveBroadcastMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -17498,7 +17506,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
 ///              .doit();
 /// # }
 /// ```
-pub struct LiveBroadcastTransitionCallBuilder<'a, C, NC, A>
+pub struct LiveBroadcastTransitionCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -17512,9 +17520,9 @@ pub struct LiveBroadcastTransitionCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for LiveBroadcastTransitionCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for LiveBroadcastTransitionCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17573,15 +17581,15 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -17631,7 +17639,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to.    
-    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> {
+    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, NC, A> {
         self._broadcast_status = new_value.to_string();
         self
     }
@@ -17641,7 +17649,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
     /// we provide this method for API completeness.
     /// 
     /// The id parameter specifies the unique ID of the broadcast that is transitioning to another status.    
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
     }
@@ -17658,7 +17666,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
     /// * *status*
     /// 
     /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
-    pub fn part(mut self, new_value: &str) -> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -17670,7 +17678,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
     /// The onBehalfOfContentOwnerChannel parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies.
     /// 
     /// This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
@@ -17680,7 +17688,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
     /// Note: This parameter is intended exclusively for YouTube content partners.
     /// 
     /// The onBehalfOfContentOwner parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -17691,7 +17699,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LiveBroadcastTransitionCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17712,7 +17720,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastTransitionCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastTransitionCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -17729,7 +17737,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> LiveBroadcastTransitionCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -17740,7 +17748,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
 /// Returns a list of categories that can be associated with YouTube videos.
 ///
 /// A builder for the *list* method supported by a *videoCategory* resource.
-/// It is not used directly, but through a `VideoCategoryMethodsBuilder`.
+/// It is not used directly, but through a `VideoCategoryMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -17785,7 +17793,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
 ///              .doit();
 /// # }
 /// ```
-pub struct VideoCategoryListCallBuilder<'a, C, NC, A>
+pub struct VideoCategoryListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -17798,9 +17806,9 @@ pub struct VideoCategoryListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for VideoCategoryListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for VideoCategoryListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -17860,15 +17868,15 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -17923,7 +17931,7 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// * *snippet*
     /// 
     /// The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.    
-    pub fn part(mut self, new_value: &str) -> VideoCategoryListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -17931,7 +17939,7 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The regionCode parameter instructs the API to return the list of video categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
-    pub fn region_code(mut self, new_value: &str) -> VideoCategoryListCallBuilder<'a, C, NC, A> {
+    pub fn region_code(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, NC, A> {
         self._region_code = Some(new_value.to_string());
         self
     }
@@ -17939,7 +17947,7 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The id parameter specifies a comma-separated list of video category IDs for the resources that you are retrieving.    
-    pub fn id(mut self, new_value: &str) -> VideoCategoryListCallBuilder<'a, C, NC, A> {
+    pub fn id(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
     }
@@ -17947,7 +17955,7 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     ///
     /// 
     /// The hl parameter specifies the language that should be used for text values in the API response.    
-    pub fn hl(mut self, new_value: &str) -> VideoCategoryListCallBuilder<'a, C, NC, A> {
+    pub fn hl(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, NC, A> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -17958,7 +17966,7 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoCategoryListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VideoCategoryListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -17979,7 +17987,7 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VideoCategoryListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoCategoryListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -17996,7 +18004,7 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> VideoCategoryListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> VideoCategoryListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -18007,7 +18015,7 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
 /// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.
 ///
 /// A builder for the *list* method supported by a *activity* resource.
-/// It is not used directly, but through a `ActivityMethodsBuilder`.
+/// It is not used directly, but through a `ActivityMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -18057,7 +18065,7 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
 ///              .doit();
 /// # }
 /// ```
-pub struct ActivityListCallBuilder<'a, C, NC, A>
+pub struct ActivityListCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -18075,9 +18083,9 @@ pub struct ActivityListCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ActivityListCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for ActivityListCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18152,15 +18160,15 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                 return Result::MissingToken
             }
             let auth_header = Authorization(token.unwrap().access_token);
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)    ;
+                    .header(auth_header);
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -18218,7 +18226,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
     /// 
     /// If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
-    pub fn part(mut self, new_value: &str) -> ActivityListCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -18226,7 +18234,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The regionCode parameter instructs the API to return results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code. YouTube uses this value when the authorized user's previous activity on YouTube does not provide enough information to generate the activity feed.    
-    pub fn region_code(mut self, new_value: &str) -> ActivityListCallBuilder<'a, C, NC, A> {
+    pub fn region_code(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._region_code = Some(new_value.to_string());
         self
     }
@@ -18234,7 +18242,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The publishedBefore parameter specifies the date and time before which an activity must have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be excluded from the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-    pub fn published_before(mut self, new_value: &str) -> ActivityListCallBuilder<'a, C, NC, A> {
+    pub fn published_before(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._published_before = Some(new_value.to_string());
         self
     }
@@ -18242,7 +18250,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The publishedAfter parameter specifies the earliest date and time that an activity could have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be included in the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
-    pub fn published_after(mut self, new_value: &str) -> ActivityListCallBuilder<'a, C, NC, A> {
+    pub fn published_after(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._published_after = Some(new_value.to_string());
         self
     }
@@ -18250,7 +18258,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
-    pub fn page_token(mut self, new_value: &str) -> ActivityListCallBuilder<'a, C, NC, A> {
+    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -18258,7 +18266,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// Set this parameter's value to true to retrieve a feed of the authenticated user's activities.    
-    pub fn mine(mut self, new_value: bool) -> ActivityListCallBuilder<'a, C, NC, A> {
+    pub fn mine(mut self, new_value: bool) -> ActivityListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
     }
@@ -18266,7 +18274,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
-    pub fn max_results(mut self, new_value: u32) -> ActivityListCallBuilder<'a, C, NC, A> {
+    pub fn max_results(mut self, new_value: u32) -> ActivityListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
     }
@@ -18274,7 +18282,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// Set this parameter's value to true to retrieve the activity feed that displays on the YouTube home page for the currently authenticated user.    
-    pub fn home(mut self, new_value: bool) -> ActivityListCallBuilder<'a, C, NC, A> {
+    pub fn home(mut self, new_value: bool) -> ActivityListCall<'a, C, NC, A> {
         self._home = Some(new_value);
         self
     }
@@ -18282,7 +18290,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     ///
     /// 
     /// The channelId parameter specifies a unique YouTube channel ID. The API will then return a list of that channel's activities.    
-    pub fn channel_id(mut self, new_value: &str) -> ActivityListCallBuilder<'a, C, NC, A> {
+    pub fn channel_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -18293,7 +18301,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18314,7 +18322,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -18331,7 +18339,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ActivityListCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ActivityListCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self
@@ -18344,7 +18352,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
 /// Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite.
 ///
 /// A builder for the *insert* method supported by a *activity* resource.
-/// It is not used directly, but through a `ActivityMethodsBuilder`.
+/// It is not used directly, but through a `ActivityMethods`.
 ///
 /// **Settable Parts**
 /// 
@@ -18392,7 +18400,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
 ///              .doit();
 /// # }
 /// ```
-pub struct ActivityInsertCallBuilder<'a, C, NC, A>
+pub struct ActivityInsertCall<'a, C, NC, A>
     where C: 'a, NC: 'a, A: 'a {
 
     hub: &'a YouTube<C, NC, A>,
@@ -18403,9 +18411,9 @@ pub struct ActivityInsertCallBuilder<'a, C, NC, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, NC, A> CallBuilder for ActivityInsertCallBuilder<'a, C, NC, A> {}
+impl<'a, C, NC, A> CallBuilder for ActivityInsertCall<'a, C, NC, A> {}
 
-impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
+impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConnector, C: BorrowMut<hyper::Client<NC>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -18464,18 +18472,18 @@ impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
             }
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
             let mut req_result = {
+
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header)
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())    ;
+                    .body(request_value_reader.into_body());
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -18529,7 +18537,7 @@ impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *snippet*
     /// * *contentDetails*
     /// 
-    pub fn request(mut self, new_value: &Activity) -> ActivityInsertCallBuilder<'a, C, NC, A> {
+    pub fn request(mut self, new_value: &Activity) -> ActivityInsertCall<'a, C, NC, A> {
         self._request = new_value.clone();
         self
     }
@@ -18549,7 +18557,7 @@ impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// The part parameter serves two purposes in this operation. It identifies the properties that the write operation will set as well as the properties that the API response will include.
     /// 
     /// The part names that you can include in the parameter value are snippet and contentDetails.
-    pub fn part(mut self, new_value: &str) -> ActivityInsertCallBuilder<'a, C, NC, A> {
+    pub fn part(mut self, new_value: &str) -> ActivityInsertCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
     }
@@ -18560,7 +18568,7 @@ impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityInsertCallBuilder<'a, C, NC, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityInsertCall<'a, C, NC, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18581,7 +18589,7 @@ impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityInsertCallBuilder<'a, C, NC, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityInsertCall<'a, C, NC, A>
                                                         where T: Str {
         self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
         self
@@ -18598,7 +18606,7 @@ impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ActivityInsertCallBuilder<'a, C, NC, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ActivityInsertCall<'a, C, NC, A> 
                                                         where T: Str {
         self._scopes.insert(scope.as_slice().to_string(), ());
         self

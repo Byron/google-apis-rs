@@ -302,17 +302,19 @@ impl_header!(XUploadContentType,
              Mime);
 
 /// A utility type to perform a resumable upload from start to end.
-pub struct ResumableUploadHelper<'a, NC: 'a> {
+pub struct ResumableUploadHelper<'a, NC: 'a, A: 'a> {
     pub client: &'a mut hyper::client::Client<NC>,
     pub delegate: &'a mut Delegate,
+    pub auth: &'a mut A,
     pub url: &'a str,
     pub reader: &'a mut ReadSeek,
     pub media_type: Mime,
     pub content_size: u64
 }
 
-impl<'a, NC> ResumableUploadHelper<'a, NC>
-    where NC: hyper::net::NetworkConnector {
+impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
+    where NC: hyper::net::NetworkConnector,
+          A: oauth2::GetToken {
     pub fn upload(&'a mut self) -> hyper::HttpResult<hyper::client::Response> {
         Err(hyper::error::HttpError::HttpStatusError)
     }

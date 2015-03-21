@@ -127,7 +127,7 @@ ${schema.new(s, c)}
 % endif
 
 // ###################
-// CallBuilders ###
+// MethodBuilders ###
 // #################
 
 % for resource in c.rta_map:

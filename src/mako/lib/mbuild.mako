@@ -396,27 +396,20 @@ match result {
         rtype = 'Result<(hyper::client::Response, %s)>' % (unique_type_name(response_schema.id))
 
     mtype_param = 'RS'
-    mtype_where = 'ReadSeek'
 
     possible_urls = [m.path]
     simple_media_param = None
     resumable_media_param = None
     if media_params:
-        stripped = lambda s: s.strip().strip(',')
+        type_params = '<%s>' % mtype_param
         qualifier = ''
-        type_params = mtype_param
-        where = mtype_param + ': ' + mtype_where
+        where = '\n\t\twhere ' + mtype_param + ': ReadSeek'
+        add_args = (', mut reader: %s, reader_mime_type: mime::Mime' % mtype_param) + ", protocol: &'static str"
         for p in media_params:
-            add_args += 'mut ' + p.type.arg_name + ': ' + ('Option<(%s, mime::Mime)>' % mtype_param) + ', '
-            possible_urls.append(p.path)
             if p.protocol == 'simple':
                 simple_media_param = p
             elif p.protocol == 'resumable':
                 resumable_media_param = p
-        # end for each param
-        where = ' where ' + stripped(where)
-        type_params = '<' + stripped(type_params) + '>'
-        add_args = ', ' + stripped(add_args)
     # end handle media params
 
     action_fn = qualifier + 'fn ' + api.terms.action + type_params + ('(mut self%s)' % add_args) + ' -> ' + rtype + where
@@ -563,15 +556,15 @@ match result {
         % endif ## response schema
 
         % if media_params:
-        let (mut url, protocol) = \
+        let mut url = \
             % for mp in media_params:
             % if loop.first:
 if \
             % else:
 else if \
             % endif
-${mp.type.arg_name}.is_some() {
-                ("${join_url(rootUrl, mp.path)}".to_string(), "${mp.protocol}")
+protocol == "${mp.protocol}" {
+                "${join_url(rootUrl, mp.path)}".to_string()
             } \
             % endfor
 else { 
@@ -673,22 +666,22 @@ else {
             % if request_value:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             % endif
+            let mut req_result = {
             % if request_value and simple_media_param:
-            let mut mp_reader: MultiPartReader = Default::default();
-            let (mut body_reader, content_type) = match ${simple_media_param.type.arg_name}.as_mut() {
-                Some(&mut (ref mut reader, ref mime)) => {
-                    mp_reader.reserve_exact(2);
-                    ${READER_SEEK | indent_all_but_first_by(5)}
-                    mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
-                             .add_part(reader, size, mime.clone());
-                    let mime_type = mp_reader.mime_type();
-                    (&mut mp_reader as &mut io::Read, ContentType(mime_type))
-                },
-                None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
-            };
+                let mut mp_reader: MultiPartReader = Default::default();
+                let (mut body_reader, content_type) = match protocol {
+                    "${simple_media_param.protocol}" => {
+                        mp_reader.reserve_exact(2);
+                        ${READER_SEEK | indent_all_but_first_by(5)}
+                        mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
+                                 .add_part(&mut reader, size, reader_mime_type.clone());
+                        let mime_type = mp_reader.mime_type();
+                        (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                    },
+                    _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                };
             % endif
 
-            let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(${method_name_to_variant(m.httpMethod)}, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))\
@@ -708,23 +701,23 @@ else {
                     .body(body_reader.into_body())\
                     % endif ## not simple_media_param
                     % endif
-    ;
+;
                 % if simple_media_param and not request_value:
-                if let Some(&mut (ref mut reader, ref mime)) = ${simple_media_param.type.arg_name}.as_mut() {
+                if protocol == "${simple_media_param.protocol}" {
                     ${READER_SEEK | indent_all_but_first_by(4)}
-                    req = req.header(ContentType(mime.clone()))
+                    req = req.header(ContentType(reader_mime_type.clone()))
                              .header(ContentLength(size))
                              .body(reader.into_body());
                 }
                 % endif ## media upload handling
                 % if resumable_media_param:
-                if let Some(&mut (_, ref mime)) = ${resumable_media_param.type.arg_name}.as_mut() {
-                    req = req.header(cmn::XUploadContentType(mime.clone()));
+                if protocol == "${resumable_media_param.protocol}" {
+                    req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
                 }
                 % endif
 
                 dlg.pre_request();
-                req.send() 
+                req.send()
             };
 
             match req_result {
@@ -749,17 +742,17 @@ else {
                         return Result::Failure(res)
                     }
                     % if resumable_media_param:
-                    if let Some((ref mut reader, ref mime)) = ${resumable_media_param.type.arg_name} {
-                        let request_size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    if protocol == "${resumable_media_param.protocol}" {
+                        ${READER_SEEK | indent_all_but_first_by(6)}
                         let mut client = &mut *self.hub.client.borrow_mut();
                         match (cmn::ResumableUploadHelper {
                             client: &mut client.borrow_mut(),
                             delegate: dlg,
+                            auth: &mut *self.hub.auth.borrow_mut(),
                             url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
-                            reader: reader,
-                            media_type: mime.clone(),
-                            content_size: request_size
+                            reader: &mut reader,
+                            media_type: reader_mime_type.clone(),
+                            content_size: size
                         }.upload()) {
                             Err(err) => {
                                 ## Do not ask the delgate again, as it was asked by the helper !
@@ -811,16 +804,8 @@ if enable_resource_parsing \
     /// * *${split_camelcase_s(item_name)}*: ${isinstance(item, (list, tuple)) and put_and(enclose_in("'", item)) or str(item)}
     % endfor
     pub fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}<${mtype_param}>(self, ${p.type.arg_name}: ${mtype_param}, mime_type: mime::Mime) -> ${rtype}
-                where ${mtype_param}: ${mtype_where} {
-        self.${api.terms.action}(\
-        % for _ in range(0, loop.index):
-None, \
-        % endfor
-Some((${p.type.arg_name}, mime_type)), \
-        % for _ in range(loop.index+1, len(media_params)):
-None, \
-        % endfor
-)
+                where ${mtype_param}: ReadSeek {
+        self.${api.terms.action}(${p.type.arg_name}, mime_type, "${p.protocol}")
     }
     % endfor
 </%def>
