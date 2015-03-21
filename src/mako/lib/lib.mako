@@ -1,11 +1,16 @@
-<%! from util import (activity_split, put_and, md_italic, split_camelcase_s, canonical_type_name, hub_type,
+<%!
+    from util import (activity_split, put_and, md_italic, split_camelcase_s, canonical_type_name, hub_type,
                       rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment, markdown_rust_block,
                       unindent_first_by, mangle_ident, mb_type, singular, scope_url_to_variant,
                       PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, CALL_BUILDER_MARKERT_TRAIT, 
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
                       REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
                       to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
-                      upload_action_fn, unique_type_name, schema_doc_format)  %>\
+                      upload_action_fn, unique_type_name, schema_doc_format)  
+
+    def pretty_name(name):
+        return ' '.join(split_camelcase_s(name).split('.'))
+%>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="mbuild" file="mbuild.mako"/>\
 
@@ -72,9 +77,9 @@ It seems there is nothing you can do here ... .
 <%
     md_methods = list()
     for method in sorted(c.rta_map[r]):
-        md_methods.append(link('*%s*' % split_camelcase_s(method),
+        md_methods.append(link('*%s*' % pretty_name(method),
                                'struct.%s.html' % mb_type(r, method)))
-    md_resource = split_camelcase_s(r)
+    md_resource = pretty_name(r)
     sn = singular(canonical_type_name(r))
 
     if sn in schemas:
@@ -90,7 +95,7 @@ Other activities are ...
 
 % endif
 % for method in sorted(c.rta_map[METHODS_RESOURCE]):
-* ${link(split_camelcase_s(method), 'struct.%s.html' % mb_type(METHODS_RESOURCE, method))}
+* ${link(pretty_name(method), 'struct.%s.html' % mb_type(METHODS_RESOURCE, method))}
 % endfor
 % endif
 
@@ -101,9 +106,9 @@ ${method_type} supported by ...
 % for m in methods:
 <% 
     _, resource, method = activity_split(m.id)
-    name_parts = [' '.join(split_camelcase_s(method).split('.'))]
+    name_parts = [pretty_name(method)]
     if resource != METHODS_RESOURCE:
-        name_parts.append(split_camelcase_s(resource))
+        name_parts.append(pretty_name(resource))
 %>\
 * ${link('*%s*' % ' '.join(name_parts), 'struct.%s.html' % mb_type(resource, method))}
 % endfor ## for each method
