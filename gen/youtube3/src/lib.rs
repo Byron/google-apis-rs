@@ -221,6 +221,7 @@
 #![feature(custom_derive, custom_attribute, plugin)]
 #![plugin(serde_macros)]
 
+#[macro_use]
 extern crate hyper;
 extern crate serde;
 extern crate "yup-oauth2" as oauth2;
@@ -5603,7 +5604,6 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -5615,12 +5615,17 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -5652,6 +5657,7 @@ impl<'a, C, NC, A> I18nLanguageListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -5846,7 +5852,6 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -5872,14 +5877,22 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
                 None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
             };
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(content_type)
-                .body(body_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(content_type)
+                    .body(body_reader.into_body())    ;
+                if let Some(&mut (_, ref mime)) = resumeable_stream.as_mut() {
+                    req = req.header(cmn::XUploadContentType(mime.clone()));
+                }
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -5900,6 +5913,25 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
                         dlg.finished();
                         return Result::Failure(res)
                     }
+                    if let Some((ref mut reader, ref mime)) = resumeable_stream {
+                        let request_size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        let mut client = &mut *self.hub.client.borrow_mut();
+                        match (cmn::ResumableUploadHelper {
+                            client: &mut client.borrow_mut(),
+                            delegate: dlg,
+                            url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
+                            reader: reader,
+                            media_type: mime.clone(),
+                            content_size: request_size
+                        }.upload()) {
+                            Err(err) => {
+                                dlg.finished();
+                                return Result::HttpError(err)
+                            }
+                            Ok(upload_result) => res = upload_result,
+                        }
+                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -5911,6 +5943,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCallBuilder<'a, C, NC, A> where NC: hyper:
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -6133,7 +6166,6 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -6145,12 +6177,17 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -6182,6 +6219,7 @@ impl<'a, C, NC, A> ChannelSectionListCallBuilder<'a, C, NC, A> where NC: hyper::
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -6418,7 +6456,6 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -6431,15 +6468,20 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -6471,6 +6513,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCallBuilder<'a, C, NC, A> where NC: hyper
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -6676,7 +6719,6 @@ impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -6688,12 +6730,17 @@ impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -6715,6 +6762,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCallBuilder<'a, C, NC, A> where NC: hyper
                         return Result::Failure(res)
                     }
                     let result_value = res;
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -6914,7 +6962,6 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -6927,15 +6974,20 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -6967,6 +7019,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCallBuilder<'a, C, NC, A> where NC: hyper
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -7185,7 +7238,6 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -7197,12 +7249,17 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -7234,6 +7291,7 @@ impl<'a, C, NC, A> GuideCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -7459,7 +7517,6 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -7472,15 +7529,20 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -7512,6 +7574,7 @@ impl<'a, C, NC, A> PlaylistInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -7764,7 +7827,6 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -7776,12 +7838,17 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -7813,6 +7880,7 @@ impl<'a, C, NC, A> PlaylistListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -8043,7 +8111,6 @@ impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -8055,12 +8122,17 @@ impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net:
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -8082,6 +8154,7 @@ impl<'a, C, NC, A> PlaylistDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net:
                         return Result::Failure(res)
                     }
                     let result_value = res;
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -8281,7 +8354,6 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -8294,15 +8366,20 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -8334,6 +8411,7 @@ impl<'a, C, NC, A> PlaylistUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net:
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -8538,7 +8616,6 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -8550,19 +8627,27 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
-            if let Some(&mut (ref mut reader, ref mime)) = stream.as_mut() {
-                let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
+                if let Some(&mut (ref mut reader, ref mime)) = stream.as_mut() {
+                    let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                 reader.seek(io::SeekFrom::Start(0)).unwrap();
-                req = req.header(ContentType(mime.clone()))
-                         .header(ContentLength(size))
-                         .body(reader.into_body());
-            }
+                    req = req.header(ContentType(mime.clone()))
+                             .header(ContentLength(size))
+                             .body(reader.into_body());
+                }
+                if let Some(&mut (_, ref mime)) = resumeable_stream.as_mut() {
+                    req = req.header(cmn::XUploadContentType(mime.clone()));
+                }
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -8583,6 +8668,25 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                         dlg.finished();
                         return Result::Failure(res)
                     }
+                    if let Some((ref mut reader, ref mime)) = resumeable_stream {
+                        let request_size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        let mut client = &mut *self.hub.client.borrow_mut();
+                        match (cmn::ResumableUploadHelper {
+                            client: &mut client.borrow_mut(),
+                            delegate: dlg,
+                            url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
+                            reader: reader,
+                            media_type: mime.clone(),
+                            content_size: request_size
+                        }.upload()) {
+                            Err(err) => {
+                                dlg.finished();
+                                return Result::HttpError(err)
+                            }
+                            Ok(upload_result) => res = upload_result,
+                        }
+                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -8594,6 +8698,7 @@ impl<'a, C, NC, A> ThumbnailSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -8855,7 +8960,6 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -8867,12 +8971,17 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -8904,6 +9013,7 @@ impl<'a, C, NC, A> VideoListCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -9169,7 +9279,6 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -9181,12 +9290,17 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -9208,6 +9322,7 @@ impl<'a, C, NC, A> VideoRateCallBuilder<'a, C, NC, A> where NC: hyper::net::Netw
                         return Result::Failure(res)
                     }
                     let result_value = res;
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -9388,7 +9503,6 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -9400,12 +9514,17 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -9437,6 +9556,7 @@ impl<'a, C, NC, A> VideoGetRatingCallBuilder<'a, C, NC, A> where NC: hyper::net:
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -9606,7 +9726,6 @@ impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -9618,12 +9737,17 @@ impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -9645,6 +9769,7 @@ impl<'a, C, NC, A> VideoDeleteCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                         return Result::Failure(res)
                     }
                     let result_value = res;
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -9864,7 +9989,6 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -9877,15 +10001,20 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -9917,6 +10046,7 @@ impl<'a, C, NC, A> VideoUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -10213,7 +10343,6 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -10239,14 +10368,22 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                 None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
             };
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(content_type)
-                .body(body_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(content_type)
+                    .body(body_reader.into_body())    ;
+                if let Some(&mut (_, ref mime)) = resumeable_stream.as_mut() {
+                    req = req.header(cmn::XUploadContentType(mime.clone()));
+                }
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -10267,6 +10404,25 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                         dlg.finished();
                         return Result::Failure(res)
                     }
+                    if let Some((ref mut reader, ref mime)) = resumeable_stream {
+                        let request_size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        let mut client = &mut *self.hub.client.borrow_mut();
+                        match (cmn::ResumableUploadHelper {
+                            client: &mut client.borrow_mut(),
+                            delegate: dlg,
+                            url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
+                            reader: reader,
+                            media_type: mime.clone(),
+                            content_size: request_size
+                        }.upload()) {
+                            Err(err) => {
+                                dlg.finished();
+                                return Result::HttpError(err)
+                            }
+                            Ok(upload_result) => res = upload_result,
+                        }
+                    }
                     let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
@@ -10278,6 +10434,7 @@ impl<'a, C, NC, A> VideoInsertCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -10575,7 +10732,6 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -10588,15 +10744,20 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -10628,6 +10789,7 @@ impl<'a, C, NC, A> SubscriptionInsertCallBuilder<'a, C, NC, A> where NC: hyper::
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -10872,7 +11034,6 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -10884,12 +11045,17 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -10921,6 +11087,7 @@ impl<'a, C, NC, A> SubscriptionListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -11169,7 +11336,6 @@ impl<'a, C, NC, A> SubscriptionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -11181,12 +11347,17 @@ impl<'a, C, NC, A> SubscriptionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -11208,6 +11379,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
                         return Result::Failure(res)
                     }
                     let result_value = res;
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -11522,7 +11694,6 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -11534,12 +11705,17 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -11571,6 +11747,7 @@ impl<'a, C, NC, A> SearchListCallBuilder<'a, C, NC, A> where NC: hyper::net::Net
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -11988,7 +12165,6 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -12000,12 +12176,17 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -12037,6 +12218,7 @@ impl<'a, C, NC, A> I18nRegionListCallBuilder<'a, C, NC, A> where NC: hyper::net:
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -12247,7 +12429,6 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -12260,15 +12441,20 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -12300,6 +12486,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCallBuilder<'a, C, NC, A> where NC: hyper::ne
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -12516,7 +12703,6 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -12528,12 +12714,17 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -12555,6 +12746,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCallBuilder<'a, C, NC, A> where NC: hyper::ne
                         return Result::Failure(res)
                     }
                     let result_value = res;
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -12777,7 +12969,6 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -12789,12 +12980,17 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -12826,6 +13022,7 @@ impl<'a, C, NC, A> LiveStreamListCallBuilder<'a, C, NC, A> where NC: hyper::net:
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -13084,7 +13281,6 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -13097,15 +13293,20 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -13137,6 +13338,7 @@ impl<'a, C, NC, A> LiveStreamInsertCallBuilder<'a, C, NC, A> where NC: hyper::ne
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -13376,7 +13578,6 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -13389,15 +13590,20 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -13429,6 +13635,7 @@ impl<'a, C, NC, A> ChannelUpdateCallBuilder<'a, C, NC, A> where NC: hyper::net::
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -13682,7 +13889,6 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -13694,12 +13900,17 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -13731,6 +13942,7 @@ impl<'a, C, NC, A> ChannelListCallBuilder<'a, C, NC, A> where NC: hyper::net::Ne
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -13968,7 +14180,6 @@ impl<'a, C, NC, A> PlaylistItemDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -13980,12 +14191,17 @@ impl<'a, C, NC, A> PlaylistItemDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -14007,6 +14223,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCallBuilder<'a, C, NC, A> where NC: hyper::
                         return Result::Failure(res)
                     }
                     let result_value = res;
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -14208,7 +14425,6 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -14220,12 +14436,17 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -14257,6 +14478,7 @@ impl<'a, C, NC, A> PlaylistItemListCallBuilder<'a, C, NC, A> where NC: hyper::ne
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -14507,7 +14729,6 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -14520,15 +14741,20 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -14560,6 +14786,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCallBuilder<'a, C, NC, A> where NC: hyper::
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -14782,7 +15009,6 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -14795,15 +15021,20 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -14835,6 +15066,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCallBuilder<'a, C, NC, A> where NC: hyper::
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -15041,7 +15273,6 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -15067,14 +15298,22 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                 None => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
             };
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(content_type)
-                .body(body_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(content_type)
+                    .body(body_reader.into_body())    ;
+                if let Some(&mut (_, ref mime)) = resumeable_stream.as_mut() {
+                    req = req.header(cmn::XUploadContentType(mime.clone()));
+                }
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -15095,7 +15334,27 @@ impl<'a, C, NC, A> WatermarkSetCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                         dlg.finished();
                         return Result::Failure(res)
                     }
+                    if let Some((ref mut reader, ref mime)) = resumeable_stream {
+                        let request_size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        let mut client = &mut *self.hub.client.borrow_mut();
+                        match (cmn::ResumableUploadHelper {
+                            client: &mut client.borrow_mut(),
+                            delegate: dlg,
+                            url: &res.headers.get::<hyper::header::Location>().expect("Location header is part of protocol").0,
+                            reader: reader,
+                            media_type: mime.clone(),
+                            content_size: request_size
+                        }.upload()) {
+                            Err(err) => {
+                                dlg.finished();
+                                return Result::HttpError(err)
+                            }
+                            Ok(upload_result) => res = upload_result,
+                        }
+                    }
                     let result_value = res;
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -15295,7 +15554,6 @@ impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net:
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -15307,12 +15565,17 @@ impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net:
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -15334,6 +15597,7 @@ impl<'a, C, NC, A> WatermarkUnsetCallBuilder<'a, C, NC, A> where NC: hyper::net:
                         return Result::Failure(res)
                     }
                     let result_value = res;
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -15538,7 +15802,6 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -15550,12 +15813,17 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -15587,6 +15855,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCallBuilder<'a, C, NC, A> where NC: hyper
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -15851,7 +16120,6 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -15864,15 +16132,20 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -15904,6 +16177,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCallBuilder<'a, C, NC, A> where NC: hyper:
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -16153,7 +16427,6 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -16166,15 +16439,20 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -16206,6 +16484,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCallBuilder<'a, C, NC, A> where NC: hyper:
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -16442,7 +16721,6 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -16454,12 +16732,17 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -16491,6 +16774,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCallBuilder<'a, C, NC, A> where NC: hyper::n
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -16743,7 +17027,6 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -16755,12 +17038,17 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -16792,6 +17080,7 @@ impl<'a, C, NC, A> LiveBroadcastListCallBuilder<'a, C, NC, A> where NC: hyper::n
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -17025,7 +17314,6 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -17037,12 +17325,17 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -17064,6 +17357,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCallBuilder<'a, C, NC, A> where NC: hyper:
                         return Result::Failure(res)
                     }
                     let result_value = res;
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -17269,7 +17563,6 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -17281,12 +17574,17 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -17318,6 +17616,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCallBuilder<'a, C, NC, A> where NC: hy
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -17551,7 +17850,6 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -17563,12 +17861,17 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -17600,6 +17903,7 @@ impl<'a, C, NC, A> VideoCategoryListCallBuilder<'a, C, NC, A> where NC: hyper::n
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -17838,7 +18142,6 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
         }
 
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -17850,12 +18153,17 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
             }
             let auth_header = Authorization(token.unwrap().access_token);
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header);
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -17887,6 +18195,7 @@ impl<'a, C, NC, A> ActivityListCallBuilder<'a, C, NC, A> where NC: hyper::net::N
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }
@@ -18144,7 +18453,6 @@ impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-        let mut client = &mut *self.hub.client.borrow_mut();
         loop {
             let mut token = self.hub.auth.borrow_mut().token(self._scopes.keys());
             if token.is_none() {
@@ -18157,15 +18465,20 @@ impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
             let auth_header = Authorization(token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-            let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
-                .header(UserAgent(self.hub._user_agent.clone()))
-                .header(auth_header)
-                .header(ContentType(json_mime_type.clone()))
-                .header(ContentLength(request_size as u64))
-                .body(request_value_reader.into_body());
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header)
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(request_value_reader.into_body())    ;
 
-            dlg.pre_request();
-            match req.send() {
+                dlg.pre_request();
+                req.send() 
+            };
+
+            match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d);
@@ -18197,6 +18510,7 @@ impl<'a, C, NC, A> ActivityInsertCallBuilder<'a, C, NC, A> where NC: hyper::net:
                             }
                         }
                     };
+
                     dlg.finished();
                     return Result::Success(result_value)
                 }

@@ -32,6 +32,7 @@ ${lib.docs(c)}
 #![feature(custom_derive, custom_attribute, plugin)]
 #![plugin(serde_macros)]
 
+#[macro_use]
 extern crate hyper;
 extern crate serde;
 extern crate "yup-oauth2" as oauth2;

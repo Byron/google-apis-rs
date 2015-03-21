@@ -291,3 +291,29 @@ impl<'a> Read for MultiPartReader<'a> {
         }
     }
 }
+
+
+/// The `X-Upload-Content-Type` header.
+#[derive(Clone, PartialEq, Debug)]
+pub struct XUploadContentType(pub Mime);
+
+impl_header!(XUploadContentType,
+             "X-Upload-Content-Type",
+             Mime);
+
+/// A utility type to perform a resumable upload from start to end.
+pub struct ResumableUploadHelper<'a, NC: 'a> {
+    pub client: &'a mut hyper::client::Client<NC>,
+    pub delegate: &'a mut Delegate,
+    pub url: &'a str,
+    pub reader: &'a mut ReadSeek,
+    pub media_type: Mime,
+    pub content_size: u64
+}
+
+impl<'a, NC> ResumableUploadHelper<'a, NC>
+    where NC: hyper::net::NetworkConnector {
+    pub fn upload(&'a mut self) -> hyper::HttpResult<hyper::client::Response> {
+        Err(hyper::error::HttpError::HttpStatusError)
+    }
+}
