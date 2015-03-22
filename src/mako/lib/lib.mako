@@ -186,7 +186,7 @@ ${link('Hub Delegate', delegate_url)}, or the ${link('Authenticator Delegate', u
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
-${'##'} About Uploads and Downlods
+${'##'} Uploads and Downlods
 If a method supports downloads, the response body, which is part of the ${link('Result', 'enum.Result.html')}, should be
 read by you to obtain the media.
 If such a method also supports a ${link('Response Result', 'trait.ResponseResult.html')}, it will return that by default.
@@ -197,7 +197,7 @@ Methods supporting uploads can do so using up to ${len(PROTOCOL_TYPE_INFO)} diff
 ${put_and(md_italic(PROTOCOL_TYPE_INFO.keys()))}. The distinctiveness of each is represented by customized 
 `${api.terms.action}(...)` methods, which are then named ${put_and(enclose_in('`', ("%s(...)" % upload_action_fn(api.terms.upload_action, v['suffix']) for v in PROTOCOL_TYPE_INFO.values())))} respectively.
 
-${'##'} About Customization/Callbacks
+${'##'} Customization and Callbacks
 
 You may alter the way an `${api.terms.action}()` method is called by providing a ${link('delegate', delegate_url)} to the 
 ${link('Method Builder', method_builder_url)} before making the final `${api.terms.action}()` call. 
@@ -206,14 +206,14 @@ retry on failure.
 
 The ${link('delegate trait', delegate_url)} is default-implemented, allowing you to customize it with minimal effort.
 
-${'##'} About Parts
+${'##'} Optional Parts in Server-Requests
 
 All structures provided by this library are made to be ${link('enocodable', request_trait_url)} and 
 ${link('decodable', response_trait_url)} via json. Optionals are used to indicate that partial requests are responses are valid.
 Most optionals are are considered ${link('Parts', part_trait_url)} which are identifyable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
-${'##'} About Builder Arguments
+${'##'} Builder Arguments
 
 Using ${link('method builders', method_builder_url)}, you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
