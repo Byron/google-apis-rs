@@ -361,6 +361,7 @@ match result {
     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
     Result::MissingToken => println!("OAuth2: Missing Token"),
+    Result::Cancelled => println!("Operation cancelled by user"),
     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
@@ -760,8 +761,7 @@ else {
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, Some(error_info)) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -792,14 +792,25 @@ else {
                             }.upload()
                         };
                         match upload_result {
-                            Err(err) => {
+                            None => {
+                                ${delegate_finish}(false);
+                                return Result::Cancelled
+                            }
+                            Some(Err(err)) => {
                                 ## Do not ask the delgate again, as it was asked by the helper !
                                 ${delegate_finish}(false);
                                 return Result::HttpError(err)
                             }
                             ## Now the result contains the actual resource, if any ... it will be 
                             ## decoded next
-                            Ok(upload_result) => res = upload_result,
+                            Some(Ok(upload_result)) => {
+                                res = upload_result;
+                                if !res.status.is_success() {
+                                    ## delegate was called in upload() already - don't tell him again
+                                    ${delegate_finish}(false);
+                                    return Result::Failure(res)
+                                }
+                            }
                         }
                     }
                     % endif

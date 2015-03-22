@@ -101,6 +101,7 @@
 //!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
 //!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
 //!     Result::MissingToken => println!("OAuth2: Missing Token"),
+//!     Result::Cancelled => println!("Operation cancelled by user"),
 //!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
 //!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
 //!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
@@ -266,6 +267,7 @@ impl Default for Scope {
 ///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
 ///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
 ///     Result::MissingToken => println!("OAuth2: Missing Token"),
+///     Result::Cancelled => println!("Operation cancelled by user"),
 ///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
 ///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
 ///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
@@ -583,8 +585,7 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, Some(error_info)) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -618,11 +619,21 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             }.upload()
                         };
                         match upload_result {
-                            Err(err) => {
+                            None => {
+                                dlg.finished(false);
+                                return Result::Cancelled
+                            }
+                            Some(Err(err)) => {
                                 dlg.finished(false);
                                 return Result::HttpError(err)
                             }
-                            Ok(upload_result) => res = upload_result,
+                            Some(Ok(upload_result)) => {
+                                res = upload_result;
+                                if !res.status.is_success() {
+                                    dlg.finished(false);
+                                    return Result::Failure(res)
+                                }
+                            }
                         }
                     }
                     let result_value = {

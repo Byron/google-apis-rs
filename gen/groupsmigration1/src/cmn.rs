@@ -228,6 +228,9 @@ pub enum Result<T = ()> {
     /// We required a Token, but didn't get one from the Authenticator
     MissingToken,
 
+    /// The delgate instructed to cancel the operation
+    Cancelled,
+
     /// An additional, free form field clashed with one of the built-in optional ones
     FieldClash(&'static str),
 
@@ -536,12 +539,15 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
         }
     }
 
-    pub fn upload(&mut self) -> hyper::HttpResult<hyper::client::Response> {
+    /// returns None if operation was cancelled by delegate, or the HttpResult.
+    /// It can be that we return the result just because we didn't understand the status code -
+    /// caller should check for status himself before assuming it's OK to use
+    pub fn upload(&mut self) -> Option<hyper::HttpResult<hyper::client::Response>> {
         let mut start = match self.start_at {
             Some(s) => s,
             None => match self.query_transfer_status() {
                 (Some(s), _) => s,
-                (_, result) => return result
+                (_, result) => return Some(result)
             }
         };
 
@@ -565,7 +571,7 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
             };
             start += request_size;
             if self.delegate.cancel_chunk_upload(&range_header) {
-                return Err(hyper::error::HttpError::HttpStatusError)
+                return None
             }
             match self.client.post(self.url)
                 .header(range_header)
@@ -573,24 +579,26 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
                 .header(UserAgent(self.user_agent.to_string()))
                 .body(&mut section_reader)
                 .send() {
-                Ok(res) => {
+                Ok(mut res) => {
                     if res.status == StatusCode::PermanentRedirect  {
                         continue
                     }
-                    if res.status != StatusCode::Ok {
-                        if let Retry::After(d) = self.delegate.http_failure(&res, None) {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let Retry::After(d) = self.delegate.http_failure(&res, serde::json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
                     }
-                    return Ok(res)
+                    return Some(Ok(res))
                 },
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
                         sleep(d);
                         continue;
                     }
-                    return Err(err)
+                    return Some(Err(err))
                 }
             }
         }
