@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-coordinate1"
+version = "0.1.0+20141215"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with coordinate (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/coordinate1"
+homepage = "https://developers.google.com/coordinate/"
+documentation = "http://byron.github.io/google-apis-rs/google-coordinate1"
+license = "MIT"
+keywords = ["coordinate", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"
+yup-oauth2 = "*"

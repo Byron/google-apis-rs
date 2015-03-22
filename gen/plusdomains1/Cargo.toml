@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-plusdomains1"
+version = "0.1.0+20150303"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with plusDomains (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/plusdomains1"
+homepage = "https://developers.google.com/+/domains/"
+documentation = "http://byron.github.io/google-apis-rs/google-plusdomains1"
+license = "MIT"
+keywords = ["plusDomains", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"
+yup-oauth2 = "*"

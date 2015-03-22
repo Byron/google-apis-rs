@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-bigquery2"
+version = "0.1.0+20141112"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with bigquery (protocol v2)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/bigquery2"
+homepage = "https://developers.google.com/bigquery/docs/overview"
+documentation = "http://byron.github.io/google-apis-rs/google-bigquery2"
+license = "MIT"
+keywords = ["bigquery", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"
+yup-oauth2 = "*"

@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-cloudmonitoring2_beta2"
+version = "0.1.0+20150305"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with Cloud Monitoring (protocol v2beta2)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudmonitoring2_beta2"
+homepage = "https://cloud.google.com/monitoring/v2beta2/"
+documentation = "http://byron.github.io/google-apis-rs/google-cloudmonitoring2_beta2"
+license = "MIT"
+keywords = ["cloudmonitoring", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"
+yup-oauth2 = "*"

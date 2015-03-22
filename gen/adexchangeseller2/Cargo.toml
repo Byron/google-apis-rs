@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-adexchangeseller2"
+version = "0.1.0+20150313"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with Ad Exchange Seller (protocol v2.0)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangeseller2"
+homepage = "https://developers.google.com/ad-exchange/seller-rest/"
+documentation = "http://byron.github.io/google-apis-rs/google-adexchangeseller2"
+license = "MIT"
+keywords = ["adexchangeseller", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"
+yup-oauth2 = "*"

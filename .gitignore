@@ -1,7 +1,7 @@
 .timestamp
 .pyenv
 .virtualenv
-gen/
+gen/doc/
 *.go
 *.pyc
 **target/

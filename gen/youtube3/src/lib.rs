@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *0.0.1+20150309*, where *20150309* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.0.1*.
+//! This documentation was generated from *YouTube* crate version *0.1.0+20150309*, where *20150309* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/v3).
@@ -152,6 +152,7 @@
 //!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
 //!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
 //!     Result::MissingToken => println!("OAuth2: Missing Token"),
+//!     Result::Cancelled => println!("Operation cancelled by user"),
 //!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
 //!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
 //!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
@@ -217,7 +218,7 @@
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
-#![allow(unused_imports, unused_mut)]
+#![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
 #![feature(custom_derive, custom_attribute, plugin)]
 #![plugin(serde_macros)]
@@ -343,6 +344,7 @@ impl Default for Scope {
 ///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
 ///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
 ///     Result::MissingToken => println!("OAuth2: Missing Token"),
+///     Result::Cancelled => println!("Operation cancelled by user"),
 ///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
 ///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
 ///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
@@ -368,7 +370,7 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
         YouTube {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.0.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.0".to_string(),
             _m: PhantomData
         }
     }
@@ -426,7 +428,7 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.0.1`.
+    /// It defaults to `google-api-rust-client/0.1.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -5548,7 +5550,6 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, I18nLanguageListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -5623,8 +5624,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -5788,7 +5788,6 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// Perform the operation you have build so far.
     fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, ChannelBannerResource)>
 		where RS: ReadSeek {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -5888,7 +5887,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone())
                         .header(content_type)
-                        .body(body_reader.into_body());
+                        .body(&mut body_reader);
                     upload_url_from_server = true;
                     if protocol == "resumable" {
                         req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
@@ -5913,8 +5912,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -5937,21 +5935,32 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             cmn::ResumableUploadHelper {
                                 client: &mut client.borrow_mut(),
                                 delegate: dlg,
+                                start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
                                 auth_header: auth_header.clone(),
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
-                                content_size: size
+                                content_length: size
                             }.upload()
                         };
                         match upload_result {
-                            Err(err) => {
+                            None => {
+                                dlg.finished(false);
+                                return Result::Cancelled
+                            }
+                            Some(Err(err)) => {
                                 dlg.finished(false);
                                 return Result::HttpError(err)
                             }
-                            Ok(upload_result) => res = upload_result,
+                            Some(Ok(upload_result)) => {
+                                res = upload_result;
+                                if !res.status.is_success() {
+                                    dlg.finished(false);
+                                    return Result::Failure(res)
+                                }
+                            }
                         }
                     }
                     let result_value = {
@@ -6139,7 +6148,6 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelSectionListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -6223,8 +6231,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -6429,7 +6436,6 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelSection)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -6498,7 +6504,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -6518,8 +6524,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -6704,7 +6709,6 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -6778,8 +6782,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -6940,7 +6943,6 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelSection)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -7006,7 +7008,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -7026,8 +7028,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -7218,7 +7219,6 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, GuideCategoryListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -7299,8 +7299,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -7494,7 +7493,6 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Playlist)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -7563,7 +7561,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -7583,8 +7581,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -7797,7 +7794,6 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -7890,8 +7886,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -8101,7 +8096,6 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -8175,8 +8169,7 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -8337,7 +8330,6 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Playlist)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -8403,7 +8395,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -8423,8 +8415,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -8601,7 +8592,6 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Perform the operation you have build so far.
     fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, ThumbnailSetResponse)>
 		where RS: ReadSeek {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -8688,7 +8678,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
-                                 .body(reader.into_body());
+                                 .body(&mut reader);
                     }
                     upload_url_from_server = true;
                     if protocol == "resumable" {
@@ -8714,8 +8704,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -8738,21 +8727,32 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             cmn::ResumableUploadHelper {
                                 client: &mut client.borrow_mut(),
                                 delegate: dlg,
+                                start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
                                 auth_header: auth_header.clone(),
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
-                                content_size: size
+                                content_length: size
                             }.upload()
                         };
                         match upload_result {
-                            Err(err) => {
+                            None => {
+                                dlg.finished(false);
+                                return Result::Cancelled
+                            }
+                            Some(Err(err)) => {
                                 dlg.finished(false);
                                 return Result::HttpError(err)
                             }
-                            Ok(upload_result) => res = upload_result,
+                            Some(Ok(upload_result)) => {
+                                res = upload_result;
+                                if !res.status.is_success() {
+                                    dlg.finished(false);
+                                    return Result::Failure(res)
+                                }
+                            }
                         }
                     }
                     let result_value = {
@@ -8961,7 +8961,6 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, VideoListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -9063,8 +9062,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -9308,7 +9306,6 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -9383,8 +9380,7 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -9533,7 +9529,6 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, VideoGetRatingResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -9608,8 +9603,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -9758,7 +9752,6 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -9832,8 +9825,7 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -10014,7 +10006,6 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Video)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -10080,7 +10071,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -10100,8 +10091,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -10351,7 +10341,6 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Perform the operation you have build so far.
     fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, Video)>
 		where RS: ReadSeek {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -10467,7 +10456,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone())
                         .header(content_type)
-                        .body(body_reader.into_body());
+                        .body(&mut body_reader);
                     upload_url_from_server = true;
                     if protocol == "resumable" {
                         req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
@@ -10492,8 +10481,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -10516,21 +10504,32 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             cmn::ResumableUploadHelper {
                                 client: &mut client.borrow_mut(),
                                 delegate: dlg,
+                                start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
                                 auth_header: auth_header.clone(),
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
-                                content_size: size
+                                content_length: size
                             }.upload()
                         };
                         match upload_result {
-                            Err(err) => {
+                            None => {
+                                dlg.finished(false);
+                                return Result::Cancelled
+                            }
+                            Some(Err(err)) => {
                                 dlg.finished(false);
                                 return Result::HttpError(err)
                             }
-                            Ok(upload_result) => res = upload_result,
+                            Some(Ok(upload_result)) => {
+                                res = upload_result;
+                                if !res.status.is_success() {
+                                    dlg.finished(false);
+                                    return Result::Failure(res)
+                                }
+                            }
                         }
                     }
                     let result_value = {
@@ -10798,7 +10797,6 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Subscription)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -10861,7 +10859,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -10881,8 +10879,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -11078,7 +11075,6 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, SubscriptionListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -11180,8 +11176,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -11412,7 +11407,6 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -11483,8 +11477,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -11683,7 +11676,6 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, SearchListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -11842,8 +11834,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -12239,7 +12230,6 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, I18nRegionListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -12314,8 +12304,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -12494,7 +12483,6 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveStream)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -12563,7 +12551,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -12583,8 +12571,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -12777,7 +12764,6 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -12854,8 +12840,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -13031,7 +13016,6 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveStreamListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -13121,8 +13105,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -13349,7 +13332,6 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveStream)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -13418,7 +13400,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -13438,8 +13420,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -13650,7 +13631,6 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -13716,7 +13696,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -13736,8 +13716,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -13945,7 +13924,6 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -14044,8 +14022,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -14265,7 +14242,6 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -14336,8 +14312,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -14492,7 +14467,6 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistItemListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -14582,8 +14556,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -14805,7 +14778,6 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistItem)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -14871,7 +14843,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -14891,8 +14863,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -15089,7 +15060,6 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistItem)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -15152,7 +15122,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -15172,8 +15142,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -15349,7 +15318,6 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Perform the operation you have build so far.
     fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<hyper::client::Response>
 		where RS: ReadSeek {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -15449,7 +15417,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone())
                         .header(content_type)
-                        .body(body_reader.into_body());
+                        .body(&mut body_reader);
                     upload_url_from_server = true;
                     if protocol == "resumable" {
                         req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
@@ -15474,8 +15442,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -15498,21 +15465,32 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             cmn::ResumableUploadHelper {
                                 client: &mut client.borrow_mut(),
                                 delegate: dlg,
+                                start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
                                 auth_header: auth_header.clone(),
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
-                                content_size: size
+                                content_length: size
                             }.upload()
                         };
                         match upload_result {
-                            Err(err) => {
+                            None => {
+                                dlg.finished(false);
+                                return Result::Cancelled
+                            }
+                            Some(Err(err)) => {
                                 dlg.finished(false);
                                 return Result::HttpError(err)
                             }
-                            Ok(upload_result) => res = upload_result,
+                            Some(Ok(upload_result)) => {
+                                res = upload_result;
+                                if !res.status.is_success() {
+                                    dlg.finished(false);
+                                    return Result::Failure(res)
+                                }
+                            }
                         }
                     }
                     let result_value = res;
@@ -15677,7 +15655,6 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -15751,8 +15728,7 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -15912,7 +15888,6 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -16000,8 +15975,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -16234,7 +16208,6 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -16303,7 +16276,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -16323,8 +16296,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -16542,7 +16514,6 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -16611,7 +16582,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -16631,8 +16602,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -16840,7 +16810,6 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -16922,8 +16891,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -17136,7 +17104,6 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcastListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -17229,8 +17196,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -17440,7 +17406,6 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -17517,8 +17482,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -17687,7 +17651,6 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -17767,8 +17730,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -17974,7 +17936,6 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, VideoCategoryListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -18055,8 +18016,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -18252,7 +18212,6 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ActivityListResponse)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -18348,8 +18307,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }
@@ -18581,7 +18539,6 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Activity)> {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -18644,7 +18601,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body());
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -18664,8 +18621,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
                             sleep(d);
                             continue;
                         }

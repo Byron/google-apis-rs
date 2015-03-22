@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-gamesconfiguration1_configuration"
+version = "0.1.0+20150309"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with Games Configuration (protocol v1configuration)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gamesconfiguration1_configuration"
+homepage = "https://developers.google.com/games/services"
+documentation = "http://byron.github.io/google-apis-rs/google-gamesconfiguration1_configuration"
+license = "MIT"
+keywords = ["gamesConfiguration", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"
+yup-oauth2 = "*"

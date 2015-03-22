@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-analytics3"
+version = "0.1.0+20150308"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with analytics (protocol v3)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/analytics3"
+homepage = "https://developers.google.com/analytics/"
+documentation = "http://byron.github.io/google-apis-rs/google-analytics3"
+license = "MIT"
+keywords = ["analytics", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"
+yup-oauth2 = "*"
