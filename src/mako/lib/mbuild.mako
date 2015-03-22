@@ -10,7 +10,7 @@
                       CALL_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
                       DELEGATE_PROPERTY_NAME, struct_type_bounds_s, supports_scopes, scope_url_to_variant,
                       re_find_replacements, ADD_PARAM_FN, ADD_PARAM_MEDIA_EXAMPLE, upload_action_fn, METHODS_RESOURCE,
-                      method_name_to_variant, unique_type_name)
+                      method_name_to_variant, unique_type_name, size_to_bytes)
 
     def get_parts(part_prop):
         if not part_prop:
@@ -442,7 +442,7 @@ match result {
     MULTI_SLASH = 'multi-slash-prefix'
     URL_ENCODE = 'url-encode'
 
-    max_size = simple_media_param.max_size
+    max_size = size_to_bytes(m.get('maxSize', '0kb'))
     READER_SEEK = "let size = reader.seek(io::SeekFrom::End(0)).unwrap();\nreader.seek(io::SeekFrom::Start(0)).unwrap();\n"
     READER_SEEK += "if size > %i {\n\treturn Result::UploadSizeLimitExceeded(size, %i)\n}" % (max_size, max_size)
 

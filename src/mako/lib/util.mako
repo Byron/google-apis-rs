@@ -27,6 +27,10 @@ ${util.library_name(name, version)}\
 ${util.library_to_crate_name(util.library_name(name, version))}\
 </%def>
 
+<%def name="crate_version()" buffered="True">\
+${cargo.build_version}+${revision}\
+</%def>
+
 ## All crates and standard `use` declaration, required for all examples
 ## Must be outside of a test function
 <%def name="test_prelude()">\

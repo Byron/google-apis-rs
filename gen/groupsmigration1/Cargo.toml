@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-groupsmigration1"
+version = "0.0.1+20140416"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with Groups Migration (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/gen/groupsmigration1/.timestamp"
+homepage = "https://developers.google.com/google-apps/groups-migration/"
+documentation = "http://byron.github.io/google-apis-rs/google-groupsmigration1"
+license = "MIT"
+keywords = ["groupsmigration", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"
+yup-oauth2 = "*"

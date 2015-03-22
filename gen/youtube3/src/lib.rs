@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *0.0.1*.
+//! This documentation was generated from *YouTube* crate version *0.0.1+20150309*.
 //! The original source code can be found [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/youtube3).
 //! # Features
 //! 
@@ -67,13 +67,13 @@
 //! 
 //! * **[Hub](struct.YouTube.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
-//! * **[Resources](cmn/trait.Resource.html)**
+//! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
-//!     * **[Parts](cmn/trait.Part.html)**
+//!     * **[Parts](trait.Part.html)**
 //!         * a collection of properties
 //!         * never directly used in *Activities*
-//! * **[Activities](cmn/trait.CallBuilder.html)**
+//! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
@@ -107,7 +107,7 @@
 //! 
 //! ```toml
 //! [dependencies]
-//! google-youtube3 = "0.0.1"
+//! google-youtube3 = "*"
 //! ```
 //! 
 //! ## A complete example
@@ -115,7 +115,6 @@
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
-//! extern crate serde;
 //! extern crate "google-youtube3" as youtube3;
 //! use youtube3::Result;
 //! # #[test] fn egal() {
@@ -150,28 +149,29 @@
 //! 
 //! match result {
 //!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Missing API Key"),
-//!     Result::MissingToken => println!("Missing Token"),
-//!     Result::Failure(_) => println!("General Failure (Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Json failed to decode: {:?}", err),
+//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!     Result::MissingToken => println!("OAuth2: Missing Token"),
+//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
 //!     Result::Success(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
 //! ## Handling Errors
 //! 
-//! All errors produced by the system are provided either as [Result](cmn/enum.Result.html) enumeration as return value of 
+//! All errors produced by the system are provided either as [Result](enum.Result.html) enumeration as return value of 
 //! the doit() methods, or handed as possibly intermediate results to either the 
-//! [Hub Delegate](cmn/trait.Delegate.html), or the [Authenticator Delegate](../yup-oauth2/trait.AuthenticatorDelegate.html).
+//! [Hub Delegate](trait.Delegate.html), or the [Authenticator Delegate](../yup-oauth2/trait.AuthenticatorDelegate.html).
 //! 
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## About Uploads and Downlods
-//! If a method supports downloads, the response body, which is part of the [Result](cmn/enum.Result.html), should be
+//! ## Uploads and Downlods
+//! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
-//! If such a method also supports a [Response Result](cmn/trait.ResponseResult.html), it will return that by default.
+//! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
 //! 
@@ -179,30 +179,30 @@
 //! *simple* and *resumable*. The distinctiveness of each is represented by customized 
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 //! 
-//! ## About Customization/Callbacks
+//! ## Customization and Callbacks
 //! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](cmn/trait.Delegate.html) to the 
-//! [Method Builder](cmn/trait.CallBuilder.html) before making the final `doit()` call. 
+//! You may alter the way an `doit()` method is called by providing a [delegate](trait.Delegate.html) to the 
+//! [Method Builder](trait.CallBuilder.html) before making the final `doit()` call. 
 //! Respective methods will be called to provide progress information, as well as determine whether the system should 
 //! retry on failure.
 //! 
-//! The [delegate trait](cmn/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+//! The [delegate trait](trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 //! 
-//! ## About Parts
+//! ## Optional Parts in Server-Requests
 //! 
-//! All structures provided by this library are made to be [enocodable](cmn/trait.RequestValue.html) and 
-//! [decodable](cmn/trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](cmn/trait.Part.html) which are identifyable by name, which will be sent to 
+//! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
+//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
-//! ## About Builder Arguments
+//! ## Builder Arguments
 //! 
-//! Using [method builders](cmn/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+//! Using [method builders](trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 //! These will always take a single argument, for which the following statements are true.
 //! 
 //! * [PODs][wiki-pod] are handed by copy
 //! * strings are passed as `&str`
-//! * [request values](cmn/trait.RequestValue.html) are borrowed
+//! * [request values](trait.RequestValue.html) are borrowed
 //! 
 //! Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 //! 
@@ -241,7 +241,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource};
 
 
 // ##############
@@ -306,7 +306,6 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// use youtube3::Result;
 /// # #[test] fn egal() {
@@ -341,11 +340,12 @@ impl Default for Scope {
 /// 
 /// match result {
 ///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Missing API Key"),
-///     Result::MissingToken => println!("Missing Token"),
-///     Result::Failure(_) => println!("General Failure (Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Json failed to decode: {:?}", err),
+///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///     Result::MissingToken => println!("OAuth2: Missing Token"),
+///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
 ///     Result::Success(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
@@ -728,8 +728,8 @@ pub struct LiveStream {
 }
 
 impl RequestValue for LiveStream {}
+impl Resource for LiveStream {}
 impl ResponseResult for LiveStream {}
-impl cmn::Resource for LiveStream {}
 
 impl ToParts for LiveStream {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
@@ -1265,8 +1265,8 @@ pub struct PlaylistItem {
 }
 
 impl RequestValue for PlaylistItem {}
+impl Resource for PlaylistItem {}
 impl ResponseResult for PlaylistItem {}
-impl cmn::Resource for PlaylistItem {}
 
 impl ToParts for PlaylistItem {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
@@ -1416,7 +1416,7 @@ pub struct I18nRegion {
     pub id: Option<String>,
 }
 
-impl cmn::Resource for I18nRegion {}
+impl Resource for I18nRegion {}
 
 impl ToParts for I18nRegion {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
@@ -1794,8 +1794,8 @@ pub struct Video {
 }
 
 impl RequestValue for Video {}
+impl Resource for Video {}
 impl ResponseResult for Video {}
-impl cmn::Resource for Video {}
 
 impl ToParts for Video {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
@@ -2034,8 +2034,8 @@ pub struct Subscription {
 }
 
 impl RequestValue for Subscription {}
+impl Resource for Subscription {}
 impl ResponseResult for Subscription {}
-impl cmn::Resource for Subscription {}
 
 impl ToParts for Subscription {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
@@ -2149,8 +2149,8 @@ pub struct Playlist {
 }
 
 impl RequestValue for Playlist {}
+impl Resource for Playlist {}
 impl ResponseResult for Playlist {}
-impl cmn::Resource for Playlist {}
 
 impl ToParts for Playlist {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
@@ -2494,8 +2494,8 @@ pub struct LiveBroadcast {
 }
 
 impl RequestValue for LiveBroadcast {}
+impl Resource for LiveBroadcast {}
 impl ResponseResult for LiveBroadcast {}
-impl cmn::Resource for LiveBroadcast {}
 
 impl ToParts for LiveBroadcast {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
@@ -2565,7 +2565,7 @@ pub struct Thumbnail {
     pub height: Option<u32>,
 }
 
-impl cmn::Resource for Thumbnail {}
+impl Resource for Thumbnail {}
 
 
 /// A channel resource contains information about a YouTube channel.
@@ -2618,8 +2618,8 @@ pub struct Channel {
 }
 
 impl RequestValue for Channel {}
+impl Resource for Channel {}
 impl ResponseResult for Channel {}
-impl cmn::Resource for Channel {}
 
 impl ToParts for Channel {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
@@ -3096,8 +3096,8 @@ pub struct ChannelSection {
 }
 
 impl RequestValue for ChannelSection {}
+impl Resource for ChannelSection {}
 impl ResponseResult for ChannelSection {}
-impl cmn::Resource for ChannelSection {}
 
 impl ToParts for ChannelSection {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
@@ -3668,7 +3668,7 @@ pub struct I18nLanguage {
     pub id: Option<String>,
 }
 
-impl cmn::Resource for I18nLanguage {}
+impl Resource for I18nLanguage {}
 
 impl ToParts for I18nLanguage {
     /// Return a comma separated list of members that are currently set, i.e. for which `self.member.is_some()`.
@@ -4030,7 +4030,6 @@ impl Part for ChannelContentDetailsRelatedPlaylists {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4055,7 +4054,7 @@ pub struct I18nLanguageMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for I18nLanguageMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for I18nLanguageMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> I18nLanguageMethods<'a, C, NC, A> {
     
@@ -4086,7 +4085,6 @@ impl<'a, C, NC, A> I18nLanguageMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4111,7 +4109,7 @@ pub struct ChannelBannerMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ChannelBannerMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelBannerMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelBannerMethods<'a, C, NC, A> {
     
@@ -4146,7 +4144,6 @@ impl<'a, C, NC, A> ChannelBannerMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4171,7 +4168,7 @@ pub struct ChannelSectionMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ChannelSectionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelSectionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelSectionMethods<'a, C, NC, A> {
     
@@ -4250,7 +4247,6 @@ impl<'a, C, NC, A> ChannelSectionMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4275,7 +4271,7 @@ pub struct GuideCategoryMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for GuideCategoryMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for GuideCategoryMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> GuideCategoryMethods<'a, C, NC, A> {
     
@@ -4308,7 +4304,6 @@ impl<'a, C, NC, A> GuideCategoryMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4333,7 +4328,7 @@ pub struct PlaylistMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for PlaylistMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for PlaylistMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistMethods<'a, C, NC, A> {
     
@@ -4415,7 +4410,6 @@ impl<'a, C, NC, A> PlaylistMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4440,7 +4434,7 @@ pub struct ThumbnailMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ThumbnailMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for ThumbnailMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ThumbnailMethods<'a, C, NC, A> {
     
@@ -4471,7 +4465,6 @@ impl<'a, C, NC, A> ThumbnailMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4496,7 +4489,7 @@ pub struct VideoMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for VideoMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for VideoMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoMethods<'a, C, NC, A> {
     
@@ -4613,7 +4606,6 @@ impl<'a, C, NC, A> VideoMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4638,7 +4630,7 @@ pub struct SubscriptionMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for SubscriptionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for SubscriptionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
@@ -4705,7 +4697,6 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4730,7 +4721,7 @@ pub struct SearchMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for SearchMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for SearchMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SearchMethods<'a, C, NC, A> {
     
@@ -4789,7 +4780,6 @@ impl<'a, C, NC, A> SearchMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4814,7 +4804,7 @@ pub struct I18nRegionMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for I18nRegionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for I18nRegionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> I18nRegionMethods<'a, C, NC, A> {
     
@@ -4845,7 +4835,6 @@ impl<'a, C, NC, A> I18nRegionMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4870,7 +4859,7 @@ pub struct LiveStreamMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for LiveStreamMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for LiveStreamMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveStreamMethods<'a, C, NC, A> {
     
@@ -4953,7 +4942,6 @@ impl<'a, C, NC, A> LiveStreamMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -4978,7 +4966,7 @@ pub struct ChannelMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ChannelMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     
@@ -5032,7 +5020,6 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5057,7 +5044,7 @@ pub struct PlaylistItemMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for PlaylistItemMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for PlaylistItemMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistItemMethods<'a, C, NC, A> {
     
@@ -5135,7 +5122,6 @@ impl<'a, C, NC, A> PlaylistItemMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5160,7 +5146,7 @@ pub struct WatermarkMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for WatermarkMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for WatermarkMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> WatermarkMethods<'a, C, NC, A> {
     
@@ -5206,7 +5192,6 @@ impl<'a, C, NC, A> WatermarkMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5231,7 +5216,7 @@ pub struct LiveBroadcastMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for LiveBroadcastMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for LiveBroadcastMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastMethods<'a, C, NC, A> {
     
@@ -5368,7 +5353,6 @@ impl<'a, C, NC, A> LiveBroadcastMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5393,7 +5377,7 @@ pub struct VideoCategoryMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for VideoCategoryMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for VideoCategoryMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoCategoryMethods<'a, C, NC, A> {
     
@@ -5426,7 +5410,6 @@ impl<'a, C, NC, A> VideoCategoryMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
-/// extern crate serde;
 /// extern crate "google-youtube3" as youtube3;
 /// 
 /// # #[test] fn egal() {
@@ -5451,7 +5434,7 @@ pub struct ActivityMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> cmn::ResourceMethodsBuilder for ActivityMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> ResourceMethodsBuilder for ActivityMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
     
@@ -5527,7 +5510,6 @@ impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -5614,12 +5596,12 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -5759,7 +5741,6 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::ChannelBannerResource;
 /// use std::fs;
@@ -5855,6 +5836,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
         let mut should_ask_dlg_for_url = false;
+        let mut upload_url_from_server = true;
         let mut upload_url: Option<String> = None;
 
         loop {
@@ -5866,14 +5848,18 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
+                    upload_url_from_server = false;
                     let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
                     match response {
-                        Ok(ref mut res) => res.headers.set(Location(upload_url.as_ref().unwrap().clone())),
+                        Ok(ref mut res) => {
+                            res.status = hyper::status::StatusCode::Ok;
+                            res.headers.set(Location(upload_url.as_ref().unwrap().clone()))
+                        }
                         _ => unreachable!(),
                     }
                     response
@@ -5884,6 +5870,9 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        if size > 0 {
+                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
@@ -5894,9 +5883,10 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                     let mut client = &mut *self.hub.client.borrow_mut();
                     let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                         .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header)
+                        .header(auth_header.clone())
                         .header(content_type)
                         .body(body_reader.into_body());
+                    upload_url_from_server = true;
                     if protocol == "resumable" {
                         req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
                     }
@@ -5931,16 +5921,29 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        if size > 0 {
+                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        }
                         let mut client = &mut *self.hub.client.borrow_mut();
-                        match (cmn::ResumableUploadHelper {
-                            client: &mut client.borrow_mut(),
-                            delegate: dlg,
-                            auth: &mut *self.hub.auth.borrow_mut(),
-                            url: &res.headers.get::<Location>().expect("Location header is part of protocol").0,
-                            reader: &mut reader,
-                            media_type: reader_mime_type.clone(),
-                            content_size: size
-                        }.upload()) {
+                        let upload_result = {
+                            let url = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            if upload_url_from_server {
+                                dlg.store_upload_url(url);
+                            }
+
+                            cmn::ResumableUploadHelper {
+                                client: &mut client.borrow_mut(),
+                                delegate: dlg,
+                                auth: &mut *self.hub.auth.borrow_mut(),
+                                user_agent: &self.hub._user_agent,
+                                auth_token: auth_header.0.clone(),
+                                url: url,
+                                reader: &mut reader,
+                                media_type: reader_mime_type.clone(),
+                                content_size: size
+                            }.upload()
+                        };
+                        match upload_result {
                             Err(err) => {
                                 dlg.finished(false);
                                 return Result::HttpError(err)
@@ -6090,7 +6093,6 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6192,12 +6194,12 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -6375,7 +6377,6 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::ChannelSection;
 /// # #[test] fn egal() {
@@ -6483,13 +6484,13 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -6661,7 +6662,6 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6747,12 +6747,12 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -6888,7 +6888,6 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::ChannelSection;
 /// # #[test] fn egal() {
@@ -6991,13 +6990,13 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -7171,7 +7170,6 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -7268,12 +7266,12 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -7440,7 +7438,6 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Playlist;
 /// # #[test] fn egal() {
@@ -7548,13 +7545,13 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -7742,7 +7739,6 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -7859,12 +7855,12 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -8058,7 +8054,6 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -8144,12 +8139,12 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -8285,7 +8280,6 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Playlist;
 /// # #[test] fn egal() {
@@ -8388,13 +8382,13 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -8556,7 +8550,6 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use std::fs;
 /// # #[test] fn egal() {
@@ -8643,6 +8636,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
 
         let mut should_ask_dlg_for_url = false;
+        let mut upload_url_from_server = true;
         let mut upload_url: Option<String> = None;
 
         loop {
@@ -8654,13 +8648,17 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
+                    upload_url_from_server = false;
                     let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
                     match response {
-                        Ok(ref mut res) => res.headers.set(Location(upload_url.as_ref().unwrap().clone())),
+                        Ok(ref mut res) => {
+                            res.status = hyper::status::StatusCode::Ok;
+                            res.headers.set(Location(upload_url.as_ref().unwrap().clone()))
+                        }
                         _ => unreachable!(),
                     }
                     response
@@ -8668,14 +8666,18 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                     let mut client = &mut *self.hub.client.borrow_mut();
                     let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                         .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header);
+                        .header(auth_header.clone());
                     if protocol == "simple" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    if size > 0 {
+                    	return Result::UploadSizeLimitExceeded(size, 0)
+                    }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
                                  .body(reader.into_body());
                     }
+                    upload_url_from_server = true;
                     if protocol == "resumable" {
                         req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
                     }
@@ -8710,16 +8712,29 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        if size > 0 {
+                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        }
                         let mut client = &mut *self.hub.client.borrow_mut();
-                        match (cmn::ResumableUploadHelper {
-                            client: &mut client.borrow_mut(),
-                            delegate: dlg,
-                            auth: &mut *self.hub.auth.borrow_mut(),
-                            url: &res.headers.get::<Location>().expect("Location header is part of protocol").0,
-                            reader: &mut reader,
-                            media_type: reader_mime_type.clone(),
-                            content_size: size
-                        }.upload()) {
+                        let upload_result = {
+                            let url = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            if upload_url_from_server {
+                                dlg.store_upload_url(url);
+                            }
+
+                            cmn::ResumableUploadHelper {
+                                client: &mut client.borrow_mut(),
+                                delegate: dlg,
+                                auth: &mut *self.hub.auth.borrow_mut(),
+                                user_agent: &self.hub._user_agent,
+                                auth_token: auth_header.0.clone(),
+                                url: url,
+                                reader: &mut reader,
+                                media_type: reader_mime_type.clone(),
+                                content_size: size
+                            }.upload()
+                        };
+                        match upload_result {
                             Err(err) => {
                                 dlg.finished(false);
                                 return Result::HttpError(err)
@@ -8878,7 +8893,6 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9010,12 +9024,12 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -9242,7 +9256,6 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9330,12 +9343,12 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -9468,7 +9481,6 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9555,12 +9567,12 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -9693,7 +9705,6 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9779,12 +9790,12 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -9930,7 +9941,6 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Video;
 /// # #[test] fn egal() {
@@ -10043,13 +10053,13 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -10257,7 +10267,6 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Video;
 /// use std::fs;
@@ -10390,6 +10399,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
         let mut should_ask_dlg_for_url = false;
+        let mut upload_url_from_server = true;
         let mut upload_url: Option<String> = None;
 
         loop {
@@ -10401,14 +10411,18 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
+                    upload_url_from_server = false;
                     let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
                     match response {
-                        Ok(ref mut res) => res.headers.set(Location(upload_url.as_ref().unwrap().clone())),
+                        Ok(ref mut res) => {
+                            res.status = hyper::status::StatusCode::Ok;
+                            res.headers.set(Location(upload_url.as_ref().unwrap().clone()))
+                        }
                         _ => unreachable!(),
                     }
                     response
@@ -10419,6 +10433,9 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        if size > 0 {
+                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
@@ -10429,9 +10446,10 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                     let mut client = &mut *self.hub.client.borrow_mut();
                     let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                         .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header)
+                        .header(auth_header.clone())
                         .header(content_type)
                         .body(body_reader.into_body());
+                    upload_url_from_server = true;
                     if protocol == "resumable" {
                         req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
                     }
@@ -10466,16 +10484,29 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        if size > 0 {
+                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        }
                         let mut client = &mut *self.hub.client.borrow_mut();
-                        match (cmn::ResumableUploadHelper {
-                            client: &mut client.borrow_mut(),
-                            delegate: dlg,
-                            auth: &mut *self.hub.auth.borrow_mut(),
-                            url: &res.headers.get::<Location>().expect("Location header is part of protocol").0,
-                            reader: &mut reader,
-                            media_type: reader_mime_type.clone(),
-                            content_size: size
-                        }.upload()) {
+                        let upload_result = {
+                            let url = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            if upload_url_from_server {
+                                dlg.store_upload_url(url);
+                            }
+
+                            cmn::ResumableUploadHelper {
+                                client: &mut client.borrow_mut(),
+                                delegate: dlg,
+                                auth: &mut *self.hub.auth.borrow_mut(),
+                                user_agent: &self.hub._user_agent,
+                                auth_token: auth_header.0.clone(),
+                                url: url,
+                                reader: &mut reader,
+                                media_type: reader_mime_type.clone(),
+                                content_size: size
+                            }.upload()
+                        };
+                        match upload_result {
                             Err(err) => {
                                 dlg.finished(false);
                                 return Result::HttpError(err)
@@ -10704,7 +10735,6 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Subscription;
 /// # #[test] fn egal() {
@@ -10802,13 +10832,13 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -10973,7 +11003,6 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -11105,12 +11134,12 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -11327,7 +11356,6 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -11408,12 +11436,12 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -11540,7 +11568,6 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -11767,12 +11794,12 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -12152,7 +12179,6 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -12239,12 +12265,12 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -12394,7 +12420,6 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::LiveStream;
 /// # #[test] fn egal() {
@@ -12504,13 +12529,13 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -12688,7 +12713,6 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -12779,12 +12803,12 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -12934,7 +12958,6 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -13046,12 +13069,12 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -13249,7 +13272,6 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::LiveStream;
 /// # #[test] fn egal() {
@@ -13359,13 +13381,13 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -13554,7 +13576,6 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Channel;
 /// # #[test] fn egal() {
@@ -13657,13 +13678,13 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -13842,7 +13863,6 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -13969,12 +13989,12 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -14180,7 +14200,6 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -14261,12 +14280,12 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -14395,7 +14414,6 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -14507,12 +14525,12 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -14708,7 +14726,6 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::PlaylistItem;
 /// # #[test] fn egal() {
@@ -14812,13 +14829,13 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -14994,7 +15011,6 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::PlaylistItem;
 /// # #[test] fn egal() {
@@ -15093,13 +15109,13 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -15253,7 +15269,6 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::InvideoBranding;
 /// use std::fs;
@@ -15350,6 +15365,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
         let mut should_ask_dlg_for_url = false;
+        let mut upload_url_from_server = true;
         let mut upload_url: Option<String> = None;
 
         loop {
@@ -15361,14 +15377,18 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
+                    upload_url_from_server = false;
                     let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
                     match response {
-                        Ok(ref mut res) => res.headers.set(Location(upload_url.as_ref().unwrap().clone())),
+                        Ok(ref mut res) => {
+                            res.status = hyper::status::StatusCode::Ok;
+                            res.headers.set(Location(upload_url.as_ref().unwrap().clone()))
+                        }
                         _ => unreachable!(),
                     }
                     response
@@ -15379,6 +15399,9 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        if size > 0 {
+                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
@@ -15389,9 +15412,10 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                     let mut client = &mut *self.hub.client.borrow_mut();
                     let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                         .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header)
+                        .header(auth_header.clone())
                         .header(content_type)
                         .body(body_reader.into_body());
+                    upload_url_from_server = true;
                     if protocol == "resumable" {
                         req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
                     }
@@ -15426,16 +15450,29 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
+                        if size > 0 {
+                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        }
                         let mut client = &mut *self.hub.client.borrow_mut();
-                        match (cmn::ResumableUploadHelper {
-                            client: &mut client.borrow_mut(),
-                            delegate: dlg,
-                            auth: &mut *self.hub.auth.borrow_mut(),
-                            url: &res.headers.get::<Location>().expect("Location header is part of protocol").0,
-                            reader: &mut reader,
-                            media_type: reader_mime_type.clone(),
-                            content_size: size
-                        }.upload()) {
+                        let upload_result = {
+                            let url = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            if upload_url_from_server {
+                                dlg.store_upload_url(url);
+                            }
+
+                            cmn::ResumableUploadHelper {
+                                client: &mut client.borrow_mut(),
+                                delegate: dlg,
+                                auth: &mut *self.hub.auth.borrow_mut(),
+                                user_agent: &self.hub._user_agent,
+                                auth_token: auth_header.0.clone(),
+                                url: url,
+                                reader: &mut reader,
+                                media_type: reader_mime_type.clone(),
+                                content_size: size
+                            }.upload()
+                        };
+                        match upload_result {
                             Err(err) => {
                                 dlg.finished(false);
                                 return Result::HttpError(err)
@@ -15568,7 +15605,6 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -15654,12 +15690,12 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -15794,7 +15830,6 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -15903,12 +15938,12 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -16112,7 +16147,6 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::LiveBroadcast;
 /// # #[test] fn egal() {
@@ -16222,13 +16256,13 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -16420,7 +16454,6 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::LiveBroadcast;
 /// # #[test] fn egal() {
@@ -16530,13 +16563,13 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());
@@ -16726,7 +16759,6 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -16825,12 +16857,12 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -17015,7 +17047,6 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -17132,12 +17163,12 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -17329,7 +17360,6 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -17420,12 +17450,12 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -17574,7 +17604,6 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -17670,12 +17699,12 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -17861,7 +17890,6 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -17958,12 +17986,12 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -18129,7 +18157,6 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -18251,12 +18278,12 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -18465,7 +18492,6 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate serde;
 /// # extern crate "google-youtube3" as youtube3;
 /// use youtube3::Activity;
 /// # #[test] fn egal() {
@@ -18563,13 +18589,13 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header)
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(request_value_reader.into_body());

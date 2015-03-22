@@ -6,12 +6,12 @@
 [package]
 
 name = "${util.crate_name()}"
-version = "${cargo.build_version}"
+version = "${util.crate_version()}"
 authors = [${",\n           ".join('"%s"' % a for a in cargo.authors)}]
 description = "A complete library to interact with ${util.canonical_name()} (protocol ${version})"
 repository = "${util.repository_url()}"
 homepage = "${documentationLink}"
-documentation = "${cargo.doc_base_url}"
+documentation = "${cargo.doc_base_url}/${util.crate_name()}"
 license = "${copyright.license_abbrev}"
 keywords = ["${name}", ${", ".join(estr(cargo.keywords))}]
 

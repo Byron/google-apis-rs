@@ -4,12 +4,12 @@
 [package]
 
 name = "google-youtube3"
-version = "0.0.1"
+version = "0.0.1+20150309"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with YouTube (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/gen/youtube3/.timestamp"
 homepage = "https://developers.google.com/youtube/v3"
-documentation = "http://byron.github.io/google-apis-rs"
+documentation = "http://byron.github.io/google-apis-rs/google-youtube3"
 license = "MIT"
 keywords = ["youtube", "google", "protocol", "web", "api"]
 

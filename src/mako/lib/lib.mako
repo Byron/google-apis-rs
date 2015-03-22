@@ -57,7 +57,7 @@
     header_methods = (('Upload', upload_methods), ('Download', download_methods), ('Subscription', subscription_methods))
 %>\
 % if rust_doc:
-This documentation was generated from *${util.canonical_name()}* crate version *${cargo.build_version}*.
+This documentation was generated from *${util.canonical_name()}* crate version *${util.crate_version()}*.
 The original source code can be found [on github](${cargo.repo_base_url}/tree/master/${directories.output}/${util.library_name()}).
 % endif
 # Features
@@ -170,7 +170,7 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 
 ```toml
 [dependencies]
-${util.crate_name()} = "${cargo.build_version}"
+${util.crate_name()} = "*"
 ```
 
 ${'##'} A complete example
