@@ -5,7 +5,7 @@ use std;
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2;
 use hyper;
-use hyper::header::{ContentType, ContentLength, Headers};
+use hyper::header::{ContentType, ContentLength, Headers, UserAgent, Authorization};
 use hyper::http::LINE_ENDING;
 use hyper::method::Method;
 
@@ -361,6 +361,8 @@ pub struct ResumableUploadHelper<'a, NC: 'a, A: 'a> {
     pub client: &'a mut hyper::client::Client<NC>,
     pub delegate: &'a mut Delegate,
     pub auth: &'a mut A,
+    pub user_agent: &'a str,
+    pub auth_token: String,
     pub url: &'a str,
     pub reader: &'a mut ReadSeek,
     pub media_type: Mime,
@@ -370,7 +372,19 @@ pub struct ResumableUploadHelper<'a, NC: 'a, A: 'a> {
 impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
     where NC: hyper::net::NetworkConnector,
           A: oauth2::GetToken {
+
+    fn query_transfer_status(&'a mut self) -> (u64, hyper::HttpResult<hyper::client::Response>) {
+        self.client.post(self.url)
+            .header(UserAgent(self.user_agent.to_string()))
+            .header(Authorization("Bearer ".to_string() + &self.auth_token));
+        (0, Err(hyper::error::HttpError::HttpStatusError))
+    }
+
     pub fn upload(&'a mut self) -> hyper::HttpResult<hyper::client::Response> {
+        let (start, result) = self.query_transfer_status();
+        if let Err(_) = result {
+            return result
+        }
         Err(hyper::error::HttpError::HttpStatusError)
     }
 }

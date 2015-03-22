@@ -359,11 +359,11 @@ ${'.' + action_name | indent_by(13)}(${action_args});
 
 match result {
     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-    Result::MissingAPIKey => println!("Missing API Key"),
-    Result::MissingToken => println!("Missing Token"),
-    Result::Failure(_) => println!("General Failure (Response doesn't print)"),
-    Result::FieldClash(clashed_field) => println!("FIELD CLASH: {:?}", clashed_field),
-    Result::JsonDecodeError(err) => println!("Json failed to decode: {:?}", err),
+    Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+    Result::MissingToken => println!("OAuth2: Missing Token"),
+    Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+    Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+    Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
     Result::Success(_) => println!("Success (value doesn't print)"),
 }
 % endif
@@ -667,7 +667,7 @@ else {
                 ${delegate_finish}(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization(token.unwrap().access_token);
+            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
             % endif
             % if request_value:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
@@ -708,7 +708,7 @@ else {
                     .header(UserAgent(self.hub._user_agent.clone()))\
                     % if supports_scopes(auth):
 
-                    .header(auth_header)\
+                    .header(auth_header.clone())\
                     % endif
                     % if request_value:
                     % if not simple_media_param:
@@ -781,6 +781,8 @@ else {
                                 client: &mut client.borrow_mut(),
                                 delegate: dlg,
                                 auth: &mut *self.hub.auth.borrow_mut(),
+                                user_agent: &self.hub._user_agent,
+                                auth_token: auth_header.0.clone(),
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),

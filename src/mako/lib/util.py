@@ -35,8 +35,6 @@ RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'co
                       'return', 'sizeof', 'static', 'self', 'struct', 'super', 'true', 'trait', 'type', 'typeof',
                       'unsafe', 'unsized', 'use', 'virtual', 'where', 'while', 'yield'))
 
-RESERVED_TYPES = set(("Result", ))
-
 _words = [w.strip(',') for w in "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(' ')]
 RUST_TYPE_RND_MAP = {'bool': lambda: str(bool(randint(0, 1))).lower(),
                      'u32' : lambda: randint(0, 100),
@@ -73,6 +71,8 @@ REQUEST_VALUE_PROPERTY_NAME = 'request'
 DELEGATE_PROPERTY_NAME = 'delegate'
 TO_PARTS_MARKER = 'ToParts'
 UNUSED_TYPE_MARKER = 'UnusedType'
+
+RESERVED_TYPES = set(("Result", RESOURCE_MARKER_TRAIT))
 
 PROTOCOL_TYPE_INFO = {
     'simple' : {
@@ -403,7 +403,7 @@ def schema_markers(s, c, transitive=True):
         for fqan, iot in activities.iteritems():
             _, resource, _ = activity_split(fqan)
             if resource and activity_name_to_type_name(resource).lower() == sid.lower():
-                res.add('cmn::%s' % RESOURCE_MARKER_TRAIT)
+                res.add(RESOURCE_MARKER_TRAIT)
             m = c.fqan_map[to_fqan(*activity_split(fqan))]
             params, _ = build_all_params(c, m)
             part_prop, _ = parts_from_params(params)

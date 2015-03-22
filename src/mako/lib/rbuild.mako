@@ -48,7 +48,7 @@ pub struct ${ThisType}
     hub: &'a ${hub_type_name}${hub_type_params_s()},
 }
 
-impl${rb_params} cmn::ResourceMethodsBuilder for ${ThisType} {}
+impl${rb_params} ResourceMethodsBuilder for ${ThisType} {}
 
 ## Builder Creators Methods ####################
 impl${rb_params} ${ThisType} {

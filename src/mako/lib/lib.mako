@@ -23,11 +23,11 @@
     # fr == fattest resource, the fatter, the more important, right ?
     fr = find_fattest_resource(c)
     hub_url = 'struct.' + hub_type(c.schemas, util.canonical_name()) + '.html'
-    method_builder_url = 'cmn/trait.' + CALL_BUILDER_MARKERT_TRAIT + '.html'
-    delegate_url = 'cmn/trait.Delegate.html'
-    request_trait_url = 'cmn/trait.' + REQUEST_MARKER_TRAIT + '.html'
-    response_trait_url = 'cmn/trait.' + RESPONSE_MARKER_TRAIT + '.html'
-    part_trait_url = 'cmn/trait.' + PART_MARKER_TRAIT + '.html'
+    method_builder_url = 'trait.' + CALL_BUILDER_MARKERT_TRAIT + '.html'
+    delegate_url = 'trait.Delegate.html'
+    request_trait_url = 'trait.' + REQUEST_MARKER_TRAIT + '.html'
+    response_trait_url = 'trait.' + RESPONSE_MARKER_TRAIT + '.html'
+    part_trait_url = 'trait.' + PART_MARKER_TRAIT + '.html'
 
     doc_base_url = cargo.doc_base_url + '/' + util.crate_name() + '/'
 
@@ -131,7 +131,7 @@ The API is structured into the following primary items:
 
 * **${link('Hub', hub_url)}**
     * a central object to maintain state and allow accessing all *Activities*
-* **${link('Resources', 'cmn/trait.' + RESOURCE_MARKER_TRAIT + '.html')}**
+* **${link('Resources', 'trait.' + RESOURCE_MARKER_TRAIT + '.html')}**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
     * **${link('Parts', part_trait_url)}**
@@ -179,7 +179,7 @@ ${self.hub_usage_example(c, rust_doc, fr=fr)}\
 
 ${'##'} Handling Errors
 
-All errors produced by the system are provided either as ${link('Result', 'cmn/enum.Result.html')} enumeration as return value of 
+All errors produced by the system are provided either as ${link('Result', 'enum.Result.html')} enumeration as return value of 
 the ${api.terms.action}() methods, or handed as possibly intermediate results to either the 
 ${link('Hub Delegate', delegate_url)}, or the ${link('Authenticator Delegate', urls.authenticator_delegate)}.
 
@@ -187,9 +187,9 @@ When delegates handle errors or intermediate values, they may have a chance to i
 makes the system potentially resilient to all kinds of errors.
 
 ${'##'} About Uploads and Downlods
-If a method supports downloads, the response body, which is part of the ${link('Result', 'cmn/enum.Result.html')}, should be
+If a method supports downloads, the response body, which is part of the ${link('Result', 'enum.Result.html')}, should be
 read by you to obtain the media.
-If such a method also supports a ${link('Response Result', 'cmn/trait.ResponseResult.html')}, it will return that by default.
+If such a method also supports a ${link('Response Result', 'trait.ResponseResult.html')}, it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `${ADD_PARAM_MEDIA_EXAMPLE}`.
 
