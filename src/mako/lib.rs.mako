@@ -27,7 +27,7 @@ ${lib.docs(c)}
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
-#![allow(unused_imports, unused_mut)]
+#![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
 #![feature(custom_derive, custom_attribute, plugin)]
 #![plugin(serde_macros)]

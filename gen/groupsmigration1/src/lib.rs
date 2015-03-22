@@ -166,7 +166,7 @@
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
-#![allow(unused_imports, unused_mut)]
+#![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
 #![feature(custom_derive, custom_attribute, plugin)]
 #![plugin(serde_macros)]
@@ -450,7 +450,6 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Perform the operation you have build so far.
     fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, Groups)>
 		where RS: ReadSeek {
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -558,7 +557,7 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
-                                 .body(reader.into_body());
+                                 .body(&mut reader);
                     }
                     upload_url_from_server = true;
                     if protocol == "resumable" {

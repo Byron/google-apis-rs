@@ -7,8 +7,8 @@ To find a library of your interest, you might want to proceed looking at the [AP
 # Project Features
 
 * provide an idiomatic rust implementation for google APIs
-* first-class documentation with cross-links and complete code-examples to increase ease-of-use
-* support all features, including uploads and resumable uploads
+* first-class documentation with cross-links and complete code-examples
+* support all features, including downloads and resumable uploads
 * safety and resilience are built-in, allowing you to create highly available tools on top of it. For example, you can trigger retries for all operations that may temporarily fail, e.g. due to network outage.
 * *(soon)* Feature-complete command line tool to interact with each API.
 

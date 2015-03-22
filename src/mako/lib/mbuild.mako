@@ -478,10 +478,6 @@ match result {
         % if URL_ENCODE in special_cases:
         use url::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         % endif
-        ## TODO: IntoBody is called explicilty, even though it should be working implicitly.
-        ## However, the compiler complains about
-        ## "the trait `core::marker::Sized` is not implemented for the type `std::io::Read`"
-        use hyper::client::IntoBody;
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -720,11 +716,11 @@ else {
 
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
-                    .body(request_value_reader.into_body())\
+                    .body(&mut request_value_reader)\
                     % else:
 
                     .header(content_type)
-                    .body(body_reader.into_body())\
+                    .body(&mut body_reader)\
                     % endif ## not simple_media_param
                     % endif
 ;
@@ -733,7 +729,7 @@ else {
                     ${READER_SEEK | indent_all_but_first_by(4)}
                     req = req.header(ContentType(reader_mime_type.clone()))
                              .header(ContentLength(size))
-                             .body(reader.into_body());
+                             .body(&mut reader);
                 }
                 % endif ## media upload handling
                 % if resumable_media_param:
