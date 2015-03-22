@@ -4,7 +4,7 @@
 [package]
 
 name = "google-calendar3"
-version = "0.1.0+20141123"
+version = "0.1.1+20141123"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with calendar (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/calendar3"

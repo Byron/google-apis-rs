@@ -28,7 +28,7 @@ api:
     - source: lib.rs
       output_dir: src
 cargo:
-  build_version: "0.1.0"
+  build_version: "0.1.1"
   repo_base_url: https://github.com/Byron/google-apis-rs
   doc_base_url: http://byron.github.io/google-apis-rs
   authors:

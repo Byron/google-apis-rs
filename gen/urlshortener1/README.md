@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-urlshortener1` library allows access to all features of the *Google urlshortener* service.
 
-This documentation was generated from *urlshortener* crate version *0.1.0+20150219*, where *20150219* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+This documentation was generated from *urlshortener* crate version *0.1.1+20150219*, where *20150219* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 
 Everything else about the *urlshortener* *v1* API can be found at the
 [official documentation site](https://developers.google.com/url-shortener/v1/getting_started).

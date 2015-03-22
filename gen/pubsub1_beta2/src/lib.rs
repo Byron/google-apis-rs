@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pubsub* crate version *0.1.0+20150213*, where *20150213* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+//! This documentation was generated from *pubsub* crate version *0.1.1+20150213*, where *20150213* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1_beta2).
 //! # Features
 //! 
@@ -304,7 +304,7 @@ impl<'a, C, NC, A> Pubsub<C, NC, A>
         Pubsub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.0".to_string(),
+            _user_agent: "google-api-rust-client/0.1.1".to_string(),
             _m: PhantomData
         }
     }
@@ -314,7 +314,7 @@ impl<'a, C, NC, A> Pubsub<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.0`.
+    /// It defaults to `google-api-rust-client/0.1.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

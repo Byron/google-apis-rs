@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-replicapoolupdater1_beta1` library allows access to all features of the *Google replicapoolupdater* service.
 
-This documentation was generated from *replicapoolupdater* crate version *0.1.0+20150129*, where *20150129* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+This documentation was generated from *replicapoolupdater* crate version *0.1.1+20150129*, where *20150129* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 
 Everything else about the *replicapoolupdater* *v1_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/compute/docs/instance-groups/manager/#applying_rolling_updates_using_the_updater_service).

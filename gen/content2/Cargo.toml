@@ -4,7 +4,7 @@
 [package]
 
 name = "google-content2"
-version = "0.1.0+20150311"
+version = "0.1.1+20150311"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with Shopping Content (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/content2"

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-admin2_email_migration"
-version = "0.1.0+20150303"
+version = "0.1.1+20150303"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with admin (protocol email_migration_v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/admin2_email_migration"

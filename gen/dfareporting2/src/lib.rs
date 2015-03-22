@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dfareporting* crate version *0.1.0+20150223*, where *20150223* is the exact revision of the *dfareporting:v2.0* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+//! This documentation was generated from *dfareporting* crate version *0.1.1+20150223*, where *20150223* is the exact revision of the *dfareporting:v2.0* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 //! 
 //! Everything else about the *dfareporting* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-advertisers/reporting/).
@@ -413,7 +413,7 @@ impl<'a, C, NC, A> Dfareporting<C, NC, A>
         Dfareporting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.0".to_string(),
+            _user_agent: "google-api-rust-client/0.1.1".to_string(),
             _m: PhantomData
         }
     }
@@ -564,7 +564,7 @@ impl<'a, C, NC, A> Dfareporting<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.0`.
+    /// It defaults to `google-api-rust-client/0.1.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -37334,8 +37334,8 @@ impl<'a, C, NC, A> CreativeAssetInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 0 {
-                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        if size > 104857600 {
+                        	return Result::UploadSizeLimitExceeded(size, 104857600)
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -37384,8 +37384,8 @@ impl<'a, C, NC, A> CreativeAssetInsertCall<'a, C, NC, A> where NC: hyper::net::N
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 0 {
-                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        if size > 104857600 {
+                        	return Result::UploadSizeLimitExceeded(size, 104857600)
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {

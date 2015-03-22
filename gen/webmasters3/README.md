@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-webmasters3` library allows access to all features of the *Google webmasters* service.
 
-This documentation was generated from *webmasters* crate version *0.1.0+20140908*, where *20140908* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+This documentation was generated from *webmasters* crate version *0.1.1+20140908*, where *20140908* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 
 Everything else about the *webmasters* *v3* API can be found at the
 [official documentation site](https://developers.google.com/webmaster-tools/v3/welcome).

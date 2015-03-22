@@ -4,7 +4,7 @@
 [package]
 
 name = "google-urlshortener1"
-version = "0.1.0+20150219"
+version = "0.1.1+20150219"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with urlshortener (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/urlshortener1"

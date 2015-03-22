@@ -4,7 +4,7 @@
 [package]
 
 name = "google-prediction1d6"
-version = "0.1.0+20140522"
+version = "0.1.1+20140522"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with prediction (protocol v1.6)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/prediction1d6"

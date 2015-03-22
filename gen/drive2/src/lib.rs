@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *0.1.0+20150108*, where *20150108* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+//! This documentation was generated from *drive* crate version *0.1.1+20150108*, where *20150108* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -402,7 +402,7 @@ impl<'a, C, NC, A> Drive<C, NC, A>
         Drive {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.0".to_string(),
+            _user_agent: "google-api-rust-client/0.1.1".to_string(),
             _m: PhantomData
         }
     }
@@ -448,7 +448,7 @@ impl<'a, C, NC, A> Drive<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.0`.
+    /// It defaults to `google-api-rust-client/0.1.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3809,8 +3809,8 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 0 {
-                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        if size > 5497558138880 {
+                        	return Result::UploadSizeLimitExceeded(size, 5497558138880)
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -3859,8 +3859,8 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 0 {
-                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        if size > 5497558138880 {
+                        	return Result::UploadSizeLimitExceeded(size, 5497558138880)
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -5780,8 +5780,8 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 0 {
-                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        if size > 5497558138880 {
+                        	return Result::UploadSizeLimitExceeded(size, 5497558138880)
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -5830,8 +5830,8 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 0 {
-                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        if size > 5497558138880 {
+                        	return Result::UploadSizeLimitExceeded(size, 5497558138880)
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -7397,8 +7397,8 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                     if protocol == "simple" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 0 {
-                    	return Result::UploadSizeLimitExceeded(size, 0)
+                    if size > 10485760 {
+                    	return Result::UploadSizeLimitExceeded(size, 10485760)
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -7438,8 +7438,8 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 0 {
-                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        if size > 10485760 {
+                        	return Result::UploadSizeLimitExceeded(size, 10485760)
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {

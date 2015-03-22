@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *analytics* crate version *0.1.0+20150308*, where *20150308* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+//! This documentation was generated from *analytics* crate version *0.1.1+20150308*, where *20150308* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 //! 
 //! Everything else about the *analytics* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/analytics/).
@@ -334,7 +334,7 @@ impl<'a, C, NC, A> Analytics<C, NC, A>
         Analytics {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.0".to_string(),
+            _user_agent: "google-api-rust-client/0.1.1".to_string(),
             _m: PhantomData
         }
     }
@@ -353,7 +353,7 @@ impl<'a, C, NC, A> Analytics<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.0`.
+    /// It defaults to `google-api-rust-client/0.1.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -13686,8 +13686,8 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
                     if protocol == "simple" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 0 {
-                    	return Result::UploadSizeLimitExceeded(size, 0)
+                    if size > 1073741824 {
+                    	return Result::UploadSizeLimitExceeded(size, 1073741824)
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -13727,8 +13727,8 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 0 {
-                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        if size > 1073741824 {
+                        	return Result::UploadSizeLimitExceeded(size, 1073741824)
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {

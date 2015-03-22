@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-oauth2_v2` library allows access to all features of the *Google oauth2* service.
 
-This documentation was generated from *oauth2* crate version *0.1.0+20150227*, where *20150227* is the exact revision of the *oauth2:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+This documentation was generated from *oauth2* crate version *0.1.1+20150227*, where *20150227* is the exact revision of the *oauth2:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 
 Everything else about the *oauth2* *v2* API can be found at the
 [official documentation site](https://developers.google.com/accounts/docs/OAuth2).

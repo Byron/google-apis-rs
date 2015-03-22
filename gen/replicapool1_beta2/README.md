@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-replicapool1_beta2` library allows access to all features of the *Google replicapool* service.
 
-This documentation was generated from *replicapool* crate version *0.1.0+20141002*, where *20141002* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+This documentation was generated from *replicapool* crate version *0.1.1+20141002*, where *20141002* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 
 Everything else about the *replicapool* *v1_beta2* API can be found at the
 [official documentation site](https://developers.google.com/compute/docs/instance-groups/manager/v1beta2).

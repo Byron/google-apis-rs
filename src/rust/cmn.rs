@@ -272,6 +272,7 @@ impl<'a> MultiPartReader<'a> {
     /// Add a new part to the queue of parts to be read on the first `read` call.
     ///
     /// # Arguments
+    ///
     /// `headers` - identifying the body of the part. It's similar to the header
     ///             in an ordinary single-part call, and should thus contain the
     ///             same information.
@@ -279,9 +280,6 @@ impl<'a> MultiPartReader<'a> {
     /// `size`    - the amount of bytes provided by the reader. It will be put onto the header as
     ///             content-size.
     /// `mime`    - It will be put onto the content type
-    /// # Panics
-    ///
-    /// If this method is called after the first `read` call, it will panic
     pub fn add_part(&mut self, reader: &'a mut Read, size: u64, mime_type: Mime) -> &mut MultiPartReader<'a> {
         let mut headers = Headers::new();
         headers.set(ContentType(mime_type));
@@ -460,22 +458,17 @@ impl Header for RangeResponseHeader {
     }
 
     fn parse_header(raw: &[Vec<u8>]) -> Option<RangeResponseHeader> {
-        match raw {
-            [ref v] => {
-                if let Ok(s) = std::str::from_utf8(v) {
-                    const PREFIX: &'static str = "bytes=";
-                    if s.starts_with(PREFIX) {
-                        let c: Chunk = match FromStr::from_str(&s[PREFIX.len()..]) {
-                            Ok(c) => c,
-                            _ => return None
-                        };
+        if let [ref v] = raw {
+            if let Ok(s) = std::str::from_utf8(v) {
+                const PREFIX: &'static str = "bytes=";
+                if s.starts_with(PREFIX) {
+                    if let Ok(c) = <Chunk as FromStr>::from_str(&s[PREFIX.len()..]) {
                         return  Some(RangeResponseHeader(c))
                     }
                 }
-                None
-            },
-            _ => None
+            }
         }
+        None
     }
 }
 
@@ -555,13 +548,13 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
             _ => MIN_CHUNK_SIZE
         };
 
+        self.reader.seek(SeekFrom::Start(start)).unwrap();
         loop {
             let request_size = match self.content_length - start {
                 rs if rs > chunk_size => chunk_size,
                 rs => rs
             };
 
-            self.reader.seek(SeekFrom::Start(start)).unwrap();
             let mut section_reader = self.reader.take(request_size);
             let range_header = ContentRange {
                 range: Some(Chunk {first: start, last: start + request_size - 1}),

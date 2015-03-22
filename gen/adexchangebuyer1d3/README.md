@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-adexchangebuyer1d3` library allows access to all features of the *Google Ad Exchange Buyer* service.
 
-This documentation was generated from *Ad Exchange Buyer* crate version *0.1.0+20150218*, where *20150218* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+This documentation was generated from *Ad Exchange Buyer* crate version *0.1.1+20150218*, where *20150218* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 
 Everything else about the *Ad Exchange Buyer* *v1d3* API can be found at the
 [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).

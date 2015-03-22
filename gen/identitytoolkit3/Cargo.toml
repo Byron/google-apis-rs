@@ -4,7 +4,7 @@
 [package]
 
 name = "google-identitytoolkit3"
-version = "0.1.0+20141009"
+version = "0.1.1+20141009"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with Identity Toolkit (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/identitytoolkit3"

@@ -443,9 +443,11 @@ match result {
     MULTI_SLASH = 'multi-slash-prefix'
     URL_ENCODE = 'url-encode'
 
-    max_size = size_to_bytes(m.get('maxSize', '0kb'))
     READER_SEEK = "let size = reader.seek(io::SeekFrom::End(0)).unwrap();\nreader.seek(io::SeekFrom::Start(0)).unwrap();\n"
-    READER_SEEK += "if size > %i {\n\treturn Result::UploadSizeLimitExceeded(size, %i)\n}" % (max_size, max_size)
+    if media_params:
+        max_size = media_params[0].max_size
+        if max_size > 0:
+            READER_SEEK += "if size > %i {\n\treturn Result::UploadSizeLimitExceeded(size, %i)\n}" % (max_size, max_size)
 
     special_cases = set()
     for possible_url in possible_urls:

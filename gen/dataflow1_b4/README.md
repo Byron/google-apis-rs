@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-dataflow1_b4` library allows access to all features of the *Google dataflow* service.
 
-This documentation was generated from *dataflow* crate version *0.1.0+20150130*, where *20150130* is the exact revision of the *dataflow:v1b4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+This documentation was generated from *dataflow* crate version *0.1.1+20150130*, where *20150130* is the exact revision of the *dataflow:v1b4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 # Features
 
 It seems there is nothing you can do here ... .

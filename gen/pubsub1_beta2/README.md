@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-pubsub1_beta2` library allows access to all features of the *Google pubsub* service.
 
-This documentation was generated from *pubsub* crate version *0.1.0+20150213*, where *20150213* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+This documentation was generated from *pubsub* crate version *0.1.1+20150213*, where *20150213* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-pubsub1_beta2/struct.Pubsub.html) ... 

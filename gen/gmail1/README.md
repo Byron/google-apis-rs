@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-gmail1` library allows access to all features of the *Google gmail* service.
 
-This documentation was generated from *gmail* crate version *0.1.0+20150313*, where *20150313* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+This documentation was generated from *gmail* crate version *0.1.1+20150313*, where *20150313* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 
 Everything else about the *gmail* *v1* API can be found at the
 [official documentation site](https://developers.google.com/gmail/api/).

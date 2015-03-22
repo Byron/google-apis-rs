@@ -4,7 +4,7 @@
 [package]
 
 name = "google-games1"
-version = "0.1.0+20150309"
+version = "0.1.1+20150309"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with Games (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/games1"

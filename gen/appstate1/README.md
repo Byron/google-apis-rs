@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-appstate1` library allows access to all features of the *Google App State* service.
 
-This documentation was generated from *App State* crate version *0.1.0+20150309*, where *20150309* is the exact revision of the *appstate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+This documentation was generated from *App State* crate version *0.1.1+20150309*, where *20150309* is the exact revision of the *appstate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 
 Everything else about the *App State* *v1* API can be found at the
 [official documentation site](https://developers.google.com/games/services/web/api/states).

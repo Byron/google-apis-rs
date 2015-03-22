@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *0.1.0+20150128*, where *20150128* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+//! This documentation was generated from *Android Publisher* crate version *0.1.1+20150128*, where *20150128* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 //! 
 //! Everything else about the *Android Publisher* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -314,7 +314,7 @@ impl<'a, C, NC, A> AndroidPublisher<C, NC, A>
         AndroidPublisher {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.0".to_string(),
+            _user_agent: "google-api-rust-client/0.1.1".to_string(),
             _m: PhantomData
         }
     }
@@ -330,7 +330,7 @@ impl<'a, C, NC, A> AndroidPublisher<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.0`.
+    /// It defaults to `google-api-rust-client/0.1.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3841,8 +3841,8 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
                     if protocol == "simple" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 0 {
-                    	return Result::UploadSizeLimitExceeded(size, 0)
+                    if size > 15728640 {
+                    	return Result::UploadSizeLimitExceeded(size, 15728640)
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -3882,8 +3882,8 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 0 {
-                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        if size > 15728640 {
+                        	return Result::UploadSizeLimitExceeded(size, 15728640)
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -7901,8 +7901,8 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
                     if protocol == "simple" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 0 {
-                    	return Result::UploadSizeLimitExceeded(size, 0)
+                    if size > 1073741824 {
+                    	return Result::UploadSizeLimitExceeded(size, 1073741824)
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -7942,8 +7942,8 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 0 {
-                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        if size > 1073741824 {
+                        	return Result::UploadSizeLimitExceeded(size, 1073741824)
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -9824,8 +9824,8 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
                     if protocol == "simple" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
-                    if size > 0 {
-                    	return Result::UploadSizeLimitExceeded(size, 0)
+                    if size > 2147483648 {
+                    	return Result::UploadSizeLimitExceeded(size, 2147483648)
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -9865,8 +9865,8 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        if size > 0 {
-                        	return Result::UploadSizeLimitExceeded(size, 0)
+                        if size > 2147483648 {
+                        	return Result::UploadSizeLimitExceeded(size, 2147483648)
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {

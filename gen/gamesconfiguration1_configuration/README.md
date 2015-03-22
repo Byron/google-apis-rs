@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-gamesconfiguration1_configuration` library allows access to all features of the *Google Games Configuration* service.
 
-This documentation was generated from *Games Configuration* crate version *0.1.0+20150309*, where *20150309* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.0*.
+This documentation was generated from *Games Configuration* crate version *0.1.1+20150309*, where *20150309* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
 
 Everything else about the *Games Configuration* *v1_configuration* API can be found at the
 [official documentation site](https://developers.google.com/games/services).

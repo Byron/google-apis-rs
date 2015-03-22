@@ -4,7 +4,7 @@
 [package]
 
 name = "google-appsactivity1"
-version = "0.1.0+20140828"
+version = "0.1.1+20140828"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with appsactivity (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/appsactivity1"
