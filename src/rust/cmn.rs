@@ -195,6 +195,10 @@ pub enum Result<T = ()> {
     /// The http connection failed
     HttpError(hyper::HttpError),
 
+    /// An attempt was made to upload a resource with size stored in field `.0`
+    /// even though the maximum upload size is what is stored in field `.1`.
+    UploadSizeLimitExceeded(u64, u64),
+
     /// We needed an API key for authentication, but didn't obtain one.
     /// Neither through the authenticator, nor through the Delegate.
     MissingAPIKey,

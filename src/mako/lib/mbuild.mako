@@ -361,6 +361,7 @@ match result {
     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
     Result::MissingToken => println!("OAuth2: Missing Token"),
+    Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
@@ -440,7 +441,10 @@ match result {
     all_required_param_name = set(p.name for p in params if is_required_property(p))
     MULTI_SLASH = 'multi-slash-prefix'
     URL_ENCODE = 'url-encode'
-    READER_SEEK = "let size = reader.seek(io::SeekFrom::End(0)).unwrap();\nreader.seek(io::SeekFrom::Start(0)).unwrap();"
+
+    max_size = simple_media_param.max_size
+    READER_SEEK = "let size = reader.seek(io::SeekFrom::End(0)).unwrap();\nreader.seek(io::SeekFrom::Start(0)).unwrap();\n"
+    READER_SEEK += "if size > %i {\n\treturn Result::UploadSizeLimitExceeded(size, %i)\n}" % (max_size, max_size)
 
     special_cases = set()
     for possible_url in possible_urls:
