@@ -2,6 +2,7 @@
 #![allow(dead_code, deprecated, unused_features, unused_variables, unused_imports)]
 //! library with code shared by all generated implementations
 #![plugin(serde_macros)]
+#[macro_use]
 extern crate hyper;
 extern crate mime;
 extern crate "yup-oauth2" as oauth2;
@@ -19,6 +20,8 @@ mod tests {
     use std::io::Read;
     use std::default::Default;
     use std::old_path::BytesContainer;
+    use hyper;
+    use std::str::FromStr;
 
     use serde::json;
 
@@ -120,5 +123,36 @@ bar\r\n\
         // }
         // let j = "{\"snooSnoo\":\"foo\",\"foo\":\"bar\"}";
         // let b: BarOpt = json::from_str(&j).unwrap();
+    }
+
+    #[test]
+    fn content_range() {
+        for &(ref c, ref expected) in 
+          &[(ContentRange {range: ByteRange::Any, total_length: 50 }, "Content-Range: bytes */50\r\n"),
+            (ContentRange {range: ByteRange::Chunk(23, 40), total_length: 45},
+             "Content-Range: bytes 23-40/45\r\n")] {
+            let mut headers = hyper::header::Headers::new();
+            headers.set(c.clone());
+            assert_eq!(headers.to_string(), expected.to_string());
+        }
+    }
+
+    #[test]
+    fn byte_range_from_str() {
+        assert_eq!(<ByteRange as FromStr>::from_str("2-42"), 
+                    Ok(ByteRange::Chunk(2, 42)))
+    }
+
+    #[test]
+    fn parse_range_response() {
+        let r: RangeResponseHeader = hyper::header::Header::parse_header(&[b"bytes=2-42".to_vec()]).unwrap();
+        
+        match r.0 {
+            ByteRange::Chunk(f, l) => {
+                assert_eq!(f, 2);
+                assert_eq!(l, 42);
+            }
+            _ => unreachable!()
+        }
     }
 }

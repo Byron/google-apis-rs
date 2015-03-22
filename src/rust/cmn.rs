@@ -1,12 +1,15 @@
 use std::marker::MarkerTrait;
 use std::io::{self, Read, Seek, Cursor, Write, SeekFrom};
 use std;
+use std::fmt;
+use std::str::FromStr;
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2;
 use oauth2::TokenType;
 use hyper;
-use hyper::header::{ContentType, ContentLength, Headers, UserAgent, Authorization};
+use hyper::header::{ContentType, ContentLength, Headers, UserAgent, Authorization, Header,
+                    HeaderFormat};
 use hyper::http::LINE_ENDING;
 use hyper::method::Method;
 
@@ -361,6 +364,107 @@ impl_header!(XUploadContentType,
              "X-Upload-Content-Type",
              Mime);
 
+#[derive(Clone, PartialEq, Debug)]
+pub enum ByteRange {
+    Any,
+    Chunk(u64, u64)
+}
+
+impl fmt::Display for ByteRange {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            ByteRange::Any => fmt.write_str("*").ok(),
+            ByteRange::Chunk(first, last) => write!(fmt, "{}-{}", first, last).ok()
+        };
+        Ok(())
+    }
+}
+
+impl FromStr for ByteRange {
+    type Err = &'static str;
+
+    /// NOTE: only implements `%i-%i`, not `*`
+    fn from_str(s: &str) -> std::result::Result<ByteRange, &'static str> {
+        let parts: Vec<&str> = s.split('-').collect();
+        if parts.len() != 2 {
+            return Err("Expected two parts: %i-%i")
+        }
+        Ok(
+            ByteRange::Chunk(
+                match FromStr::from_str(parts[0]) {
+                    Ok(d) => d,
+                    _ => return Err("Couldn't parse 'first' as digit")
+                },
+                match FromStr::from_str(parts[1]) {
+                    Ok(d) => d,
+                    _ => return Err("Couldn't parse 'last' as digit")
+                }
+            )
+        )
+    }
+}
+
+/// Implements the Content-Range header, for serialization only
+#[derive(Clone, PartialEq, Debug)]
+pub struct ContentRange {
+    pub range: ByteRange,
+    pub total_length: u64,
+}
+
+impl Header for ContentRange {
+    fn header_name() -> &'static str {
+        "Content-Range"
+    }
+
+    /// We are not parsable, as parsing is done by the `Range` header
+    fn parse_header(raw: &[Vec<u8>]) -> Option<ContentRange> {
+        None
+    }
+}
+
+
+impl HeaderFormat for ContentRange {
+    fn fmt_header(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmt, "bytes {}/{}", self.range, self.total_length).ok();
+        Ok(())
+    }
+}
+
+#[derive(Clone, PartialEq, Debug)]
+pub struct RangeResponseHeader(pub ByteRange);
+
+impl Header for RangeResponseHeader {
+    fn header_name() -> &'static str {
+        "Range"
+    }
+
+    fn parse_header(raw: &[Vec<u8>]) -> Option<RangeResponseHeader> {
+        match raw {
+            [ref v] => {
+                if let Ok(s) = std::str::from_utf8(v) {
+                    if s.starts_with("bytes=") {
+                        return  Some(RangeResponseHeader(
+                                    match FromStr::from_str(&s[6..]) {
+                                        Ok(br) => br,
+                                        _ => return None
+                                    }
+                        ))
+                    }
+                }
+                None
+            },
+            _ => None
+        }
+    }
+}
+
+impl HeaderFormat for RangeResponseHeader {
+    /// No implmentation necessary, we just need to parse
+    fn fmt_header(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        Err(fmt::Error)
+    }
+}
+
 /// A utility type to perform a resumable upload from start to end.
 pub struct ResumableUploadHelper<'a, NC: 'a, A: 'a> {
     pub client: &'a mut hyper::client::Client<NC>,
@@ -371,7 +475,7 @@ pub struct ResumableUploadHelper<'a, NC: 'a, A: 'a> {
     pub url: &'a str,
     pub reader: &'a mut ReadSeek,
     pub media_type: Mime,
-    pub content_size: u64
+    pub content_length: u64
 }
 
 impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
@@ -381,6 +485,7 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
     fn query_transfer_status(&'a mut self) -> (u64, hyper::HttpResult<hyper::client::Response>) {
         self.client.post(self.url)
             .header(UserAgent(self.user_agent.to_string()))
+            .header(ContentRange { range: ByteRange::Any, total_length: self.content_length } )
             .header(self.auth_header.clone());
         (0, Err(hyper::error::HttpError::HttpStatusError))
     }

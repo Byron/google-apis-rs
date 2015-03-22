@@ -791,7 +791,7 @@ else {
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
-                                content_size: size
+                                content_length: size
                             }.upload()
                         };
                         match upload_result {
