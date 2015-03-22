@@ -585,7 +585,7 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         let error_info: cmn::JsonServerError = json::from_str(&json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, error_info) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, Some(error_info)) {
                             sleep(d);
                             continue;
                         }
@@ -608,13 +608,14 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             cmn::ResumableUploadHelper {
                                 client: &mut client.borrow_mut(),
                                 delegate: dlg,
+                                start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
                                 auth_header: auth_header.clone(),
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
-                                content_size: size
+                                content_length: size
                             }.upload()
                         };
                         match upload_result {

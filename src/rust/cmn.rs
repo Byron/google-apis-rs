@@ -1,17 +1,18 @@
 use std::marker::MarkerTrait;
 use std::io::{self, Read, Seek, Cursor, Write, SeekFrom};
 use std;
-use std::fmt;
+use std::fmt::{self, Display};
 use std::str::FromStr;
+use std::thread::sleep;
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
-use oauth2;
-use oauth2::TokenType;
+use oauth2::{TokenType, Retry, self};
 use hyper;
 use hyper::header::{ContentType, ContentLength, Headers, UserAgent, Authorization, Header,
                     HeaderFormat};
 use hyper::http::LINE_ENDING;
 use hyper::method::Method;
+use hyper::status::StatusCode;
 
 use serde;
 
@@ -109,8 +110,8 @@ pub trait Delegate {
     /// Called whenever there is an [HttpError](http://hyperium.github.io/hyper/hyper/error/enum.HttpError.html), usually if there are network problems.
     /// 
     /// Return retry information.
-    fn http_error(&mut self, &hyper::HttpError) -> oauth2::Retry {
-        oauth2::Retry::Abort
+    fn http_error(&mut self, &hyper::HttpError) -> Retry {
+        Retry::Abort
     }
 
     /// Called whenever there is the need for your applications API key after 
@@ -163,8 +164,8 @@ pub trait Delegate {
     /// depends on the used API method.
     /// The delegate should check the status, header and decoded json error to decide
     /// whether to retry or not. In the latter case, the underlying call will fail.
-    fn http_failure(&mut self, _: &hyper::client::Response, JsonServerError) -> oauth2::Retry {
-        oauth2::Retry::Abort
+    fn http_failure(&mut self, _: &hyper::client::Response, Option<JsonServerError>) -> Retry {
+        Retry::Abort
     }
 
     /// Called prior to sending the main request of the given method. It can be used to time 
@@ -365,41 +366,38 @@ impl_header!(XUploadContentType,
              Mime);
 
 #[derive(Clone, PartialEq, Debug)]
-pub enum ByteRange {
-    Any,
-    Chunk(u64, u64)
+pub struct Chunk {
+    pub first: u64,
+    pub last: u64
 }
 
-impl fmt::Display for ByteRange {
+impl fmt::Display for Chunk {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            ByteRange::Any => fmt.write_str("*").ok(),
-            ByteRange::Chunk(first, last) => write!(fmt, "{}-{}", first, last).ok()
-        };
+        write!(fmt, "{}-{}", self.first, self.last).ok();
         Ok(())
     }
 }
 
-impl FromStr for ByteRange {
+impl FromStr for Chunk {
     type Err = &'static str;
 
     /// NOTE: only implements `%i-%i`, not `*`
-    fn from_str(s: &str) -> std::result::Result<ByteRange, &'static str> {
+    fn from_str(s: &str) -> std::result::Result<Chunk, &'static str> {
         let parts: Vec<&str> = s.split('-').collect();
         if parts.len() != 2 {
             return Err("Expected two parts: %i-%i")
         }
         Ok(
-            ByteRange::Chunk(
-                match FromStr::from_str(parts[0]) {
+            Chunk {
+                first: match FromStr::from_str(parts[0]) {
                     Ok(d) => d,
                     _ => return Err("Couldn't parse 'first' as digit")
                 },
-                match FromStr::from_str(parts[1]) {
+                last: match FromStr::from_str(parts[1]) {
                     Ok(d) => d,
                     _ => return Err("Couldn't parse 'last' as digit")
                 }
-            )
+            }
         )
     }
 }
@@ -407,7 +405,7 @@ impl FromStr for ByteRange {
 /// Implements the Content-Range header, for serialization only
 #[derive(Clone, PartialEq, Debug)]
 pub struct ContentRange {
-    pub range: ByteRange,
+    pub range: Option<Chunk>,
     pub total_length: u64,
 }
 
@@ -425,13 +423,18 @@ impl Header for ContentRange {
 
 impl HeaderFormat for ContentRange {
     fn fmt_header(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        write!(fmt, "bytes {}/{}", self.range, self.total_length).ok();
+        try!(fmt.write_str("bytes "));
+        match self.range {
+            Some(ref c) => try!(c.fmt(fmt)),
+            None => try!(fmt.write_str("*"))
+        }
+        write!(fmt, "/{}", self.total_length).ok();
         Ok(())
     }
 }
 
 #[derive(Clone, PartialEq, Debug)]
-pub struct RangeResponseHeader(pub ByteRange);
+pub struct RangeResponseHeader(pub Chunk);
 
 impl Header for RangeResponseHeader {
     fn header_name() -> &'static str {
@@ -442,13 +445,13 @@ impl Header for RangeResponseHeader {
         match raw {
             [ref v] => {
                 if let Ok(s) = std::str::from_utf8(v) {
-                    if s.starts_with("bytes=") {
-                        return  Some(RangeResponseHeader(
-                                    match FromStr::from_str(&s[6..]) {
-                                        Ok(br) => br,
-                                        _ => return None
-                                    }
-                        ))
+                    const PREFIX: &'static str = "bytes=";
+                    if s.starts_with(PREFIX) {
+                        let c: Chunk = match FromStr::from_str(&s[PREFIX.len()..]) {
+                            Ok(c) => c,
+                            _ => return None
+                        };
+                        return  Some(RangeResponseHeader(c))
                     }
                 }
                 None
@@ -469,6 +472,7 @@ impl HeaderFormat for RangeResponseHeader {
 pub struct ResumableUploadHelper<'a, NC: 'a, A: 'a> {
     pub client: &'a mut hyper::client::Client<NC>,
     pub delegate: &'a mut Delegate,
+    pub start_at: Option<u64>,
     pub auth: &'a mut A,
     pub user_agent: &'a str,
     pub auth_header: Authorization<oauth2::Scheme>,
@@ -482,19 +486,47 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
     where NC: hyper::net::NetworkConnector,
           A: oauth2::GetToken {
 
-    fn query_transfer_status(&'a mut self) -> (u64, hyper::HttpResult<hyper::client::Response>) {
-        self.client.post(self.url)
-            .header(UserAgent(self.user_agent.to_string()))
-            .header(ContentRange { range: ByteRange::Any, total_length: self.content_length } )
-            .header(self.auth_header.clone());
-        (0, Err(hyper::error::HttpError::HttpStatusError))
+    fn query_transfer_status(&'a mut self) -> (Option<u64>, hyper::HttpResult<hyper::client::Response>) {
+        loop {
+            match self.client.post(self.url)
+                .header(UserAgent(self.user_agent.to_string()))
+                .header(ContentRange { range: None, total_length: self.content_length })
+                .header(self.auth_header.clone())
+                .send() {
+                Ok(r) => {
+                    // 308 = resume-incomplete == PermanentRedirect
+                    let headers = r.headers.clone();
+                    let h: &RangeResponseHeader = match headers.get() {
+                        Some(hh) if r.status == StatusCode::PermanentRedirect => hh,
+                        None|Some(_) => {
+                            if let Retry::After(d) = self.delegate.http_failure(&r, None) {
+                                sleep(d);
+                                continue;
+                            }
+                            return (None, Ok(r))
+                        }
+                    };
+                    return (Some(h.0.last), Ok(r))
+                }
+                Err(err) => {
+                    if let Retry::After(d) = self.delegate.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    return (None, Err(err))
+                }
+            }
+        }
     }
 
     pub fn upload(&'a mut self) -> hyper::HttpResult<hyper::client::Response> {
-        let (start, result) = self.query_transfer_status();
-        if let Err(_) = result {
-            return result
-        }
+        let start = match self.start_at {
+            Some(s) => s,
+            None => match self.query_transfer_status() {
+                (Some(s), _) => s,
+                (_, result) => return result
+            }
+        };
         Err(hyper::error::HttpError::HttpStatusError)
     }
 }

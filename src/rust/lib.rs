@@ -128,8 +128,8 @@ bar\r\n\
     #[test]
     fn content_range() {
         for &(ref c, ref expected) in 
-          &[(ContentRange {range: ByteRange::Any, total_length: 50 }, "Content-Range: bytes */50\r\n"),
-            (ContentRange {range: ByteRange::Chunk(23, 40), total_length: 45},
+          &[(ContentRange {range: None, total_length: 50 }, "Content-Range: bytes */50\r\n"),
+            (ContentRange {range: Some(Chunk { first: 23, last: 40 }), total_length: 45},
              "Content-Range: bytes 23-40/45\r\n")] {
             let mut headers = hyper::header::Headers::new();
             headers.set(c.clone());
@@ -139,20 +139,14 @@ bar\r\n\
 
     #[test]
     fn byte_range_from_str() {
-        assert_eq!(<ByteRange as FromStr>::from_str("2-42"), 
-                    Ok(ByteRange::Chunk(2, 42)))
+        assert_eq!(<Chunk as FromStr>::from_str("2-42"), 
+                    Ok(Chunk { first: 2, last: 42 }))
     }
 
     #[test]
     fn parse_range_response() {
         let r: RangeResponseHeader = hyper::header::Header::parse_header(&[b"bytes=2-42".to_vec()]).unwrap();
-        
-        match r.0 {
-            ByteRange::Chunk(f, l) => {
-                assert_eq!(f, 2);
-                assert_eq!(l, 42);
-            }
-            _ => unreachable!()
-        }
+        assert_eq!(r.0.first, 2);
+        assert_eq!(r.0.last, 42);
     }
 }
