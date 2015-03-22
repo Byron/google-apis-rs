@@ -3,8 +3,12 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/README.md.mako'
 DO NOT EDIT !
 -->
-The `youtube3` library allows access to all features of *YouTube*.
+The `google-youtube3` library allows access to all features of the *Google YouTube* service.
 
+This documentation was generated from *YouTube* crate version *0.0.1+20150309*, where *20150309* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.0.1*.
+
+Everything else about the *YouTube* *v3* API can be found at the
+[official documentation site](https://developers.google.com/youtube/v3).
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-youtube3/struct.YouTube.html) ... 
@@ -57,8 +61,6 @@ Subscription supported by ...
 * [*list playlist items*](http://byron.github.io/google-apis-rs/google-youtube3/struct.PlaylistItemListCall.html)
 
 
-Everything else about the *YouTube* *v3* API can be found at the
-[official documentation site](https://developers.google.com/youtube/v3).
 
 # Structure of this Library
 

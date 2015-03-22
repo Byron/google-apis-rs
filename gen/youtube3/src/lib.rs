@@ -2,8 +2,11 @@
 // This file was generated automatically from 'src/mako/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *0.0.1+20150309*.
-//! The original source code can be found [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/youtube3).
+//! This documentation was generated from *YouTube* crate version *0.0.1+20150309*, where *20150309* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.0.1*.
+//! 
+//! Everything else about the *YouTube* *v3* API can be found at the
+//! [official documentation site](https://developers.google.com/youtube/v3).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/youtube3).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.YouTube.html) ... 
@@ -56,10 +59,8 @@
 //! * [*list playlist items*](struct.PlaylistItemListCall.html)
 //! 
 //! 
-//! Everything else about the *YouTube* *v3* API can be found at the
-//! [official documentation site](https://developers.google.com/youtube/v3).
 //! 
-//! Not what you are looking for ? Find all other google APIs in their Rust [documentation index](../index.html).
+//! Not what you are looking for ? Find all other Google APIs in their Rust [documentation index](../index.html).
 //! 
 //! # Structure of this Library
 //! 
@@ -241,7 +242,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -5596,7 +5597,8 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -5836,7 +5838,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
         let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server = true;
+        let mut upload_url_from_server;
         let mut upload_url: Option<String> = None;
 
         loop {
@@ -5848,7 +5850,8 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
@@ -5936,7 +5939,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                                 delegate: dlg,
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
-                                auth_token: auth_header.0.clone(),
+                                auth_header: auth_header.clone(),
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
@@ -6194,7 +6197,8 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -6484,7 +6488,8 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -6747,7 +6752,8 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
@@ -6990,7 +6996,8 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7266,7 +7273,8 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -7545,7 +7553,8 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -7855,7 +7864,8 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -8139,7 +8149,8 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
@@ -8382,7 +8393,8 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -8636,7 +8648,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
 
         let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server = true;
+        let mut upload_url_from_server;
         let mut upload_url: Option<String> = None;
 
         loop {
@@ -8648,7 +8660,8 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
@@ -8727,7 +8740,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                 delegate: dlg,
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
-                                auth_token: auth_header.0.clone(),
+                                auth_header: auth_header.clone(),
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
@@ -9024,7 +9037,8 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -9343,7 +9357,8 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
@@ -9567,7 +9582,8 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -9790,7 +9806,8 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
@@ -10053,7 +10070,8 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -10399,7 +10417,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
         let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server = true;
+        let mut upload_url_from_server;
         let mut upload_url: Option<String> = None;
 
         loop {
@@ -10411,7 +10429,8 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
@@ -10499,7 +10518,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                 delegate: dlg,
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
-                                auth_token: auth_header.0.clone(),
+                                auth_header: auth_header.clone(),
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
@@ -10832,7 +10851,8 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -11134,7 +11154,8 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -11436,7 +11457,8 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
@@ -11794,7 +11816,8 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -12265,7 +12288,8 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -12529,7 +12553,8 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -12803,7 +12828,8 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
@@ -13069,7 +13095,8 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -13381,7 +13408,8 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -13678,7 +13706,8 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -13989,7 +14018,8 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -14280,7 +14310,8 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
@@ -14525,7 +14556,8 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -14829,7 +14861,8 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -15109,7 +15142,8 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -15365,7 +15399,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
         let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server = true;
+        let mut upload_url_from_server;
         let mut upload_url: Option<String> = None;
 
         loop {
@@ -15377,7 +15411,8 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
@@ -15465,7 +15500,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                 delegate: dlg,
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
-                                auth_token: auth_header.0.clone(),
+                                auth_header: auth_header.clone(),
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
@@ -15690,7 +15725,8 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
@@ -15938,7 +15974,8 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
@@ -16256,7 +16293,8 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -16563,7 +16601,8 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
@@ -16857,7 +16896,8 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
@@ -17163,7 +17203,8 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -17450,7 +17491,8 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
@@ -17699,7 +17741,8 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
@@ -17986,7 +18029,8 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -18278,7 +18322,8 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
@@ -18589,7 +18634,8 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
