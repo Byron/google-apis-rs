@@ -3,11 +3,15 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/README.md.mako'
 DO NOT EDIT !
 -->
-The `groupsmigration1` library allows access to all features of *Groups Migration*.
+The `google-groupsmigration1` library allows access to all features of the *Google Groups Migration* service.
 
+This documentation was generated from *Groups Migration* crate version *0.0.1+20140416*, where *20140416* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.0.1*.
+
+Everything else about the *Groups Migration* *v1* API can be found at the
+[official documentation site](https://developers.google.com/google-apps/groups-migration/).
 # Features
 
-It seems there is nothing you can do here ... .
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-groupsmigration1/struct.GroupsMigration.html) ... 
 
 * archive
  * [*insert*](http://byron.github.io/google-apis-rs/google-groupsmigration1/struct.ArchiveInsertCall.html)
@@ -18,8 +22,6 @@ Upload supported by ...
 * [*insert archive*](http://byron.github.io/google-apis-rs/google-groupsmigration1/struct.ArchiveInsertCall.html)
 
 
-Everything else about the *Groups Migration* *v1* API can be found at the
-[official documentation site](https://developers.google.com/google-apps/groups-migration/).
 
 # Structure of this Library
 

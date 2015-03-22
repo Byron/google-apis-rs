@@ -7,7 +7,7 @@
 <%block filter="markdown_comment">\
 <%util:gen_info source="${self.uri}" />\
 </%block>
-The `${util.library_name()}` library allows access to all features of *${util.canonical_name()}*.
+The `${util.crate_name()}` library allows access to all features of the *Google ${util.canonical_name()}* service.
 
 ${lib.docs(c, rust_doc=False)}
 <%lib:license />

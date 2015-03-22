@@ -2,11 +2,14 @@
 // This file was generated automatically from 'src/mako/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Groups Migration* crate version *0.0.1+20140416*.
-//! The original source code can be found [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1).
+//! This documentation was generated from *Groups Migration* crate version *0.0.1+20140416*, where *20140416* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.0.1*.
+//! 
+//! Everything else about the *Groups Migration* *v1* API can be found at the
+//! [official documentation site](https://developers.google.com/google-apps/groups-migration/).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1).
 //! # Features
 //! 
-//! It seems there is nothing you can do here ... .
+//! Handle the following *Resources* with ease from the central [hub](struct.GroupsMigration.html) ... 
 //! 
 //! * archive
 //!  * [*insert*](struct.ArchiveInsertCall.html)
@@ -17,10 +20,8 @@
 //! * [*insert archive*](struct.ArchiveInsertCall.html)
 //! 
 //! 
-//! Everything else about the *Groups Migration* *v1* API can be found at the
-//! [official documentation site](https://developers.google.com/google-apps/groups-migration/).
 //! 
-//! Not what you are looking for ? Find all other google APIs in their Rust [documentation index](../index.html).
+//! Not what you are looking for ? Find all other Google APIs in their Rust [documentation index](../index.html).
 //! 
 //! # Structure of this Library
 //! 

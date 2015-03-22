@@ -56,13 +56,18 @@
     # end for each method
     header_methods = (('Upload', upload_methods), ('Download', download_methods), ('Subscription', subscription_methods))
 %>\
+This documentation was generated from *${util.canonical_name()}* crate version *${util.crate_version()}*, where *${revision}* is the exact revision of the *${id}* schema built by the [mako](http://www.makotemplates.org/) code generator *v${cargo.build_version}*.
+% if documentationLink:
+
+Everything else about the *${util.canonical_name()}* *${api_version}* API can be found at the
+[official documentation site](${documentationLink}).
+% endif
 % if rust_doc:
-This documentation was generated from *${util.canonical_name()}* crate version *${util.crate_version()}*.
-The original source code can be found [on github](${util.github_source_root_url()}).
+The original source code is [on github](${util.github_source_root_url()}).
 % endif
 # Features
 
-% if len(c.rta_map) > 1:
+% if len(c.rta_map) > 0 + (METHODS_RESOURCE in c.rta_map):
 Handle the following *Resources* with ease from the central ${link('hub', hub_url)} ... 
 % elif METHODS_RESOURCE in c.rta_map:
 Use the following functionality with ease from the central ${link('hub', hub_url)} ... 
@@ -116,13 +121,9 @@ ${method_type} supported by ...
 % endif  ## if methods
 % endfor ## for each method type
 
-% if documentationLink:
-Everything else about the *${util.canonical_name()}* *${api_version}* API can be found at the
-[official documentation site](${documentationLink}).
-% endif
 % if rust_doc:
 
-Not what you are looking for ? Find all other google APIs in their Rust [documentation index](../index.html).
+Not what you are looking for ? Find all other Google APIs in their Rust [documentation index](../index.html).
 % endif
 
 # Structure of this Library
