@@ -4,6 +4,7 @@ use std;
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2;
+use oauth2::TokenType;
 use hyper;
 use hyper::header::{ContentType, ContentLength, Headers, UserAgent, Authorization};
 use hyper::http::LINE_ENDING;
@@ -366,7 +367,7 @@ pub struct ResumableUploadHelper<'a, NC: 'a, A: 'a> {
     pub delegate: &'a mut Delegate,
     pub auth: &'a mut A,
     pub user_agent: &'a str,
-    pub auth_token: String,
+    pub auth_header: Authorization<oauth2::Scheme>,
     pub url: &'a str,
     pub reader: &'a mut ReadSeek,
     pub media_type: Mime,
@@ -380,7 +381,7 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
     fn query_transfer_status(&'a mut self) -> (u64, hyper::HttpResult<hyper::client::Response>) {
         self.client.post(self.url)
             .header(UserAgent(self.user_agent.to_string()))
-            .header(Authorization("Bearer ".to_string() + &self.auth_token));
+            .header(self.auth_header.clone());
         (0, Err(hyper::error::HttpError::HttpStatusError))
     }
 

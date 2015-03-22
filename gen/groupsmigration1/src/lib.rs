@@ -517,7 +517,7 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 
 
         let mut should_ask_dlg_for_url = false;
-        let mut upload_url_from_server = true;
+        let mut upload_url_from_server;
         let mut upload_url: Option<String> = None;
 
         loop {
@@ -529,7 +529,8 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                 dlg.finished(false);
                 return Result::MissingToken
             }
-            let auth_header = Authorization("Bearer ".to_string() + &token.unwrap().access_token);
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.unwrap().access_token });
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
@@ -608,7 +609,7 @@ impl<'a, C, NC, A> ArchiveInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                                 delegate: dlg,
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
-                                auth_token: auth_header.0.clone(),
+                                auth_header: auth_header.clone(),
                                 url: url,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
