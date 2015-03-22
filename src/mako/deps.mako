@@ -57,7 +57,7 @@ ${api_common}: $(RUST_SRC)/cmn.rs $(lastword $(MAKEFILE_LIST)) ${gen_root_stamp}
 
 ${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES)
 	@echo Generating ${api_name}
-	@$(MAKO) --template-dir '.' --var OUTPUT_DIR=$@ -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
+	@$(MAKO) --template-dir '.' -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
 	@touch $@
 
 ${api_name}: ${api_common}

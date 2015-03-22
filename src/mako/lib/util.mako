@@ -15,8 +15,8 @@ DO NOT EDIT !\
 ${v[1:]}\
 </%def>
 
-<%def name="repository_url()" buffered="True">\
-${cargo.repo_base_url}/${OUTPUT_DIR}\
+<%def name="github_source_root_url()" buffered="True">\
+${cargo.repo_base_url}/tree/master/${directories.output}/${self.library_name()}\
 </%def>
 
 <%def name="library_name()" buffered="True">\

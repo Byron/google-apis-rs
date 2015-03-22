@@ -58,7 +58,7 @@
 %>\
 % if rust_doc:
 This documentation was generated from *${util.canonical_name()}* crate version *${util.crate_version()}*.
-The original source code can be found [on github](${cargo.repo_base_url}/tree/master/${directories.output}/${util.library_name()}).
+The original source code can be found [on github](${util.github_source_root_url()}).
 % endif
 # Features
 
