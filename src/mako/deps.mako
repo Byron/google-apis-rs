@@ -26,6 +26,8 @@
 <%
 	import util
 	import os
+	import json
+
 	api_name = util.library_name(an, version)
 	crate_name = util.library_to_crate_name(api_name)
 	gen_root = directories.output + '/' + api_name
@@ -42,11 +44,14 @@
 	sds = [(directories.mako_src + '/' + i.source + '.mako', gen_root + '/' + i.get('output_dir', '') + '/' + i.source) 
 																								for i in api.templates]
 	api_json = directories.api_base + '/' + an + '/' + version + '/' + an + '-api.json'
-	api_json_overrides = os.path.dirname(api_json) + '/' + an + '-api_overrides.json'
+	api_meta_dir = os.path.dirname(api_json)
+	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version, 
+																		 	json.load(open(api_json, 'r'))['revision'])
+	api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.json'
 	api_json_inputs = api_json + ' $(API_SHARED_INFO)'
 	if os.path.isfile(api_json_overrides):
 		api_json_inputs += ' ' + api_json_overrides
-	api_info.append((api_name, api_clean, api_cargo, api_doc, gen_root))
+	api_info.append((api_name, api_clean, api_cargo, api_doc, api_crate_publish_file, gen_root))
 
 	space_join = lambda i: ' '.join(a[i] for a in api_info)
 %>\
@@ -61,6 +66,11 @@ ${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_STAN
 	@touch $@
 
 ${api_name}: ${api_common}
+
+${api_crate_publish_file}:
+	cd ${gen_root} && cargo publish
+	@mkdir -p ${os.path.dirname(api_crate_publish_file)}
+	touch $@
 
 ${api_cargo}: ${api_name}
 	cd ${gen_root} && cargo $(ARGS)
@@ -82,6 +92,7 @@ ${api_clean}:
 
 clean-apis: ${space_join(1)} docs-clean
 cargo: ${space_join(2)}
+publish: | apis ${space_join(4)}
 apis: ${space_join(0)}
 
 ${doc_index}: ${' '.join(central_api_index(util.library_to_crate_name(a[0])) for a in api_info)} $(MAKO_STANDARD_DEPENDENCIES)
@@ -97,7 +108,7 @@ github-pages: | docs-clean docs
 	## Have to force-push - allows us to start docs fresh, clearing out unused history
 	git push origin +gh-pages
 
-.PHONY = $(.PHONY) update-json github-pages help-api clean-apis cargo apis docs docs-clean ${space_join(0)} ${space_join(1)} ${space_join(2)} ${space_join(3)}
+.PHONY = $(.PHONY) update-json github-pages help-api clean-apis cargo publish apis docs docs-clean ${space_join(0)} ${space_join(1)} ${space_join(2)} ${space_join(3)}
 
 help-api:
 	$(info apis       -    make all APIs)

@@ -28,7 +28,7 @@ ${util.library_to_crate_name(util.library_name(name, version))}\
 </%def>
 
 <%def name="crate_version()" buffered="True">\
-${cargo.build_version}+${revision}\
+${util.crate_version(cargo.build_version, revision)}\
 </%def>
 
 ## All crates and standard `use` declaration, required for all examples

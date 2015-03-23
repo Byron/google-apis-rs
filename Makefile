@@ -34,6 +34,7 @@ help:
 	$(info github-pages -   invoke ghp-import on all documentation)
 	$(info apis         -   make all APIs)
 	$(info cargo        -   run cargo on all APIs, use ARGS="args ..." to specify cargo arguments)
+	$(info publish      -   run cargo publish on all APIs and remember successful ones with marker files)
 	$(info regen-apis   -   clear out all generated apis, and regenerate them)
 	$(info clean-apis   -   delete all generated APIs)
 	$(info help-api     -   show all api targets to build individually)

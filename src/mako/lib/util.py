@@ -799,6 +799,10 @@ def library_name(name, version):
 def library_to_crate_name(name):
     return 'google-' + name
 
+# return version like 0.1.0+2014031421
+def crate_version(build_version, revision):
+    return '%s+%s' % (build_version, revision)
+
 # return type name of a resource method builder, from a resource name
 def rb_type(r):
     return "%sMethods" % singular(canonical_type_name(r))
