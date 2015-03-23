@@ -22,7 +22,7 @@ use serde;
 pub trait Hub: MarkerTrait {}
 
 /// Identifies types for building methods of a particular resource type
-pub trait ResourceMethodsBuilder: MarkerTrait {}
+pub trait MethodsBuilder: MarkerTrait {}
 
 /// Identifies types which represent builders for a particular resource method
 pub trait CallBuilder: MarkerTrait {}

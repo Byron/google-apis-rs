@@ -744,9 +744,9 @@ else {
 
                 dlg.pre_request();
                 req.send()
-</%block>
+</%block>\
                 % if resumable_media_param:
-                }
+            }
                 % endif
             };
 
