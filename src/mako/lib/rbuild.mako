@@ -5,7 +5,8 @@
                       activity_input_type, TREF, IO_REQUEST, schema_to_required_property, 
                       rust_copy_value_s, is_required_property, organize_params, REQUEST_VALUE_PROPERTY_NAME,
                       build_all_params, rb_type_params_s, hub_type_params_s, mb_type_params_s, mb_additional_type_params, 
-                      struct_type_bounds_s, METHODS_RESOURCE)
+                      struct_type_bounds_s, METHODS_RESOURCE, SPACES_PER_TAB, prefix_all_but_first_with,
+                      METHODS_BUILDER_MARKER_TRAIT)
 %>\
 <%namespace name="util" file="util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
@@ -48,7 +49,7 @@ pub struct ${ThisType}
     hub: &'a ${hub_type_name}${hub_type_params_s()},
 }
 
-impl${rb_params} MethodsBuilder for ${ThisType} {}
+impl${rb_params} ${METHODS_BUILDER_MARKER_TRAIT} for ${ThisType} {}
 
 ## Builder Creators Methods ####################
 impl${rb_params} ${ThisType} {
@@ -80,6 +81,18 @@ impl${rb_params} ${ThisType} {
     /// Create a builder to help you perform the following task:
     ///
     ${m.description | rust_doc_comment, indent_all_but_first_by(1)}
+    % endif
+    % if required_props:
+    /// 
+    /// # Arguments
+    ///
+    % for p in required_props:
+<%
+        arg_prefix = "/// * `" + p.name + "` - "
+%>\
+    ${arg_prefix}${p.get('description', "No description provided.")
+        | prefix_all_but_first_with(' ' * SPACES_PER_TAB + '///'  + ' ' * (len(arg_prefix) - len('///')))}
+    % endfor
     % endif
     pub fn ${mangle_ident(a)}${type_params}(&self${method_args}) -> ${RType}${mb_tparams} {
         ${RType} {

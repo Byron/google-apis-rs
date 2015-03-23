@@ -65,6 +65,7 @@ REQUEST_MARKER_TRAIT = 'RequestValue'
 RESPONSE_MARKER_TRAIT = 'ResponseResult'
 RESOURCE_MARKER_TRAIT = 'Resource'
 CALL_BUILDER_MARKERT_TRAIT = 'CallBuilder'
+METHODS_BUILDER_MARKER_TRAIT = 'MethodsBuilder'
 PART_MARKER_TRAIT = 'Part'
 NESTED_MARKER_TRAIT = 'NestedType'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
@@ -85,11 +86,14 @@ If the upload fails for whichever reason, all progress is lost.""",
     },
     'resumable' : {
         'arg_name': 'resumeable_stream',
-        'description': """Upload media in a resumeable fashion.
+        'description': """Upload media in a resumable fashion.
 Even if the upload fails or is interrupted, it can be resumed for a 
 certain amount of time as the server maintains state temporarily.
 
-TODO: Write more about how delegation works in this particular case.""",
+The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+`cancel_chunk_upload(...)`.""",
         'default': 'fs::File',
         'suffix': '_resumable',
         'example_value': 'fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()'
@@ -146,19 +150,29 @@ def unindent_first_by(tabs):
         return re_linestart.sub(' ' * tabs * SPACES_PER_TAB, s)
     return unindent_inner
 
-# tabs: 1 tabs is 4 spaces
-def indent_all_but_first_by(tabs):
+# Prepend prefix  to each line but the first
+def prefix_all_but_first_with(prefix):
     def indent_inner(s):
         try:
             i = s.index('\n')
         except ValueError:
             f = s
-            p = ''
+            p = None
         else:
             f = s[:i+1]
             p = s[i+1:]
-        return f + re_linestart.sub(' ' * (tabs * SPACES_PER_TAB), p)
+        if p is None:
+            return f
+        return f + re_linestart.sub(prefix, p)
     return indent_inner
+
+
+# tabs: 1 tabs is 4 spaces
+def indent_all_but_first_by(indent, indent_in_tabs=True):
+    if indent_in_tabs:
+        indent *= SPACES_PER_TAB
+    spaces = ' ' * indent
+    return prefix_all_but_first_with(spaces)
 
 # add 4 spaces to the beginning of a line.
 # useful if you have defs embedded in an unindent block - they need to counteract. 

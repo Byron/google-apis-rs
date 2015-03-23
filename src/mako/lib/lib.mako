@@ -6,7 +6,7 @@
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
                       REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
                       to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
-                      upload_action_fn, unique_type_name, schema_doc_format)  
+                      upload_action_fn, unique_type_name, schema_doc_format, METHODS_BUILDER_MARKER_TRAIT)  
 
     def pretty_name(name):
         return ' '.join(split_camelcase_s(name).split('.'))
@@ -23,7 +23,7 @@
     # fr == fattest resource, the fatter, the more important, right ?
     fr = find_fattest_resource(c)
     hub_url = 'struct.' + hub_type(c.schemas, util.canonical_name()) + '.html'
-    method_builder_url = 'trait.' + CALL_BUILDER_MARKERT_TRAIT + '.html'
+    call_builder_url = 'trait.' + CALL_BUILDER_MARKERT_TRAIT + '.html'
     delegate_url = 'trait.Delegate.html'
     request_trait_url = 'trait.' + REQUEST_MARKER_TRAIT + '.html'
     response_trait_url = 'trait.' + RESPONSE_MARKER_TRAIT + '.html'
@@ -132,14 +132,18 @@ The API is structured into the following primary items:
 
 * **${link('Hub', hub_url)}**
     * a central object to maintain state and allow accessing all *Activities*
+    * creates ${link('*Method Builders*', 'trait.' + METHODS_BUILDER_MARKER_TRAIT + '.html')} which in turn
+      allow access to individual ${link('*Call Builders*', call_builder_url)}
 * **${link('Resources', 'trait.' + RESOURCE_MARKER_TRAIT + '.html')}**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
     * **${link('Parts', part_trait_url)}**
         * a collection of properties
         * never directly used in *Activities*
-* **${link('Activities', method_builder_url)}**
+* **${link('Activities', call_builder_url)}**
     * operations to apply to *Resources*
+
+All *structures* are marked with applicable traits to further categorize them and ease browsing.
 
 Generally speaking, you can invoke *Activities* like this:
 
@@ -187,7 +191,7 @@ ${link('Hub Delegate', delegate_url)}, or the ${link('Authenticator Delegate', u
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
-${'##'} Uploads and Downlods
+${'##'} Uploads and Downloads
 If a method supports downloads, the response body, which is part of the ${link('Result', 'enum.Result.html')}, should be
 read by you to obtain the media.
 If such a method also supports a ${link('Response Result', 'trait.ResponseResult.html')}, it will return that by default.
@@ -201,7 +205,7 @@ ${put_and(md_italic(PROTOCOL_TYPE_INFO.keys()))}. The distinctiveness of each is
 ${'##'} Customization and Callbacks
 
 You may alter the way an `${api.terms.action}()` method is called by providing a ${link('delegate', delegate_url)} to the 
-${link('Method Builder', method_builder_url)} before making the final `${api.terms.action}()` call. 
+${link('Method Builder', call_builder_url)} before making the final `${api.terms.action}()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
@@ -210,13 +214,14 @@ The ${link('delegate trait', delegate_url)} is default-implemented, allowing you
 ${'##'} Optional Parts in Server-Requests
 
 All structures provided by this library are made to be ${link('enocodable', request_trait_url)} and 
-${link('decodable', response_trait_url)} via json. Optionals are used to indicate that partial requests are responses are valid.
-Most optionals are are considered ${link('Parts', part_trait_url)} which are identifyable by name, which will be sent to 
+${link('decodable', response_trait_url)} via *json*. Optionals are used to indicate that partial requests are responses 
+are valid.
+Most optionals are are considered ${link('Parts', part_trait_url)} which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ${'##'} Builder Arguments
 
-Using ${link('method builders', method_builder_url)}, you are able to prepare an action call by repeatedly calling it's methods.
+Using ${link('method builders', call_builder_url)}, you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy

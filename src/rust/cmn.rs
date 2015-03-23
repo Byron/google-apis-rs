@@ -103,12 +103,15 @@ pub trait Delegate {
     /// information if he is interesting in knowing more context when further calls to it
     /// are made.
     /// The matching `finished()` call will always be made, no matter whether or not the API
-    /// request was sucessfull. That way, the delgate may easily maintain a clean state 
+    /// request was successful. That way, the delegate may easily maintain a clean state 
     /// between various API calls.
     fn begin(&mut self, MethodInfo) {}
 
     /// Called whenever there is an [HttpError](http://hyperium.github.io/hyper/hyper/error/enum.HttpError.html), usually if there are network problems.
     /// 
+    /// If you choose to retry after a duration, the duration should be chosen using the
+    /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
+    ///
     /// Return retry information.
     fn http_error(&mut self, &hyper::HttpError) -> Retry {
         Retry::Abort
@@ -131,7 +134,7 @@ pub trait Delegate {
     /// Called during resumable uploads to provide a URL for the impending upload.
     /// It was saved after a previous call to `store_upload_url(...)`, and if not None,
     /// will be used instead of asking the server for a new upload URL.
-    /// This is useful in case a previous resumable upload was aborted/cancelled, but should now
+    /// This is useful in case a previous resumable upload was aborted/canceled, but should now
     /// be resumed.
     /// The returned URL will be used exactly once - if it fails again and the delegate allows
     /// to retry, we will ask the server for a new upload URL.
@@ -152,8 +155,8 @@ pub trait Delegate {
     /// 
     /// # Arguments
     ///
-    /// `json_encoded_value` - The json-encoded value which failed to decode.
-    /// `json_decode_error` - The decoder error
+    /// * `json_encoded_value` - The json-encoded value which failed to decode.
+    /// * `json_decode_error`  - The decoder error
     fn response_json_decode_error(&mut self, json_encoded_value: &str, json_decode_error: &serde::json::Error) {
         let _ = json_encoded_value;
         let _ = json_decode_error;
@@ -164,6 +167,9 @@ pub trait Delegate {
     /// depends on the used API method.
     /// The delegate should check the status, header and decoded json error to decide
     /// whether to retry or not. In the latter case, the underlying call will fail.
+    ///
+    /// If you choose to retry after a duration, the duration should be chosen using the
+    /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
     fn http_failure(&mut self, _: &hyper::client::Response, Option<JsonServerError>) -> Retry {
         Retry::Abort
     }
@@ -195,8 +201,8 @@ pub trait Delegate {
     ///
     /// # Arguments
     /// 
-    /// `is_success` - a true value indicates the operation was successful. If false, you should
-    ///                discard all values stored during `store_upload_url`.
+    /// * `is_success` - a true value indicates the operation was successful. If false, you should
+    ///                  discard all values stored during `store_upload_url`.
     fn finished(&mut self, is_success: bool) {
         let _ = is_success;
     }
