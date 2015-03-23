@@ -150,6 +150,10 @@ def unindent_first_by(tabs):
         return re_linestart.sub(' ' * tabs * SPACES_PER_TAB, s)
     return unindent_inner
 
+# filter to remove empty lines from a string
+def remove_empty_lines(s):
+    return re.sub("^\n", '', s, flags=re.MULTILINE)
+
 # Prepend prefix  to each line but the first
 def prefix_all_but_first_with(prefix):
     def indent_inner(s):
