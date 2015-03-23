@@ -216,8 +216,8 @@ pub struct DefaultDelegate;
 impl Delegate for DefaultDelegate {}
 
 
-/// A universal result type used as return for all action method results.
-pub enum Result<T = ()> {
+
+pub enum Error {
     /// The http connection failed
     HttpError(hyper::HttpError),
 
@@ -244,10 +244,10 @@ pub enum Result<T = ()> {
 
     /// Indicates an HTTP repsonse with a non-success status code
     Failure(hyper::client::Response),
-
-    /// It worked !
-    Success(T),
 }
+
+/// A universal result type used as return for all calls.
+pub type Result<T> = std::result::Result<T, Error>;
 
 /// Contains information about an API request.
 pub struct MethodInfo {
@@ -503,7 +503,7 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
     where NC: hyper::net::NetworkConnector,
           A: oauth2::GetToken {
 
-    fn query_transfer_status(&mut self) -> (Option<u64>, hyper::HttpResult<hyper::client::Response>) {
+    fn query_transfer_status(&mut self) -> std::result::Result<u64, hyper::HttpResult<hyper::client::Response>> {
         loop {
             match self.client.post(self.url)
                 .header(UserAgent(self.user_agent.to_string()))
@@ -520,17 +520,17 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
                                 sleep(d);
                                 continue;
                             }
-                            return (None, Ok(r))
+                            return Err(Ok(r))
                         }
                     };
-                    return (Some(h.0.last), Ok(r))
+                    return Ok(h.0.last)
                 }
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
                         sleep(d);
                         continue;
                     }
-                    return (None, Err(err))
+                    return Err(Err(err))
                 }
             }
         }
@@ -543,8 +543,8 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
         let mut start = match self.start_at {
             Some(s) => s,
             None => match self.query_transfer_status() {
-                (Some(s), _) => s,
-                (_, result) => return Some(result)
+                Ok(s) => s,
+                Err(result) => return Some(result)
             }
         };
 

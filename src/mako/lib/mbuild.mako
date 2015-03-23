@@ -76,7 +76,7 @@ ${m.description | rust_doc_comment}
 % else:
 /// A builder for the *${method}* method supported by a *${singular(resource)}* resource.
 % endif
-/// It is not used directly, but through a `${rb_type(resource)}`.
+/// It is not used directly, but through a `${rb_type(resource)}` instance.
 ///
 % if part_desc:
 ${part_desc | rust_doc_comment}
@@ -307,7 +307,7 @@ ${capture(util.test_prelude) | hide_filter}\
 use ${util.library_name()}::${request_value_type};
 % endif
 % if handle_result:
-use ${util.library_name()}::Result;
+use ${util.library_name()}::{Result, Error};
 % endif
 % if media_params:
 use std::fs;
@@ -358,15 +358,17 @@ ${'.' + action_name | indent_by(13)}(${action_args});
 % if handle_result:
 
 match result {
-    Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-    Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-    Result::MissingToken => println!("OAuth2: Missing Token"),
-    Result::Cancelled => println!("Operation canceled by user"),
-    Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-    Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-    Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-    Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-    Result::Success(_) => println!("Success (value doesn't print)"),
+    Err(e) => match e {
+        Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+        Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+        Error::MissingToken => println!("OAuth2: Missing Token"),
+        Error::Cancelled => println!("Operation canceled by user"),
+        Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+        Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+        Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+        Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+    },
+    Ok(_) => println!("Success (value doesn't print)"),
 }
 % endif
 </%block>
@@ -447,7 +449,7 @@ match result {
     if media_params:
         max_size = media_params[0].max_size
         if max_size > 0:
-            READER_SEEK += "if size > %i {\n\treturn Result::UploadSizeLimitExceeded(size, %i)\n}" % (max_size, max_size)
+            READER_SEEK += "if size > %i {\n\treturn Err(Error::UploadSizeLimitExceeded(size, %i))\n}" % (max_size, max_size)
 
     special_cases = set()
     for possible_url in possible_urls:
@@ -527,7 +529,7 @@ match result {
         for &field in [${', '.join(enclose_in('"', reserved_params + [p.name for p in field_params]))}].iter() {
             if ${paddfields}.contains_key(field) {
                 ${delegate_finish}(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in ${paddfields}.iter() {
@@ -589,7 +591,7 @@ else {
             Some(value) => params.push(("key", value)),
             None => {
                 ${delegate_finish}(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
         % else:
@@ -668,7 +670,7 @@ else {
             }
             if token.is_none() {
                 ${delegate_finish}(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -757,7 +759,7 @@ else {
                         continue;
                     }
                     ${delegate_finish}(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -768,7 +770,7 @@ else {
                             continue;
                         }
                         ${delegate_finish}(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     % if resumable_media_param:
                     if protocol == "${resumable_media_param.protocol}" {
@@ -796,12 +798,12 @@ else {
                         match upload_result {
                             None => {
                                 ${delegate_finish}(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 ## Do not ask the delgate again, as it was asked by the helper !
                                 ${delegate_finish}(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             ## Now the result contains the actual resource, if any ... it will be 
                             ## decoded next
@@ -810,7 +812,7 @@ else {
                                 if !res.status.is_success() {
                                     ## delegate was called in upload() already - don't tell him again
                                     ${delegate_finish}(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -829,7 +831,7 @@ if enable_resource_parsing \
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     }\
@@ -842,7 +844,7 @@ if enable_resource_parsing \
                 % endif
 
                     ${delegate_finish}(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }

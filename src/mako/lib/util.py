@@ -73,7 +73,7 @@ DELEGATE_PROPERTY_NAME = 'delegate'
 TO_PARTS_MARKER = 'ToParts'
 UNUSED_TYPE_MARKER = 'UnusedType'
 
-RESERVED_TYPES = set(("Result", RESOURCE_MARKER_TRAIT))
+RESERVED_TYPES = set(("Result", RESOURCE_MARKER_TRAIT, "Error"))
 
 PROTOCOL_TYPE_INFO = {
     'simple' : {
