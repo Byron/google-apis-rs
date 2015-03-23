@@ -8,25 +8,6 @@ directories:
   api_base: etc/api
   # all mako source files
   mako_src: src/mako
-api:
-  base_path: "etc/api"
-  terms:
-    # how to actually do something with the API
-    action: doit
-    # when a resource is supposed to be uploaded
-    upload_action: upload
-  properties:
-    # additional fields specified by the user
-    params: '_additional_params'
-    # custom scopes for authentication
-    scopes: '_scopes'
-  templates:
-  # all output directories are relative to the one set for the respective API
-    - source: README.md
-    - source: LICENSE.md
-    - source: Cargo.toml
-    - source: lib.rs
-      output_dir: src
 cargo:
   build_version: "0.1.1"
   repo_base_url: https://github.com/Byron/google-apis-rs
@@ -34,7 +15,7 @@ cargo:
   authors:
     # don't forget to possibly add them to copyright authors
     - Sebastian Thiel <byronimo@gmail>
-  keywords: [google, protocol, web, api]
+  keywords: [google]
   # All APIs should live in the same repository
   repository_url: https://github.com/Byron/google-apis-rs
 urls:

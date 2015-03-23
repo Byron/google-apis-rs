@@ -18,7 +18,7 @@ keywords = ["${name}", ${", ".join(estr(cargo.keywords))}]
 [dependencies]
 hyper = "*"
 mime = "*"
-url = "*"
-serde = "*"
-serde_macros = "*"
 yup-oauth2 = "*"
+% for dep in cargo.dependencies:
+${dep}
+% endfor

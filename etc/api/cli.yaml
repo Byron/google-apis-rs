@@ -1,0 +1,9 @@
+make:
+  target_suffix: cli
+  depends_on: api
+  templates:
+    - source: main.rs
+      output_dir: src
+cargo:
+  build_version: "0.0.1"
+  keywords: [cli]
