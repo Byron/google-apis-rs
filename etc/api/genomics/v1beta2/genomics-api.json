@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/Avr5yLDEaSyBxOoYvm8FoDAE8-g\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/u10WbWL3P9lxZaZ0H6MJ8QBvqKA\"",
  "discoveryVersion": "v1",
  "id": "genomics:v1beta2",
  "name": "genomics",
  "version": "v1beta2",
- "revision": "20150303",
+ "revision": "20150317",
  "title": "Genomics API",
  "description": "Provides access to Genomics data.",
  "ownerDomain": "google.com",
@@ -129,7 +129,7 @@
   "Annotation": {
    "id": "Annotation",
    "type": "object",
-   "description": "An annotation describes a region of reference genome. The value of an annotation may be one of several canonical types, supplemented by arbitrary info tags. A variant annotation is represented by one or more of these canonical types. An annotation is not inherently associated with a specific sample/individual (though a client could choose to use annotations in this way). Example canonical annotation types are 'Gene' and 'Variant'.",
+   "description": "An annotation describes a region of reference genome. The value of an annotation may be one of several canonical types, supplemented by arbitrary info tags. A variant annotation is represented by one or more of these canonical types. An annotation is not inherently associated with a specific sample or individual (though a client could choose to use annotations in this way). Example canonical annotation types are 'Gene' and 'Variant'.",
    "properties": {
     "annotationSetId": {
      "type": "string",
@@ -160,7 +160,7 @@
     },
     "transcript": {
      "$ref": "Transcript",
-     "description": "A transcript value represents the assertion that a particular region of the reference genome may be transcribed as RNA. An alternate splicing pattern would be represented as separate transcript object. This field is only set for annotations of type TRANSCRIPT."
+     "description": "A transcript value represents the assertion that a particular region of the reference genome may be transcribed as RNA. An alternative splicing pattern would be represented as a separate transcript object. This field is only set for annotations of type TRANSCRIPT."
     },
     "type": {
      "type": "string",
@@ -180,14 +180,14 @@
     },
     "variant": {
      "$ref": "VariantAnnotation",
-     "description": "A variant annotation which describes the effect of a variant on the genome, the coding sequence, and/or higher level consequences at the organism level e.g. pathogenicity. This field is only set for annotations of type VARIANT."
+     "description": "A variant annotation, which describes the effect of a variant on the genome, the coding sequence, and/or higher level consequences at the organism level e.g. pathogenicity. This field is only set for annotations of type VARIANT."
     }
    }
   },
   "AnnotationSet": {
    "id": "AnnotationSet",
    "type": "object",
-   "description": "An annotation set is a logical grouping of annotations which share consistent type information and provenance. An example would be 'all genes from refseq', or 'all variant annotations from ClinVar'.",
+   "description": "An annotation set is a logical grouping of annotations that share consistent type information and provenance. Examples of annotation sets include 'all genes from refseq', and 'all variant annotations from ClinVar'.",
    "properties": {
     "datasetId": {
      "type": "string",
@@ -214,7 +214,7 @@
     },
     "referenceSetId": {
      "type": "string",
-     "description": "The ID of the reference set which defines the coordinate-space for this set's annotations."
+     "description": "The ID of the reference set that defines the coordinate space for this set's annotations."
     },
     "sourceUri": {
      "type": "string",
@@ -1549,7 +1549,7 @@
     },
     "types": {
      "type": "array",
-     "description": "If specified, only annotation sets which have any of these types are returned.",
+     "description": "If specified, only annotation sets that have any of these types are returned.",
      "items": {
       "type": "string",
       "enum": [
@@ -1607,7 +1607,7 @@
     },
     "range": {
      "$ref": "QueryRange",
-     "description": "If specified, this query matches only annotations which overlap this range."
+     "description": "If specified, this query matches only annotations that overlap this range."
     }
    }
   },
@@ -2079,7 +2079,7 @@
     },
     "exons": {
      "type": "array",
-     "description": "The exons which compose this transcript. Exons are the pieces of the transcript which are spliced together, may be exported from a cell's nucleus, and may then be translated to protein. This field should be unset for genomes where transcript splicing does not occur, for example prokaryotes.\n\n\nIntrons are regions of the transcript which are not included in the spliced RNA product. Though not explicitly modeled here, intron ranges can be deduced; all regions of this transcript which are not exons are introns.\n\n\nExonic sequences do not necessarily code for a translational product (amino acids). Only the regions of exons bounded by the codingSequence correspond to coding DNA sequence.\n\n\nExons are ordered by start position and may not overlap.",
+     "description": "The exons that compose this transcript. This field should be unset for genomes where transcript splicing does not occur, for example prokaryotes.\n\n\nIntrons are regions of the transcript that are not included in the spliced RNA product. Though not explicitly modeled here, intron ranges can be deduced; all regions of this transcript that are not exons are introns.\n\n\nExonic sequences do not necessarily code for a translational product (amino acids). Only the regions of exons bounded by the codingSequence correspond to coding DNA sequence.\n\n\nExons are ordered by start position and may not overlap.",
      "items": {
       "$ref": "TranscriptExon"
      }
@@ -2117,7 +2117,7 @@
     },
     "frame": {
      "$ref": "Int32Value",
-     "description": "The frame of this exon. Contains a value of 0, 1, or 2 which indicates the offset of the first coding base of the exon within the reading frame of the coding DNA sequence, if any. This field is dependent on the strandedness of this annotation (see Annotation.position.reverseStrand). For forward stranded annotations, this offset is relative to the exon.start. For reverse strand annotations, this offset is relative to the exon.end-1.\n\nUnset if this exon does not intersect the coding sequence. Upon creation of a transcript, the frame must be populated for all or none of the coding exons."
+     "description": "The frame of this exon. Contains a value of 0, 1, or 2, which indicates the offset of the first coding base of the exon within the reading frame of the coding DNA sequence, if any. This field is dependent on the strandedness of this annotation (see Annotation.position.reverseStrand). For forward stranded annotations, this offset is relative to the exon.start. For reverse strand annotations, this offset is relative to the exon.end-1.\n\nUnset if this exon does not intersect the coding sequence. Upon creation of a transcript, the frame must be populated for all or none of the coding exons."
     },
     "start": {
      "type": "string",
@@ -2292,7 +2292,7 @@
     },
     "transcriptIds": {
      "type": "array",
-     "description": "Google annotation ID of the transcripts affected by this variant. These should be provided when the variant is created.",
+     "description": "Google annotation IDs of the transcripts affected by this variant. These should be provided when the variant is created.",
      "items": {
       "type": "string"
      }
@@ -2334,7 +2334,7 @@
     },
     "externalIds": {
      "type": "array",
-     "description": "The set of external ids for this condition.",
+     "description": "The set of external IDs for this condition.",
      "items": {
       "$ref": "ExternalId"
      }
@@ -2474,7 +2474,7 @@
      "id": "genomics.annotationSets.search",
      "path": "annotationSets/search",
      "httpMethod": "POST",
-     "description": "Searches for annotation sets which match the given criteria. Results are returned in a deterministic order. Caller must have READ permission for the queried datasets.",
+     "description": "Searches for annotation sets that match the given criteria. Results are returned in a deterministic order. Caller must have READ permission for the queried datasets.",
      "request": {
       "$ref": "SearchAnnotationSetsRequest"
      },
@@ -2620,7 +2620,7 @@
      "id": "genomics.annotations.search",
      "path": "annotations/search",
      "httpMethod": "POST",
-     "description": "Searches for annotations which match the given criteria. Results are returned ordered by start position. Annotations which have matching start positions are ordered deterministically. Caller must have READ permission for the queried annotation sets.",
+     "description": "Searches for annotations that match the given criteria. Results are returned ordered by start position. Annotations that have matching start positions are ordered deterministically. Caller must have READ permission for the queried annotation sets.",
      "request": {
       "$ref": "SearchAnnotationsRequest"
      },
