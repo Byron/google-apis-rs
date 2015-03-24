@@ -330,7 +330,10 @@ def merge(a, b, path=None):
                 merge(a[key], b[key], path + [str(key)])
             else:
                 # overwrite leafs unconditionally !
-                a[key] = b[key]
+                if isinstance(a[key], list) and isinstance(b[key], list):
+                    a[key] = a[key] + b[key]
+                else:
+                    a[key] = b[key]
         else:
             a[key] = b[key]
     return a

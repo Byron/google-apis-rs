@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-dfareporting2"
+version = "0.1.1+20150223"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with dfareporting (protocol v2.0)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting2"
+homepage = "https://developers.google.com/doubleclick-advertisers/reporting/"
+documentation = "http://byron.github.io/google-apis-rs/google-dfareporting2"
+license = "MIT"
+keywords = ["dfareporting", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+yup-oauth2 = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"

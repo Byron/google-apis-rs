@@ -36,7 +36,7 @@
             fn_name = 'add_' + fn_name
         return fn_name
 %>\
-<%namespace name="util" file="util.mako"/>\
+<%namespace name="util" file="../../lib/util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
 
 ## Creates a method builder type

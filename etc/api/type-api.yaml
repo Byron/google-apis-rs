@@ -16,7 +16,7 @@ make:
   templates:
     # all output directories are relative to the one set for the respective API
     - source: README.md
-    - source: LICENSE.md
+    - source: ../LICENSE.md
     - source: ../Cargo.toml
     - source: lib.rs
       output_dir: src

@@ -13,8 +13,10 @@ MAKO_SRC = src/mako
 RUST_SRC = src/rust
 API_DEPS_TPL = $(MAKO_SRC)/deps.mako
 API_DEPS = .api.deps
-API_SHARED_INFO = etc/api/shared.yaml
-API_LIST = etc/api/
+API_DIR = etc/api
+API_SHARED_INFO = $(API_DIR)/shared.yaml
+TYPE_API_INFO = $(API_DIR)/type-api.yaml
+API_LIST = $(API_DIR)/
 ifdef TRAVIS
 API_LIST := $(API_LIST)api-list_travis.yaml
 else
@@ -56,8 +58,8 @@ $(MAKO_RENDER): $(PYTHON)
 
 # Explicitly NOT depending on $(MAKO_LIB_FILES), as it's quite stable and now takes 'too long' thanks
 # to a URL get call to the google discovery service
-$(API_DEPS): $(API_DEPS_TPL) $(API_SHARED_INFO) $(MAKO_RENDER) $(API_LIST)
-	$(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
+$(API_DEPS): $(API_DEPS_TPL) $(API_SHARED_INFO) $(MAKO_RENDER) $(TYPE_API_INFO) $(API_LIST)
+	$(MAKO) -io $(API_DEPS_TPL)=$@ --var TYPE=api --data-files $(API_SHARED_INFO) $(TYPE_API_INFO) $(API_LIST)
 
 api-deps: $(API_DEPS)
 

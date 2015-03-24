@@ -1,7 +1,9 @@
 make:
-  target_suffix: cli
+  target_suffix: -cli
   depends_on: api
   templates:
+    - source: ../LICENSE.md
+    - source: ../Cargo.toml
     - source: main.rs
       output_dir: src
 cargo:
