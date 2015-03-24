@@ -16,6 +16,8 @@ directories:
   api_base: etc/api
   # all mako source files
   mako_src: src/mako
+  # The subdirectory to contain documentation from all APIs and related programs
+  doc_subdir: doc
 cargo:
   build_version: "0.1.1"
   repo_base_url: https://github.com/Byron/google-apis-rs

@@ -6,6 +6,7 @@ gen/*-cli/
 *.go
 *.pyc
 **target/
+**build_html/
 .*.deps
 **Cargo.lock
 *.sublime-workspace

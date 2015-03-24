@@ -8,6 +8,7 @@ PIP := $(VENV_DIR)/bin/pip
 MAKO_RENDER := etc/bin/mako-render
 API_VERSION_GEN := etc/bin/api_version_to_yaml.py
 TPL := $(PYTHON) $(MAKO_RENDER)
+MKDOCS := $(shell pwd)/$(VENV_DIR)/bin/mkdocs
 
 MAKO_SRC = src/mako
 RUST_SRC = src/rust
@@ -52,7 +53,7 @@ $(VENV):
 
 $(PYTHON): $(VENV)
 	$(VENV) -p python2.7 $(VENV_DIR)
-	$(PIP) install mako pyyaml
+	$(PIP) install mako pyyaml 	mkdocs
 
 $(MAKO_RENDER): $(PYTHON)
 

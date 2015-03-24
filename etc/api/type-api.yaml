@@ -17,6 +17,7 @@ make:
   aggregated_target_suffix: -api
   depends_on_suffix:
   global_targets: Yes
+  documentation_engine: rustdoc
   templates:
     # all output directories are relative to the one set for the respective API
     - source: README.md

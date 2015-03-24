@@ -1,12 +1,19 @@
+mkdocs:
+  ## A directory to bring us from the mkdocs invocation directory to the gen-root
+  gen_root_dir: ..
+  site_dir: build_html
 make:
   id: cli
   target_name: CLIs
   target_suffix: -cli
   aggregated_target_suffix: -cli
   depends_on_suffix: ''
+  documentation_engine: mkdocs
   templates:
     - source: ../LICENSE.md
     - source: ../Cargo.toml
+    - source: mkdocs.yml
+    - source: README.md
     - source: main.rs
       output_dir: src
 cargo:

@@ -8,10 +8,16 @@
 	import json
 
 	api_info = []
-	doc_root = directories.output + '/doc'
+	doc_root = directories.output + '/' + directories.doc_subdir
 	doc_index = doc_root + '/index.html'
 
-	to_doc_root = lambda gen_root, crate_name: gen_root + '/target/doc/' + crate_name
+	def to_doc_root(gen_root, crate_name): 
+		if make.documentation_engine == 'mkdocs':
+			return gen_root + '/' + mkdocs.site_dir
+		else:
+			return gen_root + '/target/doc/' + crate_name
+	# end utility
+
 	central_api_index = lambda crate_name: doc_root + '/' + crate_name + '/index.html'
 
 	discovery_url = 'https://www.googleapis.com/discovery/v1/'
@@ -33,10 +39,10 @@
 	import json
 
 	api_name = util.library_name(an, version)
-	api_target = api_name + suffix
+	api_target = util.target_directory_name(an, version, suffix)
 	depends_on_target = ''
 	if make.depends_on_suffix is not None:
-		depends_on_target = api_name + make.depends_on_suffix
+		depends_on_target = util.target_directory_name(an, version, make.depends_on_suffix)
 	crate_name = util.library_to_crate_name(api_name, suffix)
 	gen_root = directories.output + '/' + api_target
 	gen_root_stamp = gen_root + '/.timestamp'
@@ -84,14 +90,24 @@ ${api_cargo}: ${api_target}
 	cd ${gen_root} && cargo $(ARGS)
 
 ${api_doc_index}: ${api_target}
+	% if make.documentation_engine == 'rustdoc':
 	cd ${gen_root} && cargo doc
 	@echo "Docs for ${api_target} at $@"
+	% else:
+	@echo mkdocs ${api_doc_index}
+	## Our README is the landing page, and thus will serve multiple roles at once !
+	@cd ${gen_root} && (mkdir -p docs && cd docs && ln -s ../README.md index.md &>/dev/null) || : && $(MKDOCS) build --clean
+	% endif
 
 ${api_doc}: ${api_doc_index}
 
 ${central_api_index(crate_name)}: ${api_doc_index}
 	@mkdir -p ${doc_root}
-	cp -Rf ${os.path.dirname(to_doc_root(gen_root, crate_name))}/* ${doc_root}
+	% if make.documentation_engine == 'rustdoc':
+	cp -Rf ${os.path.dirname(api_doc_root)}/* ${doc_root}
+	% else:
+	cp -Rf ${api_doc_root} ${doc_root}
+	% endif
 
 ${api_clean}:
 	-rm -Rf ${gen_root}

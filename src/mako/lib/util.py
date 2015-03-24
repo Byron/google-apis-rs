@@ -799,6 +799,9 @@ def library_name(name, version):
         version = 'v' + version
     return normalize_library_name(name) + version
 
+def target_directory_name(name, version, suffix):
+    return library_name(name, version) + suffix
+
 # return crate name for given result of `library_name()`
 def library_to_crate_name(name, suffix=''):
     return 'google-' + name + suffix
