@@ -1,5 +1,7 @@
 make:
+  target_name: CLIs
   target_suffix: -cli
+  aggregated_target_suffix: -cli
   depends_on: api
   templates:
     - source: ../LICENSE.md

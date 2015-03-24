@@ -800,8 +800,8 @@ def library_name(name, version):
     return normalize_library_name(name) + version
 
 # return crate name for given result of `library_name()`
-def library_to_crate_name(name):
-    return 'google-' + name
+def library_to_crate_name(name, suffix=''):
+    return 'google-' + name + suffix
 
 # return version like 0.1.0+2014031421
 def crate_version(build_version, revision):

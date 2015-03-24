@@ -17,6 +17,10 @@
 	discovery_url = 'https://www.googleapis.com/discovery/v1/'
 	apis = json.loads(urllib2.urlopen(discovery_url + "apis").read())
 	json_api_targets = []
+
+	suffix = make.target_suffix
+	agsuffix = make.aggregated_target_suffix
+	global_targets = make.get('global_targets', False)
 %>\
 % for an, versions in api.list.iteritems():
 % if an in api.get('blacklist', list()):
@@ -29,13 +33,14 @@
 	import json
 
 	api_name = util.library_name(an, version)
-	crate_name = util.library_to_crate_name(api_name)
-	gen_root = directories.output + '/' + api_name
+	api_target = api_name + suffix
+	crate_name = util.library_to_crate_name(api_name, suffix)
+	gen_root = directories.output + '/' + api_target
 	gen_root_stamp = gen_root + '/.timestamp'
 	api_common = gen_root + '/src/cmn.rs'
-	api_clean = api_name + '-clean'
-	api_cargo = api_name + '-cargo'
-	api_doc = api_name + '-doc'
+	api_clean = api_target + '-clean'
+	api_cargo = api_target + '-cargo'
+	api_doc = api_target + '-doc'
 
 	api_doc_root = to_doc_root(gen_root, crate_name)
 	api_doc_index = api_doc_root + '/index.html'
@@ -45,13 +50,13 @@
 																								for i in make.templates]
 	api_json = directories.api_base + '/' + an + '/' + version + '/' + an + '-api.json'
 	api_meta_dir = os.path.dirname(api_json)
-	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version, 
+	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version + make.aggregated_target_suffix,
 																		 	json.load(open(api_json, 'r'))['revision'])
 	api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.json'
 	api_json_inputs = api_json + ' $(API_SHARED_INFO) $(API_DIR)/type-' + TYPE + '.yaml'
 	if os.path.isfile(api_json_overrides):
 		api_json_inputs += ' ' + api_json_overrides
-	api_info.append((api_name, api_clean, api_cargo, api_doc, api_crate_publish_file, gen_root))
+	api_info.append((api_target, api_clean, api_cargo, api_doc, api_crate_publish_file, gen_root))
 
 	space_join = lambda i: ' '.join(a[i] for a in api_info)
 %>\
@@ -61,23 +66,23 @@ ${api_common}: $(RUST_SRC)/cmn.rs $(lastword $(MAKEFILE_LIST)) ${gen_root_stamp}
 	@cat $< >> $@
 
 ${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES)
-	@echo Generating ${api_name}
+	@echo Generating ${api_target}
 	@$(MAKO) --template-dir '.' -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
 	@touch $@
 
-${api_name}: ${api_common}
+${api_target}: ${api_common}
 
 ${api_crate_publish_file}:
 	cd ${gen_root} && cargo publish
 	@mkdir -p ${os.path.dirname(api_crate_publish_file)}
 	touch $@
 
-${api_cargo}: ${api_name}
+${api_cargo}: ${api_target}
 	cd ${gen_root} && cargo $(ARGS)
 
-${api_doc_index}: ${api_name}
+${api_doc_index}: ${api_target}
 	cd ${gen_root} && cargo doc
-	@echo "Docs for ${api_name} at $@"
+	@echo "Docs for ${api_target} at $@"
 
 ${api_doc}: ${api_doc_index}
 
@@ -90,28 +95,36 @@ ${api_clean}:
 % endfor
 % endfor
 
-clean-apis: ${space_join(1)} docs-clean
-cargo: ${space_join(2)}
-publish: | apis ${space_join(4)}
-apis: ${space_join(0)}
+clean${agsuffix}: ${space_join(1)} docs-clean${agsuffix}
+cargo${agsuffix}: ${space_join(2)}
+publish${agsuffix}: | gen-all${agsuffix} ${space_join(4)}
+gen-all${agsuffix}: ${space_join(0)}
 
-${doc_index}: ${' '.join(central_api_index(util.library_to_crate_name(a[0])) for a in api_info)} $(MAKO_STANDARD_DEPENDENCIES)
+% if global_targets:
+${doc_index}: docs${agsuffix} ## TODO: all type dependencies: docs-api, docs-cli
 	$(MAKO) --var DOC_ROOT=${doc_root} -io $(MAKO_SRC)/index.html.mako=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
 	@echo Documentation index created at '$@'
+docs-all: ${doc_index}
+docs-all-clean:
+	rm -Rf ${doc_root}
 
-docs: ${doc_index}
-docs-clean:
-	rm -Rf ${doc_root}  
-
-github-pages: | docs-clean docs 
+github-pages: | docs-all-clean docs-all
 	ghp-import -n ${doc_root}
 	## Have to force-push - allows us to start docs fresh, clearing out unused history
 	git push origin +gh-pages
 
-.PHONY = $(.PHONY) update-json github-pages help-api clean-apis cargo publish apis docs docs-clean ${space_join(0)} ${space_join(1)} ${space_join(2)} ${space_join(3)}
+.PHONY += github-pages docs-all docs-all-clean
+% endif
 
-help-api:
-	$(info apis       -    make all APIs)
+docs${agsuffix}: ${' '.join(central_api_index(util.library_to_crate_name(a[0])) for a in api_info)} $(MAKO_STANDARD_DEPENDENCIES)
+
+.PHONY = $(.PHONY) help${agsuffix} clean${agsuffix} cargo${agsuffix} publish${agsuffix} gen-all${agsuffix} ${space_join(0)} ${space_join(1)} ${space_join(2)} ${space_join(3)}
+
+help${agsuffix}:
+	$(info gen-all${agsuffix}       -   make all ${make.target_name})
+	$(info clean-all${agsuffix}     -   delete all generated ${make.target_name})
+	$(info cargo${agsuffix}         -   run cargo on all ${make.target_name}, use ARGS="args ..." to specify cargo arguments)
+	$(info publish${agsuffix}       -   run cargo publish on all ${make.target_name} and remember successful ones with marker files)
 % for a in api_info:
 	$(info ${a[0]}    -    build the ${a[0]} api)
 	$(info ${a[1]}    -    clean all generated files of the ${a[0]} api)
@@ -134,5 +147,8 @@ ${fake_target}:
 	@wget -nv ${discovery_url + info['discoveryLink']} -O ${target}
 % endfor
 
+% if global_targets:
+.PHONY += update-json
 update-json: ${' '.join(json_api_targets)}
 	$(API_VERSION_GEN) $(API_DIR) $(API_LIST) $(API_LIST)
+% endif
