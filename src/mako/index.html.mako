@@ -3,7 +3,7 @@
     from util import (library_name, library_to_crate_name)
 
     def api_index(name, version):
-        index_file_path = library_to_crate_name(library_name(name, version)) + '/index.html'
+        index_file_path = library_to_crate_name(library_name(name, version), make.target_suffix) + '/index.html'
         if os.path.isfile(DOC_ROOT + '/' + index_file_path):
             return index_file_path
         return None

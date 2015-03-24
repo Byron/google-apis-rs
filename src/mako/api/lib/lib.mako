@@ -11,7 +11,7 @@
     def pretty_name(name):
         return ' '.join(split_camelcase_s(name).split('.'))
 %>\
-<%namespace name="util" file="util.mako"/>\
+<%namespace name="util" file="../../lib/util.mako"/>\
 <%namespace name="mbuild" file="mbuild.mako"/>\
 
 ## If rust-doc is True, examples will be made to work for rust doc tests. Otherwise they are set 

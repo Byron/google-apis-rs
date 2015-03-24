@@ -8,7 +8,7 @@
                       struct_type_bounds_s, METHODS_RESOURCE, SPACES_PER_TAB, prefix_all_but_first_with,
                       METHODS_BUILDER_MARKER_TRAIT, remove_empty_lines)
 %>\
-<%namespace name="util" file="util.mako"/>\
+<%namespace name="util" file="../../lib/util.mako"/>\
 <%namespace name="lib" file="lib.mako"/>\
 
 ## Creates a Resource builder type

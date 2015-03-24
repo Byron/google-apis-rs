@@ -37,9 +37,6 @@ api:
     - v1
     calendar:
     - v3
-    # Does not build yet, see serde issue: https://github.com/erickt/rust-serde/issues/45
-    # civicinfo:
-    # - v2
     cloudlatencytest:
     - v2
     cloudmonitoring:
@@ -62,9 +59,6 @@ api:
     - v2beta1
     dfareporting:
     - v2.0
-    # Does not build yet, see serde issue: https://github.com/erickt/rust-serde/issues/45
-    # discovery:
-    # - v1
     dns:
     - v1beta1
     doubleclickbidmanager:
@@ -85,9 +79,6 @@ api:
     - v1configuration
     gamesmanagement:
     - v1management
-    # Does not build yet, see serde issue: https://github.com/erickt/rust-serde/issues/45
-    # gan:
-    # - v1beta1
     genomics:
     - v1beta2
     gmail:
@@ -110,9 +101,6 @@ api:
     - v2
     pagespeedonline:
     - v2
-    # Does not build yet, see serde issue: https://github.com/erickt/rust-serde/issues/45
-    # plus:
-    # - v1
     plusdomains:
     - v1
     prediction:

@@ -1,0 +1,14 @@
+make:
+  id: cli
+  target_name: CLIs
+  target_suffix: -cli
+  aggregated_target_suffix: -cli
+  depends_on_suffix: ''
+  templates:
+    - source: ../LICENSE.md
+    - source: ../Cargo.toml
+    - source: main.rs
+      output_dir: src
+cargo:
+  build_version: "0.0.1"
+  keywords: [cli]

@@ -1,0 +1,33 @@
+api:
+  base_path: "etc/api"
+  terms:
+    # how to actually do something with the API
+    action: doit
+    # when a resource is supposed to be uploaded
+    upload_action: upload
+  properties:
+    # additional fields specified by the user
+    params: '_additional_params'
+    # custom scopes for authentication
+    scopes: '_scopes'
+make:
+  id: api
+  target_name: APIs
+  target_suffix: ''
+  aggregated_target_suffix: -api
+  depends_on_suffix:
+  global_targets: Yes
+  templates:
+    # all output directories are relative to the one set for the respective API
+    - source: README.md
+    - source: ../LICENSE.md
+    - source: ../Cargo.toml
+    - source: lib.rs
+      output_dir: src
+cargo:
+  build_version: "0.1.1"
+  keywords: [protocol, web, api]
+  dependencies:
+    - url = "*"
+    - serde = "*"
+    - serde_macros = "*"

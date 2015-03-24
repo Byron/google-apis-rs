@@ -24,7 +24,7 @@ ${util.library_name(name, version)}\
 </%def>
 
 <%def name="crate_name()" buffered="True">\
-${util.library_to_crate_name(util.library_name(name, version))}\
+${util.library_to_crate_name(util.library_name(name, version), make.target_suffix)}\
 </%def>
 
 <%def name="crate_version()" buffered="True">\
