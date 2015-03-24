@@ -1,8 +1,9 @@
 make:
+  id: cli
   target_name: CLIs
   target_suffix: -cli
   aggregated_target_suffix: -cli
-  depends_on: api
+  depends_on_suffix: ''
   templates:
     - source: ../LICENSE.md
     - source: ../Cargo.toml

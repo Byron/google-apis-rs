@@ -1,4 +1,4 @@
-<%! from util import (estr, hash_comment) %>\
+<%! from util import (estr, hash_comment, library_to_crate_name) %>\
 <%namespace name="util" file="lib/util.mako"/>\
 <%block filter="hash_comment">\
 <%util:gen_info source="${self.uri}" />\
@@ -21,6 +21,12 @@ keywords = ["${name}", ${", ".join(estr(cargo.keywords))}]
 hyper = "*"
 mime = "*"
 yup-oauth2 = "*"
-% for dep in cargo.dependencies:
+% for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
+% if make.depends_on_suffix is not None:
+
+<% api_name = util.library_name() %>\
+[dependencies.${library_to_crate_name(api_name, suffix=make.depends_on_suffix)}]
+path = "../${api_name}"
+% endif

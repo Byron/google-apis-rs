@@ -1,4 +1,4 @@
-.PHONY:  json-to-xml clean help api-deps regen-apis license
+.PHONY: clean help deps regen-apis license
 .SUFFIXES:
 
 VENV = .virtualenv/virtualenv.py
@@ -13,9 +13,11 @@ MAKO_SRC = src/mako
 RUST_SRC = src/rust
 API_DEPS_TPL = $(MAKO_SRC)/deps.mako
 API_DEPS = .api.deps
+CLI_DEPS = .cli.deps
 API_DIR = etc/api
 API_SHARED_INFO = $(API_DIR)/shared.yaml
 TYPE_API_INFO = $(API_DIR)/type-api.yaml
+TYPE_CLI_INFO = $(API_DIR)/type-cli.yaml
 API_LIST = $(API_DIR)/
 ifdef TRAVIS
 API_LIST := $(API_LIST)api-list_travis.yaml
@@ -33,13 +35,14 @@ help:
 	$(info )
 	$(info Targets)
 	$(info help-api       -   show all api targets to build individually)
+	$(info help-cli       -   show all cli targets to build individually)
 	$(info docs-all       -   cargo-doc on all APIs and associates, assemble them together and generate index)
 	$(info docs-all-clean -   remove the entire set of generated documentation)
 	$(info github-pages   -   invoke ghp-import on all documentation)
 	$(info regen-apis     -   clear out all generated apis, and regenerate them)
 	$(info license        -   regenerate the main license file)
 	$(info update-json    -   rediscover API schema json files and update api-list.yaml with latest versions)
-	$(info api-deps       -   generate a file to tell make what API file dependencies will be)
+	$(info deps           -   generate a file to tell how to build libraries and programs)
 	$(info help           -   print this help)
 
 $(VENV):
@@ -56,19 +59,23 @@ $(MAKO_RENDER): $(PYTHON)
 # Explicitly NOT depending on $(MAKO_LIB_FILES), as it's quite stable and now takes 'too long' thanks
 # to a URL get call to the google discovery service
 $(API_DEPS): $(API_DEPS_TPL) $(API_SHARED_INFO) $(MAKO_RENDER) $(TYPE_API_INFO) $(API_LIST)
-	$(MAKO) -io $(API_DEPS_TPL)=$@ --var TYPE=api --data-files $(API_SHARED_INFO) $(TYPE_API_INFO) $(API_LIST)
+	$(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(TYPE_API_INFO) $(API_LIST)
 
-api-deps: $(API_DEPS)
+$(CLI_DEPS): $(API_DEPS_TPL) $(API_SHARED_INFO) $(MAKO_RENDER) $(TYPE_CLI_INFO) $(API_LIST)
+	$(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(TYPE_CLI_INFO) $(API_LIST)
+
+deps: $(API_DEPS) $(CLI_DEPS)
 
 include $(API_DEPS)
+include $(CLI_DEPS)
 
 LICENSE.md: $(MAKO_SRC)/LICENSE.md.mako $(API_SHARED_INFO) $(MAKO_RENDER)
 	$(MAKO) -io $<=$@ --data-files $(API_SHARED_INFO)
 
 license: LICENSE.md
 
-regen-apis: clean-apis apis license
+regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
 
-clean: clean-apis
+clean: clean-all-api clean-all-cli
 	-rm -Rf $(VENV_DIR)
-	-rm $(API_DEPS)
+	-rm $(API_DEPS) $(CLI_DEPS)

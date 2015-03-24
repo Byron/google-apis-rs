@@ -11,10 +11,11 @@ api:
     # custom scopes for authentication
     scopes: '_scopes'
 make:
+  id: api
   target_name: APIs
   target_suffix: ''
   aggregated_target_suffix: -api
-  depends_on:
+  depends_on_suffix:
   global_targets: Yes
   templates:
     # all output directories are relative to the one set for the respective API

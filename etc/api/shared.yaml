@@ -1,3 +1,11 @@
+api:
+  blacklist:
+    # All of these require Box<> support in serde
+    # See https://github.com/erickt/rust-serde/issues/45
+    - civicinfo
+    - discovery
+    - gan
+    - plus
 # Contains values shared among all API implementations
 directories:
   # directory under which all generated sources should reside

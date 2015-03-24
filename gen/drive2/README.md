@@ -1,6 +1,6 @@
 <!---
 DO NOT EDIT !
-This file was generated automatically from 'src/mako/README.md.mako'
+This file was generated automatically from 'src/mako/api/README.md.mako'
 DO NOT EDIT !
 -->
 The `google-drive2` library allows access to all features of the *Google drive* service.
@@ -69,6 +69,8 @@ The API is structured into the following primary items:
 
 * **[Hub](http://byron.github.io/google-apis-rs/google-drive2/struct.Drive.html)**
     * a central object to maintain state and allow accessing all *Activities*
+    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google-drive2/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google-drive2/trait.CallBuilder.html)
 * **[Resources](http://byron.github.io/google-apis-rs/google-drive2/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
@@ -77,6 +79,8 @@ The API is structured into the following primary items:
         * never directly used in *Activities*
 * **[Activities](http://byron.github.io/google-apis-rs/google-drive2/trait.CallBuilder.html)**
     * operations to apply to *Resources*
+
+All *structures* are marked with applicable traits to further categorize them and ease browsing.
 
 Generally speaking, you can invoke *Activities* like this:
 
@@ -124,7 +128,7 @@ extern crate hyper;
 extern crate "yup-oauth2" as oauth2;
 extern crate "google-drive2" as drive2;
 use drive2::File;
-use drive2::Result;
+use drive2::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 use drive2::Drive;
@@ -165,15 +169,17 @@ let result = hub.files().patch(&req, "fileId")
              .doit();
 
 match result {
-    Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-    Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-    Result::MissingToken => println!("OAuth2: Missing Token"),
-    Result::Cancelled => println!("Operation cancelled by user"),
-    Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-    Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-    Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-    Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-    Result::Success(_) => println!("Success (value doesn't print)"),
+    Err(e) => match e {
+        Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+        Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+        Error::MissingToken => println!("OAuth2: Missing Token"),
+        Error::Cancelled => println!("Operation canceled by user"),
+        Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+        Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+        Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+        Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+    },
+    Ok(_) => println!("Success (value doesn't print)"),
 }
 
 ```
@@ -186,7 +192,7 @@ the doit() methods, or handed as possibly intermediate results to either the
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
-## Uploads and Downlods
+## Uploads and Downloads
 If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google-drive2/enum.Result.html), should be
 read by you to obtain the media.
 If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google-drive2/trait.ResponseResult.html), it will return that by default.
@@ -209,8 +215,9 @@ The [delegate trait](http://byron.github.io/google-apis-rs/google-drive2/trait.D
 ## Optional Parts in Server-Requests
 
 All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google-drive2/trait.RequestValue.html) and 
-[decodable](http://byron.github.io/google-apis-rs/google-drive2/trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-drive2/trait.Part.html) which are identifyable by name, which will be sent to 
+[decodable](http://byron.github.io/google-apis-rs/google-drive2/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+are valid.
+Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-drive2/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments

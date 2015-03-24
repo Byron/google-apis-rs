@@ -1,5 +1,5 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
 //! This documentation was generated from *YouTube* crate version *0.1.1+20150309*, where *20150309* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
@@ -68,6 +68,8 @@
 //! 
 //! * **[Hub](struct.YouTube.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -76,6 +78,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -117,7 +121,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-youtube3" as youtube3;
-//! use youtube3::Result;
+//! use youtube3::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -149,15 +153,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -170,7 +176,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -193,8 +199,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -243,7 +250,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -309,7 +316,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-youtube3" as youtube3;
-/// use youtube3::Result;
+/// use youtube3::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -341,15 +348,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -453,28 +462,28 @@ impl<'a, C, NC, A> YouTube<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SubscriptionListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#subscriptionListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#subscriptionListResponse".
     pub kind: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
-    /// A list of subscriptions that match the request criteria.    
+    /// A list of subscriptions that match the request criteria.
     pub items: Vec<Subscription>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
 }
@@ -488,16 +497,16 @@ impl ResponseResult for SubscriptionListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelAuditDetails {
-    /// Whether or not the channel has any copyright strikes.    
+    /// Whether or not the channel has any copyright strikes.
     #[serde(alias="copyrightStrikesGoodStanding")]
     pub copyright_strikes_good_standing: bool,
-    /// Whether or not the channel respects the community guidelines.    
+    /// Whether or not the channel respects the community guidelines.
     #[serde(alias="communityGuidelinesGoodStanding")]
     pub community_guidelines_good_standing: bool,
-    /// Whether or not the channel has any unresolved claims.    
+    /// Whether or not the channel has any unresolved claims.
     #[serde(alias="contentIdClaimsGoodStanding")]
     pub content_id_claims_good_standing: bool,
-    /// Describes the general state of the channel. This field will always show if there are any issues whatsoever with the channel. Currently this field represents the result of the logical and operation over the community guidelines good standing, the copyright strikes good standing and the content ID claims good standing, but this may change in the future.    
+    /// Describes the general state of the channel. This field will always show if there are any issues whatsoever with the channel. Currently this field represents the result of the logical and operation over the community guidelines good standing, the copyright strikes good standing and the content ID claims good standing, but this may change in the future.
     #[serde(alias="overallGoodStanding")]
     pub overall_good_standing: bool,
 }
@@ -511,15 +520,15 @@ impl Part for ChannelAuditDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoFileDetails {
-    /// The uploaded video file's combined (video and audio) bitrate in bits per second.    
+    /// The uploaded video file's combined (video and audio) bitrate in bits per second.
     #[serde(alias="bitrateBps")]
     pub bitrate_bps: String,
-    /// The uploaded video file's container format.    
+    /// The uploaded video file's container format.
     pub container: String,
-    /// Geographic coordinates that identify the place where the uploaded video was recorded. Coordinates are defined using WGS 84.    
+    /// Geographic coordinates that identify the place where the uploaded video was recorded. Coordinates are defined using WGS 84.
     #[serde(alias="recordingLocation")]
     pub recording_location: GeoPoint,
-    /// The uploaded file's type as detected by YouTube's video processing engine. Currently, YouTube only processes video files, but this field is present whether a video file or another type of file was uploaded.    
+    /// The uploaded file's type as detected by YouTube's video processing engine. Currently, YouTube only processes video files, but this field is present whether a video file or another type of file was uploaded.
     #[serde(alias="fileType")]
     pub file_type: String,
     /// The date and time when the uploaded video file was created. The value is specified in ISO 8601 format. Currently, the following ISO 8601 formats are supported:  
@@ -528,19 +537,19 @@ pub struct VideoFileDetails {
     /// - Time with timezone: YYYY-MM-DDTHH:MM:SS+HH:MM
     #[serde(alias="creationTime")]
     pub creation_time: String,
-    /// The length of the uploaded video in milliseconds.    
+    /// The length of the uploaded video in milliseconds.
     #[serde(alias="durationMs")]
     pub duration_ms: String,
-    /// The uploaded file's name. This field is present whether a video file or another type of file was uploaded.    
+    /// The uploaded file's name. This field is present whether a video file or another type of file was uploaded.
     #[serde(alias="fileName")]
     pub file_name: String,
-    /// The uploaded file's size in bytes. This field is present whether a video file or another type of file was uploaded.    
+    /// The uploaded file's size in bytes. This field is present whether a video file or another type of file was uploaded.
     #[serde(alias="fileSize")]
     pub file_size: String,
-    /// A list of video streams contained in the uploaded video file. Each item in the list contains detailed metadata about a video stream.    
+    /// A list of video streams contained in the uploaded video file. Each item in the list contains detailed metadata about a video stream.
     #[serde(alias="videoStreams")]
     pub video_streams: Vec<VideoFileDetailsVideoStream>,
-    /// A list of audio streams contained in the uploaded video file. Each item in the list contains detailed metadata about an audio stream.    
+    /// A list of audio streams contained in the uploaded video file. Each item in the list contains detailed metadata about an audio stream.
     #[serde(alias="audioStreams")]
     pub audio_streams: Vec<VideoFileDetailsAudioStream>,
 }
@@ -554,9 +563,9 @@ impl Part for VideoFileDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistLocalization {
-    /// The localized strings for playlist's description.    
+    /// The localized strings for playlist's description.
     pub description: String,
-    /// The localized strings for playlist's title.    
+    /// The localized strings for playlist's title.
     pub title: String,
 }
 
@@ -569,7 +578,7 @@ impl Part for PlaylistLocalization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsComment {
-    /// The resourceId object contains information that identifies the resource associated with the comment.    
+    /// The resourceId object contains information that identifies the resource associated with the comment.
     #[serde(alias="resourceId")]
     pub resource_id: ResourceId,
 }
@@ -588,28 +597,28 @@ impl Part for ActivityContentDetailsComment {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlaylistItemListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistItemListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistItemListResponse".
     pub kind: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
-    /// A list of playlist items that match the request criteria.    
+    /// A list of playlist items that match the request criteria.
     pub items: Vec<PlaylistItem>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
 }
@@ -623,9 +632,9 @@ impl ResponseResult for PlaylistItemListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PropertyValue {
-    /// A property.    
+    /// A property.
     pub property: String,
-    /// The property's value.    
+    /// The property's value.
     pub value: String,
 }
 
@@ -638,13 +647,13 @@ impl Part for PropertyValue {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InvideoTiming {
-    /// Defines the time at which the promotion will appear. Depending on the value of type the value of the offsetMs field will represent a time offset from the start or from the end of the video, expressed in milliseconds.    
+    /// Defines the time at which the promotion will appear. Depending on the value of type the value of the offsetMs field will represent a time offset from the start or from the end of the video, expressed in milliseconds.
     #[serde(alias="offsetMs")]
     pub offset_ms: String,
-    /// Describes a timing type. If the value is offsetFromStart, then the offsetMs field represents an offset from the start of the video. If the value is offsetFromEnd, then the offsetMs field represents an offset from the end of the video.    
+    /// Describes a timing type. If the value is offsetFromStart, then the offsetMs field represents an offset from the start of the video. If the value is offsetFromEnd, then the offsetMs field represents an offset from the end of the video.
     #[serde(alias="type")]
     pub type_: String,
-    /// Defines the duration in milliseconds for which the promotion should be displayed. If missing, the client should use the default.    
+    /// Defines the duration in milliseconds for which the promotion should be displayed. If missing, the client should use the default.
     #[serde(alias="durationMs")]
     pub duration_ms: String,
 }
@@ -658,27 +667,27 @@ impl Part for InvideoTiming {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistSnippet {
-    /// The playlist's description.    
+    /// The playlist's description.
     pub description: String,
-    /// The playlist's title.    
+    /// The playlist's title.
     pub title: String,
-    /// The ID that YouTube uses to uniquely identify the channel that published the playlist.    
+    /// The ID that YouTube uses to uniquely identify the channel that published the playlist.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The date and time that the playlist was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the playlist was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="publishedAt")]
     pub published_at: String,
-    /// Keyword tags associated with the playlist.    
+    /// Keyword tags associated with the playlist.
     pub tags: Vec<String>,
-    /// The channel title of the channel that the video belongs to.    
+    /// The channel title of the channel that the video belongs to.
     #[serde(alias="channelTitle")]
     pub channel_title: String,
-    /// The language of the playlist's default title and description.    
+    /// The language of the playlist's default title and description.
     #[serde(alias="defaultLanguage")]
     pub default_language: String,
-    /// Localized title and description, read-only.    
+    /// Localized title and description, read-only.
     pub localized: PlaylistLocalization,
-    /// A map of thumbnail images associated with the playlist. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    /// A map of thumbnail images associated with the playlist. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
 }
 
@@ -691,7 +700,7 @@ impl Part for PlaylistSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsLike {
-    /// The resourceId object contains information that identifies the rated resource.    
+    /// The resourceId object contains information that identifies the rated resource.
     #[serde(alias="resourceId")]
     pub resource_id: ResourceId,
 }
@@ -713,20 +722,20 @@ impl Part for ActivityContentDetailsLike {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStream {
-    /// The status object contains information about live stream's status.    
+    /// The status object contains information about live stream's status.
     pub status: Option<LiveStreamStatus>,
-    /// The snippet object contains basic details about the stream, including its channel, title, and description.    
+    /// The snippet object contains basic details about the stream, including its channel, title, and description.
     pub snippet: Option<LiveStreamSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveStream".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveStream".
     pub kind: Option<String>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
-    /// The content_details object contains information about the stream, including the closed captions ingestion URL.    
+    /// The content_details object contains information about the stream, including the closed captions ingestion URL.
     #[serde(alias="contentDetails")]
     pub content_details: Option<LiveStreamContentDetails>,
-    /// The cdn object defines the live stream's content delivery network (CDN) settings. These settings provide details about the manner in which you stream your content to YouTube.    
+    /// The cdn object defines the live stream's content delivery network (CDN) settings. These settings provide details about the manner in which you stream your content to YouTube.
     pub cdn: Option<CdnSettings>,
-    /// The ID that YouTube assigns to uniquely identify the stream.    
+    /// The ID that YouTube assigns to uniquely identify the stream.
     pub id: Option<String>,
 }
 
@@ -763,16 +772,16 @@ impl ToParts for LiveStream {
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ThumbnailSetResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// A list of thumbnails.    
+    /// A list of thumbnails.
     pub items: Vec<ThumbnailDetails>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#thumbnailSetResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#thumbnailSetResponse".
     pub kind: String,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
 }
@@ -786,7 +795,7 @@ impl ResponseResult for ThumbnailSetResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsUpload {
-    /// The ID that YouTube uses to uniquely identify the uploaded video.    
+    /// The ID that YouTube uses to uniquely identify the uploaded video.
     #[serde(alias="videoId")]
     pub video_id: String,
 }
@@ -800,40 +809,40 @@ impl Part for ActivityContentDetailsUpload {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSettings {
-    /// Specifies the channel description.    
+    /// Specifies the channel description.
     pub description: String,
-    /// Specifies the channel title.    
+    /// Specifies the channel title.
     pub title: String,
-    /// Whether user-submitted comments left on the channel page need to be approved by the channel owner to be publicly visible.    
+    /// Whether user-submitted comments left on the channel page need to be approved by the channel owner to be publicly visible.
     #[serde(alias="moderateComments")]
     pub moderate_comments: bool,
-    /// Whether the tab to browse the videos should be displayed.    
+    /// Whether the tab to browse the videos should be displayed.
     #[serde(alias="showBrowseView")]
     pub show_browse_view: bool,
-    /// Title for the featured channels tab.    
+    /// Title for the featured channels tab.
     #[serde(alias="featuredChannelsTitle")]
     pub featured_channels_title: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="defaultLanguage")]
     pub default_language: String,
-    /// The trailer of the channel, for users that are not subscribers.    
+    /// The trailer of the channel, for users that are not subscribers.
     #[serde(alias="unsubscribedTrailer")]
     pub unsubscribed_trailer: String,
-    /// The list of featured channels.    
+    /// The list of featured channels.
     #[serde(alias="featuredChannelsUrls")]
     pub featured_channels_urls: Vec<String>,
-    /// A prominent color that can be rendered on this channel page.    
+    /// A prominent color that can be rendered on this channel page.
     #[serde(alias="profileColor")]
     pub profile_color: String,
-    /// Which content tab users should see when viewing the channel.    
+    /// Which content tab users should see when viewing the channel.
     #[serde(alias="defaultTab")]
     pub default_tab: String,
-    /// Lists keywords associated with the channel, comma-separated.    
+    /// Lists keywords associated with the channel, comma-separated.
     pub keywords: String,
-    /// Whether related channels should be proposed.    
+    /// Whether related channels should be proposed.
     #[serde(alias="showRelatedChannels")]
     pub show_related_channels: bool,
-    /// The ID for a Google Analytics account to track and measure traffic to the channels.    
+    /// The ID for a Google Analytics account to track and measure traffic to the channels.
     #[serde(alias="trackingAnalyticsAccountId")]
     pub tracking_analytics_account_id: String,
 }
@@ -847,22 +856,22 @@ impl Part for ChannelSettings {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchResultSnippet {
-    /// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.    
+    /// It indicates if the resource (video or channel) has upcoming/active live broadcast content. Or it's "none" if there is not any upcoming/active live broadcasts.
     #[serde(alias="liveBroadcastContent")]
     pub live_broadcast_content: String,
-    /// A description of the search result.    
+    /// A description of the search result.
     pub description: String,
-    /// The title of the search result.    
+    /// The title of the search result.
     pub title: String,
-    /// A map of thumbnail images associated with the search result. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    /// A map of thumbnail images associated with the search result. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
-    /// The value that YouTube uses to uniquely identify the channel that published the resource that the search result identifies.    
+    /// The value that YouTube uses to uniquely identify the channel that published the resource that the search result identifies.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The creation date and time of the resource that the search result identifies. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The creation date and time of the resource that the search result identifies. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="publishedAt")]
     pub published_at: String,
-    /// The title of the channel that published the resource that the search result identifies.    
+    /// The title of the channel that published the resource that the search result identifies.
     #[serde(alias="channelTitle")]
     pub channel_title: String,
 }
@@ -876,10 +885,10 @@ impl Part for SearchResultSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IngestionInfo {
-    /// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.    
+    /// The backup ingestion URL that you should use to stream video to YouTube. You have the option of simultaneously streaming the content that you are sending to the ingestionAddress to this URL.
     #[serde(alias="backupIngestionAddress")]
     pub backup_ingestion_address: String,
-    /// The HTTP or RTMP stream name that YouTube assigns to the video stream.    
+    /// The HTTP or RTMP stream name that YouTube assigns to the video stream.
     #[serde(alias="streamName")]
     pub stream_name: String,
     /// The primary ingestion URL that you should use to stream video to YouTube. You must stream video to this URL.
@@ -900,12 +909,12 @@ impl Part for IngestionInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CdnSettings {
-    /// The format of the video stream that you are sending to Youtube.    
+    /// The format of the video stream that you are sending to Youtube.
     pub format: String,
-    /// The ingestionInfo object contains information that YouTube provides that you need to transmit your RTMP or HTTP stream to YouTube.    
+    /// The ingestionInfo object contains information that YouTube provides that you need to transmit your RTMP or HTTP stream to YouTube.
     #[serde(alias="ingestionInfo")]
     pub ingestion_info: IngestionInfo,
-    /// The method or protocol used to transmit the video stream.    
+    /// The method or protocol used to transmit the video stream.
     #[serde(alias="ingestionType")]
     pub ingestion_type: String,
 }
@@ -924,16 +933,16 @@ impl Part for CdnSettings {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoGetRatingResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// A list of ratings that match the request criteria.    
+    /// A list of ratings that match the request criteria.
     pub items: Vec<VideoRating>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoGetRatingResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoGetRatingResponse".
     pub kind: String,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
 }
@@ -947,12 +956,12 @@ impl ResponseResult for VideoGetRatingResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoCategorySnippet {
-    /// no description provided    
+    /// no description provided
     pub assignable: bool,
-    /// The YouTube channel that created the video category.    
+    /// The YouTube channel that created the video category.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The video category's title.    
+    /// The video category's title.
     pub title: String,
 }
 
@@ -965,7 +974,7 @@ impl Part for VideoCategorySnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsChannelItem {
-    /// The resourceId object contains information that identifies the resource that was added to the channel.    
+    /// The resourceId object contains information that identifies the resource that was added to the channel.
     #[serde(alias="resourceId")]
     pub resource_id: ResourceId,
 }
@@ -979,29 +988,29 @@ impl Part for ActivityContentDetailsChannelItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastSnippet {
-    /// The date and time that the broadcast actually ended. This information is only available once the broadcast's state is complete. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the broadcast actually ended. This information is only available once the broadcast's state is complete. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="actualEndTime")]
     pub actual_end_time: String,
-    /// The broadcast's description. As with the title, you can set this field by modifying the broadcast resource or by setting the description field of the corresponding video resource.    
+    /// The broadcast's description. As with the title, you can set this field by modifying the broadcast resource or by setting the description field of the corresponding video resource.
     pub description: String,
-    /// The broadcast's title. Note that the broadcast represents exactly one YouTube video. You can set this field by modifying the broadcast resource or by setting the title field of the corresponding video resource.    
+    /// The broadcast's title. Note that the broadcast represents exactly one YouTube video. You can set this field by modifying the broadcast resource or by setting the title field of the corresponding video resource.
     pub title: String,
-    /// The ID that YouTube uses to uniquely identify the channel that is publishing the broadcast.    
+    /// The ID that YouTube uses to uniquely identify the channel that is publishing the broadcast.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The date and time that the broadcast was added to YouTube's live broadcast schedule. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the broadcast was added to YouTube's live broadcast schedule. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="publishedAt")]
     pub published_at: String,
-    /// The date and time that the broadcast is scheduled to start. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the broadcast is scheduled to start. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="scheduledStartTime")]
     pub scheduled_start_time: String,
-    /// The date and time that the broadcast actually started. This information is only available once the broadcast's state is live. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the broadcast actually started. This information is only available once the broadcast's state is live. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="actualStartTime")]
     pub actual_start_time: String,
-    /// The date and time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="scheduledEndTime")]
     pub scheduled_end_time: String,
-    /// A map of thumbnail images associated with the broadcast. For each nested object in this object, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    /// A map of thumbnail images associated with the broadcast. For each nested object in this object, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
 }
 
@@ -1014,22 +1023,22 @@ impl Part for LiveBroadcastSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionSnippet {
-    /// The subscription's details.    
+    /// The subscription's details.
     pub description: String,
-    /// The subscription's title.    
+    /// The subscription's title.
     pub title: String,
-    /// The id object contains information about the channel that the user subscribed to.    
+    /// The id object contains information about the channel that the user subscribed to.
     #[serde(alias="resourceId")]
     pub resource_id: ResourceId,
-    /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
-    /// The ID that YouTube uses to uniquely identify the subscriber's channel.    
+    /// The ID that YouTube uses to uniquely identify the subscriber's channel.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The date and time that the subscription was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the subscription was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="publishedAt")]
     pub published_at: String,
-    /// Channel title for the channel that the subscription belongs to.    
+    /// Channel title for the channel that the subscription belongs to.
     #[serde(alias="channelTitle")]
     pub channel_title: String,
 }
@@ -1043,9 +1052,9 @@ impl Part for SubscriptionSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionContentDetails {
-    /// The channel ids for type multiple_channels.    
+    /// The channel ids for type multiple_channels.
     pub channels: Vec<String>,
-    /// The playlist ids for type single_playlist and multiple_playlists. For singlePlaylist, only one playlistId is allowed.    
+    /// The playlist ids for type single_playlist and multiple_playlists. For singlePlaylist, only one playlistId is allowed.
     pub playlists: Vec<String>,
 }
 
@@ -1063,16 +1072,16 @@ impl Part for ChannelSectionContentDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nRegionListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// A list of regions where YouTube is available. In this map, the i18n region ID is the map key, and its value is the corresponding i18nRegion resource.    
+    /// A list of regions where YouTube is available. In this map, the i18n region ID is the map key, and its value is the corresponding i18nRegion resource.
     pub items: Vec<I18nRegion>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nRegionListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nRegionListResponse".
     pub kind: String,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
 }
@@ -1091,28 +1100,28 @@ impl ResponseResult for I18nRegionListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LiveStreamListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveStreamListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveStreamListResponse".
     pub kind: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
-    /// A list of live streams that match the request criteria.    
+    /// A list of live streams that match the request criteria.
     pub items: Vec<LiveStream>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
 }
@@ -1134,7 +1143,7 @@ pub struct LiveStreamContentDetails {
     /// - The  liveStreams.list method does not list non-reusable streams if you call the method and set the mine parameter to true. The only way to use that method to retrieve the resource for a non-reusable stream is to use the id parameter to identify the stream.
     #[serde(alias="isReusable")]
     pub is_reusable: bool,
-    /// The ingestion URL where the closed captions of this stream are sent.    
+    /// The ingestion URL where the closed captions of this stream are sent.
     #[serde(alias="closedCaptionsIngestionUrl")]
     pub closed_captions_ingestion_url: String,
 }
@@ -1148,9 +1157,9 @@ impl Part for LiveStreamContentDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nLanguageSnippet {
-    /// The human-readable name of the language in the language itself.    
+    /// The human-readable name of the language in the language itself.
     pub name: String,
-    /// A short BCP-47 code that uniquely identifies a language.    
+    /// A short BCP-47 code that uniquely identifies a language.
     pub hl: String,
 }
 
@@ -1168,17 +1177,17 @@ impl Part for I18nLanguageSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InvideoBranding {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="targetChannelId")]
     pub target_channel_id: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub position: Option<InvideoPosition>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="imageUrl")]
     pub image_url: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub timing: Option<InvideoTiming>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="imageBytes")]
     pub image_bytes: Option<String>,
 }
@@ -1192,7 +1201,7 @@ impl RequestValue for InvideoBranding {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItemStatus {
-    /// This resource's privacy status.    
+    /// This resource's privacy status.
     #[serde(alias="privacyStatus")]
     pub privacy_status: String,
 }
@@ -1206,9 +1215,9 @@ impl Part for PlaylistItemStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelConversionPing {
-    /// Defines the context of the ping.    
+    /// Defines the context of the ping.
     pub context: String,
-    /// The url (without the schema) that the player shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D cview%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.    
+    /// The url (without the schema) that the player shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D cview%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.
     #[serde(alias="conversionUrl")]
     pub conversion_url: String,
 }
@@ -1222,7 +1231,7 @@ impl Part for ChannelConversionPing {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoProjectDetails {
-    /// A list of project tags associated with the video during the upload.    
+    /// A list of project tags associated with the video during the upload.
     pub tags: Vec<String>,
 }
 
@@ -1252,18 +1261,18 @@ impl Part for VideoProjectDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItem {
-    /// The status object contains information about the playlist item's privacy status.    
+    /// The status object contains information about the playlist item's privacy status.
     pub status: Option<PlaylistItemStatus>,
-    /// The snippet object contains basic details about the playlist item, such as its title and position in the playlist.    
+    /// The snippet object contains basic details about the playlist item, such as its title and position in the playlist.
     pub snippet: Option<PlaylistItemSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistItem".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistItem".
     pub kind: Option<String>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
-    /// The contentDetails object is included in the resource if the included item is a YouTube video. The object contains additional information about the video.    
+    /// The contentDetails object is included in the resource if the included item is a YouTube video. The object contains additional information about the video.
     #[serde(alias="contentDetails")]
     pub content_details: Option<PlaylistItemContentDetails>,
-    /// The ID that YouTube uses to uniquely identify the playlist item.    
+    /// The ID that YouTube uses to uniquely identify the playlist item.
     pub id: Option<String>,
 }
 
@@ -1299,28 +1308,28 @@ impl ToParts for PlaylistItem {
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GuideCategoryListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#guideCategoryListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#guideCategoryListResponse".
     pub kind: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
-    /// A list of categories that can be associated with YouTube channels. In this map, the category ID is the map key, and its value is the corresponding guideCategory resource.    
+    /// A list of categories that can be associated with YouTube channels. In this map, the category ID is the map key, and its value is the corresponding guideCategory resource.
     pub items: Vec<GuideCategory>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
 }
@@ -1334,9 +1343,9 @@ impl ResponseResult for GuideCategoryListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoLocalization {
-    /// Localized version of the video's description.    
+    /// Localized version of the video's description.
     pub description: String,
-    /// Localized version of the video's title.    
+    /// Localized version of the video's title.
     pub title: String,
 }
 
@@ -1349,21 +1358,21 @@ impl Part for VideoLocalization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionSnippet {
-    /// The style of the channel section.    
+    /// The style of the channel section.
     pub style: String,
-    /// Localized title, read-only.    
+    /// Localized title, read-only.
     pub localized: ChannelSectionLocalization,
-    /// The channel section's title for multiple_playlists and multiple_channels.    
+    /// The channel section's title for multiple_playlists and multiple_channels.
     pub title: String,
-    /// The position of the channel section in the channel.    
+    /// The position of the channel section in the channel.
     pub position: u32,
-    /// The ID that YouTube uses to uniquely identify the channel that published the channel section.    
+    /// The ID that YouTube uses to uniquely identify the channel that published the channel section.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The type of the channel section.    
+    /// The type of the channel section.
     #[serde(alias="type")]
     pub type_: String,
-    /// The language of the channel section's default title and description.    
+    /// The language of the channel section's default title and description.
     #[serde(alias="defaultLanguage")]
     pub default_language: String,
 }
@@ -1377,10 +1386,10 @@ impl Part for ChannelSectionSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelContentDetails {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="relatedPlaylists")]
     pub related_playlists: ChannelContentDetailsRelatedPlaylists,
-    /// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.    
+    /// The googlePlusUserId object identifies the Google+ profile ID associated with this channel.
     #[serde(alias="googlePlusUserId")]
     pub google_plus_user_id: String,
 }
@@ -1409,13 +1418,13 @@ impl Part for TokenPagination {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nRegion {
-    /// The snippet object contains basic details about the i18n region, such as region code and human-readable name.    
+    /// The snippet object contains basic details about the i18n region, such as region code and human-readable name.
     pub snippet: Option<I18nRegionSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nRegion".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nRegion".
     pub kind: Option<String>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
-    /// The ID that YouTube uses to uniquely identify the i18n region.    
+    /// The ID that YouTube uses to uniquely identify the i18n region.
     pub id: Option<String>,
 }
 
@@ -1442,15 +1451,15 @@ impl ToParts for I18nRegion {
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ThumbnailDetails {
-    /// The default image for this resource.    
+    /// The default image for this resource.
     pub default: Thumbnail,
-    /// The high quality image for this resource.    
+    /// The high quality image for this resource.
     pub high: Thumbnail,
-    /// The medium quality image for this resource.    
+    /// The medium quality image for this resource.
     pub medium: Thumbnail,
-    /// The maximum resolution quality image for this resource.    
+    /// The maximum resolution quality image for this resource.
     pub maxres: Thumbnail,
-    /// The standard quality image for this resource.    
+    /// The standard quality image for this resource.
     pub standard: Thumbnail,
 }
 
@@ -1463,7 +1472,7 @@ impl Part for ThumbnailDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoMonetizationDetails {
-    /// The value of access indicates whether the video can be monetized or not.    
+    /// The value of access indicates whether the video can be monetized or not.
     pub access: AccessPolicy,
 }
 
@@ -1476,12 +1485,12 @@ impl Part for VideoMonetizationDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsRecommendation {
-    /// The resourceId object contains information that identifies the recommended resource.    
+    /// The resourceId object contains information that identifies the recommended resource.
     #[serde(alias="resourceId")]
     pub resource_id: ResourceId,
-    /// The reason that the resource is recommended to the user.    
+    /// The reason that the resource is recommended to the user.
     pub reason: String,
-    /// The seedResourceId object contains information about the resource that caused the recommendation.    
+    /// The seedResourceId object contains information about the resource that caused the recommendation.
     #[serde(alias="seedResourceId")]
     pub seed_resource_id: ResourceId,
 }
@@ -1495,13 +1504,13 @@ impl Part for ActivityContentDetailsRecommendation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoRecordingDetails {
-    /// The date and time when the video was recorded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.    
+    /// The date and time when the video was recorded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.
     #[serde(alias="recordingDate")]
     pub recording_date: String,
-    /// The text description of the location where the video was recorded.    
+    /// The text description of the location where the video was recorded.
     #[serde(alias="locationDescription")]
     pub location_description: String,
-    /// The geolocation information associated with the video.    
+    /// The geolocation information associated with the video.
     pub location: GeoPoint,
 }
 
@@ -1514,7 +1523,7 @@ impl Part for VideoRecordingDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsSubscription {
-    /// The resourceId object contains information that identifies the resource that the user subscribed to.    
+    /// The resourceId object contains information that identifies the resource that the user subscribed to.
     #[serde(alias="resourceId")]
     pub resource_id: ResourceId,
 }
@@ -1528,7 +1537,7 @@ impl Part for ActivityContentDetailsSubscription {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelConversionPings {
-    /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.    
+    /// Pings that the app shall fire (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
     pub pings: Vec<ChannelConversionPing>,
 }
 
@@ -1541,30 +1550,30 @@ impl Part for ChannelConversionPings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetails {
-    /// The comment object contains information about a resource that received a comment. This property is only present if the snippet.type is comment.    
+    /// The comment object contains information about a resource that received a comment. This property is only present if the snippet.type is comment.
     pub comment: ActivityContentDetailsComment,
-    /// The playlistItem object contains information about a new playlist item. This property is only present if the snippet.type is playlistItem.    
+    /// The playlistItem object contains information about a new playlist item. This property is only present if the snippet.type is playlistItem.
     #[serde(alias="playlistItem")]
     pub playlist_item: ActivityContentDetailsPlaylistItem,
-    /// The like object contains information about a resource that received a positive (like) rating. This property is only present if the snippet.type is like.    
+    /// The like object contains information about a resource that received a positive (like) rating. This property is only present if the snippet.type is like.
     pub like: ActivityContentDetailsLike,
-    /// The promotedItem object contains details about a resource which is being promoted. This property is only present if the snippet.type is promotedItem.    
+    /// The promotedItem object contains details about a resource which is being promoted. This property is only present if the snippet.type is promotedItem.
     #[serde(alias="promotedItem")]
     pub promoted_item: ActivityContentDetailsPromotedItem,
-    /// The recommendation object contains information about a recommended resource. This property is only present if the snippet.type is recommendation.    
+    /// The recommendation object contains information about a recommended resource. This property is only present if the snippet.type is recommendation.
     pub recommendation: ActivityContentDetailsRecommendation,
-    /// The favorite object contains information about a video that was marked as a favorite video. This property is only present if the snippet.type is favorite.    
+    /// The favorite object contains information about a video that was marked as a favorite video. This property is only present if the snippet.type is favorite.
     pub favorite: ActivityContentDetailsFavorite,
-    /// The upload object contains information about the uploaded video. This property is only present if the snippet.type is upload.    
+    /// The upload object contains information about the uploaded video. This property is only present if the snippet.type is upload.
     pub upload: ActivityContentDetailsUpload,
-    /// The social object contains details about a social network post. This property is only present if the snippet.type is social.    
+    /// The social object contains details about a social network post. This property is only present if the snippet.type is social.
     pub social: ActivityContentDetailsSocial,
-    /// The channelItem object contains details about a resource which was added to a channel. This property is only present if the snippet.type is channelItem.    
+    /// The channelItem object contains details about a resource which was added to a channel. This property is only present if the snippet.type is channelItem.
     #[serde(alias="channelItem")]
     pub channel_item: ActivityContentDetailsChannelItem,
-    /// The bulletin object contains details about a channel bulletin post. This object is only present if the snippet.type is bulletin.    
+    /// The bulletin object contains details about a channel bulletin post. This object is only present if the snippet.type is bulletin.
     pub bulletin: ActivityContentDetailsBulletin,
-    /// The subscription object contains information about a channel that a user subscribed to. This property is only present if the snippet.type is subscription.    
+    /// The subscription object contains information about a channel that a user subscribed to. This property is only present if the snippet.type is subscription.
     pub subscription: ActivityContentDetailsSubscription,
 }
 
@@ -1582,28 +1591,28 @@ impl Part for ActivityContentDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlaylistListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlistListResponse".
     pub kind: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
-    /// A list of playlists that match the request criteria.    
+    /// A list of playlists that match the request criteria.
     pub items: Vec<Playlist>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
 }
@@ -1617,15 +1626,15 @@ impl ResponseResult for PlaylistListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItemContentDetails {
-    /// A user-generated note for this item.    
+    /// A user-generated note for this item.
     pub note: String,
-    /// The time, measured in seconds from the start of the video, when the video should start playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) The default value is 0.    
+    /// The time, measured in seconds from the start of the video, when the video should start playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) The default value is 0.
     #[serde(alias="startAt")]
     pub start_at: String,
-    /// The time, measured in seconds from the start of the video, when the video should stop playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) By default, assume that the video.endTime is the end of the video.    
+    /// The time, measured in seconds from the start of the video, when the video should stop playing. (The playlist owner can specify the times when the video should start and stop playing when the video is played in the context of the playlist.) By default, assume that the video.endTime is the end of the video.
     #[serde(alias="endAt")]
     pub end_at: String,
-    /// The ID that YouTube uses to uniquely identify a video. To retrieve the video resource, set the id query parameter to this value in your API request.    
+    /// The ID that YouTube uses to uniquely identify a video. To retrieve the video resource, set the id query parameter to this value in your API request.
     #[serde(alias="videoId")]
     pub video_id: String,
 }
@@ -1639,10 +1648,10 @@ impl Part for PlaylistItemContentDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelContentOwnerDetails {
-    /// The ID of the content owner linked to the channel.    
+    /// The ID of the content owner linked to the channel.
     #[serde(alias="contentOwner")]
     pub content_owner: String,
-    /// The date and time of when the channel was linked to the content owner. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time of when the channel was linked to the content owner. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="timeLinked")]
     pub time_linked: String,
 }
@@ -1656,28 +1665,28 @@ impl Part for ChannelContentOwnerDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoProcessingDetails {
-    /// This value indicates whether file details are available for the uploaded video. You can retrieve a video's file details by requesting the fileDetails part in your videos.list() request.    
+    /// This value indicates whether file details are available for the uploaded video. You can retrieve a video's file details by requesting the fileDetails part in your videos.list() request.
     #[serde(alias="fileDetailsAvailability")]
     pub file_details_availability: String,
-    /// This value indicates whether video editing suggestions, which might improve video quality or the playback experience, are available for the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.    
+    /// This value indicates whether video editing suggestions, which might improve video quality or the playback experience, are available for the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
     #[serde(alias="editorSuggestionsAvailability")]
     pub editor_suggestions_availability: String,
-    /// The video's processing status. This value indicates whether YouTube was able to process the video or if the video is still being processed.    
+    /// The video's processing status. This value indicates whether YouTube was able to process the video or if the video is still being processed.
     #[serde(alias="processingStatus")]
     pub processing_status: String,
-    /// This value indicates whether the video processing engine has generated suggestions that might improve YouTube's ability to process the the video, warnings that explain video processing problems, or errors that cause video processing problems. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.    
+    /// This value indicates whether the video processing engine has generated suggestions that might improve YouTube's ability to process the the video, warnings that explain video processing problems, or errors that cause video processing problems. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
     #[serde(alias="processingIssuesAvailability")]
     pub processing_issues_availability: String,
-    /// The reason that YouTube failed to process the video. This property will only have a value if the processingStatus property's value is failed.    
+    /// The reason that YouTube failed to process the video. This property will only have a value if the processingStatus property's value is failed.
     #[serde(alias="processingFailureReason")]
     pub processing_failure_reason: String,
-    /// This value indicates whether thumbnail images have been generated for the video.    
+    /// This value indicates whether thumbnail images have been generated for the video.
     #[serde(alias="thumbnailsAvailability")]
     pub thumbnails_availability: String,
-    /// The processingProgress object contains information about the progress YouTube has made in processing the video. The values are really only relevant if the video's processing status is processing.    
+    /// The processingProgress object contains information about the progress YouTube has made in processing the video. The values are really only relevant if the video's processing status is processing.
     #[serde(alias="processingProgress")]
     pub processing_progress: VideoProcessingDetailsProcessingProgress,
-    /// This value indicates whether keyword (tag) suggestions are available for the video. Tags can be added to a video's metadata to make it easier for other users to find the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.    
+    /// This value indicates whether keyword (tag) suggestions are available for the video. Tags can be added to a video's metadata to make it easier for other users to find the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.
     #[serde(alias="tagSuggestionsAvailability")]
     pub tag_suggestions_availability: String,
 }
@@ -1691,16 +1700,16 @@ impl Part for VideoProcessingDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastStatus {
-    /// The broadcast's recording status.    
+    /// The broadcast's recording status.
     #[serde(alias="recordingStatus")]
     pub recording_status: String,
-    /// The broadcast's privacy status. Note that the broadcast represents exactly one YouTube video, so the privacy settings are identical to those supported for videos. In addition, you can set this field by modifying the broadcast resource or by setting the privacyStatus field of the corresponding video resource.    
+    /// The broadcast's privacy status. Note that the broadcast represents exactly one YouTube video, so the privacy settings are identical to those supported for videos. In addition, you can set this field by modifying the broadcast resource or by setting the privacyStatus field of the corresponding video resource.
     #[serde(alias="privacyStatus")]
     pub privacy_status: String,
-    /// The broadcast's status. The status can be updated using the API's liveBroadcasts.transition method.    
+    /// The broadcast's status. The status can be updated using the API's liveBroadcasts.transition method.
     #[serde(alias="lifeCycleStatus")]
     pub life_cycle_status: String,
-    /// Priority of the live broadcast event (internal state).    
+    /// Priority of the live broadcast event (internal state).
     #[serde(alias="liveBroadcastPriority")]
     pub live_broadcast_priority: String,
 }
@@ -1714,13 +1723,13 @@ impl Part for LiveBroadcastStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionContentDetails {
-    /// The number of new items in the subscription since its content was last read.    
+    /// The number of new items in the subscription since its content was last read.
     #[serde(alias="newItemCount")]
     pub new_item_count: u32,
-    /// The type of activity this subscription is for (only uploads, everything).    
+    /// The type of activity this subscription is for (only uploads, everything).
     #[serde(alias="activityType")]
     pub activity_type: String,
-    /// The approximate number of items that the subscription points to.    
+    /// The approximate number of items that the subscription points to.
     #[serde(alias="totalItemCount")]
     pub total_item_count: u32,
 }
@@ -1744,41 +1753,41 @@ impl Part for SubscriptionContentDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Video {
-    /// The status object contains information about the video's uploading, processing, and privacy statuses.    
+    /// The status object contains information about the video's uploading, processing, and privacy statuses.
     pub status: Option<VideoStatus>,
-    /// The topicDetails object encapsulates information about Freebase topics associated with the video.    
+    /// The topicDetails object encapsulates information about Freebase topics associated with the video.
     #[serde(alias="topicDetails")]
     pub topic_details: Option<VideoTopicDetails>,
-    /// The monetizationDetails object encapsulates information about the monetization status of the video.    
+    /// The monetizationDetails object encapsulates information about the monetization status of the video.
     #[serde(alias="monetizationDetails")]
     pub monetization_details: Option<VideoMonetizationDetails>,
-    /// The suggestions object encapsulates suggestions that identify opportunities to improve the video quality or the metadata for the uploaded video. This data can only be retrieved by the video owner.    
+    /// The suggestions object encapsulates suggestions that identify opportunities to improve the video quality or the metadata for the uploaded video. This data can only be retrieved by the video owner.
     pub suggestions: Option<VideoSuggestions>,
-    /// Age restriction details related to a video.    
+    /// Age restriction details related to a video.
     #[serde(alias="ageGating")]
     pub age_gating: Option<VideoAgeGating>,
-    /// The fileDetails object encapsulates information about the video file that was uploaded to YouTube, including the file's resolution, duration, audio and video codecs, stream bitrates, and more. This data can only be retrieved by the video owner.    
+    /// The fileDetails object encapsulates information about the video file that was uploaded to YouTube, including the file's resolution, duration, audio and video codecs, stream bitrates, and more. This data can only be retrieved by the video owner.
     #[serde(alias="fileDetails")]
     pub file_details: Option<VideoFileDetails>,
-    /// The player object contains information that you would use to play the video in an embedded player.    
+    /// The player object contains information that you would use to play the video in an embedded player.
     pub player: Option<VideoPlayer>,
-    /// The ID that YouTube uses to uniquely identify the video.    
+    /// The ID that YouTube uses to uniquely identify the video.
     pub id: Option<String>,
-    /// List with all localizations.    
+    /// List with all localizations.
     pub localizations: Option<HashMap<String, VideoLocalization>>,
-    /// The liveStreamingDetails object contains metadata about a live video broadcast. The object will only be present in a video resource if the video is an upcoming, live, or completed live broadcast.    
+    /// The liveStreamingDetails object contains metadata about a live video broadcast. The object will only be present in a video resource if the video is an upcoming, live, or completed live broadcast.
     #[serde(alias="liveStreamingDetails")]
     pub live_streaming_details: Option<VideoLiveStreamingDetails>,
-    /// The snippet object contains basic details about the video, such as its title, description, and category.    
+    /// The snippet object contains basic details about the video, such as its title, description, and category.
     pub snippet: Option<VideoSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#video".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#video".
     pub kind: Option<String>,
-    /// The statistics object contains statistics about the video.    
+    /// The statistics object contains statistics about the video.
     pub statistics: Option<VideoStatistics>,
-    /// The projectDetails object contains information about the project specific video metadata.    
+    /// The projectDetails object contains information about the project specific video metadata.
     #[serde(alias="projectDetails")]
     pub project_details: Option<VideoProjectDetails>,
-    /// The conversionPings object encapsulates information about url pings that need to be respected by the App in different video contexts.    
+    /// The conversionPings object encapsulates information about url pings that need to be respected by the App in different video contexts.
     #[serde(alias="conversionPings")]
     pub conversion_pings: Option<VideoConversionPings>,
     /// The processingProgress object encapsulates information about YouTube's progress in processing the uploaded video file. The properties in the object identify the current processing status and an estimate of the time remaining until YouTube finishes processing the video. This part also indicates whether different types of data or content, such as file details or thumbnail images, are available for the video.
@@ -1786,12 +1795,12 @@ pub struct Video {
     /// The processingProgress object is designed to be polled so that the video uploaded can track the progress that YouTube has made in processing the uploaded video file. This data can only be retrieved by the video owner.
     #[serde(alias="processingDetails")]
     pub processing_details: Option<VideoProcessingDetails>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
-    /// The contentDetails object contains information about the video content, including the length of the video and its aspect ratio.    
+    /// The contentDetails object contains information about the video content, including the length of the video and its aspect ratio.
     #[serde(alias="contentDetails")]
     pub content_details: Option<VideoContentDetails>,
-    /// The recordingDetails object encapsulates information about the location, date and address where the video was recorded.    
+    /// The recordingDetails object encapsulates information about the location, date and address where the video was recorded.
     #[serde(alias="recordingDetails")]
     pub recording_details: Option<VideoRecordingDetails>,
 }
@@ -1836,11 +1845,11 @@ impl ToParts for Video {
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoPoint {
-    /// Latitude in degrees.    
+    /// Latitude in degrees.
     pub latitude: f64,
-    /// Altitude above the reference ellipsoid, in meters.    
+    /// Altitude above the reference ellipsoid, in meters.
     pub altitude: f64,
-    /// Longitude in degrees.    
+    /// Longitude in degrees.
     pub longitude: f64,
 }
 
@@ -1853,13 +1862,13 @@ impl Part for GeoPoint {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelBrandingSettings {
-    /// Branding properties for branding images.    
+    /// Branding properties for branding images.
     pub image: ImageSettings,
-    /// Branding properties for the watch page.    
+    /// Branding properties for the watch page.
     pub watch: WatchSettings,
-    /// Branding properties for the channel view.    
+    /// Branding properties for the channel view.
     pub channel: ChannelSettings,
-    /// Additional experimental branding properties.    
+    /// Additional experimental branding properties.
     pub hints: Vec<PropertyValue>,
 }
 
@@ -1872,7 +1881,7 @@ impl Part for ChannelBrandingSettings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoPlayer {
-    /// An <iframe> tag that embeds a player that will play the video.    
+    /// An <iframe> tag that embeds a player that will play the video.
     #[serde(alias="embedHtml")]
     pub embed_html: String,
 }
@@ -1886,19 +1895,19 @@ impl Part for VideoPlayer {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSnippet {
-    /// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the channel was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="publishedAt")]
     pub published_at: String,
-    /// The description of the channel.    
+    /// The description of the channel.
     pub description: String,
-    /// The channel's title.    
+    /// The channel's title.
     pub title: String,
-    /// Localized title and description, read-only.    
+    /// Localized title and description, read-only.
     pub localized: ChannelLocalization,
-    /// The language of the channel's default title and description.    
+    /// The language of the channel's default title and description.
     #[serde(alias="defaultLanguage")]
     pub default_language: String,
-    /// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    /// A map of thumbnail images associated with the channel. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
 }
 
@@ -1911,13 +1920,13 @@ impl Part for ChannelSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WatchSettings {
-    /// The background color for the video watch page's branded area.    
+    /// The background color for the video watch page's branded area.
     #[serde(alias="textColor")]
     pub text_color: String,
-    /// An ID that uniquely identifies a playlist that displays next to the video player.    
+    /// An ID that uniquely identifies a playlist that displays next to the video player.
     #[serde(alias="featuredPlaylistId")]
     pub featured_playlist_id: String,
-    /// The text color for the video watch page's branded area.    
+    /// The text color for the video watch page's branded area.
     #[serde(alias="backgroundColor")]
     pub background_color: String,
 }
@@ -1931,7 +1940,7 @@ impl Part for WatchSettings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSectionLocalization {
-    /// The localized strings for channel section's title.    
+    /// The localized strings for channel section's title.
     pub title: String,
 }
 
@@ -1944,9 +1953,9 @@ impl Part for ChannelSectionLocalization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoContentDetailsRegionRestriction {
-    /// A list of region codes that identify countries where the video is viewable. If this property is present and a country is not listed in its value, then the video is blocked from appearing in that country. If this property is present and contains an empty list, the video is blocked in all countries.    
+    /// A list of region codes that identify countries where the video is viewable. If this property is present and a country is not listed in its value, then the video is blocked from appearing in that country. If this property is present and contains an empty list, the video is blocked in all countries.
     pub allowed: Vec<String>,
-    /// A list of region codes that identify countries where the video is blocked. If this property is present and a country is not listed in its value, then the video is viewable in that country. If this property is present and contains an empty list, the video is viewable in all countries.    
+    /// A list of region codes that identify countries where the video is blocked. If this property is present and a country is not listed in its value, then the video is viewable in that country. If this property is present and contains an empty list, the video is viewable in all countries.
     pub blocked: Vec<String>,
 }
 
@@ -1959,25 +1968,25 @@ impl Part for VideoContentDetailsRegionRestriction {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoContentDetails {
-    /// The value of definition indicates whether the video is available in high definition or only in standard definition.    
+    /// The value of definition indicates whether the video is available in high definition or only in standard definition.
     pub definition: String,
-    /// The countryRestriction object contains information about the countries where a video is (or is not) viewable.    
+    /// The countryRestriction object contains information about the countries where a video is (or is not) viewable.
     #[serde(alias="countryRestriction")]
     pub country_restriction: AccessPolicy,
-    /// Specifies the ratings that the video received under various rating schemes.    
+    /// Specifies the ratings that the video received under various rating schemes.
     #[serde(alias="contentRating")]
     pub content_rating: ContentRating,
-    /// The value of captions indicates whether the video has captions or not.    
+    /// The value of captions indicates whether the video has captions or not.
     pub caption: String,
-    /// The regionRestriction object contains information about the countries where a video is (or is not) viewable. The object will contain either the contentDetails.regionRestriction.allowed property or the contentDetails.regionRestriction.blocked property.    
+    /// The regionRestriction object contains information about the countries where a video is (or is not) viewable. The object will contain either the contentDetails.regionRestriction.allowed property or the contentDetails.regionRestriction.blocked property.
     #[serde(alias="regionRestriction")]
     pub region_restriction: VideoContentDetailsRegionRestriction,
-    /// The length of the video. The tag value is an ISO 8601 duration in the format PT#M#S, in which the letters PT indicate that the value specifies a period of time, and the letters M and S refer to length in minutes and seconds, respectively. The # characters preceding the M and S letters are both integers that specify the number of minutes (or seconds) of the video. For example, a value of PT15M51S indicates that the video is 15 minutes and 51 seconds long.    
+    /// The length of the video. The tag value is an ISO 8601 duration in the format PT#M#S, in which the letters PT indicate that the value specifies a period of time, and the letters M and S refer to length in minutes and seconds, respectively. The # characters preceding the M and S letters are both integers that specify the number of minutes (or seconds) of the video. For example, a value of PT15M51S indicates that the video is 15 minutes and 51 seconds long.
     pub duration: String,
-    /// The value of is_license_content indicates whether the video is licensed content.    
+    /// The value of is_license_content indicates whether the video is licensed content.
     #[serde(alias="licensedContent")]
     pub licensed_content: bool,
-    /// The value of dimension indicates whether the video is available in 3D or in 2D.    
+    /// The value of dimension indicates whether the video is available in 3D or in 2D.
     pub dimension: String,
 }
 
@@ -1990,16 +1999,16 @@ impl Part for VideoContentDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotedItemId {
-    /// If the promoted item represents a website, this field represents the url pointing to the website. This field will be present only if type has the value website.    
+    /// If the promoted item represents a website, this field represents the url pointing to the website. This field will be present only if type has the value website.
     #[serde(alias="websiteUrl")]
     pub website_url: String,
-    /// If type is recentUpload, this field identifies the channel from which to take the recent upload. If missing, the channel is assumed to be the same channel for which the invideoPromotion is set.    
+    /// If type is recentUpload, this field identifies the channel from which to take the recent upload. If missing, the channel is assumed to be the same channel for which the invideoPromotion is set.
     #[serde(alias="recentlyUploadedBy")]
     pub recently_uploaded_by: String,
-    /// Describes the type of the promoted item.    
+    /// Describes the type of the promoted item.
     #[serde(alias="type")]
     pub type_: String,
-    /// If the promoted item represents a video, this field represents the unique YouTube ID identifying it. This field will be present only if type has the value video.    
+    /// If the promoted item represents a video, this field represents the unique YouTube ID identifying it. This field will be present only if type has the value video.
     #[serde(alias="videoId")]
     pub video_id: String,
 }
@@ -2020,19 +2029,19 @@ impl Part for PromotedItemId {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
-    /// The snippet object contains basic details about the subscription, including its title and the channel that the user subscribed to.    
+    /// The snippet object contains basic details about the subscription, including its title and the channel that the user subscribed to.
     pub snippet: Option<SubscriptionSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#subscription".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#subscription".
     pub kind: Option<String>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
-    /// The contentDetails object contains basic statistics about the subscription.    
+    /// The contentDetails object contains basic statistics about the subscription.
     #[serde(alias="contentDetails")]
     pub content_details: Option<SubscriptionContentDetails>,
-    /// The subscriberSnippet object contains basic details about the sbuscriber.    
+    /// The subscriberSnippet object contains basic details about the sbuscriber.
     #[serde(alias="subscriberSnippet")]
     pub subscriber_snippet: Option<SubscriptionSubscriberSnippet>,
-    /// The ID that YouTube uses to uniquely identify the subscription.    
+    /// The ID that YouTube uses to uniquely identify the subscription.
     pub id: Option<String>,
 }
 
@@ -2063,9 +2072,9 @@ impl ToParts for Subscription {
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nRegionSnippet {
-    /// The region code as a 2-letter ISO country code.    
+    /// The region code as a 2-letter ISO country code.
     pub gl: String,
-    /// The human-readable name of the region.    
+    /// The human-readable name of the region.
     pub name: String,
 }
 
@@ -2078,13 +2087,13 @@ impl Part for I18nRegionSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsPlaylistItem {
-    /// The resourceId object contains information about the resource that was added to the playlist.    
+    /// The resourceId object contains information about the resource that was added to the playlist.
     #[serde(alias="resourceId")]
     pub resource_id: ResourceId,
-    /// The value that YouTube uses to uniquely identify the playlist.    
+    /// The value that YouTube uses to uniquely identify the playlist.
     #[serde(alias="playlistId")]
     pub playlist_id: String,
-    /// ID of the item within the playlist.    
+    /// ID of the item within the playlist.
     #[serde(alias="playlistItemId")]
     pub playlist_item_id: String,
 }
@@ -2098,10 +2107,10 @@ impl Part for ActivityContentDetailsPlaylistItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InvideoPosition {
-    /// Describes in which corner of the video the visual widget will appear.    
+    /// Describes in which corner of the video the visual widget will appear.
     #[serde(alias="cornerPosition")]
     pub corner_position: String,
-    /// Defines the position type.    
+    /// Defines the position type.
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -2132,22 +2141,22 @@ impl Part for InvideoPosition {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Playlist {
-    /// The status object contains status information for the playlist.    
+    /// The status object contains status information for the playlist.
     pub status: Option<PlaylistStatus>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlist".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#playlist".
     pub kind: Option<String>,
-    /// The contentDetails object contains information like video count.    
+    /// The contentDetails object contains information like video count.
     #[serde(alias="contentDetails")]
     pub content_details: Option<PlaylistContentDetails>,
-    /// The snippet object contains basic details about the playlist, such as its title and description.    
+    /// The snippet object contains basic details about the playlist, such as its title and description.
     pub snippet: Option<PlaylistSnippet>,
-    /// The player object contains information that you would use to play the playlist in an embedded player.    
+    /// The player object contains information that you would use to play the playlist in an embedded player.
     pub player: Option<PlaylistPlayer>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
-    /// The ID that YouTube uses to uniquely identify the playlist.    
+    /// The ID that YouTube uses to uniquely identify the playlist.
     pub id: Option<String>,
-    /// Localizations for different languages    
+    /// Localizations for different languages
     pub localizations: Option<HashMap<String, PlaylistLocalization>>,
 }
 
@@ -2180,10 +2189,10 @@ impl ToParts for Playlist {
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GuideCategorySnippet {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// Description of the guide category.    
+    /// Description of the guide category.
     pub title: String,
 }
 
@@ -2196,32 +2205,32 @@ impl Part for GuideCategorySnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoSnippet {
-    /// The video's description.    
+    /// The video's description.
     pub description: String,
-    /// A list of keyword tags associated with the video. Tags may contain spaces. This field is only visible to the video's uploader.    
+    /// A list of keyword tags associated with the video. Tags may contain spaces. This field is only visible to the video's uploader.
     pub tags: Vec<String>,
-    /// The ID that YouTube uses to uniquely identify the channel that the video was uploaded to.    
+    /// The ID that YouTube uses to uniquely identify the channel that the video was uploaded to.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The language of the videos's default snippet.    
+    /// The language of the videos's default snippet.
     #[serde(alias="defaultLanguage")]
     pub default_language: String,
-    /// Indicates if the video is an upcoming/active live broadcast. Or it's "none" if the video is not an upcoming/active live broadcast.    
+    /// Indicates if the video is an upcoming/active live broadcast. Or it's "none" if the video is not an upcoming/active live broadcast.
     #[serde(alias="liveBroadcastContent")]
     pub live_broadcast_content: String,
-    /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="publishedAt")]
     pub published_at: String,
-    /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    /// A map of thumbnail images associated with the video. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
-    /// The video's title.    
+    /// The video's title.
     pub title: String,
-    /// The YouTube video category associated with the video.    
+    /// The YouTube video category associated with the video.
     #[serde(alias="categoryId")]
     pub category_id: String,
-    /// Localized snippet selected with the hl parameter. If no such localization exists, this field is populated with the default snippet. (Read-only)    
+    /// Localized snippet selected with the hl parameter. If no such localization exists, this field is populated with the default snippet. (Read-only)
     pub localized: VideoLocalization,
-    /// Channel title for the channel that the video belongs to.    
+    /// Channel title for the channel that the video belongs to.
     #[serde(alias="channelTitle")]
     pub channel_title: String,
 }
@@ -2235,15 +2244,15 @@ impl Part for VideoSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InvideoPromotion {
-    /// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.    
+    /// The default temporal position within the video where the promoted item will be displayed. Can be overriden by more specific timing in the item.
     #[serde(alias="defaultTiming")]
     pub default_timing: InvideoTiming,
-    /// List of promoted items in decreasing priority.    
+    /// List of promoted items in decreasing priority.
     pub items: Vec<PromotedItem>,
-    /// Indicates whether the channel's promotional campaign uses "smart timing." This feature attempts to show promotions at a point in the video when they are more likely to be clicked and less likely to disrupt the viewing experience. This feature also picks up a single promotion to show on each video.    
+    /// Indicates whether the channel's promotional campaign uses "smart timing." This feature attempts to show promotions at a point in the video when they are more likely to be clicked and less likely to disrupt the viewing experience. This feature also picks up a single promotion to show on each video.
     #[serde(alias="useSmartTiming")]
     pub use_smart_timing: bool,
-    /// The spatial position within the video where the promoted item will be displayed.    
+    /// The spatial position within the video where the promoted item will be displayed.
     pub position: InvideoPosition,
 }
 
@@ -2256,15 +2265,15 @@ impl Part for InvideoPromotion {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotedItem {
-    /// The temporal position within the video where the promoted item will be displayed. If present, it overrides the default timing.    
+    /// The temporal position within the video where the promoted item will be displayed. If present, it overrides the default timing.
     pub timing: InvideoTiming,
-    /// If true, the content owner's name will be used when displaying the promotion. This field can only be set when the update is made on behalf of the content owner.    
+    /// If true, the content owner's name will be used when displaying the promotion. This field can only be set when the update is made on behalf of the content owner.
     #[serde(alias="promotedByContentOwner")]
     pub promoted_by_content_owner: bool,
-    /// A custom message to display for this promotion. This field is currently ignored unless the promoted item is a website.    
+    /// A custom message to display for this promotion. This field is currently ignored unless the promoted item is a website.
     #[serde(alias="customMessage")]
     pub custom_message: String,
-    /// Identifies the promoted item.    
+    /// Identifies the promoted item.
     pub id: PromotedItemId,
 }
 
@@ -2277,19 +2286,19 @@ impl Part for PromotedItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcastContentDetails {
-    /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.    
+    /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.
     #[serde(alias="startWithSlate")]
     pub start_with_slate: bool,
-    /// This value uniquely identifies the live stream bound to the broadcast.    
+    /// This value uniquely identifies the live stream bound to the broadcast.
     #[serde(alias="boundStreamId")]
     pub bound_stream_id: String,
-    /// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.    
+    /// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.
     #[serde(alias="enableEmbed")]
     pub enable_embed: bool,
-    /// This setting indicates whether closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API.    
+    /// This setting indicates whether closed captioning is enabled for this broadcast. The ingestion URL of the closed captions is returned through the liveStreams API.
     #[serde(alias="enableClosedCaptions")]
     pub enable_closed_captions: bool,
-    /// This setting indicates whether YouTube should enable content encryption for the broadcast.    
+    /// This setting indicates whether YouTube should enable content encryption for the broadcast.
     #[serde(alias="enableContentEncryption")]
     pub enable_content_encryption: bool,
     /// Automatically start recording after the event goes live. The default value for this property is true.
@@ -2306,7 +2315,7 @@ pub struct LiveBroadcastContentDetails {
     /// Important: You must set the value to true and also set the enableArchive property's value to true if you want to make playback available immediately after the broadcast ends.
     #[serde(alias="enableDvr")]
     pub enable_dvr: bool,
-    /// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.    
+    /// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.
     #[serde(alias="monitorStream")]
     pub monitor_stream: MonitorStreamInfo,
 }
@@ -2320,26 +2329,26 @@ impl Part for LiveBroadcastContentDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoStatus {
-    /// The video's license.    
+    /// The video's license.
     pub license: String,
-    /// This value indicates if the video can be embedded on another website.    
+    /// This value indicates if the video can be embedded on another website.
     pub embeddable: bool,
-    /// The video's privacy status.    
+    /// The video's privacy status.
     #[serde(alias="privacyStatus")]
     pub privacy_status: String,
-    /// The date and time when the video is scheduled to publish. It can be set only if the privacy status of the video is private. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time when the video is scheduled to publish. It can be set only if the privacy status of the video is private. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="publishAt")]
     pub publish_at: String,
-    /// This value indicates if the extended video statistics on the watch page can be viewed by everyone. Note that the view count, likes, etc will still be visible if this is disabled.    
+    /// This value indicates if the extended video statistics on the watch page can be viewed by everyone. Note that the view count, likes, etc will still be visible if this is disabled.
     #[serde(alias="publicStatsViewable")]
     pub public_stats_viewable: bool,
-    /// The status of the uploaded video.    
+    /// The status of the uploaded video.
     #[serde(alias="uploadStatus")]
     pub upload_status: String,
-    /// This value explains why YouTube rejected an uploaded video. This property is only present if the uploadStatus property indicates that the upload was rejected.    
+    /// This value explains why YouTube rejected an uploaded video. This property is only present if the uploadStatus property indicates that the upload was rejected.
     #[serde(alias="rejectionReason")]
     pub rejection_reason: String,
-    /// This value explains why a video failed to upload. This property is only present if the uploadStatus property indicates that the upload failed.    
+    /// This value explains why a video failed to upload. This property is only present if the uploadStatus property indicates that the upload failed.
     #[serde(alias="failureReason")]
     pub failure_reason: String,
 }
@@ -2353,13 +2362,13 @@ impl Part for VideoStatus {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GuideCategory {
-    /// The snippet object contains basic details about the category, such as its title.    
+    /// The snippet object contains basic details about the category, such as its title.
     pub snippet: GuideCategorySnippet,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#guideCategory".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#guideCategory".
     pub kind: String,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The ID that YouTube uses to uniquely identify the guide category.    
+    /// The ID that YouTube uses to uniquely identify the guide category.
     pub id: String,
 }
 
@@ -2377,16 +2386,16 @@ impl Part for GuideCategory {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChannelSectionListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// A list of ChannelSections that match the request criteria.    
+    /// A list of ChannelSections that match the request criteria.
     pub items: Vec<ChannelSection>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelSectionListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelSectionListResponse".
     pub kind: String,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
 }
@@ -2400,10 +2409,10 @@ impl ResponseResult for ChannelSectionListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonitorStreamInfo {
-    /// If you have set the enableMonitorStream property to true, then this property determines the length of the live broadcast delay.    
+    /// If you have set the enableMonitorStream property to true, then this property determines the length of the live broadcast delay.
     #[serde(alias="broadcastStreamDelayMs")]
     pub broadcast_stream_delay_ms: u32,
-    /// HTML code that embeds a player that plays the monitor stream.    
+    /// HTML code that embeds a player that plays the monitor stream.
     #[serde(alias="embedHtml")]
     pub embed_html: String,
     /// This value determines whether the monitor stream is enabled for the broadcast. If the monitor stream is enabled, then YouTube will broadcast the event content on a special stream intended only for the broadcaster's consumption. The broadcaster can use the stream to review the event content and also to identify the optimal times to insert cuepoints.
@@ -2429,16 +2438,16 @@ impl Part for MonitorStreamInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nLanguageListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// A list of supported i18n languages. In this map, the i18n language ID is the map key, and its value is the corresponding i18nLanguage resource.    
+    /// A list of supported i18n languages. In this map, the i18n language ID is the map key, and its value is the corresponding i18nLanguage resource.
     pub items: Vec<I18nLanguage>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nLanguageListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nLanguageListResponse".
     pub kind: String,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
 }
@@ -2452,12 +2461,12 @@ impl ResponseResult for I18nLanguageListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedProperty {
-    /// no description provided    
+    /// no description provided
     pub default: String,
-    /// The language of the default property.    
+    /// The language of the default property.
     #[serde(alias="defaultLanguage")]
     pub default_language: LanguageTag,
-    /// no description provided    
+    /// no description provided
     pub localized: Vec<LocalizedString>,
 }
 
@@ -2481,18 +2490,18 @@ impl Part for LocalizedProperty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveBroadcast {
-    /// The status object contains information about the event's status.    
+    /// The status object contains information about the event's status.
     pub status: Option<LiveBroadcastStatus>,
-    /// The snippet object contains basic details about the event, including its title, description, start time, and end time.    
+    /// The snippet object contains basic details about the event, including its title, description, start time, and end time.
     pub snippet: Option<LiveBroadcastSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveBroadcast".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveBroadcast".
     pub kind: Option<String>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
-    /// The contentDetails object contains information about the event's video content, such as whether the content can be shown in an embedded video player or if it will be archived and therefore available for viewing after the event has concluded.    
+    /// The contentDetails object contains information about the event's video content, such as whether the content can be shown in an embedded video player or if it will be archived and therefore available for viewing after the event has concluded.
     #[serde(alias="contentDetails")]
     pub content_details: Option<LiveBroadcastContentDetails>,
-    /// The ID that YouTube assigns to uniquely identify the broadcast.    
+    /// The ID that YouTube assigns to uniquely identify the broadcast.
     pub id: Option<String>,
 }
 
@@ -2523,25 +2532,25 @@ impl ToParts for LiveBroadcast {
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoFileDetailsVideoStream {
-    /// The video stream's bitrate, in bits per second.    
+    /// The video stream's bitrate, in bits per second.
     #[serde(alias="bitrateBps")]
     pub bitrate_bps: String,
-    /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.    
+    /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.
     pub vendor: String,
-    /// The video codec that the stream uses.    
+    /// The video codec that the stream uses.
     pub codec: String,
-    /// The encoded video content's width in pixels. You can calculate the video's encoding aspect ratio as width_pixels / height_pixels.    
+    /// The encoded video content's width in pixels. You can calculate the video's encoding aspect ratio as width_pixels / height_pixels.
     #[serde(alias="widthPixels")]
     pub width_pixels: u32,
-    /// The encoded video content's height in pixels.    
+    /// The encoded video content's height in pixels.
     #[serde(alias="heightPixels")]
     pub height_pixels: u32,
-    /// The video content's display aspect ratio, which specifies the aspect ratio in which the video should be displayed.    
+    /// The video content's display aspect ratio, which specifies the aspect ratio in which the video should be displayed.
     #[serde(alias="aspectRatio")]
     pub aspect_ratio: f64,
-    /// The amount that YouTube needs to rotate the original source content to properly display the video.    
+    /// The amount that YouTube needs to rotate the original source content to properly display the video.
     pub rotation: String,
-    /// The video stream's frame rate, in frames per second.    
+    /// The video stream's frame rate, in frames per second.
     #[serde(alias="frameRateFps")]
     pub frame_rate_fps: f64,
 }
@@ -2560,11 +2569,11 @@ impl Part for VideoFileDetailsVideoStream {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Thumbnail {
-    /// The thumbnail image's URL.    
+    /// The thumbnail image's URL.
     pub url: Option<String>,
-    /// (Optional) Width of the thumbnail image.    
+    /// (Optional) Width of the thumbnail image.
     pub width: Option<u32>,
-    /// (Optional) Height of the thumbnail image.    
+    /// (Optional) Height of the thumbnail image.
     pub height: Option<u32>,
 }
 
@@ -2583,40 +2592,40 @@ impl Resource for Thumbnail {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
-    /// The status object encapsulates information about the privacy status of the channel.    
+    /// The status object encapsulates information about the privacy status of the channel.
     pub status: Option<ChannelStatus>,
-    /// The invideoPromotion object encapsulates information about promotion campaign associated with the channel.    
+    /// The invideoPromotion object encapsulates information about promotion campaign associated with the channel.
     #[serde(alias="invideoPromotion")]
     pub invideo_promotion: Option<InvideoPromotion>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#channel".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#channel".
     pub kind: Option<String>,
-    /// The statistics object encapsulates statistics for the channel.    
+    /// The statistics object encapsulates statistics for the channel.
     pub statistics: Option<ChannelStatistics>,
-    /// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.    
+    /// The contentOwnerDetails object encapsulates channel data that is relevant for YouTube Partners linked with the channel.
     #[serde(alias="contentOwnerDetails")]
     pub content_owner_details: Option<ChannelContentOwnerDetails>,
-    /// The topicDetails object encapsulates information about Freebase topics associated with the channel.    
+    /// The topicDetails object encapsulates information about Freebase topics associated with the channel.
     #[serde(alias="topicDetails")]
     pub topic_details: Option<ChannelTopicDetails>,
-    /// The contentDetails object encapsulates information about the channel's content.    
+    /// The contentDetails object encapsulates information about the channel's content.
     #[serde(alias="contentDetails")]
     pub content_details: Option<ChannelContentDetails>,
-    /// The brandingSettings object encapsulates information about the branding of the channel.    
+    /// The brandingSettings object encapsulates information about the branding of the channel.
     #[serde(alias="brandingSettings")]
     pub branding_settings: Option<ChannelBrandingSettings>,
-    /// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.    
+    /// The conversionPings object encapsulates information about conversion pings that need to be respected by the channel.
     #[serde(alias="conversionPings")]
     pub conversion_pings: Option<ChannelConversionPings>,
-    /// The snippet object contains basic details about the channel, such as its title, description, and thumbnail images.    
+    /// The snippet object contains basic details about the channel, such as its title, description, and thumbnail images.
     pub snippet: Option<ChannelSnippet>,
-    /// The auditionDetails object encapsulates channel data that is relevant for YouTube Partners during the audition process.    
+    /// The auditionDetails object encapsulates channel data that is relevant for YouTube Partners during the audition process.
     #[serde(alias="auditDetails")]
     pub audit_details: Option<ChannelAuditDetails>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
-    /// The ID that YouTube uses to uniquely identify the channel.    
+    /// The ID that YouTube uses to uniquely identify the channel.
     pub id: Option<String>,
-    /// Localizations for different languages    
+    /// Localizations for different languages
     pub localizations: Option<HashMap<String, ChannelLocalization>>,
 }
 
@@ -2655,19 +2664,19 @@ impl ToParts for Channel {
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelStatistics {
-    /// The number of comments for the channel.    
+    /// The number of comments for the channel.
     #[serde(alias="commentCount")]
     pub comment_count: i64,
-    /// The number of subscribers that the channel has.    
+    /// The number of subscribers that the channel has.
     #[serde(alias="subscriberCount")]
     pub subscriber_count: i64,
-    /// The number of videos uploaded to the channel.    
+    /// The number of videos uploaded to the channel.
     #[serde(alias="videoCount")]
     pub video_count: i64,
-    /// Whether or not the number of subscribers is shown for this user.    
+    /// Whether or not the number of subscribers is shown for this user.
     #[serde(alias="hiddenSubscriberCount")]
     pub hidden_subscriber_count: bool,
-    /// The number of times the channel has been viewed.    
+    /// The number of times the channel has been viewed.
     #[serde(alias="viewCount")]
     pub view_count: i64,
 }
@@ -2681,19 +2690,19 @@ impl Part for ChannelStatistics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsSocial {
-    /// The resourceId object encapsulates information that identifies the resource associated with a social network post.    
+    /// The resourceId object encapsulates information that identifies the resource associated with a social network post.
     #[serde(alias="resourceId")]
     pub resource_id: ResourceId,
-    /// An image of the post's author.    
+    /// An image of the post's author.
     #[serde(alias="imageUrl")]
     pub image_url: String,
-    /// The name of the social network.    
+    /// The name of the social network.
     #[serde(alias="type")]
     pub type_: String,
-    /// The URL of the social network post.    
+    /// The URL of the social network post.
     #[serde(alias="referenceUrl")]
     pub reference_url: String,
-    /// The author of the social network post.    
+    /// The author of the social network post.
     pub author: String,
 }
 
@@ -2706,9 +2715,9 @@ impl Part for ActivityContentDetailsSocial {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelLocalization {
-    /// The localized strings for channel's description.    
+    /// The localized strings for channel's description.
     pub description: String,
-    /// The localized strings for channel's title, read-only.    
+    /// The localized strings for channel's title, read-only.
     pub title: String,
 }
 
@@ -2721,15 +2730,15 @@ impl Part for ChannelLocalization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceId {
-    /// The type of the API resource.    
+    /// The type of the API resource.
     pub kind: String,
-    /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a channel. This property is only present if the resourceId.kind value is youtube#channel.    
+    /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a channel. This property is only present if the resourceId.kind value is youtube#channel.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a playlist. This property is only present if the resourceId.kind value is youtube#playlist.    
+    /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a playlist. This property is only present if the resourceId.kind value is youtube#playlist.
     #[serde(alias="playlistId")]
     pub playlist_id: String,
-    /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a video. This property is only present if the resourceId.kind value is youtube#video.    
+    /// The ID that YouTube uses to uniquely identify the referred resource, if that resource is a video. This property is only present if the resourceId.kind value is youtube#video.
     #[serde(alias="videoId")]
     pub video_id: String,
 }
@@ -2743,13 +2752,13 @@ impl Part for ResourceId {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchResult {
-    /// The snippet object contains basic details about a search result, such as its title or description. For example, if the search result is a video, then the title will be the video's title and the description will be the video's description.    
+    /// The snippet object contains basic details about a search result, such as its title or description. For example, if the search result is a video, then the title will be the video's title and the description will be the video's description.
     pub snippet: SearchResultSnippet,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#searchResult".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#searchResult".
     pub kind: String,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The id object contains information that can be used to uniquely identify the resource that matches the search request.    
+    /// The id object contains information that can be used to uniquely identify the resource that matches the search request.
     pub id: ResourceId,
 }
 
@@ -2767,28 +2776,28 @@ impl Part for SearchResult {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoCategoryListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoCategoryListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoCategoryListResponse".
     pub kind: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
-    /// A list of video categories that can be associated with YouTube videos. In this map, the video category ID is the map key, and its value is the corresponding videoCategory resource.    
+    /// A list of video categories that can be associated with YouTube videos. In this map, the video category ID is the map key, and its value is the corresponding videoCategory resource.
     pub items: Vec<VideoCategory>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
 }
@@ -2802,26 +2811,26 @@ impl ResponseResult for VideoCategoryListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivitySnippet {
-    /// A map of thumbnail images associated with the resource that is primarily associated with the activity. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    /// A map of thumbnail images associated with the resource that is primarily associated with the activity. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
-    /// The title of the resource primarily associated with the activity.    
+    /// The title of the resource primarily associated with the activity.
     pub title: String,
-    /// The ID that YouTube uses to uniquely identify the channel associated with the activity.    
+    /// The ID that YouTube uses to uniquely identify the channel associated with the activity.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the video was uploaded. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="publishedAt")]
     pub published_at: String,
-    /// Channel title for the channel responsible for this activity    
+    /// Channel title for the channel responsible for this activity
     #[serde(alias="channelTitle")]
     pub channel_title: String,
-    /// The type of activity that the resource describes.    
+    /// The type of activity that the resource describes.
     #[serde(alias="type")]
     pub type_: String,
-    /// The group ID associated with the activity. A group ID identifies user events that are associated with the same user and resource. For example, if a user rates a video and marks the same video as a favorite, the entries for those events would have the same group ID in the user's activity feed. In your user interface, you can avoid repetition by grouping events with the same groupId value.    
+    /// The group ID associated with the activity. A group ID identifies user events that are associated with the same user and resource. For example, if a user rates a video and marks the same video as a favorite, the entries for those events would have the same group ID in the user's activity feed. In your user interface, you can avoid repetition by grouping events with the same groupId value.
     #[serde(alias="groupId")]
     pub group_id: String,
-    /// The description of the resource primarily associated with the activity.    
+    /// The description of the resource primarily associated with the activity.
     pub description: String,
 }
 
@@ -2834,7 +2843,7 @@ impl Part for ActivitySnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoProcessingDetailsProcessingProgress {
-    /// An estimate of the amount of time, in millseconds, that YouTube needs to finish processing the video.    
+    /// An estimate of the amount of time, in millseconds, that YouTube needs to finish processing the video.
     #[serde(alias="timeLeftMs")]
     pub time_left_ms: String,
     /// The number of parts of the video that YouTube has already processed. You can estimate the percentage of the video that YouTube has already processed by calculating:
@@ -2843,7 +2852,7 @@ pub struct VideoProcessingDetailsProcessingProgress {
     /// Note that since the estimated number of parts could increase without a corresponding increase in the number of parts that have already been processed, it is possible that the calculated progress could periodically decrease while YouTube processes a video.
     #[serde(alias="partsProcessed")]
     pub parts_processed: String,
-    /// An estimate of the total number of parts that need to be processed for the video. The number may be updated with more precise estimates while YouTube processes the video.    
+    /// An estimate of the total number of parts that need to be processed for the video. The number may be updated with more precise estimates while YouTube processes the video.
     #[serde(alias="partsTotal")]
     pub parts_total: String,
 }
@@ -2862,28 +2871,28 @@ impl Part for VideoProcessingDetailsProcessingProgress {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#searchListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#searchListResponse".
     pub kind: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
-    /// A list of results that match the search criteria.    
+    /// A list of results that match the search criteria.
     pub items: Vec<SearchResult>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
 }
@@ -2897,7 +2906,7 @@ impl ResponseResult for SearchListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelTopicDetails {
-    /// A list of Freebase topic IDs associated with the channel. You can retrieve information about each topic using the Freebase Topic API.    
+    /// A list of Freebase topic IDs associated with the channel. You can retrieve information about each topic using the Freebase Topic API.
     #[serde(alias="topicIds")]
     pub topic_ids: Vec<String>,
 }
@@ -2916,28 +2925,28 @@ impl Part for ChannelTopicDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoListResponse".
     pub kind: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
-    /// A list of videos that match the request criteria.    
+    /// A list of videos that match the request criteria.
     pub items: Vec<Video>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
 }
@@ -2951,7 +2960,7 @@ impl ResponseResult for VideoListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LanguageTag {
-    /// no description provided    
+    /// no description provided
     pub value: String,
 }
 
@@ -2964,7 +2973,7 @@ impl Part for LanguageTag {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistStatus {
-    /// The playlist's privacy status.    
+    /// The playlist's privacy status.
     #[serde(alias="privacyStatus")]
     pub privacy_status: String,
 }
@@ -2978,9 +2987,9 @@ impl Part for PlaylistStatus {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoRating {
-    /// no description provided    
+    /// no description provided
     pub rating: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="videoId")]
     pub video_id: String,
 }
@@ -2994,15 +3003,15 @@ impl Part for VideoRating {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStreamSnippet {
-    /// The ID that YouTube uses to uniquely identify the channel that is transmitting the stream.    
+    /// The ID that YouTube uses to uniquely identify the channel that is transmitting the stream.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The stream's description. The value cannot be longer than 10000 characters.    
+    /// The stream's description. The value cannot be longer than 10000 characters.
     pub description: String,
-    /// The date and time that the stream was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the stream was created. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="publishedAt")]
     pub published_at: String,
-    /// The stream's title. The value must be between 1 and 128 characters long.    
+    /// The stream's title. The value must be between 1 and 128 characters long.
     pub title: String,
 }
 
@@ -3015,13 +3024,13 @@ impl Part for LiveStreamSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelStatus {
-    /// Privacy status of the channel.    
+    /// Privacy status of the channel.
     #[serde(alias="privacyStatus")]
     pub privacy_status: String,
-    /// If true, then the user is linked to either a YouTube username or G+ account. Otherwise, the user doesn't have a public YouTube identity.    
+    /// If true, then the user is linked to either a YouTube username or G+ account. Otherwise, the user doesn't have a public YouTube identity.
     #[serde(alias="isLinked")]
     pub is_linked: bool,
-    /// The long uploads status of this channel. See    
+    /// The long uploads status of this channel. See
     #[serde(alias="longUploadsStatus")]
     pub long_uploads_status: String,
 }
@@ -3040,28 +3049,28 @@ impl Part for ChannelStatus {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChannelListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelListResponse".
     pub kind: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
-    /// A list of channels that match the request criteria.    
+    /// A list of channels that match the request criteria.
     pub items: Vec<Channel>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
 }
@@ -3083,18 +3092,18 @@ impl ResponseResult for ChannelListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelSection {
-    /// The snippet object contains basic details about the channel section, such as its type, style and title.    
+    /// The snippet object contains basic details about the channel section, such as its type, style and title.
     pub snippet: Option<ChannelSectionSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelSection".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelSection".
     pub kind: Option<String>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
-    /// The contentDetails object contains details about the channel section content, such as a list of playlists or channels featured in the section.    
+    /// The contentDetails object contains details about the channel section content, such as a list of playlists or channels featured in the section.
     #[serde(alias="contentDetails")]
     pub content_details: Option<ChannelSectionContentDetails>,
-    /// The ID that YouTube uses to uniquely identify the channel section.    
+    /// The ID that YouTube uses to uniquely identify the channel section.
     pub id: Option<String>,
-    /// Localizations for different languages    
+    /// Localizations for different languages
     pub localizations: Option<HashMap<String, ChannelSectionLocalization>>,
 }
 
@@ -3130,28 +3139,28 @@ impl ToParts for ChannelSection {
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LiveBroadcastListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveBroadcastListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#liveBroadcastListResponse".
     pub kind: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
-    /// A list of broadcasts that match the request criteria.    
+    /// A list of broadcasts that match the request criteria.
     pub items: Vec<LiveBroadcast>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
 }
@@ -3165,7 +3174,7 @@ impl ResponseResult for LiveBroadcastListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LiveStreamStatus {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="streamStatus")]
     pub stream_status: String,
 }
@@ -3179,19 +3188,19 @@ impl Part for LiveStreamStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoLiveStreamingDetails {
-    /// The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.    
+    /// The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.
     #[serde(alias="concurrentViewers")]
     pub concurrent_viewers: String,
-    /// The time that the broadcast is scheduled to begin. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The time that the broadcast is scheduled to begin. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="scheduledStartTime")]
     pub scheduled_start_time: String,
-    /// The time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. If the value is empty or the property is not present, then the broadcast is scheduled to continue indefinitely.    
+    /// The time that the broadcast is scheduled to end. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. If the value is empty or the property is not present, then the broadcast is scheduled to continue indefinitely.
     #[serde(alias="scheduledEndTime")]
     pub scheduled_end_time: String,
-    /// The time that the broadcast actually started. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast begins.    
+    /// The time that the broadcast actually started. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast begins.
     #[serde(alias="actualStartTime")]
     pub actual_start_time: String,
-    /// The time that the broadcast actually ended. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast is over.    
+    /// The time that the broadcast actually ended. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format. This value will not be available until the broadcast is over.
     #[serde(alias="actualEndTime")]
     pub actual_end_time: String,
 }
@@ -3205,196 +3214,196 @@ impl Part for VideoLiveStreamingDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContentRating {
-    /// Internal YouTube rating.    
+    /// Internal YouTube rating.
     #[serde(alias="ytRating")]
     pub yt_rating: String,
-    /// Rating system for French Canadian TV - Regie du cinema    
+    /// Rating system for French Canadian TV - Regie du cinema
     #[serde(alias="catvfrRating")]
     pub catvfr_rating: String,
-    /// Rating system in India - Central Board of Film Certification    
+    /// Rating system in India - Central Board of Film Certification
     #[serde(alias="cbfcRating")]
     pub cbfc_rating: String,
-    /// Rating system for Thailand - Board of Filmand Video Censors    
+    /// Rating system for Thailand - Board of Filmand Video Censors
     #[serde(alias="bfvcRating")]
     pub bfvc_rating: String,
-    /// Rating system for Austria - Bundesministeriums f�r Unterricht, Kunst und Kultur!    
+    /// Rating system for Austria - Bundesministeriums f�r Unterricht, Kunst und Kultur!
     #[serde(alias="bmukkRating")]
     pub bmukk_rating: String,
-    /// Rating system for Switzerland - Switzerland Rating System    
+    /// Rating system for Switzerland - Switzerland Rating System
     #[serde(alias="chfilmRating")]
     pub chfilm_rating: String,
-    /// Rating system for Taiwan - Ministry of Culture - Tawan    
+    /// Rating system for Taiwan - Ministry of Culture - Tawan
     #[serde(alias="moctwRating")]
     pub moctw_rating: String,
-    /// Rating system for Canadian TV - Canadian TV Classification System    
+    /// Rating system for Canadian TV - Canadian TV Classification System
     #[serde(alias="catvRating")]
     pub catv_rating: String,
-    /// Rating system for Peru - Peru Rating System    
+    /// Rating system for Peru - Peru Rating System
     #[serde(alias="pefilmRating")]
     pub pefilm_rating: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="djctqRatingReasons")]
     pub djctq_rating_reasons: Vec<String>,
-    /// Rating system for Argentina - Instituto Nacional de Cine y Artes Audiovisuales    
+    /// Rating system for Argentina - Instituto Nacional de Cine y Artes Audiovisuales
     #[serde(alias="incaaRating")]
     pub incaa_rating: String,
-    /// Rating system for Israel - Israel Rating System    
+    /// Rating system for Israel - Israel Rating System
     #[serde(alias="ilfilmRating")]
     pub ilfilm_rating: String,
-    /// Rating system for Luxembourg - Commission de surveillance de la classification des films    
+    /// Rating system for Luxembourg - Commission de surveillance de la classification des films
     #[serde(alias="cscfRating")]
     pub cscf_rating: String,
-    /// Rating system in Germany - Voluntary Self Regulation of the Movie Industry    
+    /// Rating system in Germany - Voluntary Self Regulation of the Movie Industry
     #[serde(alias="fskRating")]
     pub fsk_rating: String,
-    /// Rating system in South Korea - Korea Media Rating Board    
+    /// Rating system in South Korea - Korea Media Rating Board
     #[serde(alias="kmrbRating")]
     pub kmrb_rating: String,
-    /// Rating system in Brazil - Department of Justice, Rating, Titles and Qualification    
+    /// Rating system in Brazil - Department of Justice, Rating, Titles and Qualification
     #[serde(alias="djctqRating")]
     pub djctq_rating: String,
-    /// Rating system for Hong kong - Office for Film, Newspaper and Article Administration    
+    /// Rating system for Hong kong - Office for Film, Newspaper and Article Administration
     #[serde(alias="fcoRating")]
     pub fco_rating: String,
-    /// Rating system for Norway - Medietilsynet    
+    /// Rating system for Norway - Medietilsynet
     #[serde(alias="medietilsynetRating")]
     pub medietilsynet_rating: String,
-    /// Rating system for Greece - Greece Rating System    
+    /// Rating system for Greece - Greece Rating System
     #[serde(alias="grfilmRating")]
     pub grfilm_rating: String,
-    /// Rating system for Chile - Consejo de Calificaci�n Cinematogr�fica    
+    /// Rating system for Chile - Consejo de Calificaci�n Cinematogr�fica
     #[serde(alias="cccRating")]
     pub ccc_rating: String,
-    /// Rating system for Ireland - Raidi� Teilif�s �ireann    
+    /// Rating system for Ireland - Raidi� Teilif�s �ireann
     #[serde(alias="rteRating")]
     pub rte_rating: String,
-    /// Rating system in France - French Minister of Culture    
+    /// Rating system in France - French Minister of Culture
     #[serde(alias="fmocRating")]
     pub fmoc_rating: String,
-    /// Rating system in Japan - Eiga Rinri Kanri Iinkai    
+    /// Rating system in Japan - Eiga Rinri Kanri Iinkai
     #[serde(alias="eirinRating")]
     pub eirin_rating: String,
-    /// Rating system for Portugal - Comiss�o de Classifica��o de Espect�culos    
+    /// Rating system for Portugal - Comiss�o de Classifica��o de Espect�culos
     #[serde(alias="cceRating")]
     pub cce_rating: String,
-    /// Rating system for Latvia - National Film Center of Latvia    
+    /// Rating system for Latvia - National Film Center of Latvia
     #[serde(alias="nkclvRating")]
     pub nkclv_rating: String,
-    /// Rating system for South africa - Film & Publication Board    
+    /// Rating system for South africa - Film & Publication Board
     #[serde(alias="fpbRating")]
     pub fpb_rating: String,
-    /// Rating system for Iceland - SMAIS    
+    /// Rating system for Iceland - SMAIS
     #[serde(alias="smaisRating")]
     pub smais_rating: String,
-    /// Canadian Home Video Rating System    
+    /// Canadian Home Video Rating System
     #[serde(alias="chvrsRating")]
     pub chvrs_rating: String,
-    /// Rating system for Italy - Autorit� per le Garanzie nelle Comunicazioni    
+    /// Rating system for Italy - Autorit� per le Garanzie nelle Comunicazioni
     #[serde(alias="agcomRating")]
     pub agcom_rating: String,
-    /// Rating system for Colombia - MoC    
+    /// Rating system for Colombia - MoC
     #[serde(alias="mocRating")]
     pub moc_rating: String,
-    /// Rating system for Hungary - Rating Committee of the National Office of Film    
+    /// Rating system for Hungary - Rating Committee of the National Office of Film
     #[serde(alias="rcnofRating")]
     pub rcnof_rating: String,
-    /// Rating system for Malaysia - Film Censorship Board of Malaysia    
+    /// Rating system for Malaysia - Film Censorship Board of Malaysia
     #[serde(alias="fcbmRating")]
     pub fcbm_rating: String,
-    /// Rating system for Netherlands - Nederlands Instituut voor de Classificatie van Audiovisuele Media    
+    /// Rating system for Netherlands - Nederlands Instituut voor de Classificatie van Audiovisuele Media
     #[serde(alias="kijkwijzerRating")]
     pub kijkwijzer_rating: String,
-    /// Rating system for Singapore - Media Development Authority    
+    /// Rating system for Singapore - Media Development Authority
     #[serde(alias="mdaRating")]
     pub mda_rating: String,
-    /// Rating system for Nigeria - National Film and Video Censors Board    
+    /// Rating system for Nigeria - National Film and Video Censors Board
     #[serde(alias="nfvcbRating")]
     pub nfvcb_rating: String,
-    /// Rating system for Venezuela - SiBCI    
+    /// Rating system for Venezuela - SiBCI
     #[serde(alias="resorteviolenciaRating")]
     pub resorteviolencia_rating: String,
-    /// Rating system for France - Conseil sup�rieur de l?audiovisuel    
+    /// Rating system for France - Conseil sup�rieur de l?audiovisuel
     #[serde(alias="csaRating")]
     pub csa_rating: String,
-    /// Rating system in New Zealand - Office of Film and Literature Classification    
+    /// Rating system in New Zealand - Office of Film and Literature Classification
     #[serde(alias="oflcRating")]
     pub oflc_rating: String,
-    /// TV Parental Guidelines rating of the content.    
+    /// TV Parental Guidelines rating of the content.
     #[serde(alias="tvpgRating")]
     pub tvpg_rating: String,
-    /// Rating system for Bulgaria - National Film Centre    
+    /// Rating system for Bulgaria - National Film Centre
     #[serde(alias="nfrcRating")]
     pub nfrc_rating: String,
-    /// Rating system for Malta - Film Age-Classification Board    
+    /// Rating system for Malta - Film Age-Classification Board
     #[serde(alias="mccaaRating")]
     pub mccaa_rating: String,
-    /// Rating system in Mexico - General Directorate of Radio, Television and Cinematography    
+    /// Rating system in Mexico - General Directorate of Radio, Television and Cinematography
     #[serde(alias="rtcRating")]
     pub rtc_rating: String,
-    /// Rating system in Italy - Ministero dei Beni e delle Attivita Culturali e del Turismo    
+    /// Rating system in Italy - Ministero dei Beni e delle Attivita Culturali e del Turismo
     #[serde(alias="mibacRating")]
     pub mibac_rating: String,
-    /// British Board of Film Classification    
+    /// British Board of Film Classification
     #[serde(alias="bbfcRating")]
     pub bbfc_rating: String,
-    /// Rating system for Egypt - Egypt Rating System    
+    /// Rating system for Egypt - Egypt Rating System
     #[serde(alias="egfilmRating")]
     pub egfilm_rating: String,
-    /// Rating system for Belgium - Belgium Rating System    
+    /// Rating system for Belgium - Belgium Rating System
     #[serde(alias="cicfRating")]
     pub cicf_rating: String,
-    /// Rating system for Poland - National Broadcasting Council    
+    /// Rating system for Poland - National Broadcasting Council
     #[serde(alias="nbcplRating")]
     pub nbcpl_rating: String,
-    /// Rating system for Maldives - National Bureau of Classification    
+    /// Rating system for Maldives - National Bureau of Classification
     #[serde(alias="nbcRating")]
     pub nbc_rating: String,
-    /// Motion Picture Association of America rating for the content.    
+    /// Motion Picture Association of America rating for the content.
     #[serde(alias="mpaaRating")]
     pub mpaa_rating: String,
-    /// Rating system in Ireland - Irish Film Classification Office    
+    /// Rating system in Ireland - Irish Film Classification Office
     #[serde(alias="ifcoRating")]
     pub ifco_rating: String,
-    /// Rating system in Australia - Australian Classification Board    
+    /// Rating system in Australia - Australian Classification Board
     #[serde(alias="acbRating")]
     pub acb_rating: String,
-    /// Rating system for Estonia - Estonia Rating System    
+    /// Rating system for Estonia - Estonia Rating System
     #[serde(alias="eefilmRating")]
     pub eefilm_rating: String,
-    /// Rating system for Czech republic - Czech republic Rating System    
+    /// Rating system for Czech republic - Czech republic Rating System
     #[serde(alias="czfilmRating")]
     pub czfilm_rating: String,
-    /// Rating system for Indonesia - Lembaga Sensor Film    
+    /// Rating system for Indonesia - Lembaga Sensor Film
     #[serde(alias="lsfRating")]
     pub lsf_rating: String,
-    /// Rating system in Russia    
+    /// Rating system in Russia
     #[serde(alias="russiaRating")]
     pub russia_rating: String,
-    /// Rating system for Kenya - Kenya Film Classification Board    
+    /// Rating system for Kenya - Kenya Film Classification Board
     #[serde(alias="kfcbRating")]
     pub kfcb_rating: String,
-    /// Rating system for Philippines - MOVIE AND TELEVISION REVIEW AND CLASSIFICATION BOARD    
+    /// Rating system for Philippines - MOVIE AND TELEVISION REVIEW AND CLASSIFICATION BOARD
     #[serde(alias="mtrcbRating")]
     pub mtrcb_rating: String,
-    /// Rating system for Chile - Asociaci�n Nacional de Televisi�n    
+    /// Rating system for Chile - Asociaci�n Nacional de Televisi�n
     #[serde(alias="anatelRating")]
     pub anatel_rating: String,
-    /// Rating system for Sweden - Statens medier�d (National Media Council)    
+    /// Rating system for Sweden - Statens medier�d (National Media Council)
     #[serde(alias="smsaRating")]
     pub smsa_rating: String,
-    /// Rating system for Romania - CONSILIUL NATIONAL AL AUDIOVIZUALULUI - CNA    
+    /// Rating system for Romania - CONSILIUL NATIONAL AL AUDIOVIZUALULUI - CNA
     #[serde(alias="cnaRating")]
     pub cna_rating: String,
-    /// Rating system in Spain - Instituto de Cinematografia y de las Artes Audiovisuales    
+    /// Rating system in Spain - Instituto de Cinematografia y de las Artes Audiovisuales
     #[serde(alias="icaaRating")]
     pub icaa_rating: String,
-    /// Rating system for Denmark - The Media Council for Children and Young People    
+    /// Rating system for Denmark - The Media Council for Children and Young People
     #[serde(alias="mccypRating")]
     pub mccyp_rating: String,
-    /// Rating system for Slovakia - Slovakia Rating System    
+    /// Rating system for Slovakia - Slovakia Rating System
     #[serde(alias="skfilmRating")]
     pub skfilm_rating: String,
-    /// Rating system for Finland - Finnish Centre for Media Education and Audiovisual Media    
+    /// Rating system for Finland - Finnish Centre for Media Education and Audiovisual Media
     #[serde(alias="mekuRating")]
     pub meku_rating: String,
 }
@@ -3413,28 +3422,28 @@ impl Part for ContentRating {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityListResponse {
-    /// Serialized EventId of the request which produced this response.    
+    /// Serialized EventId of the request which produced this response.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the next page in the result set.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#activityListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#activityListResponse".
     pub kind: String,
-    /// The visitorId identifies the visitor.    
+    /// The visitorId identifies the visitor.
     #[serde(alias="visitorId")]
     pub visitor_id: String,
-    /// A list of activities, or events, that match the request criteria.    
+    /// A list of activities, or events, that match the request criteria.
     pub items: Vec<Activity>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.    
+    /// The token that can be used as the value of the pageToken parameter to retrieve the previous page in the result set.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
 }
@@ -3453,16 +3462,16 @@ impl ResponseResult for ActivityListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Activity {
-    /// The snippet object contains basic details about the activity, including the activity's type and group ID.    
+    /// The snippet object contains basic details about the activity, including the activity's type and group ID.
     pub snippet: Option<ActivitySnippet>,
-    /// The contentDetails object contains information about the content associated with the activity. For example, if the snippet.type value is videoRated, then the contentDetails object's content identifies the rated video.    
+    /// The contentDetails object contains information about the content associated with the activity. For example, if the snippet.type value is videoRated, then the contentDetails object's content identifies the rated video.
     #[serde(alias="contentDetails")]
     pub content_details: Option<ActivityContentDetails>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#activity".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#activity".
     pub kind: Option<String>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
-    /// The ID that YouTube uses to uniquely identify the activity.    
+    /// The ID that YouTube uses to uniquely identify the activity.
     pub id: Option<String>,
 }
 
@@ -3491,14 +3500,14 @@ impl ToParts for Activity {
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionSubscriberSnippet {
-    /// The channel ID of the subscriber.    
+    /// The channel ID of the subscriber.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The description of the subscriber.    
+    /// The description of the subscriber.
     pub description: String,
-    /// Thumbnails for this subscriber.    
+    /// Thumbnails for this subscriber.
     pub thumbnails: ThumbnailDetails,
-    /// The title of the subscriber.    
+    /// The title of the subscriber.
     pub title: String,
 }
 
@@ -3511,70 +3520,70 @@ impl Part for SubscriptionSubscriberSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImageSettings {
-    /// Banner image. TV size medium resolution (1280x720).    
+    /// Banner image. TV size medium resolution (1280x720).
     #[serde(alias="bannerTvMediumImageUrl")]
     pub banner_tv_medium_image_url: String,
-    /// The image map script for the large banner image.    
+    /// The image map script for the large banner image.
     #[serde(alias="largeBrandedBannerImageImapScript")]
     pub large_branded_banner_image_imap_script: LocalizedProperty,
-    /// Banner image. Mobile size (640x175).    
+    /// Banner image. Mobile size (640x175).
     #[serde(alias="bannerMobileImageUrl")]
     pub banner_mobile_image_url: String,
-    /// The URL for the 640px by 70px banner image that appears below the video player in the default view of the video watch page.    
+    /// The URL for the 640px by 70px banner image that appears below the video player in the default view of the video watch page.
     #[serde(alias="smallBrandedBannerImageUrl")]
     pub small_branded_banner_image_url: LocalizedProperty,
-    /// Banner image. Tablet size high resolution (2276x377).    
+    /// Banner image. Tablet size high resolution (2276x377).
     #[serde(alias="bannerTabletHdImageUrl")]
     pub banner_tablet_hd_image_url: String,
-    /// Banner image. Tablet size low resolution (1138x188).    
+    /// Banner image. Tablet size low resolution (1138x188).
     #[serde(alias="bannerTabletLowImageUrl")]
     pub banner_tablet_low_image_url: String,
-    /// Banner image. Mobile size medium/high resolution (960x263).    
+    /// Banner image. Mobile size medium/high resolution (960x263).
     #[serde(alias="bannerMobileMediumHdImageUrl")]
     pub banner_mobile_medium_hd_image_url: String,
-    /// The URL for a 1px by 1px tracking pixel that can be used to collect statistics for views of the channel or video pages.    
+    /// The URL for a 1px by 1px tracking pixel that can be used to collect statistics for views of the channel or video pages.
     #[serde(alias="trackingImageUrl")]
     pub tracking_image_url: String,
-    /// Banner image. Mobile size high resolution (1440x395).    
+    /// Banner image. Mobile size high resolution (1440x395).
     #[serde(alias="bannerMobileExtraHdImageUrl")]
     pub banner_mobile_extra_hd_image_url: String,
-    /// Banner image. Tablet size (1707x283).    
+    /// Banner image. Tablet size (1707x283).
     #[serde(alias="bannerTabletImageUrl")]
     pub banner_tablet_image_url: String,
-    /// Banner image. Mobile size low resolution (320x88).    
+    /// Banner image. Mobile size low resolution (320x88).
     #[serde(alias="bannerMobileLowImageUrl")]
     pub banner_mobile_low_image_url: String,
-    /// Banner image. TV size extra high resolution (2120x1192).    
+    /// Banner image. TV size extra high resolution (2120x1192).
     #[serde(alias="bannerTvImageUrl")]
     pub banner_tv_image_url: String,
-    /// Banner image. TV size low resolution (854x480).    
+    /// Banner image. TV size low resolution (854x480).
     #[serde(alias="bannerTvLowImageUrl")]
     pub banner_tv_low_image_url: String,
-    /// Banner image. Tablet size extra high resolution (2560x424).    
+    /// Banner image. Tablet size extra high resolution (2560x424).
     #[serde(alias="bannerTabletExtraHdImageUrl")]
     pub banner_tablet_extra_hd_image_url: String,
-    /// The URL for the 854px by 70px image that appears below the video player in the expanded video view of the video watch page.    
+    /// The URL for the 854px by 70px image that appears below the video player in the expanded video view of the video watch page.
     #[serde(alias="largeBrandedBannerImageUrl")]
     pub large_branded_banner_image_url: LocalizedProperty,
-    /// Banner image. TV size high resolution (1920x1080).    
+    /// Banner image. TV size high resolution (1920x1080).
     #[serde(alias="bannerTvHighImageUrl")]
     pub banner_tv_high_image_url: String,
-    /// The URL for the background image shown on the video watch page. The image should be 1200px by 615px, with a maximum file size of 128k.    
+    /// The URL for the background image shown on the video watch page. The image should be 1200px by 615px, with a maximum file size of 128k.
     #[serde(alias="backgroundImageUrl")]
     pub background_image_url: LocalizedProperty,
-    /// The image map script for the small banner image.    
+    /// The image map script for the small banner image.
     #[serde(alias="smallBrandedBannerImageImapScript")]
     pub small_branded_banner_image_imap_script: LocalizedProperty,
-    /// Banner image. Desktop size (1060x175).    
+    /// Banner image. Desktop size (1060x175).
     #[serde(alias="bannerImageUrl")]
     pub banner_image_url: String,
-    /// Banner image. Mobile size high resolution (1280x360).    
+    /// Banner image. Mobile size high resolution (1280x360).
     #[serde(alias="bannerMobileHdImageUrl")]
     pub banner_mobile_hd_image_url: String,
-    /// This is used only in update requests; if it's set, we use this URL to generate all of the above banner URLs.    
+    /// This is used only in update requests; if it's set, we use this URL to generate all of the above banner URLs.
     #[serde(alias="bannerExternalUrl")]
     pub banner_external_url: String,
-    /// The URL for the image that appears above the top-left corner of the video player. This is a 25-pixel-high image with a flexible width that cannot exceed 170 pixels.    
+    /// The URL for the image that appears above the top-left corner of the video player. This is a 25-pixel-high image with a flexible width that cannot exceed 170 pixels.
     #[serde(alias="watchIconImageUrl")]
     pub watch_icon_image_url: String,
 }
@@ -3588,34 +3597,34 @@ impl Part for ImageSettings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsPromotedItem {
-    /// The type of call-to-action, a message to the user indicating action that can be taken.    
+    /// The type of call-to-action, a message to the user indicating action that can be taken.
     #[serde(alias="ctaType")]
     pub cta_type: String,
-    /// The URL the client should fetch to request a promoted item.    
+    /// The URL the client should fetch to request a promoted item.
     #[serde(alias="adTag")]
     pub ad_tag: String,
-    /// The URL the client should direct the user to, if the user chooses to visit the advertiser's website.    
+    /// The URL the client should direct the user to, if the user chooses to visit the advertiser's website.
     #[serde(alias="destinationUrl")]
     pub destination_url: String,
-    /// The list of forecasting URLs. The client should ping all of these URLs when a promoted item is not available, to indicate that a promoted item could have been shown.    
+    /// The list of forecasting URLs. The client should ping all of these URLs when a promoted item is not available, to indicate that a promoted item could have been shown.
     #[serde(alias="forecastingUrl")]
     pub forecasting_url: Vec<String>,
-    /// The list of impression URLs. The client should ping all of these URLs to indicate that the user was shown this promoted item.    
+    /// The list of impression URLs. The client should ping all of these URLs to indicate that the user was shown this promoted item.
     #[serde(alias="impressionUrl")]
     pub impression_url: Vec<String>,
-    /// The URL the client should ping to indicate that the user was shown this promoted item.    
+    /// The URL the client should ping to indicate that the user was shown this promoted item.
     #[serde(alias="creativeViewUrl")]
     pub creative_view_url: String,
-    /// The ID that YouTube uses to uniquely identify the promoted video.    
+    /// The ID that YouTube uses to uniquely identify the promoted video.
     #[serde(alias="videoId")]
     pub video_id: String,
-    /// The text description to accompany the promoted item.    
+    /// The text description to accompany the promoted item.
     #[serde(alias="descriptionText")]
     pub description_text: String,
-    /// The custom call-to-action button text. If specified, it will override the default button text for the cta_type.    
+    /// The custom call-to-action button text. If specified, it will override the default button text for the cta_type.
     #[serde(alias="customCtaButtonText")]
     pub custom_cta_button_text: String,
-    /// The URL the client should ping to indicate that the user clicked through on this promoted item.    
+    /// The URL the client should ping to indicate that the user clicked through on this promoted item.
     #[serde(alias="clickTrackingUrl")]
     pub click_tracking_url: String,
 }
@@ -3629,7 +3638,7 @@ impl Part for ActivityContentDetailsPromotedItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoConversionPings {
-    /// Pings that the app shall fire for a video (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.    
+    /// Pings that the app shall fire for a video (authenticated by biscotti cookie). Each ping has a context, in which the app must fire the ping, and a url identifying the ping.
     pub pings: Vec<VideoConversionPing>,
 }
 
@@ -3642,7 +3651,7 @@ impl Part for VideoConversionPings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsBulletin {
-    /// The resourceId object contains information that identifies the resource associated with a bulletin post.    
+    /// The resourceId object contains information that identifies the resource associated with a bulletin post.
     #[serde(alias="resourceId")]
     pub resource_id: ResourceId,
 }
@@ -3661,13 +3670,13 @@ impl Part for ActivityContentDetailsBulletin {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct I18nLanguage {
-    /// The snippet object contains basic details about the i18n language, such as language code and human-readable name.    
+    /// The snippet object contains basic details about the i18n language, such as language code and human-readable name.
     pub snippet: Option<I18nLanguageSnippet>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nLanguage".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#i18nLanguage".
     pub kind: Option<String>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
-    /// The ID that YouTube uses to uniquely identify the i18n language.    
+    /// The ID that YouTube uses to uniquely identify the i18n language.
     pub id: Option<String>,
 }
 
@@ -3694,9 +3703,9 @@ impl ToParts for I18nLanguage {
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedString {
-    /// no description provided    
+    /// no description provided
     pub language: String,
-    /// no description provided    
+    /// no description provided
     pub value: String,
 }
 
@@ -3709,14 +3718,14 @@ impl Part for LocalizedString {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoFileDetailsAudioStream {
-    /// The audio stream's bitrate, in bits per second.    
+    /// The audio stream's bitrate, in bits per second.
     #[serde(alias="bitrateBps")]
     pub bitrate_bps: String,
-    /// The audio codec that the stream uses.    
+    /// The audio codec that the stream uses.
     pub codec: String,
-    /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.    
+    /// A value that uniquely identifies a video vendor. Typically, the value is a four-letter vendor code.
     pub vendor: String,
-    /// The number of audio channels that the stream contains.    
+    /// The number of audio channels that the stream contains.
     #[serde(alias="channelCount")]
     pub channel_count: u32,
 }
@@ -3730,12 +3739,12 @@ impl Part for VideoFileDetailsAudioStream {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoAgeGating {
-    /// Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won't be present.    
+    /// Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won't be present.
     pub restricted: bool,
-    /// Indicates whether or not the video has alcoholic beverage content. Only users of legal purchasing age in a particular country, as identified by ICAP, can view the content.    
+    /// Indicates whether or not the video has alcoholic beverage content. Only users of legal purchasing age in a particular country, as identified by ICAP, can view the content.
     #[serde(alias="alcoholContent")]
     pub alcohol_content: bool,
-    /// Video game rating, if any.    
+    /// Video game rating, if any.
     #[serde(alias="videoGameRating")]
     pub video_game_rating: String,
 }
@@ -3749,10 +3758,10 @@ impl Part for VideoAgeGating {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoTopicDetails {
-    /// A list of Freebase topic IDs that are centrally associated with the video. These are topics that are centrally featured in the video, and it can be said that the video is mainly about each of these. You can retrieve information about each topic using the Freebase Topic API.    
+    /// A list of Freebase topic IDs that are centrally associated with the video. These are topics that are centrally featured in the video, and it can be said that the video is mainly about each of these. You can retrieve information about each topic using the Freebase Topic API.
     #[serde(alias="topicIds")]
     pub topic_ids: Vec<String>,
-    /// Similar to topic_id, except that these topics are merely relevant to the video. These are topics that may be mentioned in, or appear in the video. You can retrieve information about each topic using Freebase Topic API.    
+    /// Similar to topic_id, except that these topics are merely relevant to the video. These are topics that may be mentioned in, or appear in the video. You can retrieve information about each topic using Freebase Topic API.
     #[serde(alias="relevantTopicIds")]
     pub relevant_topic_ids: Vec<String>,
 }
@@ -3766,19 +3775,19 @@ impl Part for VideoTopicDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoStatistics {
-    /// The number of comments for the video.    
+    /// The number of comments for the video.
     #[serde(alias="commentCount")]
     pub comment_count: i64,
-    /// The number of times the video has been viewed.    
+    /// The number of times the video has been viewed.
     #[serde(alias="viewCount")]
     pub view_count: i64,
-    /// The number of users who currently have the video marked as a favorite video.    
+    /// The number of users who currently have the video marked as a favorite video.
     #[serde(alias="favoriteCount")]
     pub favorite_count: i64,
-    /// The number of users who have indicated that they disliked the video by giving it a negative rating.    
+    /// The number of users who have indicated that they disliked the video by giving it a negative rating.
     #[serde(alias="dislikeCount")]
     pub dislike_count: i64,
-    /// The number of users who have indicated that they liked the video by giving it a positive rating.    
+    /// The number of users who have indicated that they liked the video by giving it a positive rating.
     #[serde(alias="likeCount")]
     pub like_count: i64,
 }
@@ -3792,9 +3801,9 @@ impl Part for VideoStatistics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoConversionPing {
-    /// Defines the context of the ping.    
+    /// Defines the context of the ping.
     pub context: String,
-    /// The url (without the schema) that the app shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D like%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA%3Bytvid%3DUrIaJUvIQDg&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.    
+    /// The url (without the schema) that the app shall send the ping to. It's at caller's descretion to decide which schema to use (http vs https) Example of a returned url: //googleads.g.doubleclick.net/pagead/ viewthroughconversion/962985656/?data=path%3DtHe_path%3Btype%3D like%3Butuid%3DGISQtTNGYqaYl4sKxoVvKA%3Bytvid%3DUrIaJUvIQDg&labe=default The caller must append biscotti authentication (ms param in case of mobile, for example) to this ping.
     #[serde(alias="conversionUrl")]
     pub conversion_url: String,
 }
@@ -3808,13 +3817,13 @@ impl Part for VideoConversionPing {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VideoCategory {
-    /// The snippet object contains basic details about the video category, including its title.    
+    /// The snippet object contains basic details about the video category, including its title.
     pub snippet: VideoCategorySnippet,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoCategory".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#videoCategory".
     pub kind: String,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: String,
-    /// The ID that YouTube uses to uniquely identify the video category.    
+    /// The ID that YouTube uses to uniquely identify the video category.
     pub id: String,
 }
 
@@ -3827,28 +3836,28 @@ impl Part for VideoCategory {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistItemSnippet {
-    /// The ID that YouTube uses to uniquely identify the user that added the item to the playlist.    
+    /// The ID that YouTube uses to uniquely identify the user that added the item to the playlist.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The item's description.    
+    /// The item's description.
     pub description: String,
-    /// The item's title.    
+    /// The item's title.
     pub title: String,
-    /// The id object contains information that can be used to uniquely identify the resource that is included in the playlist as the playlist item.    
+    /// The id object contains information that can be used to uniquely identify the resource that is included in the playlist as the playlist item.
     #[serde(alias="resourceId")]
     pub resource_id: ResourceId,
-    /// The ID that YouTube uses to uniquely identify the playlist that the playlist item is in.    
+    /// The ID that YouTube uses to uniquely identify the playlist that the playlist item is in.
     #[serde(alias="playlistId")]
     pub playlist_id: String,
-    /// The date and time that the item was added to the playlist. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The date and time that the item was added to the playlist. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(alias="publishedAt")]
     pub published_at: String,
-    /// Channel title for the channel that the playlist item belongs to.    
+    /// Channel title for the channel that the playlist item belongs to.
     #[serde(alias="channelTitle")]
     pub channel_title: String,
-    /// The order in which the item appears in the playlist. The value uses a zero-based index, so the first item has a position of 0, the second item has a position of 1, and so forth.    
+    /// The order in which the item appears in the playlist. The value uses a zero-based index, so the first item has a position of 0, the second item has a position of 1, and so forth.
     pub position: u32,
-    /// A map of thumbnail images associated with the playlist item. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.    
+    /// A map of thumbnail images associated with the playlist item. For each object in the map, the key is the name of the thumbnail image, and the value is an object that contains other information about the thumbnail.
     pub thumbnails: ThumbnailDetails,
 }
 
@@ -3861,7 +3870,7 @@ impl Part for PlaylistItemSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityContentDetailsFavorite {
-    /// The resourceId object contains information that identifies the resource that was marked as a favorite.    
+    /// The resourceId object contains information that identifies the resource that was marked as a favorite.
     #[serde(alias="resourceId")]
     pub resource_id: ResourceId,
 }
@@ -3875,7 +3884,7 @@ impl Part for ActivityContentDetailsFavorite {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistPlayer {
-    /// An <iframe> tag that embeds a player that will play the playlist.    
+    /// An <iframe> tag that embeds a player that will play the playlist.
     #[serde(alias="embedHtml")]
     pub embed_html: String,
 }
@@ -3889,10 +3898,10 @@ impl Part for PlaylistPlayer {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoSuggestionsTagSuggestion {
-    /// A set of video categories for which the tag is relevant. You can use this information to display appropriate tag suggestions based on the video category that the video uploader associates with the video. By default, tag suggestions are relevant for all categories if there are no restricts defined for the keyword.    
+    /// A set of video categories for which the tag is relevant. You can use this information to display appropriate tag suggestions based on the video category that the video uploader associates with the video. By default, tag suggestions are relevant for all categories if there are no restricts defined for the keyword.
     #[serde(alias="categoryRestricts")]
     pub category_restricts: Vec<String>,
-    /// The keyword tag suggested for the video.    
+    /// The keyword tag suggested for the video.
     pub tag: String,
 }
 
@@ -3905,19 +3914,19 @@ impl Part for VideoSuggestionsTagSuggestion {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VideoSuggestions {
-    /// A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video's current processing status, eventually, that status will almost certainly be failed.    
+    /// A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video's current processing status, eventually, that status will almost certainly be failed.
     #[serde(alias="processingErrors")]
     pub processing_errors: Vec<String>,
-    /// A list of keyword tags that could be added to the video's metadata to increase the likelihood that users will locate your video when searching or browsing on YouTube.    
+    /// A list of keyword tags that could be added to the video's metadata to increase the likelihood that users will locate your video when searching or browsing on YouTube.
     #[serde(alias="tagSuggestions")]
     pub tag_suggestions: Vec<VideoSuggestionsTagSuggestion>,
-    /// A list of video editing operations that might improve the video quality or playback experience of the uploaded video.    
+    /// A list of video editing operations that might improve the video quality or playback experience of the uploaded video.
     #[serde(alias="editorSuggestions")]
     pub editor_suggestions: Vec<String>,
-    /// A list of reasons why YouTube may have difficulty transcoding the uploaded video or that might result in an erroneous transcoding. These warnings are generated before YouTube actually processes the uploaded video file. In addition, they identify issues that are unlikely to cause the video processing to fail but that might cause problems such as sync issues, video artifacts, or a missing audio track.    
+    /// A list of reasons why YouTube may have difficulty transcoding the uploaded video or that might result in an erroneous transcoding. These warnings are generated before YouTube actually processes the uploaded video file. In addition, they identify issues that are unlikely to cause the video processing to fail but that might cause problems such as sync issues, video artifacts, or a missing audio track.
     #[serde(alias="processingWarnings")]
     pub processing_warnings: Vec<String>,
-    /// A list of suggestions that may improve YouTube's ability to process the video.    
+    /// A list of suggestions that may improve YouTube's ability to process the video.
     #[serde(alias="processingHints")]
     pub processing_hints: Vec<String>,
 }
@@ -3931,9 +3940,9 @@ impl Part for VideoSuggestions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessPolicy {
-    /// A list of region codes that identify countries where the default policy do not apply.    
+    /// A list of region codes that identify countries where the default policy do not apply.
     pub exception: Vec<String>,
-    /// The value of allowed indicates whether the access to the policy is allowed or denied by default.    
+    /// The value of allowed indicates whether the access to the policy is allowed or denied by default.
     pub allowed: bool,
 }
 
@@ -3951,11 +3960,11 @@ impl Part for AccessPolicy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelBannerResource {
-    /// The URL of this banner image.    
+    /// The URL of this banner image.
     pub url: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelBannerResource".    
+    /// Identifies what kind of resource this is. Value: the fixed string "youtube#channelBannerResource".
     pub kind: Option<String>,
-    /// Etag of this resource.    
+    /// Etag of this resource.
     pub etag: Option<String>,
 }
 
@@ -3969,7 +3978,7 @@ impl ResponseResult for ChannelBannerResource {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaylistContentDetails {
-    /// The number of videos in the playlist.    
+    /// The number of videos in the playlist.
     #[serde(alias="itemCount")]
     pub item_count: u32,
 }
@@ -3983,10 +3992,10 @@ impl Part for PlaylistContentDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PageInfo {
-    /// The number of results included in the API response.    
+    /// The number of results included in the API response.
     #[serde(alias="resultsPerPage")]
     pub results_per_page: i32,
-    /// The total number of results in the result set.    
+    /// The total number of results in the result set.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -4000,16 +4009,16 @@ impl Part for PageInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChannelContentDetailsRelatedPlaylists {
-    /// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.    
+    /// The ID of the playlist that contains the channel"s uploaded videos. Use the  videos.insert method to upload new videos and the videos.delete method to delete previously uploaded videos.
     pub uploads: String,
-    /// The ID of the playlist that contains the channel"s watch history. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
+    /// The ID of the playlist that contains the channel"s watch history. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
     #[serde(alias="watchHistory")]
     pub watch_history: String,
-    /// The ID of the playlist that contains the channel"s liked videos. Use the   playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
+    /// The ID of the playlist that contains the channel"s liked videos. Use the   playlistItems.insert and  playlistItems.delete to add or remove items from that list.
     pub likes: String,
-    /// The ID of the playlist that contains the channel"s favorite videos. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
+    /// The ID of the playlist that contains the channel"s favorite videos. Use the  playlistItems.insert and  playlistItems.delete to add or remove items from that list.
     pub favorites: String,
-    /// The ID of the playlist that contains the channel"s watch later playlist. Use the playlistItems.insert and  playlistItems.delete to add or remove items from that list.    
+    /// The ID of the playlist that contains the channel"s watch later playlist. Use the playlistItems.insert and  playlistItems.delete to add or remove items from that list.
     #[serde(alias="watchLater")]
     pub watch_later: String,
 }
@@ -4057,13 +4066,17 @@ pub struct I18nLanguageMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for I18nLanguageMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for I18nLanguageMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> I18nLanguageMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of supported languages.    
+    /// Returns a list of supported languages.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     pub fn list(&self, part: &str) -> I18nLanguageListCall<'a, C, NC, A> {
         I18nLanguageListCall {
             hub: self.hub,
@@ -4112,7 +4125,7 @@ pub struct ChannelBannerMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelBannerMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ChannelBannerMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelBannerMethods<'a, C, NC, A> {
     
@@ -4123,6 +4136,10 @@ impl<'a, C, NC, A> ChannelBannerMethods<'a, C, NC, A> {
     /// - Call the channelBanners.insert method to upload the binary image data to YouTube. The image must have a 16:9 aspect ratio and be at least 2120x1192 pixels.
     /// - Extract the url property's value from the response that the API returns for step 1.
     /// - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &ChannelBannerResource) -> ChannelBannerInsertCall<'a, C, NC, A> {
         ChannelBannerInsertCall {
             hub: self.hub,
@@ -4171,13 +4188,18 @@ pub struct ChannelSectionMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelSectionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ChannelSectionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelSectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns channelSection resources that match the API request criteria.    
+    /// Returns channelSection resources that match the API request criteria.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+    ///            If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set part=snippet, the API response will also contain all of those nested properties.
     pub fn list(&self, part: &str) -> ChannelSectionListCall<'a, C, NC, A> {
         ChannelSectionListCall {
             hub: self.hub,
@@ -4194,7 +4216,11 @@ impl<'a, C, NC, A> ChannelSectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a channelSection for the authenticated user's channel.    
+    /// Adds a channelSection for the authenticated user's channel.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &ChannelSection) -> ChannelSectionInsertCall<'a, C, NC, A> {
         ChannelSectionInsertCall {
             hub: self.hub,
@@ -4210,7 +4236,11 @@ impl<'a, C, NC, A> ChannelSectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a channelSection.    
+    /// Deletes a channelSection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID.
     pub fn delete(&self, id: &str) -> ChannelSectionDeleteCall<'a, C, NC, A> {
         ChannelSectionDeleteCall {
             hub: self.hub,
@@ -4224,7 +4254,11 @@ impl<'a, C, NC, A> ChannelSectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a channelSection.    
+    /// Update a channelSection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update(&self, request: &ChannelSection) -> ChannelSectionUpdateCall<'a, C, NC, A> {
         ChannelSectionUpdateCall {
             hub: self.hub,
@@ -4274,13 +4308,18 @@ pub struct GuideCategoryMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for GuideCategoryMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for GuideCategoryMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> GuideCategoryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of categories that can be associated with YouTube channels.    
+    /// Returns a list of categories that can be associated with YouTube channels.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more guideCategory resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
+    ///            If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a guideCategory resource, the snippet property contains other properties, such as the category's title. If you set part=snippet, the API response will also contain all of those nested properties.
     pub fn list(&self, part: &str) -> GuideCategoryListCall<'a, C, NC, A> {
         GuideCategoryListCall {
             hub: self.hub,
@@ -4331,13 +4370,17 @@ pub struct PlaylistMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PlaylistMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PlaylistMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a playlist.    
+    /// Creates a playlist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Playlist) -> PlaylistInsertCall<'a, C, NC, A> {
         PlaylistInsertCall {
             hub: self.hub,
@@ -4353,7 +4396,12 @@ impl<'a, C, NC, A> PlaylistMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.    
+    /// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, status, and contentDetails.
+    ///            If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set part=snippet, the API response will contain all of those properties.
     pub fn list(&self, part: &str) -> PlaylistListCall<'a, C, NC, A> {
         PlaylistListCall {
             hub: self.hub,
@@ -4373,7 +4421,11 @@ impl<'a, C, NC, A> PlaylistMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a playlist.    
+    /// Deletes a playlist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID.
     pub fn delete(&self, id: &str) -> PlaylistDeleteCall<'a, C, NC, A> {
         PlaylistDeleteCall {
             hub: self.hub,
@@ -4387,7 +4439,11 @@ impl<'a, C, NC, A> PlaylistMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.    
+    /// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update(&self, request: &Playlist) -> PlaylistUpdateCall<'a, C, NC, A> {
         PlaylistUpdateCall {
             hub: self.hub,
@@ -4437,13 +4493,17 @@ pub struct ThumbnailMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ThumbnailMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ThumbnailMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ThumbnailMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads a custom video thumbnail to YouTube and sets it for a video.    
+    /// Uploads a custom video thumbnail to YouTube and sets it for a video.
+    /// 
+    /// # Arguments
+    ///
+    /// * `videoId` - The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided.
     pub fn set(&self, video_id: &str) -> ThumbnailSetCall<'a, C, NC, A> {
         ThumbnailSetCall {
             hub: self.hub,
@@ -4492,13 +4552,18 @@ pub struct VideoMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for VideoMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for VideoMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of videos that match the API request parameters.    
+    /// Returns a list of videos that match the API request parameters.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
+    ///            If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set part=snippet, the API response will contain all of those properties.
     pub fn list(&self, part: &str) -> VideoListCall<'a, C, NC, A> {
         VideoListCall {
             hub: self.hub,
@@ -4521,7 +4586,12 @@ impl<'a, C, NC, A> VideoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add a like or dislike rating to a video or remove a rating from a video.    
+    /// Add a like or dislike rating to a video or remove a rating from a video.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed.
+    /// * `rating` - Specifies the rating to record.
     pub fn rate(&self, id: &str, rating: &str) -> VideoRateCall<'a, C, NC, A> {
         VideoRateCall {
             hub: self.hub,
@@ -4536,7 +4606,11 @@ impl<'a, C, NC, A> VideoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the ratings that the authorized user gave to a list of specified videos.    
+    /// Retrieves the ratings that the authorized user gave to a list of specified videos.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID.
     pub fn get_rating(&self, id: &str) -> VideoGetRatingCall<'a, C, NC, A> {
         VideoGetRatingCall {
             hub: self.hub,
@@ -4550,7 +4624,11 @@ impl<'a, C, NC, A> VideoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a YouTube video.    
+    /// Deletes a YouTube video.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID.
     pub fn delete(&self, id: &str) -> VideoDeleteCall<'a, C, NC, A> {
         VideoDeleteCall {
             hub: self.hub,
@@ -4564,7 +4642,11 @@ impl<'a, C, NC, A> VideoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a video's metadata.    
+    /// Updates a video's metadata.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update(&self, request: &Video) -> VideoUpdateCall<'a, C, NC, A> {
         VideoUpdateCall {
             hub: self.hub,
@@ -4579,7 +4661,11 @@ impl<'a, C, NC, A> VideoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads a video to YouTube and optionally sets the video's metadata.    
+    /// Uploads a video to YouTube and optionally sets the video's metadata.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Video) -> VideoInsertCall<'a, C, NC, A> {
         VideoInsertCall {
             hub: self.hub,
@@ -4633,13 +4719,17 @@ pub struct SubscriptionMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for SubscriptionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for SubscriptionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a subscription for the authenticated user's channel.    
+    /// Adds a subscription for the authenticated user's channel.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Subscription) -> SubscriptionInsertCall<'a, C, NC, A> {
         SubscriptionInsertCall {
             hub: self.hub,
@@ -4653,7 +4743,12 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns subscription resources that match the API request criteria.    
+    /// Returns subscription resources that match the API request criteria.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+    ///            If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set part=snippet, the API response will also contain all of those nested properties.
     pub fn list(&self, part: &str) -> SubscriptionListCall<'a, C, NC, A> {
         SubscriptionListCall {
             hub: self.hub,
@@ -4676,7 +4771,11 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a subscription.    
+    /// Deletes a subscription.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID.
     pub fn delete(&self, id: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
         SubscriptionDeleteCall {
             hub: self.hub,
@@ -4724,13 +4823,18 @@ pub struct SearchMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for SearchMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for SearchMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SearchMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.    
+    /// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
+    ///            If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a search result, the snippet property contains other properties that identify the result's title, description, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
     pub fn list(&self, part: &str) -> SearchListCall<'a, C, NC, A> {
         SearchListCall {
             hub: self.hub,
@@ -4807,13 +4911,17 @@ pub struct I18nRegionMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for I18nRegionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for I18nRegionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> I18nRegionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of supported regions.    
+    /// Returns a list of supported regions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     pub fn list(&self, part: &str) -> I18nRegionListCall<'a, C, NC, A> {
         I18nRegionListCall {
             hub: self.hub,
@@ -4862,13 +4970,17 @@ pub struct LiveStreamMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for LiveStreamMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for LiveStreamMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveStreamMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.    
+    /// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update(&self, request: &LiveStream) -> LiveStreamUpdateCall<'a, C, NC, A> {
         LiveStreamUpdateCall {
             hub: self.hub,
@@ -4884,7 +4996,11 @@ impl<'a, C, NC, A> LiveStreamMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a video stream.    
+    /// Deletes a video stream.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the YouTube live stream ID for the resource that is being deleted.
     pub fn delete(&self, id: &str) -> LiveStreamDeleteCall<'a, C, NC, A> {
         LiveStreamDeleteCall {
             hub: self.hub,
@@ -4899,7 +5015,11 @@ impl<'a, C, NC, A> LiveStreamMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of video streams that match the API request parameters.    
+    /// Returns a list of video streams that match the API request parameters.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.
     pub fn list(&self, part: &str) -> LiveStreamListCall<'a, C, NC, A> {
         LiveStreamListCall {
             hub: self.hub,
@@ -4918,7 +5038,11 @@ impl<'a, C, NC, A> LiveStreamMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.    
+    /// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &LiveStream) -> LiveStreamInsertCall<'a, C, NC, A> {
         LiveStreamInsertCall {
             hub: self.hub,
@@ -4969,13 +5093,17 @@ pub struct ChannelMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ChannelMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a channel's metadata.    
+    /// Updates a channel's metadata.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update(&self, request: &Channel) -> ChannelUpdateCall<'a, C, NC, A> {
         ChannelUpdateCall {
             hub: self.hub,
@@ -4990,7 +5118,12 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a collection of zero or more channel resources that match the request criteria.    
+    /// Returns a collection of zero or more channel resources that match the request criteria.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, statistics, topicDetails, and invideoPromotion.
+    ///            If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set part=contentDetails, the API response will also contain all of those nested properties.
     pub fn list(&self, part: &str) -> ChannelListCall<'a, C, NC, A> {
         ChannelListCall {
             hub: self.hub,
@@ -5047,13 +5180,17 @@ pub struct PlaylistItemMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PlaylistItemMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PlaylistItemMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlaylistItemMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a playlist item.    
+    /// Deletes a playlist item.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID.
     pub fn delete(&self, id: &str) -> PlaylistItemDeleteCall<'a, C, NC, A> {
         PlaylistItemDeleteCall {
             hub: self.hub,
@@ -5066,7 +5203,12 @@ impl<'a, C, NC, A> PlaylistItemMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.    
+    /// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+    ///            If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set part=snippet, the API response will contain all of those properties.
     pub fn list(&self, part: &str) -> PlaylistItemListCall<'a, C, NC, A> {
         PlaylistItemListCall {
             hub: self.hub,
@@ -5085,7 +5227,11 @@ impl<'a, C, NC, A> PlaylistItemMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a resource to a playlist.    
+    /// Adds a resource to a playlist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &PlaylistItem) -> PlaylistItemInsertCall<'a, C, NC, A> {
         PlaylistItemInsertCall {
             hub: self.hub,
@@ -5100,7 +5246,11 @@ impl<'a, C, NC, A> PlaylistItemMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies a playlist item. For example, you could update the item's position in the playlist.    
+    /// Modifies a playlist item. For example, you could update the item's position in the playlist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update(&self, request: &PlaylistItem) -> PlaylistItemUpdateCall<'a, C, NC, A> {
         PlaylistItemUpdateCall {
             hub: self.hub,
@@ -5149,13 +5299,18 @@ pub struct WatermarkMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for WatermarkMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for WatermarkMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> WatermarkMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads a watermark image to YouTube and sets it for a channel.    
+    /// Uploads a watermark image to YouTube and sets it for a channel.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `channelId` - The channelId parameter specifies a YouTube channel ID for which the watermark is being provided.
     pub fn set(&self, request: &InvideoBranding, channel_id: &str) -> WatermarkSetCall<'a, C, NC, A> {
         WatermarkSetCall {
             hub: self.hub,
@@ -5170,7 +5325,11 @@ impl<'a, C, NC, A> WatermarkMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a watermark.    
+    /// Deletes a watermark.
+    /// 
+    /// # Arguments
+    ///
+    /// * `channelId` - The channelId parameter specifies a YouTube channel ID for which the watermark is being unset.
     pub fn unset(&self, channel_id: &str) -> WatermarkUnsetCall<'a, C, NC, A> {
         WatermarkUnsetCall {
             hub: self.hub,
@@ -5219,13 +5378,18 @@ pub struct LiveBroadcastMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for LiveBroadcastMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for LiveBroadcastMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LiveBroadcastMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Controls the settings for a slate that can be displayed in the broadcast stream.    
+    /// Controls the settings for a slate that can be displayed in the broadcast stream.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated.
+    /// * `part` - The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn control(&self, id: &str, part: &str) -> LiveBroadcastControlCall<'a, C, NC, A> {
         LiveBroadcastControlCall {
             hub: self.hub,
@@ -5244,7 +5408,11 @@ impl<'a, C, NC, A> LiveBroadcastMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.    
+    /// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update(&self, request: &LiveBroadcast) -> LiveBroadcastUpdateCall<'a, C, NC, A> {
         LiveBroadcastUpdateCall {
             hub: self.hub,
@@ -5260,7 +5428,11 @@ impl<'a, C, NC, A> LiveBroadcastMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a broadcast.    
+    /// Creates a broadcast.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &LiveBroadcast) -> LiveBroadcastInsertCall<'a, C, NC, A> {
         LiveBroadcastInsertCall {
             hub: self.hub,
@@ -5276,7 +5448,12 @@ impl<'a, C, NC, A> LiveBroadcastMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.    
+    /// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.
+    /// * `part` - The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn bind(&self, id: &str, part: &str) -> LiveBroadcastBindCall<'a, C, NC, A> {
         LiveBroadcastBindCall {
             hub: self.hub,
@@ -5293,7 +5470,11 @@ impl<'a, C, NC, A> LiveBroadcastMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of YouTube broadcasts that match the API request parameters.    
+    /// Returns a list of YouTube broadcasts that match the API request parameters.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn list(&self, part: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
         LiveBroadcastListCall {
             hub: self.hub,
@@ -5313,7 +5494,11 @@ impl<'a, C, NC, A> LiveBroadcastMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a broadcast.    
+    /// Deletes a broadcast.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted.
     pub fn delete(&self, id: &str) -> LiveBroadcastDeleteCall<'a, C, NC, A> {
         LiveBroadcastDeleteCall {
             hub: self.hub,
@@ -5328,7 +5513,13 @@ impl<'a, C, NC, A> LiveBroadcastMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.    
+    /// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.
+    /// 
+    /// # Arguments
+    ///
+    /// * `broadcastStatus` - The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to.
+    /// * `id` - The id parameter specifies the unique ID of the broadcast that is transitioning to another status.
+    /// * `part` - The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn transition(&self, broadcast_status: &str, id: &str, part: &str) -> LiveBroadcastTransitionCall<'a, C, NC, A> {
         LiveBroadcastTransitionCall {
             hub: self.hub,
@@ -5380,13 +5571,17 @@ pub struct VideoCategoryMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for VideoCategoryMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for VideoCategoryMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VideoCategoryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of categories that can be associated with YouTube videos.    
+    /// Returns a list of categories that can be associated with YouTube videos.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.
     pub fn list(&self, part: &str) -> VideoCategoryListCall<'a, C, NC, A> {
         VideoCategoryListCall {
             hub: self.hub,
@@ -5437,13 +5632,18 @@ pub struct ActivityMethods<'a, C, NC, A>
     hub: &'a YouTube<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ActivityMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ActivityMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.    
+    /// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `part` - The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+    ///            If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties.
     pub fn list(&self, part: &str) -> ActivityListCall<'a, C, NC, A> {
         ActivityListCall {
             hub: self.hub,
@@ -5467,6 +5667,10 @@ impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
     /// Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
     /// 
     /// Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Activity) -> ActivityInsertCall<'a, C, NC, A> {
         ActivityInsertCall {
             hub: self.hub,
@@ -5490,7 +5694,7 @@ impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
 /// Returns a list of supported languages.
 ///
 /// A builder for the *list* method supported by a *i18nLanguage* resource.
-/// It is not used directly, but through a `I18nLanguageMethods`.
+/// It is not used directly, but through a `I18nLanguageMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -5567,7 +5771,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "part", "hl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5596,7 +5800,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5608,7 +5812,6 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5618,7 +5821,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5629,7 +5832,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5638,13 +5841,13 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5661,7 +5864,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *id*
     /// * *snippet*
     /// 
-    /// The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
+    /// The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     pub fn part(mut self, new_value: &str) -> I18nLanguageListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
@@ -5669,7 +5872,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *hl* query property to the given value.
     ///
     /// 
-    /// The hl parameter specifies the language that should be used for text values in the API response.    
+    /// The hl parameter specifies the language that should be used for text values in the API response.
     pub fn hl(mut self, new_value: &str) -> I18nLanguageListCall<'a, C, NC, A> {
         self._hl = Some(new_value.to_string());
         self
@@ -5734,7 +5937,7 @@ impl<'a, C, NC, A> I18nLanguageListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2.
 ///
 /// A builder for the *insert* method supported by a *channelBanner* resource.
-/// It is not used directly, but through a `ChannelBannerMethods`.
+/// It is not used directly, but through a `ChannelBannerMethods` instance.
 ///
 /// # Example
 ///
@@ -5804,7 +6007,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5847,7 +6050,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5873,7 +6076,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 6291456 {
-                        	return Result::UploadSizeLimitExceeded(size, 6291456)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 6291456))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -5895,7 +6098,6 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -5906,7 +6108,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5917,13 +6119,13 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 6291456 {
-                        	return Result::UploadSizeLimitExceeded(size, 6291456)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 6291456))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -5948,17 +6150,17 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -5970,13 +6172,13 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5992,11 +6194,14 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 6MB
     /// * *multipart*: yes
@@ -6081,7 +6286,7 @@ impl<'a, C, NC, A> ChannelBannerInsertCall<'a, C, NC, A> where NC: hyper::net::N
 /// Returns channelSection resources that match the API request criteria.
 ///
 /// A builder for the *list* method supported by a *channelSection* resource.
-/// It is not used directly, but through a `ChannelSectionMethods`.
+/// It is not used directly, but through a `ChannelSectionMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -6174,7 +6379,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "part", "onBehalfOfContentOwner", "mine", "id", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6203,7 +6408,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6215,7 +6420,6 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6225,7 +6429,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6236,7 +6440,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6245,13 +6449,13 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6289,7 +6493,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *mine* query property to the given value.
     ///
     /// 
-    /// Set this parameter's value to true to retrieve a feed of the authenticated user's channelSections.    
+    /// Set this parameter's value to true to retrieve a feed of the authenticated user's channelSections.
     pub fn mine(mut self, new_value: bool) -> ChannelSectionListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
@@ -6297,7 +6501,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *id* query property to the given value.
     ///
     /// 
-    /// The id parameter specifies a comma-separated list of the YouTube channelSection ID(s) for the resource(s) that are being retrieved. In a channelSection resource, the id property specifies the YouTube channelSection ID.    
+    /// The id parameter specifies a comma-separated list of the YouTube channelSection ID(s) for the resource(s) that are being retrieved. In a channelSection resource, the id property specifies the YouTube channelSection ID.
     pub fn id(mut self, new_value: &str) -> ChannelSectionListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
@@ -6305,7 +6509,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *channel id* query property to the given value.
     ///
     /// 
-    /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's channelSections.    
+    /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's channelSections.
     pub fn channel_id(mut self, new_value: &str) -> ChannelSectionListCall<'a, C, NC, A> {
         self._channel_id = Some(new_value.to_string());
         self
@@ -6366,7 +6570,7 @@ impl<'a, C, NC, A> ChannelSectionListCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Adds a channelSection for the authenticated user's channel.
 ///
 /// A builder for the *insert* method supported by a *channelSection* resource.
-/// It is not used directly, but through a `ChannelSectionMethods`.
+/// It is not used directly, but through a `ChannelSectionMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -6459,7 +6663,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6492,7 +6696,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6508,7 +6712,6 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6518,7 +6721,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6529,7 +6732,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6538,13 +6741,13 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6663,7 +6866,7 @@ impl<'a, C, NC, A> ChannelSectionInsertCall<'a, C, NC, A> where NC: hyper::net::
 /// Deletes a channelSection.
 ///
 /// A builder for the *delete* method supported by a *channelSection* resource.
-/// It is not used directly, but through a `ChannelSectionMethods`.
+/// It is not used directly, but through a `ChannelSectionMethods` instance.
 ///
 /// # Example
 ///
@@ -6726,7 +6929,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6754,7 +6957,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6766,7 +6969,6 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6776,7 +6978,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6787,12 +6989,12 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6804,7 +7006,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID.    
+    /// The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID.
     pub fn id(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -6875,7 +7077,7 @@ impl<'a, C, NC, A> ChannelSectionDeleteCall<'a, C, NC, A> where NC: hyper::net::
 /// Update a channelSection.
 ///
 /// A builder for the *update* method supported by a *channelSection* resource.
-/// It is not used directly, but through a `ChannelSectionMethods`.
+/// It is not used directly, but through a `ChannelSectionMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -6963,7 +7165,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6996,7 +7198,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7012,7 +7214,6 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7022,7 +7223,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7033,7 +7234,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7042,13 +7243,13 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7155,7 +7356,7 @@ impl<'a, C, NC, A> ChannelSectionUpdateCall<'a, C, NC, A> where NC: hyper::net::
 /// Returns a list of categories that can be associated with YouTube channels.
 ///
 /// A builder for the *list* method supported by a *guideCategory* resource.
-/// It is not used directly, but through a `GuideCategoryMethods`.
+/// It is not used directly, but through a `GuideCategoryMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -7242,7 +7443,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "part", "regionCode", "id", "hl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7271,7 +7472,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7283,7 +7484,6 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7293,7 +7493,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7304,7 +7504,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7313,13 +7513,13 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7346,7 +7546,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *region code* query property to the given value.
     ///
     /// 
-    /// The regionCode parameter instructs the API to return the list of guide categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
+    /// The regionCode parameter instructs the API to return the list of guide categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.
     pub fn region_code(mut self, new_value: &str) -> GuideCategoryListCall<'a, C, NC, A> {
         self._region_code = Some(new_value.to_string());
         self
@@ -7354,7 +7554,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *id* query property to the given value.
     ///
     /// 
-    /// The id parameter specifies a comma-separated list of the YouTube channel category ID(s) for the resource(s) that are being retrieved. In a guideCategory resource, the id property specifies the YouTube channel category ID.    
+    /// The id parameter specifies a comma-separated list of the YouTube channel category ID(s) for the resource(s) that are being retrieved. In a guideCategory resource, the id property specifies the YouTube channel category ID.
     pub fn id(mut self, new_value: &str) -> GuideCategoryListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
@@ -7362,7 +7562,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *hl* query property to the given value.
     ///
     /// 
-    /// The hl parameter specifies the language that will be used for text values in the API response.    
+    /// The hl parameter specifies the language that will be used for text values in the API response.
     pub fn hl(mut self, new_value: &str) -> GuideCategoryListCall<'a, C, NC, A> {
         self._hl = Some(new_value.to_string());
         self
@@ -7423,7 +7623,7 @@ impl<'a, C, NC, A> GuideCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Creates a playlist.
 ///
 /// A builder for the *insert* method supported by a *playlist* resource.
-/// It is not used directly, but through a `PlaylistMethods`.
+/// It is not used directly, but through a `PlaylistMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -7516,7 +7716,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7549,7 +7749,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7565,7 +7765,6 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7575,7 +7774,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7586,7 +7785,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7595,13 +7794,13 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7720,7 +7919,7 @@ impl<'a, C, NC, A> PlaylistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs.
 ///
 /// A builder for the *list* method supported by a *playlist* resource.
-/// It is not used directly, but through a `PlaylistMethods`.
+/// It is not used directly, but through a `PlaylistMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -7829,7 +8028,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7858,7 +8057,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7870,7 +8069,6 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7880,7 +8078,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7891,7 +8089,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7900,13 +8098,13 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7935,7 +8133,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     pub fn page_token(mut self, new_value: &str) -> PlaylistListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7965,7 +8163,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *mine* query property to the given value.
     ///
     /// 
-    /// Set this parameter's value to true to instruct the API to only return playlists owned by the authenticated user.    
+    /// Set this parameter's value to true to instruct the API to only return playlists owned by the authenticated user.
     pub fn mine(mut self, new_value: bool) -> PlaylistListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
@@ -7973,7 +8171,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     pub fn max_results(mut self, new_value: u32) -> PlaylistListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7981,7 +8179,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *id* query property to the given value.
     ///
     /// 
-    /// The id parameter specifies a comma-separated list of the YouTube playlist ID(s) for the resource(s) that are being retrieved. In a playlist resource, the id property specifies the playlist's YouTube playlist ID.    
+    /// The id parameter specifies a comma-separated list of the YouTube playlist ID(s) for the resource(s) that are being retrieved. In a playlist resource, the id property specifies the playlist's YouTube playlist ID.
     pub fn id(mut self, new_value: &str) -> PlaylistListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
@@ -7989,7 +8187,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *channel id* query property to the given value.
     ///
     /// 
-    /// This value indicates that the API should only return the specified channel's playlists.    
+    /// This value indicates that the API should only return the specified channel's playlists.
     pub fn channel_id(mut self, new_value: &str) -> PlaylistListCall<'a, C, NC, A> {
         self._channel_id = Some(new_value.to_string());
         self
@@ -8050,7 +8248,7 @@ impl<'a, C, NC, A> PlaylistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Deletes a playlist.
 ///
 /// A builder for the *delete* method supported by a *playlist* resource.
-/// It is not used directly, but through a `PlaylistMethods`.
+/// It is not used directly, but through a `PlaylistMethods` instance.
 ///
 /// # Example
 ///
@@ -8113,7 +8311,7 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8141,7 +8339,7 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8153,7 +8351,6 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8163,7 +8360,7 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8174,12 +8371,12 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8191,7 +8388,7 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID.    
+    /// The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID.
     pub fn id(mut self, new_value: &str) -> PlaylistDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -8262,7 +8459,7 @@ impl<'a, C, NC, A> PlaylistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Modifies a playlist. For example, you could change a playlist's title, description, or privacy status.
 ///
 /// A builder for the *update* method supported by a *playlist* resource.
-/// It is not used directly, but through a `PlaylistMethods`.
+/// It is not used directly, but through a `PlaylistMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -8350,7 +8547,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8383,7 +8580,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8399,7 +8596,6 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8409,7 +8605,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8420,7 +8616,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8429,13 +8625,13 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8544,7 +8740,7 @@ impl<'a, C, NC, A> PlaylistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Uploads a custom video thumbnail to YouTube and sets it for a video.
 ///
 /// A builder for the *set* method supported by a *thumbnail* resource.
-/// It is not used directly, but through a `ThumbnailMethods`.
+/// It is not used directly, but through a `ThumbnailMethods` instance.
 ///
 /// # Example
 ///
@@ -8609,7 +8805,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "videoId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8648,7 +8844,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8674,7 +8870,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 2097152 {
-                    	return Result::UploadSizeLimitExceeded(size, 2097152)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 2097152))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -8687,7 +8883,6 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -8698,7 +8893,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8709,13 +8904,13 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 2097152 {
-                        	return Result::UploadSizeLimitExceeded(size, 2097152)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 2097152))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -8740,17 +8935,17 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -8762,13 +8957,13 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8784,11 +8979,14 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 2MB
     /// * *multipart*: yes
@@ -8803,7 +9001,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided.    
+    /// The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided.
     pub fn video_id(mut self, new_value: &str) -> ThumbnailSetCall<'a, C, NC, A> {
         self._video_id = new_value.to_string();
         self
@@ -8811,7 +9009,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *on behalf of content owner* query property to the given value.
     ///
     /// 
-    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
+    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ThumbnailSetCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
@@ -8872,7 +9070,7 @@ impl<'a, C, NC, A> ThumbnailSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Returns a list of videos that match the API request parameters.
 ///
 /// A builder for the *list* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethods`.
+/// It is not used directly, but through a `VideoMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -9005,7 +9203,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "part", "videoCategoryId", "regionCode", "pageToken", "onBehalfOfContentOwner", "myRating", "maxResults", "locale", "id", "hl", "chart"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9034,7 +9232,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9046,7 +9244,6 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9056,7 +9253,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9067,7 +9264,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9076,13 +9273,13 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9120,7 +9317,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *video category id* query property to the given value.
     ///
     /// 
-    /// The videoCategoryId parameter identifies the video category for which the chart should be retrieved. This parameter can only be used in conjunction with the chart parameter. By default, charts are not restricted to a particular category.    
+    /// The videoCategoryId parameter identifies the video category for which the chart should be retrieved. This parameter can only be used in conjunction with the chart parameter. By default, charts are not restricted to a particular category.
     pub fn video_category_id(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._video_category_id = Some(new_value.to_string());
         self
@@ -9128,7 +9325,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *region code* query property to the given value.
     ///
     /// 
-    /// The regionCode parameter instructs the API to select a video chart available in the specified region. This parameter can only be used in conjunction with the chart parameter. The parameter value is an ISO 3166-1 alpha-2 country code.    
+    /// The regionCode parameter instructs the API to select a video chart available in the specified region. This parameter can only be used in conjunction with the chart parameter. The parameter value is an ISO 3166-1 alpha-2 country code.
     pub fn region_code(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._region_code = Some(new_value.to_string());
         self
@@ -9156,7 +9353,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *my rating* query property to the given value.
     ///
     /// 
-    /// Set this parameter's value to like or dislike to instruct the API to only return videos liked or disliked by the authenticated user.    
+    /// Set this parameter's value to like or dislike to instruct the API to only return videos liked or disliked by the authenticated user.
     pub fn my_rating(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._my_rating = Some(new_value.to_string());
         self
@@ -9174,7 +9371,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// DEPRECATED    
+    /// DEPRECATED
     pub fn locale(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -9182,7 +9379,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *id* query property to the given value.
     ///
     /// 
-    /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) that are being retrieved. In a video resource, the id property specifies the video's ID.    
+    /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) that are being retrieved. In a video resource, the id property specifies the video's ID.
     pub fn id(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
@@ -9190,7 +9387,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *hl* query property to the given value.
     ///
     /// 
-    /// The hl parameter instructs the API to return a localized version of the video details. If localized text is nor available for the requested language, the localizations object in the API response will contain the requested information in the default language instead. The parameter value is a BCP-47 language code. Your application can determine whether the requested localization was returned by checking the value of the snippet.localized.language property in the API response.    
+    /// The hl parameter instructs the API to return a localized version of the video details. If localized text is nor available for the requested language, the localizations object in the API response will contain the requested information in the default language instead. The parameter value is a BCP-47 language code. Your application can determine whether the requested localization was returned by checking the value of the snippet.localized.language property in the API response.
     pub fn hl(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._hl = Some(new_value.to_string());
         self
@@ -9198,7 +9395,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *chart* query property to the given value.
     ///
     /// 
-    /// The chart parameter identifies the chart that you want to retrieve.    
+    /// The chart parameter identifies the chart that you want to retrieve.
     pub fn chart(mut self, new_value: &str) -> VideoListCall<'a, C, NC, A> {
         self._chart = Some(new_value.to_string());
         self
@@ -9259,7 +9456,7 @@ impl<'a, C, NC, A> VideoListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Add a like or dislike rating to a video or remove a rating from a video.
 ///
 /// A builder for the *rate* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethods`.
+/// It is not used directly, but through a `VideoMethods` instance.
 ///
 /// # Example
 ///
@@ -9324,7 +9521,7 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["id", "rating", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9352,7 +9549,7 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9364,7 +9561,6 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9374,7 +9570,7 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9385,12 +9581,12 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9402,7 +9598,7 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed.    
+    /// The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed.
     pub fn id(mut self, new_value: &str) -> VideoRateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -9412,7 +9608,7 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Specifies the rating to record.    
+    /// Specifies the rating to record.
     pub fn rating(mut self, new_value: &str) -> VideoRateCall<'a, C, NC, A> {
         self._rating = new_value.to_string();
         self
@@ -9483,7 +9679,7 @@ impl<'a, C, NC, A> VideoRateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Retrieves the ratings that the authorized user gave to a list of specified videos.
 ///
 /// A builder for the *getRating* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethods`.
+/// It is not used directly, but through a `VideoMethods` instance.
 ///
 /// # Example
 ///
@@ -9546,7 +9742,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9575,7 +9771,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9587,7 +9783,6 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9597,7 +9792,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9608,7 +9803,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9617,13 +9812,13 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9635,7 +9830,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID.    
+    /// The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID.
     pub fn id(mut self, new_value: &str) -> VideoGetRatingCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -9706,7 +9901,7 @@ impl<'a, C, NC, A> VideoGetRatingCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Deletes a YouTube video.
 ///
 /// A builder for the *delete* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethods`.
+/// It is not used directly, but through a `VideoMethods` instance.
 ///
 /// # Example
 ///
@@ -9769,7 +9964,7 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9797,7 +9992,7 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9809,7 +10004,6 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9819,7 +10013,7 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9830,12 +10024,12 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9847,7 +10041,7 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID.    
+    /// The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID.
     pub fn id(mut self, new_value: &str) -> VideoDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -9918,7 +10112,7 @@ impl<'a, C, NC, A> VideoDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates a video's metadata.
 ///
 /// A builder for the *update* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethods`.
+/// It is not used directly, but through a `VideoMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -10026,7 +10220,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10059,7 +10253,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10075,7 +10269,6 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10085,7 +10278,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10096,7 +10289,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10105,13 +10298,13 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10242,7 +10435,7 @@ impl<'a, C, NC, A> VideoUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Uploads a video to YouTube and optionally sets the video's metadata.
 ///
 /// A builder for the *insert* method supported by a *video* resource.
-/// It is not used directly, but through a `VideoMethods`.
+/// It is not used directly, but through a `VideoMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -10373,7 +10566,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "part", "stabilize", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "notifySubscribers", "autoLevels"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10416,7 +10609,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10442,7 +10635,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 68719476736 {
-                        	return Result::UploadSizeLimitExceeded(size, 68719476736)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 68719476736))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -10464,7 +10657,6 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -10475,7 +10667,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10486,13 +10678,13 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 68719476736 {
-                        	return Result::UploadSizeLimitExceeded(size, 68719476736)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 68719476736))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -10517,17 +10709,17 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -10539,13 +10731,13 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10561,11 +10753,14 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 64GB
     /// * *multipart*: yes
@@ -10632,7 +10827,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *stabilize* query property to the given value.
     ///
     /// 
-    /// The stabilize parameter indicates whether YouTube should adjust the video to remove shaky camera motions.    
+    /// The stabilize parameter indicates whether YouTube should adjust the video to remove shaky camera motions.
     pub fn stabilize(mut self, new_value: bool) -> VideoInsertCall<'a, C, NC, A> {
         self._stabilize = Some(new_value);
         self
@@ -10662,7 +10857,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *notify subscribers* query property to the given value.
     ///
     /// 
-    /// The notifySubscribers parameter indicates whether YouTube should send notification to subscribers about the inserted video.    
+    /// The notifySubscribers parameter indicates whether YouTube should send notification to subscribers about the inserted video.
     pub fn notify_subscribers(mut self, new_value: bool) -> VideoInsertCall<'a, C, NC, A> {
         self._notify_subscribers = Some(new_value);
         self
@@ -10670,7 +10865,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *auto levels* query property to the given value.
     ///
     /// 
-    /// The autoLevels parameter indicates whether YouTube should automatically enhance the video's lighting and color.    
+    /// The autoLevels parameter indicates whether YouTube should automatically enhance the video's lighting and color.
     pub fn auto_levels(mut self, new_value: bool) -> VideoInsertCall<'a, C, NC, A> {
         self._auto_levels = Some(new_value);
         self
@@ -10731,7 +10926,7 @@ impl<'a, C, NC, A> VideoInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Adds a subscription for the authenticated user's channel.
 ///
 /// A builder for the *insert* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -10814,7 +11009,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10847,7 +11042,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10863,7 +11058,6 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10873,7 +11067,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10884,7 +11078,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10893,13 +11087,13 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10996,7 +11190,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Returns subscription resources that match the API request criteria.
 ///
 /// A builder for the *list* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -11119,7 +11313,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "part", "pageToken", "order", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "id", "forChannelId", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11148,7 +11342,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11160,7 +11354,6 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11170,7 +11363,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11181,7 +11374,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11190,13 +11383,13 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11224,7 +11417,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -11232,7 +11425,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *order* query property to the given value.
     ///
     /// 
-    /// The order parameter specifies the method that will be used to sort resources in the API response.    
+    /// The order parameter specifies the method that will be used to sort resources in the API response.
     pub fn order(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._order = Some(new_value.to_string());
         self
@@ -11262,7 +11455,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *my subscribers* query property to the given value.
     ///
     /// 
-    /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user.    
+    /// Set this parameter's value to true to retrieve a feed of the subscribers of the authenticated user.
     pub fn my_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a, C, NC, A> {
         self._my_subscribers = Some(new_value);
         self
@@ -11270,7 +11463,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *mine* query property to the given value.
     ///
     /// 
-    /// Set this parameter's value to true to retrieve a feed of the authenticated user's subscriptions.    
+    /// Set this parameter's value to true to retrieve a feed of the authenticated user's subscriptions.
     pub fn mine(mut self, new_value: bool) -> SubscriptionListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
@@ -11278,7 +11471,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -11286,7 +11479,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *id* query property to the given value.
     ///
     /// 
-    /// The id parameter specifies a comma-separated list of the YouTube subscription ID(s) for the resource(s) that are being retrieved. In a subscription resource, the id property specifies the YouTube subscription ID.    
+    /// The id parameter specifies a comma-separated list of the YouTube subscription ID(s) for the resource(s) that are being retrieved. In a subscription resource, the id property specifies the YouTube subscription ID.
     pub fn id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
@@ -11294,7 +11487,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *for channel id* query property to the given value.
     ///
     /// 
-    /// The forChannelId parameter specifies a comma-separated list of channel IDs. The API response will then only contain subscriptions matching those channels.    
+    /// The forChannelId parameter specifies a comma-separated list of channel IDs. The API response will then only contain subscriptions matching those channels.
     pub fn for_channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._for_channel_id = Some(new_value.to_string());
         self
@@ -11302,7 +11495,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *channel id* query property to the given value.
     ///
     /// 
-    /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's subscriptions.    
+    /// The channelId parameter specifies a YouTube channel ID. The API will only return that channel's subscriptions.
     pub fn channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._channel_id = Some(new_value.to_string());
         self
@@ -11363,7 +11556,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Deletes a subscription.
 ///
 /// A builder for the *delete* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -11421,7 +11614,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11449,7 +11642,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11461,7 +11654,6 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11471,7 +11663,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11482,12 +11674,12 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11499,7 +11691,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID.    
+    /// The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID.
     pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -11560,7 +11752,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource.
 ///
 /// A builder for the *list* method supported by a *search* resource.
-/// It is not used directly, but through a `SearchMethods`.
+/// It is not used directly, but through a `SearchMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -11777,7 +11969,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "part", "videoType", "videoSyndicated", "videoLicense", "videoEmbeddable", "videoDuration", "videoDimension", "videoDefinition", "videoCategoryId", "videoCaption", "type", "topicId", "safeSearch", "relevanceLanguage", "relatedToVideoId", "regionCode", "q", "publishedBefore", "publishedAfter", "pageToken", "order", "onBehalfOfContentOwner", "maxResults", "locationRadius", "location", "forMine", "forContentOwner", "eventType", "channelType", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11806,7 +11998,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11818,7 +12010,6 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11828,7 +12019,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11839,7 +12030,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11848,13 +12039,13 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11881,7 +12072,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *video type* query property to the given value.
     ///
     /// 
-    /// The videoType parameter lets you restrict a search to a particular type of videos.    
+    /// The videoType parameter lets you restrict a search to a particular type of videos.
     pub fn video_type(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_type = Some(new_value.to_string());
         self
@@ -11889,7 +12080,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *video syndicated* query property to the given value.
     ///
     /// 
-    /// The videoSyndicated parameter lets you to restrict a search to only videos that can be played outside youtube.com.    
+    /// The videoSyndicated parameter lets you to restrict a search to only videos that can be played outside youtube.com.
     pub fn video_syndicated(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_syndicated = Some(new_value.to_string());
         self
@@ -11897,7 +12088,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *video license* query property to the given value.
     ///
     /// 
-    /// The videoLicense parameter filters search results to only include videos with a particular license. YouTube lets video uploaders choose to attach either the Creative Commons license or the standard YouTube license to each of their videos.    
+    /// The videoLicense parameter filters search results to only include videos with a particular license. YouTube lets video uploaders choose to attach either the Creative Commons license or the standard YouTube license to each of their videos.
     pub fn video_license(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_license = Some(new_value.to_string());
         self
@@ -11905,7 +12096,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *video embeddable* query property to the given value.
     ///
     /// 
-    /// The videoEmbeddable parameter lets you to restrict a search to only videos that can be embedded into a webpage.    
+    /// The videoEmbeddable parameter lets you to restrict a search to only videos that can be embedded into a webpage.
     pub fn video_embeddable(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_embeddable = Some(new_value.to_string());
         self
@@ -11913,7 +12104,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *video duration* query property to the given value.
     ///
     /// 
-    /// The videoDuration parameter filters video search results based on their duration.    
+    /// The videoDuration parameter filters video search results based on their duration.
     pub fn video_duration(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_duration = Some(new_value.to_string());
         self
@@ -11921,7 +12112,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *video dimension* query property to the given value.
     ///
     /// 
-    /// The videoDimension parameter lets you restrict a search to only retrieve 2D or 3D videos.    
+    /// The videoDimension parameter lets you restrict a search to only retrieve 2D or 3D videos.
     pub fn video_dimension(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_dimension = Some(new_value.to_string());
         self
@@ -11929,7 +12120,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *video definition* query property to the given value.
     ///
     /// 
-    /// The videoDefinition parameter lets you restrict a search to only include either high definition (HD) or standard definition (SD) videos. HD videos are available for playback in at least 720p, though higher resolutions, like 1080p, might also be available.    
+    /// The videoDefinition parameter lets you restrict a search to only include either high definition (HD) or standard definition (SD) videos. HD videos are available for playback in at least 720p, though higher resolutions, like 1080p, might also be available.
     pub fn video_definition(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_definition = Some(new_value.to_string());
         self
@@ -11937,7 +12128,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *video category id* query property to the given value.
     ///
     /// 
-    /// The videoCategoryId parameter filters video search results based on their category.    
+    /// The videoCategoryId parameter filters video search results based on their category.
     pub fn video_category_id(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_category_id = Some(new_value.to_string());
         self
@@ -11945,7 +12136,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *video caption* query property to the given value.
     ///
     /// 
-    /// The videoCaption parameter indicates whether the API should filter video search results based on whether they have captions.    
+    /// The videoCaption parameter indicates whether the API should filter video search results based on whether they have captions.
     pub fn video_caption(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._video_caption = Some(new_value.to_string());
         self
@@ -11953,7 +12144,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *type* query property to the given value.
     ///
     /// 
-    /// The type parameter restricts a search query to only retrieve a particular type of resource. The value is a comma-separated list of resource types.    
+    /// The type parameter restricts a search query to only retrieve a particular type of resource. The value is a comma-separated list of resource types.
     pub fn type_(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._type_ = Some(new_value.to_string());
         self
@@ -11961,7 +12152,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *topic id* query property to the given value.
     ///
     /// 
-    /// The topicId parameter indicates that the API response should only contain resources associated with the specified topic. The value identifies a Freebase topic ID.    
+    /// The topicId parameter indicates that the API response should only contain resources associated with the specified topic. The value identifies a Freebase topic ID.
     pub fn topic_id(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._topic_id = Some(new_value.to_string());
         self
@@ -11969,7 +12160,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *safe search* query property to the given value.
     ///
     /// 
-    /// The safeSearch parameter indicates whether the search results should include restricted content as well as standard content.    
+    /// The safeSearch parameter indicates whether the search results should include restricted content as well as standard content.
     pub fn safe_search(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._safe_search = Some(new_value.to_string());
         self
@@ -11977,7 +12168,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *relevance language* query property to the given value.
     ///
     /// 
-    /// The relevanceLanguage parameter instructs the API to return search results that are most relevant to the specified language. The parameter value is typically an ISO 639-1 two-letter language code. However, you should use the values zh-Hans for simplified Chinese and zh-Hant for traditional Chinese. Please note that results in other languages will still be returned if they are highly relevant to the search query term.    
+    /// The relevanceLanguage parameter instructs the API to return search results that are most relevant to the specified language. The parameter value is typically an ISO 639-1 two-letter language code. However, you should use the values zh-Hans for simplified Chinese and zh-Hant for traditional Chinese. Please note that results in other languages will still be returned if they are highly relevant to the search query term.
     pub fn relevance_language(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._relevance_language = Some(new_value.to_string());
         self
@@ -11985,7 +12176,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *related to video id* query property to the given value.
     ///
     /// 
-    /// The relatedToVideoId parameter retrieves a list of videos that are related to the video that the parameter value identifies. The parameter value must be set to a YouTube video ID and, if you are using this parameter, the type parameter must be set to video.    
+    /// The relatedToVideoId parameter retrieves a list of videos that are related to the video that the parameter value identifies. The parameter value must be set to a YouTube video ID and, if you are using this parameter, the type parameter must be set to video.
     pub fn related_to_video_id(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._related_to_video_id = Some(new_value.to_string());
         self
@@ -11993,7 +12184,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *region code* query property to the given value.
     ///
     /// 
-    /// The regionCode parameter instructs the API to return search results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
+    /// The regionCode parameter instructs the API to return search results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.
     pub fn region_code(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._region_code = Some(new_value.to_string());
         self
@@ -12001,7 +12192,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *q* query property to the given value.
     ///
     /// 
-    /// The q parameter specifies the query term to search for.    
+    /// The q parameter specifies the query term to search for.
     pub fn q(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._q = Some(new_value.to_string());
         self
@@ -12009,7 +12200,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *published before* query property to the given value.
     ///
     /// 
-    /// The publishedBefore parameter indicates that the API response should only contain resources created before the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
+    /// The publishedBefore parameter indicates that the API response should only contain resources created before the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).
     pub fn published_before(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._published_before = Some(new_value.to_string());
         self
@@ -12017,7 +12208,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *published after* query property to the given value.
     ///
     /// 
-    /// The publishedAfter parameter indicates that the API response should only contain resources created after the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
+    /// The publishedAfter parameter indicates that the API response should only contain resources created after the specified time. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).
     pub fn published_after(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._published_after = Some(new_value.to_string());
         self
@@ -12025,7 +12216,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     pub fn page_token(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -12033,7 +12224,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *order* query property to the given value.
     ///
     /// 
-    /// The order parameter specifies the method that will be used to order resources in the API response.    
+    /// The order parameter specifies the method that will be used to order resources in the API response.
     pub fn order(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._order = Some(new_value.to_string());
         self
@@ -12051,7 +12242,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     pub fn max_results(mut self, new_value: u32) -> SearchListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -12059,7 +12250,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *location radius* query property to the given value.
     ///
     /// 
-    /// The locationRadius, in conjunction with the location parameter, defines a geographic area. If the geographic coordinates associated with a video fall within that area, then the video may be included in search results. This parameter value must be a floating point number followed by a measurement unit. Valid measurement units are m, km, ft, and mi. For example, valid parameter values include 1500m, 5km, 10000ft, and 0.75mi. The API does not support locationRadius parameter values larger than 1000 kilometers.    
+    /// The locationRadius, in conjunction with the location parameter, defines a geographic area. If the geographic coordinates associated with a video fall within that area, then the video may be included in search results. This parameter value must be a floating point number followed by a measurement unit. Valid measurement units are m, km, ft, and mi. For example, valid parameter values include 1500m, 5km, 10000ft, and 0.75mi. The API does not support locationRadius parameter values larger than 1000 kilometers.
     pub fn location_radius(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._location_radius = Some(new_value.to_string());
         self
@@ -12067,7 +12258,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *location* query property to the given value.
     ///
     /// 
-    /// The location parameter restricts a search to videos that have a geographical location specified in their metadata. The value is a string that specifies geographic latitude/longitude coordinates e.g. (37.42307,-122.08427)    
+    /// The location parameter restricts a search to videos that have a geographical location specified in their metadata. The value is a string that specifies geographic latitude/longitude coordinates e.g. (37.42307,-122.08427)
     pub fn location(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._location = Some(new_value.to_string());
         self
@@ -12075,7 +12266,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *for mine* query property to the given value.
     ///
     /// 
-    /// The forMine parameter restricts the search to only retrieve videos owned by the authenticated user. If you set this parameter to true, then the type parameter's value must also be set to video.    
+    /// The forMine parameter restricts the search to only retrieve videos owned by the authenticated user. If you set this parameter to true, then the type parameter's value must also be set to video.
     pub fn for_mine(mut self, new_value: bool) -> SearchListCall<'a, C, NC, A> {
         self._for_mine = Some(new_value);
         self
@@ -12093,7 +12284,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *event type* query property to the given value.
     ///
     /// 
-    /// The eventType parameter restricts a search to broadcast events.    
+    /// The eventType parameter restricts a search to broadcast events.
     pub fn event_type(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._event_type = Some(new_value.to_string());
         self
@@ -12101,7 +12292,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *channel type* query property to the given value.
     ///
     /// 
-    /// The channelType parameter lets you restrict a search to a particular type of channel.    
+    /// The channelType parameter lets you restrict a search to a particular type of channel.
     pub fn channel_type(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._channel_type = Some(new_value.to_string());
         self
@@ -12109,7 +12300,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *channel id* query property to the given value.
     ///
     /// 
-    /// The channelId parameter indicates that the API response should only contain resources created by the channel    
+    /// The channelId parameter indicates that the API response should only contain resources created by the channel
     pub fn channel_id(mut self, new_value: &str) -> SearchListCall<'a, C, NC, A> {
         self._channel_id = Some(new_value.to_string());
         self
@@ -12170,7 +12361,7 @@ impl<'a, C, NC, A> SearchListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Returns a list of supported regions.
 ///
 /// A builder for the *list* method supported by a *i18nRegion* resource.
-/// It is not used directly, but through a `I18nRegionMethods`.
+/// It is not used directly, but through a `I18nRegionMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -12247,7 +12438,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "part", "hl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12276,7 +12467,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12288,7 +12479,6 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12298,7 +12488,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12309,7 +12499,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12318,13 +12508,13 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12341,7 +12531,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *id*
     /// * *snippet*
     /// 
-    /// The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.    
+    /// The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
     pub fn part(mut self, new_value: &str) -> I18nRegionListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
@@ -12349,7 +12539,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *hl* query property to the given value.
     ///
     /// 
-    /// The hl parameter specifies the language that should be used for text values in the API response.    
+    /// The hl parameter specifies the language that should be used for text values in the API response.
     pub fn hl(mut self, new_value: &str) -> I18nRegionListCall<'a, C, NC, A> {
         self._hl = Some(new_value.to_string());
         self
@@ -12410,7 +12600,7 @@ impl<'a, C, NC, A> I18nRegionListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings.
 ///
 /// A builder for the *update* method supported by a *liveStream* resource.
-/// It is not used directly, but through a `LiveStreamMethods`.
+/// It is not used directly, but through a `LiveStreamMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -12506,7 +12696,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12539,7 +12729,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12555,7 +12745,6 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12565,7 +12754,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12576,7 +12765,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12585,13 +12774,13 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12716,7 +12905,7 @@ impl<'a, C, NC, A> LiveStreamUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Deletes a video stream.
 ///
 /// A builder for the *delete* method supported by a *liveStream* resource.
-/// It is not used directly, but through a `LiveStreamMethods`.
+/// It is not used directly, but through a `LiveStreamMethods` instance.
 ///
 /// # Example
 ///
@@ -12784,7 +12973,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["id", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12812,7 +13001,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12824,7 +13013,6 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12834,7 +13022,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12845,12 +13033,12 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12862,7 +13050,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the YouTube live stream ID for the resource that is being deleted.    
+    /// The id parameter specifies the YouTube live stream ID for the resource that is being deleted.
     pub fn id(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -12945,7 +13133,7 @@ impl<'a, C, NC, A> LiveStreamDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Returns a list of video streams that match the API request parameters.
 ///
 /// A builder for the *list* method supported by a *liveStream* resource.
-/// It is not used directly, but through a `LiveStreamMethods`.
+/// It is not used directly, but through a `LiveStreamMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -13048,7 +13236,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13077,7 +13265,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13089,7 +13277,6 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13099,7 +13286,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13110,7 +13297,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13119,13 +13306,13 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13144,7 +13331,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *cdn*
     /// * *status*
     /// 
-    /// The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.    
+    /// The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.
     pub fn part(mut self, new_value: &str) -> LiveStreamListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
@@ -13152,7 +13339,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     pub fn page_token(mut self, new_value: &str) -> LiveStreamListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -13182,7 +13369,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *mine* query property to the given value.
     ///
     /// 
-    /// The mine parameter can be used to instruct the API to only return streams owned by the authenticated user. Set the parameter value to true to only retrieve your own streams.    
+    /// The mine parameter can be used to instruct the API to only return streams owned by the authenticated user. Set the parameter value to true to only retrieve your own streams.
     pub fn mine(mut self, new_value: bool) -> LiveStreamListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
@@ -13190,7 +13377,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set. Acceptable values are 0 to 50, inclusive. The default value is 5.    
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set. Acceptable values are 0 to 50, inclusive. The default value is 5.
     pub fn max_results(mut self, new_value: u32) -> LiveStreamListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -13198,7 +13385,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *id* query property to the given value.
     ///
     /// 
-    /// The id parameter specifies a comma-separated list of YouTube stream IDs that identify the streams being retrieved. In a liveStream resource, the id property specifies the stream's ID.    
+    /// The id parameter specifies a comma-separated list of YouTube stream IDs that identify the streams being retrieved. In a liveStream resource, the id property specifies the stream's ID.
     pub fn id(mut self, new_value: &str) -> LiveStreamListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
@@ -13259,7 +13446,7 @@ impl<'a, C, NC, A> LiveStreamListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience.
 ///
 /// A builder for the *insert* method supported by a *liveStream* resource.
-/// It is not used directly, but through a `LiveStreamMethods`.
+/// It is not used directly, but through a `LiveStreamMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -13355,7 +13542,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13388,7 +13575,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13404,7 +13591,6 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13414,7 +13600,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13425,7 +13611,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13434,13 +13620,13 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13563,7 +13749,7 @@ impl<'a, C, NC, A> LiveStreamInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Updates a channel's metadata.
 ///
 /// A builder for the *update* method supported by a *channel* resource.
-/// It is not used directly, but through a `ChannelMethods`.
+/// It is not used directly, but through a `ChannelMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -13651,7 +13837,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13684,7 +13870,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13700,7 +13886,6 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13710,7 +13895,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13721,7 +13906,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13730,13 +13915,13 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13782,7 +13967,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *on behalf of content owner* query property to the given value.
     ///
     /// 
-    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
+    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelUpdateCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
@@ -13843,7 +14028,7 @@ impl<'a, C, NC, A> ChannelUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Returns a collection of zero or more channel resources that match the request criteria.
 ///
 /// A builder for the *list* method supported by a *channel* resource.
-/// It is not used directly, but through a `ChannelMethods`.
+/// It is not used directly, but through a `ChannelMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -13965,7 +14150,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwner", "mySubscribers", "mine", "maxResults", "managedByMe", "id", "forUsername", "categoryId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13994,7 +14179,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14006,7 +14191,6 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14016,7 +14200,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14027,7 +14211,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14036,13 +14220,13 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14073,7 +14257,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     pub fn page_token(mut self, new_value: &str) -> ChannelListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -14081,7 +14265,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *on behalf of content owner* query property to the given value.
     ///
     /// 
-    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
+    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
@@ -14089,7 +14273,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *my subscribers* query property to the given value.
     ///
     /// 
-    /// Set this parameter's value to true to retrieve a list of channels that subscribed to the authenticated user's channel.    
+    /// Set this parameter's value to true to retrieve a list of channels that subscribed to the authenticated user's channel.
     pub fn my_subscribers(mut self, new_value: bool) -> ChannelListCall<'a, C, NC, A> {
         self._my_subscribers = Some(new_value);
         self
@@ -14097,7 +14281,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *mine* query property to the given value.
     ///
     /// 
-    /// Set this parameter's value to true to instruct the API to only return channels owned by the authenticated user.    
+    /// Set this parameter's value to true to instruct the API to only return channels owned by the authenticated user.
     pub fn mine(mut self, new_value: bool) -> ChannelListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
@@ -14105,7 +14289,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     pub fn max_results(mut self, new_value: u32) -> ChannelListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -14113,7 +14297,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *managed by me* query property to the given value.
     ///
     /// 
-    /// Set this parameter's value to true to instruct the API to only return channels managed by the content owner that the onBehalfOfContentOwner parameter specifies. The user must be authenticated as a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.    
+    /// Set this parameter's value to true to instruct the API to only return channels managed by the content owner that the onBehalfOfContentOwner parameter specifies. The user must be authenticated as a CMS account linked to the specified content owner and onBehalfOfContentOwner must be provided.
     pub fn managed_by_me(mut self, new_value: bool) -> ChannelListCall<'a, C, NC, A> {
         self._managed_by_me = Some(new_value);
         self
@@ -14121,7 +14305,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *id* query property to the given value.
     ///
     /// 
-    /// The id parameter specifies a comma-separated list of the YouTube channel ID(s) for the resource(s) that are being retrieved. In a channel resource, the id property specifies the channel's YouTube channel ID.    
+    /// The id parameter specifies a comma-separated list of the YouTube channel ID(s) for the resource(s) that are being retrieved. In a channel resource, the id property specifies the channel's YouTube channel ID.
     pub fn id(mut self, new_value: &str) -> ChannelListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
@@ -14129,7 +14313,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *for username* query property to the given value.
     ///
     /// 
-    /// The forUsername parameter specifies a YouTube username, thereby requesting the channel associated with that username.    
+    /// The forUsername parameter specifies a YouTube username, thereby requesting the channel associated with that username.
     pub fn for_username(mut self, new_value: &str) -> ChannelListCall<'a, C, NC, A> {
         self._for_username = Some(new_value.to_string());
         self
@@ -14137,7 +14321,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *category id* query property to the given value.
     ///
     /// 
-    /// The categoryId parameter specifies a YouTube guide category, thereby requesting YouTube channels associated with that category.    
+    /// The categoryId parameter specifies a YouTube guide category, thereby requesting YouTube channels associated with that category.
     pub fn category_id(mut self, new_value: &str) -> ChannelListCall<'a, C, NC, A> {
         self._category_id = Some(new_value.to_string());
         self
@@ -14198,7 +14382,7 @@ impl<'a, C, NC, A> ChannelListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Deletes a playlist item.
 ///
 /// A builder for the *delete* method supported by a *playlistItem* resource.
-/// It is not used directly, but through a `PlaylistItemMethods`.
+/// It is not used directly, but through a `PlaylistItemMethods` instance.
 ///
 /// # Example
 ///
@@ -14256,7 +14440,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14284,7 +14468,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14296,7 +14480,6 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14306,7 +14489,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14317,12 +14500,12 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14334,7 +14517,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID.    
+    /// The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID.
     pub fn id(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -14395,7 +14578,7 @@ impl<'a, C, NC, A> PlaylistItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs.
 ///
 /// A builder for the *list* method supported by a *playlistItem* resource.
-/// It is not used directly, but through a `PlaylistItemMethods`.
+/// It is not used directly, but through a `PlaylistItemMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -14499,7 +14682,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "part", "videoId", "playlistId", "pageToken", "onBehalfOfContentOwner", "maxResults", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14528,7 +14711,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14540,7 +14723,6 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14550,7 +14732,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14561,7 +14743,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14570,13 +14752,13 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14605,7 +14787,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *video id* query property to the given value.
     ///
     /// 
-    /// The videoId parameter specifies that the request should return only the playlist items that contain the specified video.    
+    /// The videoId parameter specifies that the request should return only the playlist items that contain the specified video.
     pub fn video_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, NC, A> {
         self._video_id = Some(new_value.to_string());
         self
@@ -14613,7 +14795,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *playlist id* query property to the given value.
     ///
     /// 
-    /// The playlistId parameter specifies the unique ID of the playlist for which you want to retrieve playlist items. Note that even though this is an optional parameter, every request to retrieve playlist items must specify a value for either the id parameter or the playlistId parameter.    
+    /// The playlistId parameter specifies the unique ID of the playlist for which you want to retrieve playlist items. Note that even though this is an optional parameter, every request to retrieve playlist items must specify a value for either the id parameter or the playlistId parameter.
     pub fn playlist_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, NC, A> {
         self._playlist_id = Some(new_value.to_string());
         self
@@ -14621,7 +14803,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     pub fn page_token(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -14639,7 +14821,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     pub fn max_results(mut self, new_value: u32) -> PlaylistItemListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -14647,7 +14829,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *id* query property to the given value.
     ///
     /// 
-    /// The id parameter specifies a comma-separated list of one or more unique playlist item IDs.    
+    /// The id parameter specifies a comma-separated list of one or more unique playlist item IDs.
     pub fn id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
@@ -14708,7 +14890,7 @@ impl<'a, C, NC, A> PlaylistItemListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Adds a resource to a playlist.
 ///
 /// A builder for the *insert* method supported by a *playlistItem* resource.
-/// It is not used directly, but through a `PlaylistItemMethods`.
+/// It is not used directly, but through a `PlaylistItemMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -14798,7 +14980,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "part", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14831,7 +15013,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14847,7 +15029,6 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14857,7 +15038,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14868,7 +15049,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14877,13 +15058,13 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14992,7 +15173,7 @@ impl<'a, C, NC, A> PlaylistItemInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Modifies a playlist item. For example, you could update the item's position in the playlist.
 ///
 /// A builder for the *update* method supported by a *playlistItem* resource.
-/// It is not used directly, but through a `PlaylistItemMethods`.
+/// It is not used directly, but through a `PlaylistItemMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -15077,7 +15258,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15110,7 +15291,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15126,7 +15307,6 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15136,7 +15316,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15147,7 +15327,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15156,13 +15336,13 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15263,7 +15443,7 @@ impl<'a, C, NC, A> PlaylistItemUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Uploads a watermark image to YouTube and sets it for a channel.
 ///
 /// A builder for the *set* method supported by a *watermark* resource.
-/// It is not used directly, but through a `WatermarkMethods`.
+/// It is not used directly, but through a `WatermarkMethods` instance.
 ///
 /// # Example
 ///
@@ -15335,7 +15515,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["channelId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15377,7 +15557,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15403,7 +15583,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 10485760 {
-                        	return Result::UploadSizeLimitExceeded(size, 10485760)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -15425,7 +15605,6 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -15436,7 +15615,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15447,13 +15626,13 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 10485760 {
-                        	return Result::UploadSizeLimitExceeded(size, 10485760)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -15478,17 +15657,17 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -15496,7 +15675,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15512,11 +15691,14 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 10MB
     /// * *multipart*: yes
@@ -15540,7 +15722,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The channelId parameter specifies a YouTube channel ID for which the watermark is being provided.    
+    /// The channelId parameter specifies a YouTube channel ID for which the watermark is being provided.
     pub fn channel_id(mut self, new_value: &str) -> WatermarkSetCall<'a, C, NC, A> {
         self._channel_id = new_value.to_string();
         self
@@ -15548,7 +15730,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *on behalf of content owner* query property to the given value.
     ///
     /// 
-    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
+    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkSetCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
@@ -15609,7 +15791,7 @@ impl<'a, C, NC, A> WatermarkSetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Deletes a watermark.
 ///
 /// A builder for the *unset* method supported by a *watermark* resource.
-/// It is not used directly, but through a `WatermarkMethods`.
+/// It is not used directly, but through a `WatermarkMethods` instance.
 ///
 /// # Example
 ///
@@ -15672,7 +15854,7 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["channelId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15700,7 +15882,7 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15712,7 +15894,6 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15722,7 +15903,7 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15733,12 +15914,12 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15750,7 +15931,7 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The channelId parameter specifies a YouTube channel ID for which the watermark is being unset.    
+    /// The channelId parameter specifies a YouTube channel ID for which the watermark is being unset.
     pub fn channel_id(mut self, new_value: &str) -> WatermarkUnsetCall<'a, C, NC, A> {
         self._channel_id = new_value.to_string();
         self
@@ -15758,7 +15939,7 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *on behalf of content owner* query property to the given value.
     ///
     /// 
-    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.    
+    /// The onBehalfOfContentOwner parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkUnsetCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
@@ -15819,7 +16000,7 @@ impl<'a, C, NC, A> WatermarkUnsetCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Controls the settings for a slate that can be displayed in the broadcast stream.
 ///
 /// A builder for the *control* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethods`.
+/// It is not used directly, but through a `LiveBroadcastMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -15918,7 +16099,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "id", "part", "walltime", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "offsetTimeMs", "displaySlate"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15947,7 +16128,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15959,7 +16140,6 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15969,7 +16149,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15980,7 +16160,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15989,13 +16169,13 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16007,7 +16187,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated.    
+    /// The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated.
     pub fn id(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -16024,7 +16204,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
     /// * *contentDetails*
     /// * *status*
     /// 
-    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn part(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
@@ -16032,7 +16212,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *walltime* query property to the given value.
     ///
     /// 
-    /// The walltime parameter specifies the wall clock time at which the specified slate change will occur. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.    
+    /// The walltime parameter specifies the wall clock time at which the specified slate change will occur. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sssZ) format.
     pub fn walltime(mut self, new_value: &str) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._walltime = Some(new_value.to_string());
         self
@@ -16074,7 +16254,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *display slate* query property to the given value.
     ///
     /// 
-    /// The displaySlate parameter specifies whether the slate is being enabled or disabled.    
+    /// The displaySlate parameter specifies whether the slate is being enabled or disabled.
     pub fn display_slate(mut self, new_value: bool) -> LiveBroadcastControlCall<'a, C, NC, A> {
         self._display_slate = Some(new_value);
         self
@@ -16135,7 +16315,7 @@ impl<'a, C, NC, A> LiveBroadcastControlCall<'a, C, NC, A> where NC: hyper::net::
 /// Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object.
 ///
 /// A builder for the *update* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethods`.
+/// It is not used directly, but through a `LiveBroadcastMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -16231,7 +16411,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16264,7 +16444,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16280,7 +16460,6 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16290,7 +16469,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16301,7 +16480,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16310,13 +16489,13 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16441,7 +16620,7 @@ impl<'a, C, NC, A> LiveBroadcastUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 /// Creates a broadcast.
 ///
 /// A builder for the *insert* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethods`.
+/// It is not used directly, but through a `LiveBroadcastMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -16537,7 +16716,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16570,7 +16749,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16586,7 +16765,6 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16596,7 +16774,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16607,7 +16785,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16616,13 +16794,13 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16745,7 +16923,7 @@ impl<'a, C, NC, A> LiveBroadcastInsertCall<'a, C, NC, A> where NC: hyper::net::N
 /// Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream.
 ///
 /// A builder for the *bind* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethods`.
+/// It is not used directly, but through a `LiveBroadcastMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -16834,7 +17012,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "id", "part", "streamId", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16863,7 +17041,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16875,7 +17053,6 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16885,7 +17062,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16896,7 +17073,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16905,13 +17082,13 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16923,7 +17100,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.    
+    /// The id parameter specifies the unique ID of the broadcast that is being bound to a video stream.
     pub fn id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -16940,7 +17117,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *contentDetails*
     /// * *status*
     /// 
-    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn part(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
@@ -16948,7 +17125,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *stream id* query property to the given value.
     ///
     /// 
-    /// The streamId parameter specifies the unique ID of the video stream that is being bound to a broadcast. If this parameter is omitted, the API will remove any existing binding between the broadcast and a video stream.    
+    /// The streamId parameter specifies the unique ID of the video stream that is being bound to a broadcast. If this parameter is omitted, the API will remove any existing binding between the broadcast and a video stream.
     pub fn stream_id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C, NC, A> {
         self._stream_id = Some(new_value.to_string());
         self
@@ -17031,7 +17208,7 @@ impl<'a, C, NC, A> LiveBroadcastBindCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Returns a list of YouTube broadcasts that match the API request parameters.
 ///
 /// A builder for the *list* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethods`.
+/// It is not used directly, but through a `LiveBroadcastMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -17139,7 +17316,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "part", "pageToken", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner", "mine", "maxResults", "id", "broadcastStatus"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17168,7 +17345,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17180,7 +17357,6 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17190,7 +17366,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17201,7 +17377,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17210,13 +17386,13 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17235,7 +17411,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *contentDetails*
     /// * *status*
     /// 
-    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn part(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
@@ -17243,7 +17419,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     pub fn page_token(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -17273,7 +17449,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *mine* query property to the given value.
     ///
     /// 
-    /// The mine parameter can be used to instruct the API to only return broadcasts owned by the authenticated user. Set the parameter value to true to only retrieve your own broadcasts.    
+    /// The mine parameter can be used to instruct the API to only return broadcasts owned by the authenticated user. Set the parameter value to true to only retrieve your own broadcasts.
     pub fn mine(mut self, new_value: bool) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
@@ -17281,7 +17457,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     pub fn max_results(mut self, new_value: u32) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -17289,7 +17465,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *id* query property to the given value.
     ///
     /// 
-    /// The id parameter specifies a comma-separated list of YouTube broadcast IDs that identify the broadcasts being retrieved. In a liveBroadcast resource, the id property specifies the broadcast's ID.    
+    /// The id parameter specifies a comma-separated list of YouTube broadcast IDs that identify the broadcasts being retrieved. In a liveBroadcast resource, the id property specifies the broadcast's ID.
     pub fn id(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
@@ -17297,7 +17473,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *broadcast status* query property to the given value.
     ///
     /// 
-    /// The broadcastStatus parameter filters the API response to only include broadcasts with the specified status.    
+    /// The broadcastStatus parameter filters the API response to only include broadcasts with the specified status.
     pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C, NC, A> {
         self._broadcast_status = Some(new_value.to_string());
         self
@@ -17358,7 +17534,7 @@ impl<'a, C, NC, A> LiveBroadcastListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Deletes a broadcast.
 ///
 /// A builder for the *delete* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethods`.
+/// It is not used directly, but through a `LiveBroadcastMethods` instance.
 ///
 /// # Example
 ///
@@ -17426,7 +17602,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["id", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17454,7 +17630,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17466,7 +17642,6 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17476,7 +17651,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17487,12 +17662,12 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17504,7 +17679,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted.    
+    /// The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted.
     pub fn id(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -17587,7 +17762,7 @@ impl<'a, C, NC, A> LiveBroadcastDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 /// Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active.
 ///
 /// A builder for the *transition* method supported by a *liveBroadcast* resource.
-/// It is not used directly, but through a `LiveBroadcastMethods`.
+/// It is not used directly, but through a `LiveBroadcastMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -17673,7 +17848,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "broadcastStatus", "id", "part", "onBehalfOfContentOwnerChannel", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17702,7 +17877,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17714,7 +17889,6 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17724,7 +17898,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17735,7 +17909,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17744,13 +17918,13 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17762,7 +17936,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to.    
+    /// The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to.
     pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, NC, A> {
         self._broadcast_status = new_value.to_string();
         self
@@ -17772,7 +17946,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the unique ID of the broadcast that is transitioning to another status.    
+    /// The id parameter specifies the unique ID of the broadcast that is transitioning to another status.
     pub fn id(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -17789,7 +17963,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
     /// * *contentDetails*
     /// * *status*
     /// 
-    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.    
+    /// The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
     pub fn part(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
@@ -17872,7 +18046,7 @@ impl<'a, C, NC, A> LiveBroadcastTransitionCall<'a, C, NC, A> where NC: hyper::ne
 /// Returns a list of categories that can be associated with YouTube videos.
 ///
 /// A builder for the *list* method supported by a *videoCategory* resource.
-/// It is not used directly, but through a `VideoCategoryMethods`.
+/// It is not used directly, but through a `VideoCategoryMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -17959,7 +18133,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "part", "regionCode", "id", "hl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17988,7 +18162,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18000,7 +18174,6 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18010,7 +18183,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18021,7 +18194,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18030,13 +18203,13 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18053,7 +18226,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *id*
     /// * *snippet*
     /// 
-    /// The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.    
+    /// The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.
     pub fn part(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, NC, A> {
         self._part = new_value.to_string();
         self
@@ -18061,7 +18234,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *region code* query property to the given value.
     ///
     /// 
-    /// The regionCode parameter instructs the API to return the list of video categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.    
+    /// The regionCode parameter instructs the API to return the list of video categories available in the specified country. The parameter value is an ISO 3166-1 alpha-2 country code.
     pub fn region_code(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, NC, A> {
         self._region_code = Some(new_value.to_string());
         self
@@ -18069,7 +18242,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *id* query property to the given value.
     ///
     /// 
-    /// The id parameter specifies a comma-separated list of video category IDs for the resources that you are retrieving.    
+    /// The id parameter specifies a comma-separated list of video category IDs for the resources that you are retrieving.
     pub fn id(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
@@ -18077,7 +18250,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *hl* query property to the given value.
     ///
     /// 
-    /// The hl parameter specifies the language that should be used for text values in the API response.    
+    /// The hl parameter specifies the language that should be used for text values in the API response.
     pub fn hl(mut self, new_value: &str) -> VideoCategoryListCall<'a, C, NC, A> {
         self._hl = Some(new_value.to_string());
         self
@@ -18138,7 +18311,7 @@ impl<'a, C, NC, A> VideoCategoryListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user.
 ///
 /// A builder for the *list* method supported by a *activity* resource.
-/// It is not used directly, but through a `ActivityMethods`.
+/// It is not used directly, but through a `ActivityMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -18250,7 +18423,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "part", "regionCode", "publishedBefore", "publishedAfter", "pageToken", "mine", "maxResults", "home", "channelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18279,7 +18452,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18291,7 +18464,6 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18301,7 +18473,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18312,7 +18484,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18321,13 +18493,13 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18355,7 +18527,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *region code* query property to the given value.
     ///
     /// 
-    /// The regionCode parameter instructs the API to return results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code. YouTube uses this value when the authorized user's previous activity on YouTube does not provide enough information to generate the activity feed.    
+    /// The regionCode parameter instructs the API to return results for the specified country. The parameter value is an ISO 3166-1 alpha-2 country code. YouTube uses this value when the authorized user's previous activity on YouTube does not provide enough information to generate the activity feed.
     pub fn region_code(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._region_code = Some(new_value.to_string());
         self
@@ -18363,7 +18535,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *published before* query property to the given value.
     ///
     /// 
-    /// The publishedBefore parameter specifies the date and time before which an activity must have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be excluded from the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The publishedBefore parameter specifies the date and time before which an activity must have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be excluded from the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     pub fn published_before(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._published_before = Some(new_value.to_string());
         self
@@ -18371,7 +18543,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *published after* query property to the given value.
     ///
     /// 
-    /// The publishedAfter parameter specifies the earliest date and time that an activity could have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be included in the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.    
+    /// The publishedAfter parameter specifies the earliest date and time that an activity could have occurred for that activity to be included in the API response. If the parameter value specifies a day, but not a time, then any activities that occurred that day will be included in the result set. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     pub fn published_after(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._published_after = Some(new_value.to_string());
         self
@@ -18379,7 +18551,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.    
+    /// The pageToken parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -18387,7 +18559,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *mine* query property to the given value.
     ///
     /// 
-    /// Set this parameter's value to true to retrieve a feed of the authenticated user's activities.    
+    /// Set this parameter's value to true to retrieve a feed of the authenticated user's activities.
     pub fn mine(mut self, new_value: bool) -> ActivityListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
@@ -18395,7 +18567,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.    
+    /// The maxResults parameter specifies the maximum number of items that should be returned in the result set.
     pub fn max_results(mut self, new_value: u32) -> ActivityListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -18403,7 +18575,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *home* query property to the given value.
     ///
     /// 
-    /// Set this parameter's value to true to retrieve the activity feed that displays on the YouTube home page for the currently authenticated user.    
+    /// Set this parameter's value to true to retrieve the activity feed that displays on the YouTube home page for the currently authenticated user.
     pub fn home(mut self, new_value: bool) -> ActivityListCall<'a, C, NC, A> {
         self._home = Some(new_value);
         self
@@ -18411,7 +18583,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *channel id* query property to the given value.
     ///
     /// 
-    /// The channelId parameter specifies a unique YouTube channel ID. The API will then return a list of that channel's activities.    
+    /// The channelId parameter specifies a unique YouTube channel ID. The API will then return a list of that channel's activities.
     pub fn channel_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._channel_id = Some(new_value.to_string());
         self
@@ -18474,7 +18646,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite.
 ///
 /// A builder for the *insert* method supported by a *activity* resource.
-/// It is not used directly, but through a `ActivityMethods`.
+/// It is not used directly, but through a `ActivityMethods` instance.
 ///
 /// **Settable Parts**
 /// 
@@ -18556,7 +18728,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18589,7 +18761,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18605,7 +18777,6 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18615,7 +18786,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18626,7 +18797,7 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18635,13 +18806,13 @@ impl<'a, C, NC, A> ActivityInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }

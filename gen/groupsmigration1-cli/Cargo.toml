@@ -3,20 +3,20 @@
 # DO NOT EDIT !
 [package]
 
-name = "google-groupsmigration1"
-version = "0.1.1+20140416"
+name = "google-groupsmigration1-cli"
+version = "0.0.1+20140416"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with Groups Migration (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1"
 homepage = "https://developers.google.com/google-apps/groups-migration/"
-documentation = "http://byron.github.io/google-apis-rs/google-groupsmigration1"
+documentation = "http://byron.github.io/google-apis-rs/google-groupsmigration1-cli"
 license = "MIT"
-keywords = ["groupsmigration", "google", "protocol", "web", "api"]
+keywords = ["groupsmigration", "google", "cli"]
 
 [dependencies]
 hyper = "*"
 mime = "*"
 yup-oauth2 = "*"
-url = "*"
-serde = "*"
-serde_macros = "*"
+
+[dependencies.google-groupsmigration1]
+path = "../groupsmigration1"

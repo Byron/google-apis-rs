@@ -34,6 +34,9 @@
 
 	api_name = util.library_name(an, version)
 	api_target = api_name + suffix
+	depends_on_target = ''
+	if make.depends_on_suffix is not None:
+		depends_on_target = api_name + make.depends_on_suffix
 	crate_name = util.library_to_crate_name(api_name, suffix)
 	gen_root = directories.output + '/' + api_target
 	gen_root_stamp = gen_root + '/.timestamp'
@@ -46,28 +49,28 @@
 	api_doc_index = api_doc_root + '/index.html'
 
 	# source, destination of individual output files
-	sds = [(directories.mako_src + '/' + TYPE + '/' + i.source + '.mako', gen_root + '/' + i.get('output_dir', '') + '/' + i.source) 
+	sds = [(directories.mako_src + '/' + make.id + '/' + i.source + '.mako', gen_root + '/' + i.get('output_dir', '') + '/' + i.source.strip('../')) 
 																								for i in make.templates]
 	api_json = directories.api_base + '/' + an + '/' + version + '/' + an + '-api.json'
 	api_meta_dir = os.path.dirname(api_json)
 	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version + make.aggregated_target_suffix,
 																		 	json.load(open(api_json, 'r'))['revision'])
 	api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.json'
-	api_json_inputs = api_json + ' $(API_SHARED_INFO) $(API_DIR)/type-' + TYPE + '.yaml'
+	api_json_inputs = api_json + ' $(API_SHARED_INFO) $(API_DIR)/type-' + make.id + '.yaml'
 	if os.path.isfile(api_json_overrides):
 		api_json_inputs += ' ' + api_json_overrides
 	api_info.append((api_target, api_clean, api_cargo, api_doc, api_crate_publish_file, gen_root))
 
 	space_join = lambda i: ' '.join(a[i] for a in api_info)
 %>\
-${api_common}: $(RUST_SRC)/cmn.rs $(lastword $(MAKEFILE_LIST)) ${gen_root_stamp}
+${api_common}: $(RUST_SRC)/${make.id}/cmn.rs $(lastword $(MAKEFILE_LIST)) ${gen_root_stamp}
 	@ echo "// COPY OF '$<'"  > $@
 	@ echo "// DO NOT EDIT"  >> $@
 	@cat $< >> $@
 
-${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES)
+${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES) ${depends_on_target}
 	@echo Generating ${api_target}
-	@$(MAKO) --template-dir '.' -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
+	@$(MAKO) -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
 	@touch $@
 
 ${api_target}: ${api_common}
@@ -132,6 +135,9 @@ help${agsuffix}:
 	$(info ${a[3]}    -    run cargo doc on the ${a[0]}")
 % endfor
 
+% if global_targets:
+.PHONY += update-json
+
 % for info in apis['items']:
 <%
 	import util
@@ -147,8 +153,6 @@ ${fake_target}:
 	@wget -nv ${discovery_url + info['discoveryLink']} -O ${target}
 % endfor
 
-% if global_targets:
-.PHONY += update-json
 update-json: ${' '.join(json_api_targets)}
 	$(API_VERSION_GEN) $(API_DIR) $(API_LIST) $(API_LIST)
 % endif

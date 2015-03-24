@@ -9,13 +9,14 @@ extern crate "yup-oauth2" as oauth2;
 extern crate serde;
 
 // just pull it in the check if it compiles
-mod cmn;
+mod api;
+mod cli;
 
 /// This module is for testing only, its code is used in mako templates
 #[cfg(test)]
-mod tests {
+mod test_api {
     extern crate "yup-hyper-mock" as hyper_mock;
-    use super::cmn::*;
+    use super::api::cmn::*;
     use self::hyper_mock::*;
     use std::io::Read;
     use std::default::Default;

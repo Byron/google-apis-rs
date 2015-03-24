@@ -2,9 +2,10 @@
 .pyenv
 .virtualenv
 gen/doc/
+gen/*-cli/
 *.go
 *.pyc
 **target/
-.api.deps
+.*.deps
 **Cargo.lock
 *.sublime-workspace

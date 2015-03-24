@@ -1,5 +1,5 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
 //! This documentation was generated from *drive* crate version *0.1.1+20150108*, where *20150108* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
@@ -69,6 +69,8 @@
 //! 
 //! * **[Hub](struct.Drive.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -77,6 +79,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -124,7 +128,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-drive2" as drive2;
 //! use drive2::File;
-//! use drive2::Result;
+//! use drive2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -166,15 +170,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -187,7 +193,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -210,8 +216,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -260,7 +267,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -331,7 +338,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-drive2" as drive2;
 /// use drive2::File;
-/// use drive2::Result;
+/// use drive2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -373,15 +380,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -474,17 +483,17 @@ impl<'a, C, NC, A> Drive<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ParentReference {
-    /// Whether or not the parent is the root folder.    
+    /// Whether or not the parent is the root folder.
     #[serde(alias="isRoot")]
     pub is_root: Option<bool>,
-    /// This is always drive#parentReference.    
+    /// This is always drive#parentReference.
     pub kind: Option<String>,
-    /// The ID of the parent.    
+    /// The ID of the parent.
     pub id: Option<String>,
-    /// A link back to this reference.    
+    /// A link back to this reference.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// A link to the parent.    
+    /// A link to the parent.
     #[serde(alias="parentLink")]
     pub parent_link: Option<String>,
 }
@@ -513,39 +522,39 @@ pub struct Comment {
     /// - "open" - The comment is still open. 
     /// - "resolved" - The comment has been resolved by one of its replies.
     pub status: Option<String>,
-    /// A link back to this comment.    
+    /// A link back to this comment.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// This is always drive#comment.    
+    /// This is always drive#comment.
     pub kind: Option<String>,
-    /// The user who wrote this comment.    
+    /// The user who wrote this comment.
     pub author: Option<User>,
-    /// Whether this comment has been deleted. If a comment has been deleted the content will be cleared and this will only represent a comment that once existed.    
+    /// Whether this comment has been deleted. If a comment has been deleted the content will be cleared and this will only represent a comment that once existed.
     pub deleted: Option<bool>,
-    /// The date when this comment was first created.    
+    /// The date when this comment was first created.
     #[serde(alias="createdDate")]
     pub created_date: Option<String>,
-    /// HTML formatted content for this comment.    
+    /// HTML formatted content for this comment.
     #[serde(alias="htmlContent")]
     pub html_content: Option<String>,
-    /// The plain text content used to create this comment. This is not HTML safe and should only be used as a starting point to make edits to a comment's content.    
+    /// The plain text content used to create this comment. This is not HTML safe and should only be used as a starting point to make edits to a comment's content.
     pub content: Option<String>,
-    /// The date when this comment or any of its replies were last modified.    
+    /// The date when this comment or any of its replies were last modified.
     #[serde(alias="modifiedDate")]
     pub modified_date: Option<String>,
-    /// The context of the file which is being commented on.    
+    /// The context of the file which is being commented on.
     pub context: Option<CommentContext>,
-    /// Replies to this post.    
+    /// Replies to this post.
     pub replies: Option<Vec<CommentReply>>,
-    /// The ID of the comment.    
+    /// The ID of the comment.
     #[serde(alias="commentId")]
     pub comment_id: Option<String>,
-    /// A region of the document represented as a JSON string. See anchor documentation for details on how to define and interpret anchor properties.    
+    /// A region of the document represented as a JSON string. See anchor documentation for details on how to define and interpret anchor properties.
     pub anchor: Option<String>,
-    /// The title of the file which this comment is addressing.    
+    /// The title of the file which this comment is addressing.
     #[serde(alias="fileTitle")]
     pub file_title: Option<String>,
-    /// The file which this comment is addressing.    
+    /// The file which this comment is addressing.
     #[serde(alias="fileId")]
     pub file_id: Option<String>,
 }
@@ -566,73 +575,73 @@ impl ResponseResult for Comment {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct About {
-    /// The user's language or locale code, as defined by BCP 47, with some extensions from Unicode's LDML format (http://www.unicode.org/reports/tr35/).    
+    /// The user's language or locale code, as defined by BCP 47, with some extensions from Unicode's LDML format (http://www.unicode.org/reports/tr35/).
     #[serde(alias="languageCode")]
     pub language_code: String,
-    /// The amount of storage quota used by different Google services.    
+    /// The amount of storage quota used by different Google services.
     #[serde(alias="quotaBytesByService")]
     pub quota_bytes_by_service: Vec<AboutQuotaBytesByService>,
-    /// List of additional features enabled on this account.    
+    /// List of additional features enabled on this account.
     pub features: Vec<AboutFeatures>,
-    /// The number of quota bytes used by Google Drive.    
+    /// The number of quota bytes used by Google Drive.
     #[serde(alias="quotaBytesUsed")]
     pub quota_bytes_used: String,
-    /// This is always drive#about.    
+    /// This is always drive#about.
     pub kind: String,
-    /// Information about supported additional roles per file type. The most specific type takes precedence.    
+    /// Information about supported additional roles per file type. The most specific type takes precedence.
     #[serde(alias="additionalRoleInfo")]
     pub additional_role_info: Vec<AboutAdditionalRoleInfo>,
-    /// The palette of allowable folder colors as RGB hex strings.    
+    /// The palette of allowable folder colors as RGB hex strings.
     #[serde(alias="folderColorPalette")]
     pub folder_color_palette: Vec<String>,
-    /// The authenticated user.    
+    /// The authenticated user.
     pub user: User,
     /// The type of the user's storage quota. Possible values are:  
     /// - LIMITED 
     /// - UNLIMITED
     #[serde(alias="quotaType")]
     pub quota_type: String,
-    /// The number of quota bytes used by all Google apps (Drive, Picasa, etc.).    
+    /// The number of quota bytes used by all Google apps (Drive, Picasa, etc.).
     #[serde(alias="quotaBytesUsedAggregate")]
     pub quota_bytes_used_aggregate: String,
-    /// List of max upload sizes for each file type. The most specific type takes precedence.    
+    /// List of max upload sizes for each file type. The most specific type takes precedence.
     #[serde(alias="maxUploadSizes")]
     pub max_upload_sizes: Vec<AboutMaxUploadSizes>,
-    /// The current user's ID as visible in the permissions collection.    
+    /// The current user's ID as visible in the permissions collection.
     #[serde(alias="permissionId")]
     pub permission_id: String,
-    /// The name of the current user.    
+    /// The name of the current user.
     pub name: String,
-    /// The total number of quota bytes.    
+    /// The total number of quota bytes.
     #[serde(alias="quotaBytesTotal")]
     pub quota_bytes_total: String,
-    /// The number of remaining change ids.    
+    /// The number of remaining change ids.
     #[serde(alias="remainingChangeIds")]
     pub remaining_change_ids: String,
-    /// The ETag of the item.    
+    /// The ETag of the item.
     pub etag: String,
-    /// The allowable import formats.    
+    /// The allowable import formats.
     #[serde(alias="importFormats")]
     pub import_formats: Vec<AboutImportFormats>,
-    /// The id of the root folder.    
+    /// The id of the root folder.
     #[serde(alias="rootFolderId")]
     pub root_folder_id: String,
-    /// The largest change id.    
+    /// The largest change id.
     #[serde(alias="largestChangeId")]
     pub largest_change_id: String,
-    /// The number of quota bytes used by trashed items.    
+    /// The number of quota bytes used by trashed items.
     #[serde(alias="quotaBytesUsedInTrash")]
     pub quota_bytes_used_in_trash: String,
-    /// The allowable export formats.    
+    /// The allowable export formats.
     #[serde(alias="exportFormats")]
     pub export_formats: Vec<AboutExportFormats>,
-    /// The domain sharing policy for the current user.    
+    /// The domain sharing policy for the current user.
     #[serde(alias="domainSharingPolicy")]
     pub domain_sharing_policy: String,
-    /// A link back to this item.    
+    /// A link back to this item.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// A boolean indicating whether the authenticated app is installed by the authenticated user.    
+    /// A boolean indicating whether the authenticated app is installed by the authenticated user.
     #[serde(alias="isCurrentAppInstalled")]
     pub is_current_app_installed: bool,
 }
@@ -646,10 +655,10 @@ impl ResponseResult for About {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileThumbnail {
-    /// The MIME type of the thumbnail.    
+    /// The MIME type of the thumbnail.
     #[serde(alias="mimeType")]
     pub mime_type: String,
-    /// The URL-safe Base64 encoded bytes of the thumbnail image. It should conform to RFC 4648 section 5.    
+    /// The URL-safe Base64 encoded bytes of the thumbnail image. It should conform to RFC 4648 section 5.
     pub image: String,
 }
 
@@ -679,143 +688,143 @@ impl Part for FileThumbnail {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct File {
-    /// The MIME type of the file. This is only mutable on update when uploading new content. This field can be left blank, and the mimetype will be determined from the uploaded content's MIME type.    
+    /// The MIME type of the file. This is only mutable on update when uploading new content. This field can be left blank, and the mimetype will be determined from the uploaded content's MIME type.
     #[serde(alias="mimeType")]
     pub mime_type: Option<String>,
-    /// Last time this file was viewed by the user (formatted RFC 3339 timestamp).    
+    /// Last time this file was viewed by the user (formatted RFC 3339 timestamp).
     #[serde(alias="lastViewedByMeDate")]
     pub last_viewed_by_me_date: Option<String>,
-    /// Whether this file is in the Application Data folder.    
+    /// Whether this file is in the Application Data folder.
     #[serde(alias="appDataContents")]
     pub app_data_contents: Option<bool>,
-    /// A short-lived link to the file's thumbnail. Typically lasts on the order of hours.    
+    /// A short-lived link to the file's thumbnail. Typically lasts on the order of hours.
     #[serde(alias="thumbnailLink")]
     pub thumbnail_link: Option<String>,
-    /// A group of labels for the file.    
+    /// A group of labels for the file.
     pub labels: Option<FileLabels>,
-    /// Indexable text attributes for the file (can only be written)    
+    /// Indexable text attributes for the file (can only be written)
     #[serde(alias="indexableText")]
     pub indexable_text: Option<FileIndexableText>,
-    /// Whether this file has been explicitly trashed, as opposed to recursively trashed. This will only be populated if the file is trashed.    
+    /// Whether this file has been explicitly trashed, as opposed to recursively trashed. This will only be populated if the file is trashed.
     #[serde(alias="explicitlyTrashed")]
     pub explicitly_trashed: Option<bool>,
-    /// ETag of the file.    
+    /// ETag of the file.
     pub etag: Option<String>,
-    /// Name of the last user to modify this file.    
+    /// Name of the last user to modify this file.
     #[serde(alias="lastModifyingUserName")]
     pub last_modifying_user_name: Option<String>,
-    /// Whether writers can share the document with other users.    
+    /// Whether writers can share the document with other users.
     #[serde(alias="writersCanShare")]
     pub writers_can_share: Option<bool>,
-    /// Time at which this file was shared with the user (formatted RFC 3339 timestamp).    
+    /// Time at which this file was shared with the user (formatted RFC 3339 timestamp).
     #[serde(alias="sharedWithMeDate")]
     pub shared_with_me_date: Option<String>,
-    /// User that shared the item with the current user, if available.    
+    /// User that shared the item with the current user, if available.
     #[serde(alias="sharingUser")]
     pub sharing_user: Option<User>,
-    /// Metadata about video media. This will only be present for video types.    
+    /// Metadata about video media. This will only be present for video types.
     #[serde(alias="videoMediaMetadata")]
     pub video_media_metadata: Option<FileVideoMediaMetadata>,
-    /// The last user to modify this file.    
+    /// The last user to modify this file.
     #[serde(alias="lastModifyingUser")]
     pub last_modifying_user: Option<User>,
-    /// Whether the file can be copied by the current user.    
+    /// Whether the file can be copied by the current user.
     pub copyable: Option<bool>,
-    /// Folder color as an RGB hex string if the file is a folder. The list of supported colors is available in the folderColorPalette field of the About resource. If an unsupported color is specified, it will be changed to the closest color in the palette.    
+    /// Folder color as an RGB hex string if the file is a folder. The list of supported colors is available in the folderColorPalette field of the About resource. If an unsupported color is specified, it will be changed to the closest color in the palette.
     #[serde(alias="folderColorRgb")]
     pub folder_color_rgb: Option<String>,
-    /// Name(s) of the owner(s) of this file.    
+    /// Name(s) of the owner(s) of this file.
     #[serde(alias="ownerNames")]
     pub owner_names: Option<Vec<String>>,
-    /// The type of file. This is always drive#file.    
+    /// The type of file. This is always drive#file.
     pub kind: Option<String>,
-    /// The ID of the file.    
+    /// The ID of the file.
     pub id: Option<String>,
-    /// A link only available on public folders for viewing their static web assets (HTML, CSS, JS, etc) via Google Drive's Website Hosting.    
+    /// A link only available on public folders for viewing their static web assets (HTML, CSS, JS, etc) via Google Drive's Website Hosting.
     #[serde(alias="webViewLink")]
     pub web_view_link: Option<String>,
-    /// A monotonically increasing version number for the file. This reflects every change made to the file on the server, even those not visible to the requesting user.    
+    /// A monotonically increasing version number for the file. This reflects every change made to the file on the server, even those not visible to the requesting user.
     pub version: Option<String>,
     /// Collection of parent folders which contain this file.
     /// Setting this field will put the file in all of the provided folders. On insert, if no folders are provided, the file will be placed in the default root folder.
     pub parents: Option<Vec<ParentReference>>,
-    /// Links for exporting Google Docs to specific formats.    
+    /// Links for exporting Google Docs to specific formats.
     #[serde(alias="exportLinks")]
     pub export_links: Option<HashMap<String, String>>,
-    /// Whether the file has been shared.    
+    /// Whether the file has been shared.
     pub shared: Option<bool>,
-    /// A link to the file's icon.    
+    /// A link to the file's icon.
     #[serde(alias="iconLink")]
     pub icon_link: Option<String>,
-    /// Thumbnail for the file. Only accepted on upload and for files that are not already thumbnailed by Google.    
+    /// Thumbnail for the file. Only accepted on upload and for files that are not already thumbnailed by Google.
     pub thumbnail: Option<FileThumbnail>,
-    /// A map of the id of each of the user's apps to a link to open this file with that app. Only populated when the drive.apps.readonly scope is used.    
+    /// A map of the id of each of the user's apps to a link to open this file with that app. Only populated when the drive.apps.readonly scope is used.
     #[serde(alias="openWithLinks")]
     pub open_with_links: Option<HashMap<String, String>>,
-    /// A link to open this file with the user's default app for this file. Only populated when the drive.apps.readonly scope is used.    
+    /// A link to open this file with the user's default app for this file. Only populated when the drive.apps.readonly scope is used.
     #[serde(alias="defaultOpenWithLink")]
     pub default_open_with_link: Option<String>,
-    /// A short description of the file.    
+    /// A short description of the file.
     pub description: Option<String>,
-    /// A link for downloading the content of the file in a browser using cookie based authentication. In cases where the content is shared publicly, the content can be downloaded without any credentials.    
+    /// A link for downloading the content of the file in a browser using cookie based authentication. In cases where the content is shared publicly, the content can be downloaded without any credentials.
     #[serde(alias="webContentLink")]
     pub web_content_link: Option<String>,
-    /// Whether the file can be edited by the current user.    
+    /// Whether the file can be edited by the current user.
     pub editable: Option<bool>,
-    /// A link for embedding the file.    
+    /// A link for embedding the file.
     #[serde(alias="embedLink")]
     pub embed_link: Option<String>,
-    /// Time this file was explicitly marked viewed by the user (formatted RFC 3339 timestamp).    
+    /// Time this file was explicitly marked viewed by the user (formatted RFC 3339 timestamp).
     #[serde(alias="markedViewedByMeDate")]
     pub marked_viewed_by_me_date: Option<String>,
-    /// The file extension used when downloading this file. This field is read only. To set the extension, include it in the title when creating the file. This is only populated for files with content stored in Drive.    
+    /// The file extension used when downloading this file. This field is read only. To set the extension, include it in the title when creating the file. This is only populated for files with content stored in Drive.
     #[serde(alias="fileExtension")]
     pub file_extension: Option<String>,
-    /// The size of the file in bytes. This is only populated for files with content stored in Drive.    
+    /// The size of the file in bytes. This is only populated for files with content stored in Drive.
     #[serde(alias="fileSize")]
     pub file_size: Option<String>,
-    /// Create time for this file (formatted RFC 3339 timestamp).    
+    /// Create time for this file (formatted RFC 3339 timestamp).
     #[serde(alias="createdDate")]
     pub created_date: Option<String>,
-    /// The list of properties.    
+    /// The list of properties.
     pub properties: Option<Vec<Property>>,
-    /// An MD5 checksum for the content of this file. This is populated only for files with content stored in Drive.    
+    /// An MD5 checksum for the content of this file. This is populated only for files with content stored in Drive.
     #[serde(alias="md5Checksum")]
     pub md5_checksum: Option<String>,
-    /// The list of permissions for users with access to this file.    
+    /// The list of permissions for users with access to this file.
     pub permissions: Option<Vec<Permission>>,
-    /// Metadata about image media. This will only be present for image types, and its contents will depend on what can be parsed from the image content.    
+    /// Metadata about image media. This will only be present for image types, and its contents will depend on what can be parsed from the image content.
     #[serde(alias="imageMediaMetadata")]
     pub image_media_metadata: Option<FileImageMediaMetadata>,
-    /// The owner(s) of this file.    
+    /// The owner(s) of this file.
     pub owners: Option<Vec<User>>,
-    /// A link for opening the file in a relevant Google editor or viewer.    
+    /// A link for opening the file in a relevant Google editor or viewer.
     #[serde(alias="alternateLink")]
     pub alternate_link: Option<String>,
-    /// The title of this file.    
+    /// The title of this file.
     pub title: Option<String>,
-    /// Last time this file was modified by the user (formatted RFC 3339 timestamp). Note that setting modifiedDate will also update the modifiedByMe date for the user which set the date.    
+    /// Last time this file was modified by the user (formatted RFC 3339 timestamp). Note that setting modifiedDate will also update the modifiedByMe date for the user which set the date.
     #[serde(alias="modifiedByMeDate")]
     pub modified_by_me_date: Option<String>,
-    /// Short lived download URL for the file. This is only populated for files with content stored in Drive.    
+    /// Short lived download URL for the file. This is only populated for files with content stored in Drive.
     #[serde(alias="downloadUrl")]
     pub download_url: Option<String>,
-    /// The permissions for the authenticated user on this file.    
+    /// The permissions for the authenticated user on this file.
     #[serde(alias="userPermission")]
     pub user_permission: Option<Permission>,
-    /// The original filename if the file was uploaded manually, or the original title if the file was inserted through the API. Note that renames of the title will not change the original filename. This will only be populated on files with content stored in Drive.    
+    /// The original filename if the file was uploaded manually, or the original title if the file was inserted through the API. Note that renames of the title will not change the original filename. This will only be populated on files with content stored in Drive.
     #[serde(alias="originalFilename")]
     pub original_filename: Option<String>,
-    /// The number of quota bytes used by this file.    
+    /// The number of quota bytes used by this file.
     #[serde(alias="quotaBytesUsed")]
     pub quota_bytes_used: Option<String>,
-    /// The ID of the file's head revision. This will only be populated for files with content stored in Drive.    
+    /// The ID of the file's head revision. This will only be populated for files with content stored in Drive.
     #[serde(alias="headRevisionId")]
     pub head_revision_id: Option<String>,
-    /// A link back to this file.    
+    /// A link back to this file.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// Last time this file was modified by anyone (formatted RFC 3339 timestamp). This is only mutable on update when the setModifiedDate parameter is set.    
+    /// Last time this file was modified by anyone (formatted RFC 3339 timestamp). This is only mutable on update when the setModifiedDate parameter is set.
     #[serde(alias="modifiedDate")]
     pub modified_date: Option<String>,
 }
@@ -831,10 +840,10 @@ impl ResponseResult for File {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutAdditionalRoleInfo {
-    /// The supported additional roles per primary role.    
+    /// The supported additional roles per primary role.
     #[serde(alias="roleSets")]
     pub role_sets: Vec<AboutAdditionalRoleInfoRoleSets>,
-    /// The content type that this additional role info applies to.    
+    /// The content type that this additional role info applies to.
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -854,22 +863,22 @@ impl Part for AboutAdditionalRoleInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChangeList {
-    /// The page token for the next page of changes.    
+    /// The page token for the next page of changes.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// This is always drive#changeList.    
+    /// This is always drive#changeList.
     pub kind: String,
-    /// The ETag of the list.    
+    /// The ETag of the list.
     pub etag: String,
-    /// The current largest change ID.    
+    /// The current largest change ID.
     #[serde(alias="largestChangeId")]
     pub largest_change_id: String,
-    /// The actual list of changes.    
+    /// The actual list of changes.
     pub items: Vec<Change>,
-    /// A link back to this list.    
+    /// A link back to this list.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// A link to the next page of changes.    
+    /// A link to the next page of changes.
     #[serde(alias="nextLink")]
     pub next_link: String,
 }
@@ -888,13 +897,13 @@ impl ResponseResult for ChangeList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PropertyList {
-    /// The list of properties.    
+    /// The list of properties.
     pub items: Vec<Property>,
-    /// This is always drive#propertyList.    
+    /// This is always drive#propertyList.
     pub kind: String,
-    /// The ETag of the list.    
+    /// The ETag of the list.
     pub etag: String,
-    /// The link back to this list.    
+    /// The link back to this list.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -913,9 +922,9 @@ impl ResponseResult for PropertyList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PermissionId {
-    /// This is always drive#permissionId.    
+    /// This is always drive#permissionId.
     pub kind: String,
-    /// The permission ID.    
+    /// The permission ID.
     pub id: String,
 }
 
@@ -928,7 +937,7 @@ impl ResponseResult for PermissionId {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileIndexableText {
-    /// The text to be indexed for this file.    
+    /// The text to be indexed for this file.
     pub text: String,
 }
 
@@ -942,10 +951,10 @@ impl Part for FileIndexableText {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutAdditionalRoleInfoRoleSets {
-    /// A primary permission role.    
+    /// A primary permission role.
     #[serde(alias="primaryRole")]
     pub primary_role: String,
-    /// The supported additional roles with the primary role.    
+    /// The supported additional roles with the primary role.
     #[serde(alias="additionalRoles")]
     pub additional_roles: Vec<String>,
 }
@@ -965,17 +974,17 @@ impl Part for AboutAdditionalRoleInfoRoleSets {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CommentReplyList {
-    /// The token to use to request the next page of results.    
+    /// The token to use to request the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of reply.    
+    /// List of reply.
     pub items: Vec<CommentReply>,
-    /// This is always drive#commentReplyList.    
+    /// This is always drive#commentReplyList.
     pub kind: String,
-    /// A link back to this list.    
+    /// A link back to this list.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// A link to the next page of replies.    
+    /// A link to the next page of replies.
     #[serde(alias="nextLink")]
     pub next_link: String,
 }
@@ -989,9 +998,9 @@ impl ResponseResult for CommentReplyList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutImportFormats {
-    /// The imported file's content type to convert from.    
+    /// The imported file's content type to convert from.
     pub source: String,
-    /// The possible content types to convert to.    
+    /// The possible content types to convert to.
     pub targets: Vec<String>,
 }
 
@@ -1010,13 +1019,13 @@ impl Part for AboutImportFormats {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RevisionList {
-    /// The actual list of revisions.    
+    /// The actual list of revisions.
     pub items: Vec<Revision>,
-    /// This is always drive#revisionList.    
+    /// This is always drive#revisionList.
     pub kind: String,
-    /// The ETag of the list.    
+    /// The ETag of the list.
     pub etag: String,
-    /// A link back to this list.    
+    /// A link back to this list.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -1030,10 +1039,10 @@ impl ResponseResult for RevisionList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutMaxUploadSizes {
-    /// The file type.    
+    /// The file type.
     #[serde(alias="type")]
     pub type_: String,
-    /// The max upload size for this type.    
+    /// The max upload size for this type.
     pub size: String,
 }
 
@@ -1047,15 +1056,15 @@ impl Part for AboutMaxUploadSizes {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileLabels {
-    /// Whether viewers are prevented from downloading this file.    
+    /// Whether viewers are prevented from downloading this file.
     pub restricted: bool,
-    /// Deprecated.    
+    /// Deprecated.
     pub hidden: bool,
-    /// Whether this file has been trashed. This label applies to all users accessing the file; however, only owners are allowed to see and untrash files.    
+    /// Whether this file has been trashed. This label applies to all users accessing the file; however, only owners are allowed to see and untrash files.
     pub trashed: bool,
-    /// Whether this file is starred by the user.    
+    /// Whether this file is starred by the user.
     pub starred: bool,
-    /// Whether this file has been viewed by this user.    
+    /// Whether this file has been viewed by this user.
     pub viewed: bool,
 }
 
@@ -1077,18 +1086,18 @@ impl Part for FileLabels {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Property {
-    /// The link back to this property.    
+    /// The link back to this property.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// This is always drive#property.    
+    /// This is always drive#property.
     pub kind: Option<String>,
-    /// ETag of the property.    
+    /// ETag of the property.
     pub etag: Option<String>,
-    /// The visibility of this property.    
+    /// The visibility of this property.
     pub visibility: Option<String>,
-    /// The key of this property.    
+    /// The key of this property.
     pub key: Option<String>,
-    /// The value of this property.    
+    /// The value of this property.
     pub value: Option<String>,
 }
 
@@ -1109,28 +1118,28 @@ impl ResponseResult for Property {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
-    /// A version-specific identifier for the watched resource.    
+    /// A version-specific identifier for the watched resource.
     #[serde(alias="resourceUri")]
     pub resource_uri: Option<String>,
-    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".    
+    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
     pub kind: Option<String>,
-    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.    
+    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
     #[serde(alias="resourceId")]
     pub resource_id: Option<String>,
-    /// A UUID or similar unique string that identifies this channel.    
+    /// A UUID or similar unique string that identifies this channel.
     pub id: Option<String>,
-    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.    
+    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
     pub token: Option<String>,
-    /// Additional parameters controlling delivery channel behavior. Optional.    
+    /// Additional parameters controlling delivery channel behavior. Optional.
     pub params: Option<HashMap<String, String>>,
-    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.    
+    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
     pub expiration: Option<String>,
-    /// The address where notifications are delivered for this channel.    
+    /// The address where notifications are delivered for this channel.
     pub address: Option<String>,
-    /// The type of delivery mechanism used for this channel.    
+    /// The type of delivery mechanism used for this channel.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// A Boolean value to indicate whether payload is wanted. Optional.    
+    /// A Boolean value to indicate whether payload is wanted. Optional.
     pub payload: Option<bool>,
 }
 
@@ -1154,53 +1163,53 @@ impl ResponseResult for Channel {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Revision {
-    /// The MIME type of the revision.    
+    /// The MIME type of the revision.
     #[serde(alias="mimeType")]
     pub mime_type: Option<String>,
-    /// A link to the published revision.    
+    /// A link to the published revision.
     #[serde(alias="publishedLink")]
     pub published_link: Option<String>,
-    /// Whether this revision is published outside the domain. This is only populated and can only be modified for Google Docs.    
+    /// Whether this revision is published outside the domain. This is only populated and can only be modified for Google Docs.
     #[serde(alias="publishedOutsideDomain")]
     pub published_outside_domain: Option<bool>,
-    /// Whether subsequent revisions will be automatically republished. This is only populated and can only be modified for Google Docs.    
+    /// Whether subsequent revisions will be automatically republished. This is only populated and can only be modified for Google Docs.
     #[serde(alias="publishAuto")]
     pub publish_auto: Option<bool>,
-    /// The size of the revision in bytes. This will only be populated on files with content stored in Drive.    
+    /// The size of the revision in bytes. This will only be populated on files with content stored in Drive.
     #[serde(alias="fileSize")]
     pub file_size: Option<String>,
-    /// Name of the last user to modify this revision.    
+    /// Name of the last user to modify this revision.
     #[serde(alias="lastModifyingUserName")]
     pub last_modifying_user_name: Option<String>,
-    /// The ID of the revision.    
+    /// The ID of the revision.
     pub id: Option<String>,
-    /// An MD5 checksum for the content of this revision. This will only be populated on files with content stored in Drive.    
+    /// An MD5 checksum for the content of this revision. This will only be populated on files with content stored in Drive.
     #[serde(alias="md5Checksum")]
     pub md5_checksum: Option<String>,
-    /// Short term download URL for the file. This will only be populated on files with content stored in Drive.    
+    /// Short term download URL for the file. This will only be populated on files with content stored in Drive.
     #[serde(alias="downloadUrl")]
     pub download_url: Option<String>,
-    /// This is always drive#revision.    
+    /// This is always drive#revision.
     pub kind: Option<String>,
-    /// The last user to modify this revision.    
+    /// The last user to modify this revision.
     #[serde(alias="lastModifyingUser")]
     pub last_modifying_user: Option<User>,
-    /// Whether this revision is pinned to prevent automatic purging. This will only be populated and can only be modified on files with content stored in Drive which are not Google Docs. Revisions can also be pinned when they are created through the drive.files.insert/update/copy by using the pinned query parameter.    
+    /// Whether this revision is pinned to prevent automatic purging. This will only be populated and can only be modified on files with content stored in Drive which are not Google Docs. Revisions can also be pinned when they are created through the drive.files.insert/update/copy by using the pinned query parameter.
     pub pinned: Option<bool>,
-    /// The ETag of the revision.    
+    /// The ETag of the revision.
     pub etag: Option<String>,
-    /// The original filename when this revision was created. This will only be populated on files with content stored in Drive.    
+    /// The original filename when this revision was created. This will only be populated on files with content stored in Drive.
     #[serde(alias="originalFilename")]
     pub original_filename: Option<String>,
-    /// Links for exporting Google Docs to specific formats.    
+    /// Links for exporting Google Docs to specific formats.
     #[serde(alias="exportLinks")]
     pub export_links: Option<HashMap<String, String>>,
-    /// Whether this revision is published. This is only populated and can only be modified for Google Docs.    
+    /// Whether this revision is published. This is only populated and can only be modified for Google Docs.
     pub published: Option<bool>,
-    /// A link back to this revision.    
+    /// A link back to this revision.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// Last time this revision was modified (formatted RFC 3339 timestamp).    
+    /// Last time this revision was modified (formatted RFC 3339 timestamp).
     #[serde(alias="modifiedDate")]
     pub modified_date: Option<String>,
 }
@@ -1221,17 +1230,17 @@ impl ResponseResult for Revision {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CommentList {
-    /// The token to use to request the next page of results.    
+    /// The token to use to request the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of comments.    
+    /// List of comments.
     pub items: Vec<Comment>,
-    /// This is always drive#commentList.    
+    /// This is always drive#commentList.
     pub kind: String,
-    /// A link back to this list.    
+    /// A link back to this list.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// A link to the next page of comments.    
+    /// A link to the next page of comments.
     #[serde(alias="nextLink")]
     pub next_link: String,
 }
@@ -1250,13 +1259,13 @@ impl ResponseResult for CommentList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ParentList {
-    /// The actual list of parents.    
+    /// The actual list of parents.
     pub items: Vec<ParentReference>,
-    /// This is always drive#parentList.    
+    /// This is always drive#parentList.
     pub kind: String,
-    /// The ETag of the list.    
+    /// The ETag of the list.
     pub etag: String,
-    /// A link back to this list.    
+    /// A link back to this list.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -1275,13 +1284,13 @@ impl ResponseResult for ParentList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PermissionList {
-    /// The actual list of permissions.    
+    /// The actual list of permissions.
     pub items: Vec<Permission>,
-    /// This is always drive#permissionList.    
+    /// This is always drive#permissionList.
     pub kind: String,
-    /// The ETag of the list.    
+    /// The ETag of the list.
     pub etag: String,
-    /// A link back to this list.    
+    /// A link back to this list.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -1295,10 +1304,10 @@ impl ResponseResult for PermissionList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutQuotaBytesByService {
-    /// The service's name, e.g. DRIVE, GMAIL, or PHOTOS.    
+    /// The service's name, e.g. DRIVE, GMAIL, or PHOTOS.
     #[serde(alias="serviceName")]
     pub service_name: String,
-    /// The storage quota bytes used by the service.    
+    /// The storage quota bytes used by the service.
     #[serde(alias="bytesUsed")]
     pub bytes_used: String,
 }
@@ -1324,29 +1333,29 @@ impl Part for AboutQuotaBytesByService {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Permission {
-    /// Whether the link is required for this permission.    
+    /// Whether the link is required for this permission.
     #[serde(alias="withLink")]
     pub with_link: Option<bool>,
-    /// The domain name of the entity this permission refers to. This is an output-only field which is present when the permission type is user, group or domain.    
+    /// The domain name of the entity this permission refers to. This is an output-only field which is present when the permission type is user, group or domain.
     pub domain: Option<String>,
-    /// The name for this permission.    
+    /// The name for this permission.
     pub name: Option<String>,
-    /// This is always drive#permission.    
+    /// This is always drive#permission.
     pub kind: Option<String>,
-    /// The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified.    
+    /// The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified.
     pub value: Option<String>,
-    /// Additional roles for this user. Only commenter is currently allowed.    
+    /// Additional roles for this user. Only commenter is currently allowed.
     #[serde(alias="additionalRoles")]
     pub additional_roles: Option<Vec<String>>,
-    /// The authkey parameter required for this permission.    
+    /// The authkey parameter required for this permission.
     #[serde(alias="authKey")]
     pub auth_key: Option<String>,
-    /// The ETag of the permission.    
+    /// The ETag of the permission.
     pub etag: Option<String>,
-    /// The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is user or group.    
+    /// The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is user or group.
     #[serde(alias="emailAddress")]
     pub email_address: Option<String>,
-    /// A link to the profile photo, if available.    
+    /// A link to the profile photo, if available.
     #[serde(alias="photoLink")]
     pub photo_link: Option<String>,
     /// The primary role for this user. Allowed values are:  
@@ -1361,9 +1370,9 @@ pub struct Permission {
     /// - anyone
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified.    
+    /// The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified.
     pub id: Option<String>,
-    /// A link back to this permission.    
+    /// A link back to this permission.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -1379,60 +1388,60 @@ impl ResponseResult for Permission {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileImageMediaMetadata {
-    /// The exposure bias of the photo (APEX value).    
+    /// The exposure bias of the photo (APEX value).
     #[serde(alias="exposureBias")]
     pub exposure_bias: f32,
-    /// The length of the exposure, in seconds.    
+    /// The length of the exposure, in seconds.
     #[serde(alias="exposureTime")]
     pub exposure_time: f32,
-    /// The smallest f-number of the lens at the focal length used to create the photo (APEX value).    
+    /// The smallest f-number of the lens at the focal length used to create the photo (APEX value).
     #[serde(alias="maxApertureValue")]
     pub max_aperture_value: f32,
-    /// The color space of the photo.    
+    /// The color space of the photo.
     #[serde(alias="colorSpace")]
     pub color_space: String,
-    /// The height of the image in pixels.    
+    /// The height of the image in pixels.
     pub height: i32,
-    /// The lens used to create the photo.    
+    /// The lens used to create the photo.
     pub lens: String,
-    /// The aperture used to create the photo (f-number).    
+    /// The aperture used to create the photo (f-number).
     pub aperture: f32,
-    /// The date and time the photo was taken (EXIF format timestamp).    
+    /// The date and time the photo was taken (EXIF format timestamp).
     pub date: String,
-    /// The rotation in clockwise degrees from the image's original orientation.    
+    /// The rotation in clockwise degrees from the image's original orientation.
     pub rotation: i32,
-    /// The white balance mode used to create the photo.    
+    /// The white balance mode used to create the photo.
     #[serde(alias="whiteBalance")]
     pub white_balance: String,
-    /// The model of the camera used to create the photo.    
+    /// The model of the camera used to create the photo.
     #[serde(alias="cameraModel")]
     pub camera_model: String,
-    /// Whether a flash was used to create the photo.    
+    /// Whether a flash was used to create the photo.
     #[serde(alias="flashUsed")]
     pub flash_used: bool,
-    /// The make of the camera used to create the photo.    
+    /// The make of the camera used to create the photo.
     #[serde(alias="cameraMake")]
     pub camera_make: String,
-    /// The focal length used to create the photo, in millimeters.    
+    /// The focal length used to create the photo, in millimeters.
     #[serde(alias="focalLength")]
     pub focal_length: f32,
-    /// The exposure mode used to create the photo.    
+    /// The exposure mode used to create the photo.
     #[serde(alias="exposureMode")]
     pub exposure_mode: String,
-    /// The distance to the subject of the photo, in meters.    
+    /// The distance to the subject of the photo, in meters.
     #[serde(alias="subjectDistance")]
     pub subject_distance: i32,
-    /// The width of the image in pixels.    
+    /// The width of the image in pixels.
     pub width: i32,
-    /// The metering mode used to create the photo.    
+    /// The metering mode used to create the photo.
     #[serde(alias="meteringMode")]
     pub metering_mode: String,
-    /// Geographic location information stored in the image.    
+    /// Geographic location information stored in the image.
     pub location: FileImageMediaMetadataLocation,
-    /// The ISO speed used to create the photo.    
+    /// The ISO speed used to create the photo.
     #[serde(alias="isoSpeed")]
     pub iso_speed: i32,
-    /// The type of sensor used to create the photo.    
+    /// The type of sensor used to create the photo.
     pub sensor: String,
 }
 
@@ -1452,70 +1461,70 @@ impl Part for FileImageMediaMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct App {
-    /// The list of secondary mime types.    
+    /// The list of secondary mime types.
     #[serde(alias="secondaryMimeTypes")]
     pub secondary_mime_types: Vec<String>,
-    /// Whether the app is selected as the default handler for the types it supports.    
+    /// Whether the app is selected as the default handler for the types it supports.
     #[serde(alias="useByDefault")]
     pub use_by_default: bool,
-    /// Whether the app is installed.    
+    /// Whether the app is installed.
     pub installed: bool,
-    /// A link to the product listing for this app.    
+    /// A link to the product listing for this app.
     #[serde(alias="productUrl")]
     pub product_url: String,
-    /// Whether this app supports importing Google Docs.    
+    /// Whether this app supports importing Google Docs.
     #[serde(alias="supportsImport")]
     pub supports_import: bool,
-    /// Whether this app supports creating new objects.    
+    /// Whether this app supports creating new objects.
     #[serde(alias="supportsCreate")]
     pub supports_create: bool,
-    /// A long description of the app.    
+    /// A long description of the app.
     #[serde(alias="longDescription")]
     pub long_description: String,
-    /// A short description of the app.    
+    /// A short description of the app.
     #[serde(alias="shortDescription")]
     pub short_description: String,
-    /// The ID of the app.    
+    /// The ID of the app.
     pub id: String,
-    /// Whether the app has drive-wide scope. An app with drive-wide scope can access all files in the user's drive.    
+    /// Whether the app has drive-wide scope. An app with drive-wide scope can access all files in the user's drive.
     #[serde(alias="hasDriveWideScope")]
     pub has_drive_wide_scope: bool,
-    /// The type of object this app creates (e.g. Chart). If empty, the app name should be used instead.    
+    /// The type of object this app creates (e.g. Chart). If empty, the app name should be used instead.
     #[serde(alias="objectType")]
     pub object_type: String,
-    /// This is always drive#app.    
+    /// This is always drive#app.
     pub kind: String,
-    /// The list of primary file extensions.    
+    /// The list of primary file extensions.
     #[serde(alias="primaryFileExtensions")]
     pub primary_file_extensions: Vec<String>,
-    /// The list of primary mime types.    
+    /// The list of primary mime types.
     #[serde(alias="primaryMimeTypes")]
     pub primary_mime_types: Vec<String>,
-    /// The url to create a new file with this app.    
+    /// The url to create a new file with this app.
     #[serde(alias="createUrl")]
     pub create_url: String,
-    /// The various icons for the app.    
+    /// The various icons for the app.
     pub icons: Vec<AppIcons>,
-    /// Whether this app supports creating new files when offline.    
+    /// Whether this app supports creating new files when offline.
     #[serde(alias="supportsOfflineCreate")]
     pub supports_offline_create: bool,
-    /// The list of secondary file extensions.    
+    /// The list of secondary file extensions.
     #[serde(alias="secondaryFileExtensions")]
     pub secondary_file_extensions: Vec<String>,
-    /// The name of the app.    
+    /// The name of the app.
     pub name: String,
-    /// Whether the app is authorized to access data on the user's Drive.    
+    /// Whether the app is authorized to access data on the user's Drive.
     pub authorized: bool,
-    /// Whether this app supports opening more than one file.    
+    /// Whether this app supports opening more than one file.
     #[serde(alias="supportsMultiOpen")]
     pub supports_multi_open: bool,
-    /// The template url to create a new file with this app in a given folder. The template will contain {folderId} to be replaced by the folder to create the new file in.    
+    /// The template url to create a new file with this app in a given folder. The template will contain {folderId} to be replaced by the folder to create the new file in.
     #[serde(alias="createInFolderTemplate")]
     pub create_in_folder_template: String,
-    /// The template url for opening files with this app. The template will contain {ids} and/or {exportIds} to be replaced by the actual file ids.    
+    /// The template url for opening files with this app. The template will contain {ids} and/or {exportIds} to be replaced by the actual file ids.
     #[serde(alias="openUrlTemplate")]
     pub open_url_template: String,
-    /// The ID of the product listing for this app.    
+    /// The ID of the product listing for this app.
     #[serde(alias="productId")]
     pub product_id: String,
 }
@@ -1530,11 +1539,11 @@ impl ResponseResult for App {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileImageMediaMetadataLocation {
-    /// The latitude stored in the image.    
+    /// The latitude stored in the image.
     pub latitude: f64,
-    /// The altitude stored in the image.    
+    /// The altitude stored in the image.
     pub altitude: f64,
-    /// The longitude stored in the image.    
+    /// The longitude stored in the image.
     pub longitude: f64,
 }
 
@@ -1553,19 +1562,19 @@ impl Part for FileImageMediaMetadataLocation {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FileList {
-    /// The page token for the next page of files.    
+    /// The page token for the next page of files.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// This is always drive#fileList.    
+    /// This is always drive#fileList.
     pub kind: String,
-    /// The ETag of the list.    
+    /// The ETag of the list.
     pub etag: String,
-    /// The actual list of files.    
+    /// The actual list of files.
     pub items: Vec<File>,
-    /// A link back to this list.    
+    /// A link back to this list.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// A link to the next page of files.    
+    /// A link to the next page of files.
     #[serde(alias="nextLink")]
     pub next_link: String,
 }
@@ -1584,19 +1593,19 @@ impl ResponseResult for FileList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ChildList {
-    /// The page token for the next page of children.    
+    /// The page token for the next page of children.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// This is always drive#childList.    
+    /// This is always drive#childList.
     pub kind: String,
-    /// The ETag of the list.    
+    /// The ETag of the list.
     pub etag: String,
-    /// The actual list of children.    
+    /// The actual list of children.
     pub items: Vec<ChildReference>,
-    /// A link back to this list.    
+    /// A link back to this list.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// A link to the next page of children.    
+    /// A link to the next page of children.
     #[serde(alias="nextLink")]
     pub next_link: String,
 }
@@ -1618,28 +1627,28 @@ impl ResponseResult for ChildList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentReply {
-    /// This is always drive#commentReply.    
+    /// This is always drive#commentReply.
     pub kind: Option<String>,
-    /// The user who wrote this reply.    
+    /// The user who wrote this reply.
     pub author: Option<User>,
-    /// Whether this reply has been deleted. If a reply has been deleted the content will be cleared and this will only represent a reply that once existed.    
+    /// Whether this reply has been deleted. If a reply has been deleted the content will be cleared and this will only represent a reply that once existed.
     pub deleted: Option<bool>,
-    /// HTML formatted content for this reply.    
+    /// HTML formatted content for this reply.
     #[serde(alias="htmlContent")]
     pub html_content: Option<String>,
-    /// The plain text content used to create this reply. This is not HTML safe and should only be used as a starting point to make edits to a reply's content. This field is required on inserts if no verb is specified (resolve/reopen).    
+    /// The plain text content used to create this reply. This is not HTML safe and should only be used as a starting point to make edits to a reply's content. This field is required on inserts if no verb is specified (resolve/reopen).
     pub content: Option<String>,
     /// The action this reply performed to the parent comment. When creating a new reply this is the action to be perform to the parent comment. Possible values are:  
     /// - "resolve" - To resolve a comment. 
     /// - "reopen" - To reopen (un-resolve) a comment.
     pub verb: Option<String>,
-    /// The ID of the reply.    
+    /// The ID of the reply.
     #[serde(alias="replyId")]
     pub reply_id: Option<String>,
-    /// The date when this reply was last modified.    
+    /// The date when this reply was last modified.
     #[serde(alias="modifiedDate")]
     pub modified_date: Option<String>,
-    /// The date when this reply was first created.    
+    /// The date when this reply was first created.
     #[serde(alias="createdDate")]
     pub created_date: Option<String>,
 }
@@ -1654,7 +1663,7 @@ impl ResponseResult for CommentReply {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserPicture {
-    /// A URL that points to a profile picture of this user.    
+    /// A URL that points to a profile picture of this user.
     pub url: String,
 }
 
@@ -1668,10 +1677,10 @@ impl Part for UserPicture {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutFeatures {
-    /// The name of the feature.    
+    /// The name of the feature.
     #[serde(alias="featureName")]
     pub feature_name: String,
-    /// The request limit rate for this feature, in queries per second.    
+    /// The request limit rate for this feature, in queries per second.
     #[serde(alias="featureRate")]
     pub feature_rate: f64,
 }
@@ -1686,20 +1695,20 @@ impl Part for AboutFeatures {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
-    /// The user's profile picture.    
+    /// The user's profile picture.
     pub picture: UserPicture,
-    /// This is always drive#user.    
+    /// This is always drive#user.
     pub kind: String,
-    /// Whether this user is the same as the authenticated user for whom the request was made.    
+    /// Whether this user is the same as the authenticated user for whom the request was made.
     #[serde(alias="isAuthenticatedUser")]
     pub is_authenticated_user: bool,
-    /// A plain text displayable name for this user.    
+    /// A plain text displayable name for this user.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The email address of the user.    
+    /// The email address of the user.
     #[serde(alias="emailAddress")]
     pub email_address: String,
-    /// The user's ID as visible in the permissions collection.    
+    /// The user's ID as visible in the permissions collection.
     #[serde(alias="permissionId")]
     pub permission_id: String,
 }
@@ -1718,16 +1727,16 @@ impl Part for User {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AppList {
-    /// The actual list of apps.    
+    /// The actual list of apps.
     pub items: Vec<App>,
-    /// This is always drive#appList.    
+    /// This is always drive#appList.
     pub kind: String,
-    /// The ETag of the list.    
+    /// The ETag of the list.
     pub etag: String,
-    /// A link back to this list.    
+    /// A link back to this list.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// List of app IDs that the user has specified to use by default. The list is in reverse-priority order (lowest to highest).    
+    /// List of app IDs that the user has specified to use by default. The list is in reverse-priority order (lowest to highest).
     #[serde(alias="defaultAppIds")]
     pub default_app_ids: Vec<String>,
 }
@@ -1746,10 +1755,10 @@ pub struct AppIcons {
     /// - document - icon for a file associated with the app 
     /// - documentShared - icon for a shared file associated with the app
     pub category: String,
-    /// URL for the icon.    
+    /// URL for the icon.
     #[serde(alias="iconUrl")]
     pub icon_url: String,
-    /// Size of the icon. Represented as the maximum of the width and height.    
+    /// Size of the icon. Represented as the maximum of the width and height.
     pub size: i32,
 }
 
@@ -1763,10 +1772,10 @@ impl Part for AppIcons {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentContext {
-    /// The MIME type of the context snippet.    
+    /// The MIME type of the context snippet.
     #[serde(alias="type")]
     pub type_: String,
-    /// Data representation of the segment of the file being commented on. In the case of a text file for example, this would be the actual text that the comment is about.    
+    /// Data representation of the segment of the file being commented on. In the case of a text file for example, this would be the actual text that the comment is about.
     pub value: String,
 }
 
@@ -1786,14 +1795,14 @@ impl Part for CommentContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChildReference {
-    /// This is always drive#childReference.    
+    /// This is always drive#childReference.
     pub kind: Option<String>,
-    /// A link to the child.    
+    /// A link to the child.
     #[serde(alias="childLink")]
     pub child_link: Option<String>,
-    /// The ID of the child.    
+    /// The ID of the child.
     pub id: Option<String>,
-    /// A link back to this reference.    
+    /// A link back to this reference.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -1808,12 +1817,12 @@ impl ResponseResult for ChildReference {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileVideoMediaMetadata {
-    /// The width of the video in pixels.    
+    /// The width of the video in pixels.
     pub width: i32,
-    /// The duration of the video in milliseconds.    
+    /// The duration of the video in milliseconds.
     #[serde(alias="durationMillis")]
     pub duration_millis: String,
-    /// The height of the video in pixels.    
+    /// The height of the video in pixels.
     pub height: i32,
 }
 
@@ -1827,9 +1836,9 @@ impl Part for FileVideoMediaMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AboutExportFormats {
-    /// The content type to convert from.    
+    /// The content type to convert from.
     pub source: String,
-    /// The possible content types to convert to.    
+    /// The possible content types to convert to.
     pub targets: Vec<String>,
 }
 
@@ -1850,21 +1859,21 @@ impl Part for AboutExportFormats {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Change {
-    /// The time of this modification.    
+    /// The time of this modification.
     #[serde(alias="modificationDate")]
     pub modification_date: String,
-    /// This is always drive#change.    
+    /// This is always drive#change.
     pub kind: String,
-    /// The updated state of the file. Present if the file has not been deleted.    
+    /// The updated state of the file. Present if the file has not been deleted.
     pub file: File,
-    /// Whether the file has been deleted.    
+    /// Whether the file has been deleted.
     pub deleted: bool,
-    /// The ID of the change.    
+    /// The ID of the change.
     pub id: String,
-    /// A link back to this change.    
+    /// A link back to this change.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// The ID of the file associated with this change.    
+    /// The ID of the file associated with this change.
     #[serde(alias="fileId")]
     pub file_id: String,
 }
@@ -1912,13 +1921,18 @@ pub struct FileMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for FileMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for FileMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Subscribe to changes on a file    
+    /// Subscribe to changes on a file
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID for the file in question.
     pub fn watch(&self, request: &Channel, file_id: &str) -> FileWatchCall<'a, C, NC, A> {
         FileWatchCall {
             hub: self.hub,
@@ -1935,7 +1949,11 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Insert a new file.    
+    /// Insert a new file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &File) -> FileInsertCall<'a, C, NC, A> {
         FileInsertCall {
             hub: self.hub,
@@ -1956,7 +1974,11 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Restores a file from the trash.    
+    /// Restores a file from the trash.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file to untrash.
     pub fn untrash(&self, file_id: &str) -> FileUntrashCall<'a, C, NC, A> {
         FileUntrashCall {
             hub: self.hub,
@@ -1969,7 +1991,12 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a copy of the specified file.    
+    /// Creates a copy of the specified file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file to copy.
     pub fn copy(&self, request: &File, file_id: &str) -> FileCopyCall<'a, C, NC, A> {
         FileCopyCall {
             hub: self.hub,
@@ -1990,7 +2017,11 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves a file to the trash.    
+    /// Moves a file to the trash.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file to trash.
     pub fn trash(&self, file_id: &str) -> FileTrashCall<'a, C, NC, A> {
         FileTrashCall {
             hub: self.hub,
@@ -2003,7 +2034,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes all of the user's trashed files.    
+    /// Permanently deletes all of the user's trashed files.
     pub fn empty_trash(&self) -> FileEmptyTrashCall<'a, C, NC, A> {
         FileEmptyTrashCall {
             hub: self.hub,
@@ -2015,7 +2046,7 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the user's files.    
+    /// Lists the user's files.
     pub fn list(&self) -> FileListCall<'a, C, NC, A> {
         FileListCall {
             hub: self.hub,
@@ -2032,7 +2063,11 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Set the file's updated time to the current server time.    
+    /// Set the file's updated time to the current server time.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file to update.
     pub fn touch(&self, file_id: &str) -> FileTouchCall<'a, C, NC, A> {
         FileTouchCall {
             hub: self.hub,
@@ -2045,7 +2080,12 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates file metadata and/or content.    
+    /// Updates file metadata and/or content.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file to update.
     pub fn update(&self, request: &File, file_id: &str) -> FileUpdateCall<'a, C, NC, A> {
         FileUpdateCall {
             hub: self.hub,
@@ -2071,7 +2111,11 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file.    
+    /// Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file to delete.
     pub fn delete(&self, file_id: &str) -> FileDeleteCall<'a, C, NC, A> {
         FileDeleteCall {
             hub: self.hub,
@@ -2084,7 +2128,12 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates file metadata and/or content. This method supports patch semantics.    
+    /// Updates file metadata and/or content. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file to update.
     pub fn patch(&self, request: &File, file_id: &str) -> FilePatchCall<'a, C, NC, A> {
         FilePatchCall {
             hub: self.hub,
@@ -2110,7 +2159,11 @@ impl<'a, C, NC, A> FileMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a file's metadata by ID.    
+    /// Gets a file's metadata by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID for the file in question.
     pub fn get(&self, file_id: &str) -> FileGetCall<'a, C, NC, A> {
         FileGetCall {
             hub: self.hub,
@@ -2161,13 +2214,13 @@ pub struct AboutMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AboutMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AboutMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AboutMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the information about the current user along with Drive API settings    
+    /// Gets the information about the current user along with Drive API settings
     pub fn get(&self) -> AboutGetCall<'a, C, NC, A> {
         AboutGetCall {
             hub: self.hub,
@@ -2217,13 +2270,17 @@ pub struct RealtimeMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for RealtimeMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for RealtimeMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> RealtimeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Overwrites the Realtime API data model associated with this file with the provided JSON data model.    
+    /// Overwrites the Realtime API data model associated with this file with the provided JSON data model.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file that the Realtime API data model is associated with.
     pub fn update(&self, file_id: &str) -> RealtimeUpdateCall<'a, C, NC, A> {
         RealtimeUpdateCall {
             hub: self.hub,
@@ -2237,7 +2294,11 @@ impl<'a, C, NC, A> RealtimeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Exports the contents of the Realtime API data model associated with this file as JSON.    
+    /// Exports the contents of the Realtime API data model associated with this file as JSON.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file that the Realtime API data model is associated with.
     pub fn get(&self, file_id: &str) -> RealtimeGetCall<'a, C, NC, A> {
         RealtimeGetCall {
             hub: self.hub,
@@ -2286,13 +2347,17 @@ pub struct AppMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AppMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AppMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AppMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a specific app.    
+    /// Gets a specific app.
+    /// 
+    /// # Arguments
+    ///
+    /// * `appId` - The ID of the app.
     pub fn get(&self, app_id: &str) -> AppGetCall<'a, C, NC, A> {
         AppGetCall {
             hub: self.hub,
@@ -2305,7 +2370,7 @@ impl<'a, C, NC, A> AppMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a user's installed apps.    
+    /// Lists a user's installed apps.
     pub fn list(&self) -> AppListCall<'a, C, NC, A> {
         AppListCall {
             hub: self.hub,
@@ -2355,13 +2420,18 @@ pub struct CommentMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CommentMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CommentMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a comment.    
+    /// Deletes a comment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `commentId` - The ID of the comment.
     pub fn delete(&self, file_id: &str, comment_id: &str) -> CommentDeleteCall<'a, C, NC, A> {
         CommentDeleteCall {
             hub: self.hub,
@@ -2375,7 +2445,12 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a comment by ID.    
+    /// Gets a comment by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `commentId` - The ID of the comment.
     pub fn get(&self, file_id: &str, comment_id: &str) -> CommentGetCall<'a, C, NC, A> {
         CommentGetCall {
             hub: self.hub,
@@ -2390,7 +2465,12 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new comment on the given file.    
+    /// Creates a new comment on the given file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
     pub fn insert(&self, request: &Comment, file_id: &str) -> CommentInsertCall<'a, C, NC, A> {
         CommentInsertCall {
             hub: self.hub,
@@ -2404,7 +2484,13 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing comment. This method supports patch semantics.    
+    /// Updates an existing comment. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
+    /// * `commentId` - The ID of the comment.
     pub fn patch(&self, request: &Comment, file_id: &str, comment_id: &str) -> CommentPatchCall<'a, C, NC, A> {
         CommentPatchCall {
             hub: self.hub,
@@ -2419,7 +2505,13 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing comment.    
+    /// Updates an existing comment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
+    /// * `commentId` - The ID of the comment.
     pub fn update(&self, request: &Comment, file_id: &str, comment_id: &str) -> CommentUpdateCall<'a, C, NC, A> {
         CommentUpdateCall {
             hub: self.hub,
@@ -2434,7 +2526,11 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a file's comments.    
+    /// Lists a file's comments.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
     pub fn list(&self, file_id: &str) -> CommentListCall<'a, C, NC, A> {
         CommentListCall {
             hub: self.hub,
@@ -2486,13 +2582,17 @@ pub struct ChildrenMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ChildrenMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ChildrenMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChildrenMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a folder's children.    
+    /// Lists a folder's children.
+    /// 
+    /// # Arguments
+    ///
+    /// * `folderId` - The ID of the folder.
     pub fn list(&self, folder_id: &str) -> ChildrenListCall<'a, C, NC, A> {
         ChildrenListCall {
             hub: self.hub,
@@ -2508,7 +2608,12 @@ impl<'a, C, NC, A> ChildrenMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a specific child reference.    
+    /// Gets a specific child reference.
+    /// 
+    /// # Arguments
+    ///
+    /// * `folderId` - The ID of the folder.
+    /// * `childId` - The ID of the child.
     pub fn get(&self, folder_id: &str, child_id: &str) -> ChildrenGetCall<'a, C, NC, A> {
         ChildrenGetCall {
             hub: self.hub,
@@ -2522,7 +2627,12 @@ impl<'a, C, NC, A> ChildrenMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a child from a folder.    
+    /// Removes a child from a folder.
+    /// 
+    /// # Arguments
+    ///
+    /// * `folderId` - The ID of the folder.
+    /// * `childId` - The ID of the child.
     pub fn delete(&self, folder_id: &str, child_id: &str) -> ChildrenDeleteCall<'a, C, NC, A> {
         ChildrenDeleteCall {
             hub: self.hub,
@@ -2536,7 +2646,12 @@ impl<'a, C, NC, A> ChildrenMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a file into a folder.    
+    /// Inserts a file into a folder.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `folderId` - The ID of the folder.
     pub fn insert(&self, request: &ChildReference, folder_id: &str) -> ChildrenInsertCall<'a, C, NC, A> {
         ChildrenInsertCall {
             hub: self.hub,
@@ -2585,13 +2700,17 @@ pub struct ChannelMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ChannelMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Stop watching resources through this channel    
+    /// Stop watching resources through this channel
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, NC, A> {
         ChannelStopCall {
             hub: self.hub,
@@ -2639,13 +2758,17 @@ pub struct ParentMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ParentMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ParentMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ParentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a file's parents.    
+    /// Lists a file's parents.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
     pub fn list(&self, file_id: &str) -> ParentListCall<'a, C, NC, A> {
         ParentListCall {
             hub: self.hub,
@@ -2658,7 +2781,12 @@ impl<'a, C, NC, A> ParentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a parent from a file.    
+    /// Removes a parent from a file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `parentId` - The ID of the parent.
     pub fn delete(&self, file_id: &str, parent_id: &str) -> ParentDeleteCall<'a, C, NC, A> {
         ParentDeleteCall {
             hub: self.hub,
@@ -2672,7 +2800,12 @@ impl<'a, C, NC, A> ParentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a parent folder for a file.    
+    /// Adds a parent folder for a file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
     pub fn insert(&self, request: &ParentReference, file_id: &str) -> ParentInsertCall<'a, C, NC, A> {
         ParentInsertCall {
             hub: self.hub,
@@ -2686,7 +2819,12 @@ impl<'a, C, NC, A> ParentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a specific parent reference.    
+    /// Gets a specific parent reference.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `parentId` - The ID of the parent.
     pub fn get(&self, file_id: &str, parent_id: &str) -> ParentGetCall<'a, C, NC, A> {
         ParentGetCall {
             hub: self.hub,
@@ -2735,13 +2873,20 @@ pub struct ReplyMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ReplyMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ReplyMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing reply. This method supports patch semantics.    
+    /// Updates an existing reply. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
+    /// * `commentId` - The ID of the comment.
+    /// * `replyId` - The ID of the reply.
     pub fn patch(&self, request: &CommentReply, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyPatchCall<'a, C, NC, A> {
         ReplyPatchCall {
             hub: self.hub,
@@ -2757,7 +2902,12 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all of the replies to a comment.    
+    /// Lists all of the replies to a comment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `commentId` - The ID of the comment.
     pub fn list(&self, file_id: &str, comment_id: &str) -> ReplyListCall<'a, C, NC, A> {
         ReplyListCall {
             hub: self.hub,
@@ -2774,7 +2924,13 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a reply.    
+    /// Gets a reply.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `commentId` - The ID of the comment.
+    /// * `replyId` - The ID of the reply.
     pub fn get(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyGetCall<'a, C, NC, A> {
         ReplyGetCall {
             hub: self.hub,
@@ -2790,7 +2946,13 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new reply to the given comment.    
+    /// Creates a new reply to the given comment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
+    /// * `commentId` - The ID of the comment.
     pub fn insert(&self, request: &CommentReply, file_id: &str, comment_id: &str) -> ReplyInsertCall<'a, C, NC, A> {
         ReplyInsertCall {
             hub: self.hub,
@@ -2805,7 +2967,13 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a reply.    
+    /// Deletes a reply.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `commentId` - The ID of the comment.
+    /// * `replyId` - The ID of the reply.
     pub fn delete(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyDeleteCall<'a, C, NC, A> {
         ReplyDeleteCall {
             hub: self.hub,
@@ -2820,7 +2988,14 @@ impl<'a, C, NC, A> ReplyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing reply.    
+    /// Updates an existing reply.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
+    /// * `commentId` - The ID of the comment.
+    /// * `replyId` - The ID of the reply.
     pub fn update(&self, request: &CommentReply, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyUpdateCall<'a, C, NC, A> {
         ReplyUpdateCall {
             hub: self.hub,
@@ -2871,13 +3046,18 @@ pub struct PermissionMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PermissionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PermissionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a permission from a file.    
+    /// Deletes a permission from a file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID for the file.
+    /// * `permissionId` - The ID for the permission.
     pub fn delete(&self, file_id: &str, permission_id: &str) -> PermissionDeleteCall<'a, C, NC, A> {
         PermissionDeleteCall {
             hub: self.hub,
@@ -2891,7 +3071,12 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a permission for a file.    
+    /// Inserts a permission for a file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID for the file.
     pub fn insert(&self, request: &Permission, file_id: &str) -> PermissionInsertCall<'a, C, NC, A> {
         PermissionInsertCall {
             hub: self.hub,
@@ -2907,7 +3092,13 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a permission.    
+    /// Updates a permission.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID for the file.
+    /// * `permissionId` - The ID for the permission.
     pub fn update(&self, request: &Permission, file_id: &str, permission_id: &str) -> PermissionUpdateCall<'a, C, NC, A> {
         PermissionUpdateCall {
             hub: self.hub,
@@ -2923,7 +3114,13 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a permission. This method supports patch semantics.    
+    /// Updates a permission. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID for the file.
+    /// * `permissionId` - The ID for the permission.
     pub fn patch(&self, request: &Permission, file_id: &str, permission_id: &str) -> PermissionPatchCall<'a, C, NC, A> {
         PermissionPatchCall {
             hub: self.hub,
@@ -2939,7 +3136,11 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a file's permissions.    
+    /// Lists a file's permissions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID for the file.
     pub fn list(&self, file_id: &str) -> PermissionListCall<'a, C, NC, A> {
         PermissionListCall {
             hub: self.hub,
@@ -2952,7 +3153,12 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a permission by ID.    
+    /// Gets a permission by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID for the file.
+    /// * `permissionId` - The ID for the permission.
     pub fn get(&self, file_id: &str, permission_id: &str) -> PermissionGetCall<'a, C, NC, A> {
         PermissionGetCall {
             hub: self.hub,
@@ -2966,7 +3172,11 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the permission ID for an email address.    
+    /// Returns the permission ID for an email address.
+    /// 
+    /// # Arguments
+    ///
+    /// * `email` - The email address for which to return a permission ID
     pub fn get_id_for_email(&self, email: &str) -> PermissionGetIdForEmailCall<'a, C, NC, A> {
         PermissionGetIdForEmailCall {
             hub: self.hub,
@@ -3014,13 +3224,17 @@ pub struct ChangeMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ChangeMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ChangeMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Subscribe to changes for a user.    
+    /// Subscribe to changes for a user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn watch(&self, request: &Channel) -> ChangeWatchCall<'a, C, NC, A> {
         ChangeWatchCall {
             hub: self.hub,
@@ -3038,7 +3252,7 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the changes for a user.    
+    /// Lists the changes for a user.
     pub fn list(&self) -> ChangeListCall<'a, C, NC, A> {
         ChangeListCall {
             hub: self.hub,
@@ -3055,7 +3269,11 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a specific change.    
+    /// Gets a specific change.
+    /// 
+    /// # Arguments
+    ///
+    /// * `changeId` - The ID of the change.
     pub fn get(&self, change_id: &str) -> ChangeGetCall<'a, C, NC, A> {
         ChangeGetCall {
             hub: self.hub,
@@ -3103,13 +3321,19 @@ pub struct PropertyMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PropertyMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PropertyMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a property. This method supports patch semantics.    
+    /// Updates a property. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
+    /// * `propertyKey` - The key of the property.
     pub fn patch(&self, request: &Property, file_id: &str, property_key: &str) -> PropertyPatchCall<'a, C, NC, A> {
         PropertyPatchCall {
             hub: self.hub,
@@ -3125,7 +3349,12 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a property.    
+    /// Deletes a property.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `propertyKey` - The key of the property.
     pub fn delete(&self, file_id: &str, property_key: &str) -> PropertyDeleteCall<'a, C, NC, A> {
         PropertyDeleteCall {
             hub: self.hub,
@@ -3140,7 +3369,12 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a property to a file.    
+    /// Adds a property to a file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
     pub fn insert(&self, request: &Property, file_id: &str) -> PropertyInsertCall<'a, C, NC, A> {
         PropertyInsertCall {
             hub: self.hub,
@@ -3154,7 +3388,11 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a file's properties.    
+    /// Lists a file's properties.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
     pub fn list(&self, file_id: &str) -> PropertyListCall<'a, C, NC, A> {
         PropertyListCall {
             hub: self.hub,
@@ -3167,7 +3405,13 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a property.    
+    /// Updates a property.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID of the file.
+    /// * `propertyKey` - The key of the property.
     pub fn update(&self, request: &Property, file_id: &str, property_key: &str) -> PropertyUpdateCall<'a, C, NC, A> {
         PropertyUpdateCall {
             hub: self.hub,
@@ -3183,7 +3427,12 @@ impl<'a, C, NC, A> PropertyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a property by its key.    
+    /// Gets a property by its key.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `propertyKey` - The key of the property.
     pub fn get(&self, file_id: &str, property_key: &str) -> PropertyGetCall<'a, C, NC, A> {
         PropertyGetCall {
             hub: self.hub,
@@ -3233,13 +3482,18 @@ pub struct RevisionMethods<'a, C, NC, A>
     hub: &'a Drive<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for RevisionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for RevisionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a specific revision.    
+    /// Gets a specific revision.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `revisionId` - The ID of the revision.
     pub fn get(&self, file_id: &str, revision_id: &str) -> RevisionGetCall<'a, C, NC, A> {
         RevisionGetCall {
             hub: self.hub,
@@ -3253,7 +3507,12 @@ impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a revision.    
+    /// Removes a revision.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
+    /// * `revisionId` - The ID of the revision.
     pub fn delete(&self, file_id: &str, revision_id: &str) -> RevisionDeleteCall<'a, C, NC, A> {
         RevisionDeleteCall {
             hub: self.hub,
@@ -3267,7 +3526,13 @@ impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a revision.    
+    /// Updates a revision.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID for the file.
+    /// * `revisionId` - The ID for the revision.
     pub fn update(&self, request: &Revision, file_id: &str, revision_id: &str) -> RevisionUpdateCall<'a, C, NC, A> {
         RevisionUpdateCall {
             hub: self.hub,
@@ -3282,7 +3547,11 @@ impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a file's revisions.    
+    /// Lists a file's revisions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `fileId` - The ID of the file.
     pub fn list(&self, file_id: &str) -> RevisionListCall<'a, C, NC, A> {
         RevisionListCall {
             hub: self.hub,
@@ -3295,7 +3564,13 @@ impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a revision. This method supports patch semantics.    
+    /// Updates a revision. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - The ID for the file.
+    /// * `revisionId` - The ID for the revision.
     pub fn patch(&self, request: &Revision, file_id: &str, revision_id: &str) -> RevisionPatchCall<'a, C, NC, A> {
         RevisionPatchCall {
             hub: self.hub,
@@ -3325,7 +3600,7 @@ impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
 /// but not the `Channel` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *watch* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -3405,7 +3680,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["fileId", "updateViewedDate", "projection", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3478,7 +3753,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3494,7 +3769,6 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3504,7 +3778,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3515,7 +3789,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -3524,13 +3798,13 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3551,7 +3825,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the file in question.    
+    /// The ID for the file in question.
     pub fn file_id(mut self, new_value: &str) -> FileWatchCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -3559,7 +3833,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *update viewed date* query property to the given value.
     ///
     /// 
-    /// Whether to update the view date after successfully retrieving the file.    
+    /// Whether to update the view date after successfully retrieving the file.
     pub fn update_viewed_date(mut self, new_value: bool) -> FileWatchCall<'a, C, NC, A> {
         self._update_viewed_date = Some(new_value);
         self
@@ -3567,7 +3841,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// This parameter is deprecated and has no function.    
+    /// This parameter is deprecated and has no function.
     pub fn projection(mut self, new_value: &str) -> FileWatchCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -3575,7 +3849,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *acknowledge abuse* query property to the given value.
     ///
     /// 
-    /// Whether the user is acknowledging the risk of downloading known malware or other abusive files.    
+    /// Whether the user is acknowledging the risk of downloading known malware or other abusive files.
     pub fn acknowledge_abuse(mut self, new_value: bool) -> FileWatchCall<'a, C, NC, A> {
         self._acknowledge_abuse = Some(new_value);
         self
@@ -3636,7 +3910,7 @@ impl<'a, C, NC, A> FileWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Insert a new file.
 ///
 /// A builder for the *insert* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -3741,7 +4015,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "visibility", "useContentAsIndexableText", "timedTextTrackName", "timedTextLanguage", "pinned", "ocrLanguage", "ocr", "convert"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3784,7 +4058,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3810,7 +4084,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 5497558138880 {
-                        	return Result::UploadSizeLimitExceeded(size, 5497558138880)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 5497558138880))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -3832,7 +4106,6 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -3843,7 +4116,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3854,13 +4127,13 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 5497558138880 {
-                        	return Result::UploadSizeLimitExceeded(size, 5497558138880)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 5497558138880))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -3885,17 +4158,17 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -3907,13 +4180,13 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3929,11 +4202,14 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 5120GB
     /// * *multipart*: yes
@@ -3955,7 +4231,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *visibility* query property to the given value.
     ///
     /// 
-    /// The visibility of the new file. This parameter is only relevant when convert=false.    
+    /// The visibility of the new file. This parameter is only relevant when convert=false.
     pub fn visibility(mut self, new_value: &str) -> FileInsertCall<'a, C, NC, A> {
         self._visibility = Some(new_value.to_string());
         self
@@ -3963,7 +4239,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *use content as indexable text* query property to the given value.
     ///
     /// 
-    /// Whether to use the content as indexable text.    
+    /// Whether to use the content as indexable text.
     pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileInsertCall<'a, C, NC, A> {
         self._use_content_as_indexable_text = Some(new_value);
         self
@@ -3971,7 +4247,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *timed text track name* query property to the given value.
     ///
     /// 
-    /// The timed text track name.    
+    /// The timed text track name.
     pub fn timed_text_track_name(mut self, new_value: &str) -> FileInsertCall<'a, C, NC, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
@@ -3979,7 +4255,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *timed text language* query property to the given value.
     ///
     /// 
-    /// The language of the timed text.    
+    /// The language of the timed text.
     pub fn timed_text_language(mut self, new_value: &str) -> FileInsertCall<'a, C, NC, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
@@ -3987,7 +4263,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *pinned* query property to the given value.
     ///
     /// 
-    /// Whether to pin the head revision of the uploaded file. A file can have a maximum of 200 pinned revisions.    
+    /// Whether to pin the head revision of the uploaded file. A file can have a maximum of 200 pinned revisions.
     pub fn pinned(mut self, new_value: bool) -> FileInsertCall<'a, C, NC, A> {
         self._pinned = Some(new_value);
         self
@@ -3995,7 +4271,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *ocr language* query property to the given value.
     ///
     /// 
-    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.    
+    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
     pub fn ocr_language(mut self, new_value: &str) -> FileInsertCall<'a, C, NC, A> {
         self._ocr_language = Some(new_value.to_string());
         self
@@ -4003,7 +4279,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *ocr* query property to the given value.
     ///
     /// 
-    /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.    
+    /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
     pub fn ocr(mut self, new_value: bool) -> FileInsertCall<'a, C, NC, A> {
         self._ocr = Some(new_value);
         self
@@ -4011,7 +4287,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *convert* query property to the given value.
     ///
     /// 
-    /// Whether to convert this file to the corresponding Google Docs format.    
+    /// Whether to convert this file to the corresponding Google Docs format.
     pub fn convert(mut self, new_value: bool) -> FileInsertCall<'a, C, NC, A> {
         self._convert = Some(new_value);
         self
@@ -4072,7 +4348,7 @@ impl<'a, C, NC, A> FileInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Restores a file from the trash.
 ///
 /// A builder for the *untrash* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -4130,7 +4406,7 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4183,7 +4459,7 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4195,7 +4471,6 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4205,7 +4480,7 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4216,7 +4491,7 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4225,13 +4500,13 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4243,7 +4518,7 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file to untrash.    
+    /// The ID of the file to untrash.
     pub fn file_id(mut self, new_value: &str) -> FileUntrashCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -4304,7 +4579,7 @@ impl<'a, C, NC, A> FileUntrashCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Creates a copy of the specified file.
 ///
 /// A builder for the *copy* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -4404,7 +4679,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "fileId", "visibility", "timedTextTrackName", "timedTextLanguage", "pinned", "ocrLanguage", "ocr", "convert"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4461,7 +4736,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4477,7 +4752,6 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4487,7 +4761,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4498,7 +4772,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4507,13 +4781,13 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4534,7 +4808,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file to copy.    
+    /// The ID of the file to copy.
     pub fn file_id(mut self, new_value: &str) -> FileCopyCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -4542,7 +4816,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *visibility* query property to the given value.
     ///
     /// 
-    /// The visibility of the new file. This parameter is only relevant when the source is not a native Google Doc and convert=false.    
+    /// The visibility of the new file. This parameter is only relevant when the source is not a native Google Doc and convert=false.
     pub fn visibility(mut self, new_value: &str) -> FileCopyCall<'a, C, NC, A> {
         self._visibility = Some(new_value.to_string());
         self
@@ -4550,7 +4824,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *timed text track name* query property to the given value.
     ///
     /// 
-    /// The timed text track name.    
+    /// The timed text track name.
     pub fn timed_text_track_name(mut self, new_value: &str) -> FileCopyCall<'a, C, NC, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
@@ -4558,7 +4832,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *timed text language* query property to the given value.
     ///
     /// 
-    /// The language of the timed text.    
+    /// The language of the timed text.
     pub fn timed_text_language(mut self, new_value: &str) -> FileCopyCall<'a, C, NC, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
@@ -4566,7 +4840,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *pinned* query property to the given value.
     ///
     /// 
-    /// Whether to pin the head revision of the new copy. A file can have a maximum of 200 pinned revisions.    
+    /// Whether to pin the head revision of the new copy. A file can have a maximum of 200 pinned revisions.
     pub fn pinned(mut self, new_value: bool) -> FileCopyCall<'a, C, NC, A> {
         self._pinned = Some(new_value);
         self
@@ -4574,7 +4848,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *ocr language* query property to the given value.
     ///
     /// 
-    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.    
+    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
     pub fn ocr_language(mut self, new_value: &str) -> FileCopyCall<'a, C, NC, A> {
         self._ocr_language = Some(new_value.to_string());
         self
@@ -4582,7 +4856,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *ocr* query property to the given value.
     ///
     /// 
-    /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.    
+    /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
     pub fn ocr(mut self, new_value: bool) -> FileCopyCall<'a, C, NC, A> {
         self._ocr = Some(new_value);
         self
@@ -4590,7 +4864,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *convert* query property to the given value.
     ///
     /// 
-    /// Whether to convert this file to the corresponding Google Docs format.    
+    /// Whether to convert this file to the corresponding Google Docs format.
     pub fn convert(mut self, new_value: bool) -> FileCopyCall<'a, C, NC, A> {
         self._convert = Some(new_value);
         self
@@ -4651,7 +4925,7 @@ impl<'a, C, NC, A> FileCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Moves a file to the trash.
 ///
 /// A builder for the *trash* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -4709,7 +4983,7 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4762,7 +5036,7 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4774,7 +5048,6 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4784,7 +5057,7 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4795,7 +5068,7 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4804,13 +5077,13 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4822,7 +5095,7 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file to trash.    
+    /// The ID of the file to trash.
     pub fn file_id(mut self, new_value: &str) -> FileTrashCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -4883,7 +5156,7 @@ impl<'a, C, NC, A> FileTrashCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Permanently deletes all of the user's trashed files.
 ///
 /// A builder for the *emptyTrash* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -4939,7 +5212,7 @@ impl<'a, C, NC, A> FileEmptyTrashCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4967,7 +5240,7 @@ impl<'a, C, NC, A> FileEmptyTrashCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4979,7 +5252,6 @@ impl<'a, C, NC, A> FileEmptyTrashCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4989,7 +5261,7 @@ impl<'a, C, NC, A> FileEmptyTrashCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5000,12 +5272,12 @@ impl<'a, C, NC, A> FileEmptyTrashCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5068,7 +5340,7 @@ impl<'a, C, NC, A> FileEmptyTrashCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Lists the user's files.
 ///
 /// A builder for the *list* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -5149,7 +5421,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "q", "projection", "pageToken", "maxResults", "corpus"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5178,7 +5450,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5190,7 +5462,6 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5200,7 +5471,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5211,7 +5482,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5220,13 +5491,13 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5236,7 +5507,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *q* query property to the given value.
     ///
     /// 
-    /// Query string for searching files.    
+    /// Query string for searching files.
     pub fn q(mut self, new_value: &str) -> FileListCall<'a, C, NC, A> {
         self._q = Some(new_value.to_string());
         self
@@ -5244,7 +5515,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// This parameter is deprecated and has no function.    
+    /// This parameter is deprecated and has no function.
     pub fn projection(mut self, new_value: &str) -> FileListCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -5252,7 +5523,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token for files.    
+    /// Page token for files.
     pub fn page_token(mut self, new_value: &str) -> FileListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -5260,7 +5531,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of files to return.    
+    /// Maximum number of files to return.
     pub fn max_results(mut self, new_value: i32) -> FileListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5268,7 +5539,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *corpus* query property to the given value.
     ///
     /// 
-    /// The body of items (files/documents) to which the query applies.    
+    /// The body of items (files/documents) to which the query applies.
     pub fn corpus(mut self, new_value: &str) -> FileListCall<'a, C, NC, A> {
         self._corpus = Some(new_value.to_string());
         self
@@ -5329,7 +5600,7 @@ impl<'a, C, NC, A> FileListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Set the file's updated time to the current server time.
 ///
 /// A builder for the *touch* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -5387,7 +5658,7 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5440,7 +5711,7 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5452,7 +5723,6 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5462,7 +5732,7 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5473,7 +5743,7 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5482,13 +5752,13 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5500,7 +5770,7 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file to update.    
+    /// The ID of the file to update.
     pub fn file_id(mut self, new_value: &str) -> FileTouchCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -5561,7 +5831,7 @@ impl<'a, C, NC, A> FileTouchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Updates file metadata and/or content.
 ///
 /// A builder for the *update* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -5688,7 +5958,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "convert", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5755,7 +6025,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5781,7 +6051,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 5497558138880 {
-                        	return Result::UploadSizeLimitExceeded(size, 5497558138880)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 5497558138880))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -5803,7 +6073,6 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -5814,7 +6083,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5825,13 +6094,13 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 5497558138880 {
-                        	return Result::UploadSizeLimitExceeded(size, 5497558138880)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 5497558138880))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -5856,17 +6125,17 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -5878,13 +6147,13 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5900,11 +6169,14 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 5120GB
     /// * *multipart*: yes
@@ -5928,7 +6200,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file to update.    
+    /// The ID of the file to update.
     pub fn file_id(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -5936,7 +6208,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *use content as indexable text* query property to the given value.
     ///
     /// 
-    /// Whether to use the content as indexable text.    
+    /// Whether to use the content as indexable text.
     pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
         self._use_content_as_indexable_text = Some(new_value);
         self
@@ -5944,7 +6216,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *update viewed date* query property to the given value.
     ///
     /// 
-    /// Whether to update the view date after successfully updating the file.    
+    /// Whether to update the view date after successfully updating the file.
     pub fn update_viewed_date(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
         self._update_viewed_date = Some(new_value);
         self
@@ -5952,7 +6224,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *timed text track name* query property to the given value.
     ///
     /// 
-    /// The timed text track name.    
+    /// The timed text track name.
     pub fn timed_text_track_name(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
@@ -5960,7 +6232,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *timed text language* query property to the given value.
     ///
     /// 
-    /// The language of the timed text.    
+    /// The language of the timed text.
     pub fn timed_text_language(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
@@ -5968,7 +6240,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *set modified date* query property to the given value.
     ///
     /// 
-    /// Whether to set the modified date with the supplied modified date.    
+    /// Whether to set the modified date with the supplied modified date.
     pub fn set_modified_date(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
         self._set_modified_date = Some(new_value);
         self
@@ -5976,7 +6248,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *remove parents* query property to the given value.
     ///
     /// 
-    /// Comma-separated list of parent IDs to remove.    
+    /// Comma-separated list of parent IDs to remove.
     pub fn remove_parents(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
         self._remove_parents = Some(new_value.to_string());
         self
@@ -5984,7 +6256,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *pinned* query property to the given value.
     ///
     /// 
-    /// Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.    
+    /// Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.
     pub fn pinned(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
         self._pinned = Some(new_value);
         self
@@ -5992,7 +6264,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *ocr language* query property to the given value.
     ///
     /// 
-    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.    
+    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
     pub fn ocr_language(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
         self._ocr_language = Some(new_value.to_string());
         self
@@ -6000,7 +6272,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *ocr* query property to the given value.
     ///
     /// 
-    /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.    
+    /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
     pub fn ocr(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
         self._ocr = Some(new_value);
         self
@@ -6008,7 +6280,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *new revision* query property to the given value.
     ///
     /// 
-    /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous revisions are preserved (causing increased use of the user's data storage quota).    
+    /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous revisions are preserved (causing increased use of the user's data storage quota).
     pub fn new_revision(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
         self._new_revision = Some(new_value);
         self
@@ -6016,7 +6288,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *convert* query property to the given value.
     ///
     /// 
-    /// Whether to convert this file to the corresponding Google Docs format.    
+    /// Whether to convert this file to the corresponding Google Docs format.
     pub fn convert(mut self, new_value: bool) -> FileUpdateCall<'a, C, NC, A> {
         self._convert = Some(new_value);
         self
@@ -6024,7 +6296,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *add parents* query property to the given value.
     ///
     /// 
-    /// Comma-separated list of parent IDs to add.    
+    /// Comma-separated list of parent IDs to add.
     pub fn add_parents(mut self, new_value: &str) -> FileUpdateCall<'a, C, NC, A> {
         self._add_parents = Some(new_value.to_string());
         self
@@ -6085,7 +6357,7 @@ impl<'a, C, NC, A> FileUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file.
 ///
 /// A builder for the *delete* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -6143,7 +6415,7 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6195,7 +6467,7 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6207,7 +6479,6 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6217,7 +6488,7 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6228,12 +6499,12 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6245,7 +6516,7 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file to delete.    
+    /// The ID of the file to delete.
     pub fn file_id(mut self, new_value: &str) -> FileDeleteCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -6306,7 +6577,7 @@ impl<'a, C, NC, A> FileDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates file metadata and/or content. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -6431,7 +6702,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "convert", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6488,7 +6759,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6504,7 +6775,6 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6514,7 +6784,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6525,7 +6795,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6534,13 +6804,13 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6561,7 +6831,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file to update.    
+    /// The ID of the file to update.
     pub fn file_id(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -6569,7 +6839,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *use content as indexable text* query property to the given value.
     ///
     /// 
-    /// Whether to use the content as indexable text.    
+    /// Whether to use the content as indexable text.
     pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
         self._use_content_as_indexable_text = Some(new_value);
         self
@@ -6577,7 +6847,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *update viewed date* query property to the given value.
     ///
     /// 
-    /// Whether to update the view date after successfully updating the file.    
+    /// Whether to update the view date after successfully updating the file.
     pub fn update_viewed_date(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
         self._update_viewed_date = Some(new_value);
         self
@@ -6585,7 +6855,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *timed text track name* query property to the given value.
     ///
     /// 
-    /// The timed text track name.    
+    /// The timed text track name.
     pub fn timed_text_track_name(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
         self._timed_text_track_name = Some(new_value.to_string());
         self
@@ -6593,7 +6863,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *timed text language* query property to the given value.
     ///
     /// 
-    /// The language of the timed text.    
+    /// The language of the timed text.
     pub fn timed_text_language(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
         self._timed_text_language = Some(new_value.to_string());
         self
@@ -6601,7 +6871,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *set modified date* query property to the given value.
     ///
     /// 
-    /// Whether to set the modified date with the supplied modified date.    
+    /// Whether to set the modified date with the supplied modified date.
     pub fn set_modified_date(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
         self._set_modified_date = Some(new_value);
         self
@@ -6609,7 +6879,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *remove parents* query property to the given value.
     ///
     /// 
-    /// Comma-separated list of parent IDs to remove.    
+    /// Comma-separated list of parent IDs to remove.
     pub fn remove_parents(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
         self._remove_parents = Some(new_value.to_string());
         self
@@ -6617,7 +6887,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *pinned* query property to the given value.
     ///
     /// 
-    /// Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.    
+    /// Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.
     pub fn pinned(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
         self._pinned = Some(new_value);
         self
@@ -6625,7 +6895,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *ocr language* query property to the given value.
     ///
     /// 
-    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.    
+    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
     pub fn ocr_language(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
         self._ocr_language = Some(new_value.to_string());
         self
@@ -6633,7 +6903,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *ocr* query property to the given value.
     ///
     /// 
-    /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.    
+    /// Whether to attempt OCR on .jpg, .png, .gif, or .pdf uploads.
     pub fn ocr(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
         self._ocr = Some(new_value);
         self
@@ -6641,7 +6911,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *new revision* query property to the given value.
     ///
     /// 
-    /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous revisions are preserved (causing increased use of the user's data storage quota).    
+    /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous revisions are preserved (causing increased use of the user's data storage quota).
     pub fn new_revision(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
         self._new_revision = Some(new_value);
         self
@@ -6649,7 +6919,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *convert* query property to the given value.
     ///
     /// 
-    /// Whether to convert this file to the corresponding Google Docs format.    
+    /// Whether to convert this file to the corresponding Google Docs format.
     pub fn convert(mut self, new_value: bool) -> FilePatchCall<'a, C, NC, A> {
         self._convert = Some(new_value);
         self
@@ -6657,7 +6927,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *add parents* query property to the given value.
     ///
     /// 
-    /// Comma-separated list of parent IDs to add.    
+    /// Comma-separated list of parent IDs to add.
     pub fn add_parents(mut self, new_value: &str) -> FilePatchCall<'a, C, NC, A> {
         self._add_parents = Some(new_value.to_string());
         self
@@ -6723,7 +6993,7 @@ impl<'a, C, NC, A> FilePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// but not the `File` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *get* method supported by a *file* resource.
-/// It is not used directly, but through a `FileMethods`.
+/// It is not used directly, but through a `FileMethods` instance.
 ///
 /// # Example
 ///
@@ -6796,7 +7066,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["fileId", "updateViewedDate", "projection", "acknowledgeAbuse"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6865,7 +7135,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6877,7 +7147,6 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6887,7 +7156,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6898,7 +7167,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -6907,13 +7176,13 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6925,7 +7194,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the file in question.    
+    /// The ID for the file in question.
     pub fn file_id(mut self, new_value: &str) -> FileGetCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -6933,7 +7202,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *update viewed date* query property to the given value.
     ///
     /// 
-    /// Whether to update the view date after successfully retrieving the file.    
+    /// Whether to update the view date after successfully retrieving the file.
     pub fn update_viewed_date(mut self, new_value: bool) -> FileGetCall<'a, C, NC, A> {
         self._update_viewed_date = Some(new_value);
         self
@@ -6941,7 +7210,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// This parameter is deprecated and has no function.    
+    /// This parameter is deprecated and has no function.
     pub fn projection(mut self, new_value: &str) -> FileGetCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -6949,7 +7218,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *acknowledge abuse* query property to the given value.
     ///
     /// 
-    /// Whether the user is acknowledging the risk of downloading known malware or other abusive files.    
+    /// Whether the user is acknowledging the risk of downloading known malware or other abusive files.
     pub fn acknowledge_abuse(mut self, new_value: bool) -> FileGetCall<'a, C, NC, A> {
         self._acknowledge_abuse = Some(new_value);
         self
@@ -7010,7 +7279,7 @@ impl<'a, C, NC, A> FileGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Gets the information about the current user along with Drive API settings
 ///
 /// A builder for the *get* method supported by a *about* resource.
-/// It is not used directly, but through a `AboutMethods`.
+/// It is not used directly, but through a `AboutMethods` instance.
 ///
 /// # Example
 ///
@@ -7081,7 +7350,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "startChangeId", "maxChangeIdCount", "includeSubscribed"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7110,7 +7379,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7122,7 +7391,6 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7132,7 +7400,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7143,7 +7411,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7152,13 +7420,13 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7168,7 +7436,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *start change id* query property to the given value.
     ///
     /// 
-    /// Change ID to start counting from when calculating number of remaining change IDs    
+    /// Change ID to start counting from when calculating number of remaining change IDs
     pub fn start_change_id(mut self, new_value: &str) -> AboutGetCall<'a, C, NC, A> {
         self._start_change_id = Some(new_value.to_string());
         self
@@ -7176,7 +7444,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *max change id count* query property to the given value.
     ///
     /// 
-    /// Maximum number of remaining change IDs to count    
+    /// Maximum number of remaining change IDs to count
     pub fn max_change_id_count(mut self, new_value: i64) -> AboutGetCall<'a, C, NC, A> {
         self._max_change_id_count = Some(new_value);
         self
@@ -7184,7 +7452,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *include subscribed* query property to the given value.
     ///
     /// 
-    /// When calculating the number of remaining change IDs, whether to include public files the user has opened and shared files. When set to false, this counts only change IDs for owned files and any shared or public files that the user has explicitly added to a folder they own.    
+    /// When calculating the number of remaining change IDs, whether to include public files the user has opened and shared files. When set to false, this counts only change IDs for owned files and any shared or public files that the user has explicitly added to a folder they own.
     pub fn include_subscribed(mut self, new_value: bool) -> AboutGetCall<'a, C, NC, A> {
         self._include_subscribed = Some(new_value);
         self
@@ -7245,7 +7513,7 @@ impl<'a, C, NC, A> AboutGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Overwrites the Realtime API data model associated with this file with the provided JSON data model.
 ///
 /// A builder for the *update* method supported by a *realtime* resource.
-/// It is not used directly, but through a `RealtimeMethods`.
+/// It is not used directly, but through a `RealtimeMethods` instance.
 ///
 /// # Example
 ///
@@ -7310,7 +7578,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["fileId", "baseRevision"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7372,7 +7640,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7398,7 +7666,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 10485760 {
-                    	return Result::UploadSizeLimitExceeded(size, 10485760)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -7411,7 +7679,6 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -7422,7 +7689,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7433,13 +7700,13 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 10485760 {
-                        	return Result::UploadSizeLimitExceeded(size, 10485760)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -7464,17 +7731,17 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -7482,7 +7749,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7498,11 +7765,14 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 10MB
     /// * *multipart*: yes
@@ -7517,7 +7787,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file that the Realtime API data model is associated with.    
+    /// The ID of the file that the Realtime API data model is associated with.
     pub fn file_id(mut self, new_value: &str) -> RealtimeUpdateCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -7525,7 +7795,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *base revision* query property to the given value.
     ///
     /// 
-    /// The revision of the model to diff the uploaded model against. If set, the uploaded model is diffed against the provided revision and those differences are merged with any changes made to the model after the provided revision. If not set, the uploaded model replaces the current model on the server.    
+    /// The revision of the model to diff the uploaded model against. If set, the uploaded model is diffed against the provided revision and those differences are merged with any changes made to the model after the provided revision. If not set, the uploaded model replaces the current model on the server.
     pub fn base_revision(mut self, new_value: &str) -> RealtimeUpdateCall<'a, C, NC, A> {
         self._base_revision = Some(new_value.to_string());
         self
@@ -7589,7 +7859,7 @@ impl<'a, C, NC, A> RealtimeUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// `.param("alt", "media")`.
 ///
 /// A builder for the *get* method supported by a *realtime* resource.
-/// It is not used directly, but through a `RealtimeMethods`.
+/// It is not used directly, but through a `RealtimeMethods` instance.
 ///
 /// # Example
 ///
@@ -7652,7 +7922,7 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["fileId", "revision"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7704,7 +7974,7 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7716,7 +7986,6 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7726,7 +7995,7 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7737,12 +8006,12 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7754,7 +8023,7 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file that the Realtime API data model is associated with.    
+    /// The ID of the file that the Realtime API data model is associated with.
     pub fn file_id(mut self, new_value: &str) -> RealtimeGetCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -7762,7 +8031,7 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *revision* query property to the given value.
     ///
     /// 
-    /// The revision of the Realtime API data model to export. Revisions start at 1 (the initial empty data model) and are incremented with each change. If this parameter is excluded, the most recent data model will be returned.    
+    /// The revision of the Realtime API data model to export. Revisions start at 1 (the initial empty data model) and are incremented with each change. If this parameter is excluded, the most recent data model will be returned.
     pub fn revision(mut self, new_value: i32) -> RealtimeGetCall<'a, C, NC, A> {
         self._revision = Some(new_value);
         self
@@ -7823,7 +8092,7 @@ impl<'a, C, NC, A> RealtimeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Gets a specific app.
 ///
 /// A builder for the *get* method supported by a *app* resource.
-/// It is not used directly, but through a `AppMethods`.
+/// It is not used directly, but through a `AppMethods` instance.
 ///
 /// # Example
 ///
@@ -7881,7 +8150,7 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
         for &field in ["alt", "appId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7934,7 +8203,7 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7946,7 +8215,6 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7956,7 +8224,7 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7967,7 +8235,7 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7976,13 +8244,13 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7994,7 +8262,7 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the app.    
+    /// The ID of the app.
     pub fn app_id(mut self, new_value: &str) -> AppGetCall<'a, C, NC, A> {
         self._app_id = new_value.to_string();
         self
@@ -8055,7 +8323,7 @@ impl<'a, C, NC, A> AppGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 /// Lists a user's installed apps.
 ///
 /// A builder for the *list* method supported by a *app* resource.
-/// It is not used directly, but through a `AppMethods`.
+/// It is not used directly, but through a `AppMethods` instance.
 ///
 /// # Example
 ///
@@ -8126,7 +8394,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "languageCode", "appFilterMimeTypes", "appFilterExtensions"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8155,7 +8423,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8167,7 +8435,6 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8177,7 +8444,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8188,7 +8455,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8197,13 +8464,13 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8213,7 +8480,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *language code* query property to the given value.
     ///
     /// 
-    /// A language or locale code, as defined by BCP 47, with some extensions from Unicode's LDML format (http://www.unicode.org/reports/tr35/).    
+    /// A language or locale code, as defined by BCP 47, with some extensions from Unicode's LDML format (http://www.unicode.org/reports/tr35/).
     pub fn language_code(mut self, new_value: &str) -> AppListCall<'a, C, NC, A> {
         self._language_code = Some(new_value.to_string());
         self
@@ -8221,7 +8488,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *app filter mime types* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of MIME types for open with filtering. All apps within the given app query scope which can open any of the given MIME types will be included in the response. If appFilterExtensions are provided as well, the result is a union of the two resulting app lists.    
+    /// A comma-separated list of MIME types for open with filtering. All apps within the given app query scope which can open any of the given MIME types will be included in the response. If appFilterExtensions are provided as well, the result is a union of the two resulting app lists.
     pub fn app_filter_mime_types(mut self, new_value: &str) -> AppListCall<'a, C, NC, A> {
         self._app_filter_mime_types = Some(new_value.to_string());
         self
@@ -8229,7 +8496,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *app filter extensions* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of file extensions for open with filtering. All apps within the given app query scope which can open any of the given file extensions will be included in the response. If appFilterMimeTypes are provided as well, the result is a union of the two resulting app lists.    
+    /// A comma-separated list of file extensions for open with filtering. All apps within the given app query scope which can open any of the given file extensions will be included in the response. If appFilterMimeTypes are provided as well, the result is a union of the two resulting app lists.
     pub fn app_filter_extensions(mut self, new_value: &str) -> AppListCall<'a, C, NC, A> {
         self._app_filter_extensions = Some(new_value.to_string());
         self
@@ -8290,7 +8557,7 @@ impl<'a, C, NC, A> AppListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Deletes a comment.
 ///
 /// A builder for the *delete* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -8350,7 +8617,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8402,7 +8669,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8414,7 +8681,6 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8424,7 +8690,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8435,12 +8701,12 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8452,7 +8718,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -8462,7 +8728,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment.    
+    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -8523,7 +8789,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Gets a comment by ID.
 ///
 /// A builder for the *get* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -8588,7 +8854,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "fileId", "commentId", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8641,7 +8907,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8653,7 +8919,6 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8663,7 +8928,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8674,7 +8939,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8683,13 +8948,13 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8701,7 +8966,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -8711,7 +8976,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment.    
+    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -8719,7 +8984,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *include deleted* query property to the given value.
     ///
     /// 
-    /// If set, this will succeed when retrieving a deleted comment, and will include any deleted replies.    
+    /// If set, this will succeed when retrieving a deleted comment, and will include any deleted replies.
     pub fn include_deleted(mut self, new_value: bool) -> CommentGetCall<'a, C, NC, A> {
         self._include_deleted = Some(new_value);
         self
@@ -8780,7 +9045,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Creates a new comment on the given file.
 ///
 /// A builder for the *insert* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -8845,7 +9110,7 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8902,7 +9167,7 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8918,7 +9183,6 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8928,7 +9192,7 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8939,7 +9203,7 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8948,13 +9212,13 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8975,7 +9239,7 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentInsertCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -9036,7 +9300,7 @@ impl<'a, C, NC, A> CommentInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates an existing comment. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -9103,7 +9367,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9160,7 +9424,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9176,7 +9440,6 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9186,7 +9449,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9197,7 +9460,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9206,13 +9469,13 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9233,7 +9496,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentPatchCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -9243,7 +9506,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment.    
+    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> CommentPatchCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -9304,7 +9567,7 @@ impl<'a, C, NC, A> CommentPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Updates an existing comment.
 ///
 /// A builder for the *update* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -9371,7 +9634,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9428,7 +9691,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9444,7 +9707,6 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9454,7 +9716,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9465,7 +9727,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9474,13 +9736,13 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9501,7 +9763,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentUpdateCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -9511,7 +9773,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment.    
+    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> CommentUpdateCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -9572,7 +9834,7 @@ impl<'a, C, NC, A> CommentUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Lists a file's comments.
 ///
 /// A builder for the *list* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -9650,7 +9912,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "fileId", "updatedMin", "pageToken", "maxResults", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9703,7 +9965,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9715,7 +9977,6 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9725,7 +9986,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9736,7 +9997,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9745,13 +10006,13 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9763,7 +10024,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -9771,7 +10032,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *updated min* query property to the given value.
     ///
     /// 
-    /// Only discussions that were updated after this timestamp will be returned. Formatted as an RFC 3339 timestamp.    
+    /// Only discussions that were updated after this timestamp will be returned. Formatted as an RFC 3339 timestamp.
     pub fn updated_min(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
         self._updated_min = Some(new_value.to_string());
         self
@@ -9779,7 +10040,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -9787,7 +10048,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of discussions to include in the response, used for paging.    
+    /// The maximum number of discussions to include in the response, used for paging.
     pub fn max_results(mut self, new_value: i32) -> CommentListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -9795,7 +10056,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *include deleted* query property to the given value.
     ///
     /// 
-    /// If set, all comments and replies, including deleted comments and replies (with content stripped) will be returned.    
+    /// If set, all comments and replies, including deleted comments and replies (with content stripped) will be returned.
     pub fn include_deleted(mut self, new_value: bool) -> CommentListCall<'a, C, NC, A> {
         self._include_deleted = Some(new_value);
         self
@@ -9856,7 +10117,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Lists a folder's children.
 ///
 /// A builder for the *list* method supported by a *children* resource.
-/// It is not used directly, but through a `ChildrenMethods`.
+/// It is not used directly, but through a `ChildrenMethods` instance.
 ///
 /// # Example
 ///
@@ -9929,7 +10190,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "folderId", "q", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9982,7 +10243,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9994,7 +10255,6 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10004,7 +10264,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10015,7 +10275,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10024,13 +10284,13 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10042,7 +10302,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the folder.    
+    /// The ID of the folder.
     pub fn folder_id(mut self, new_value: &str) -> ChildrenListCall<'a, C, NC, A> {
         self._folder_id = new_value.to_string();
         self
@@ -10050,7 +10310,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *q* query property to the given value.
     ///
     /// 
-    /// Query string for searching children.    
+    /// Query string for searching children.
     pub fn q(mut self, new_value: &str) -> ChildrenListCall<'a, C, NC, A> {
         self._q = Some(new_value.to_string());
         self
@@ -10058,7 +10318,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token for children.    
+    /// Page token for children.
     pub fn page_token(mut self, new_value: &str) -> ChildrenListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -10066,7 +10326,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of children to return.    
+    /// Maximum number of children to return.
     pub fn max_results(mut self, new_value: i32) -> ChildrenListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -10127,7 +10387,7 @@ impl<'a, C, NC, A> ChildrenListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Gets a specific child reference.
 ///
 /// A builder for the *get* method supported by a *children* resource.
-/// It is not used directly, but through a `ChildrenMethods`.
+/// It is not used directly, but through a `ChildrenMethods` instance.
 ///
 /// # Example
 ///
@@ -10187,7 +10447,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "folderId", "childId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10240,7 +10500,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10252,7 +10512,6 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10262,7 +10521,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10273,7 +10532,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10282,13 +10541,13 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10300,7 +10559,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the folder.    
+    /// The ID of the folder.
     pub fn folder_id(mut self, new_value: &str) -> ChildrenGetCall<'a, C, NC, A> {
         self._folder_id = new_value.to_string();
         self
@@ -10310,7 +10569,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the child.    
+    /// The ID of the child.
     pub fn child_id(mut self, new_value: &str) -> ChildrenGetCall<'a, C, NC, A> {
         self._child_id = new_value.to_string();
         self
@@ -10371,7 +10630,7 @@ impl<'a, C, NC, A> ChildrenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Removes a child from a folder.
 ///
 /// A builder for the *delete* method supported by a *children* resource.
-/// It is not used directly, but through a `ChildrenMethods`.
+/// It is not used directly, but through a `ChildrenMethods` instance.
 ///
 /// # Example
 ///
@@ -10431,7 +10690,7 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["folderId", "childId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10483,7 +10742,7 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10495,7 +10754,6 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10505,7 +10763,7 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10516,12 +10774,12 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10533,7 +10791,7 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the folder.    
+    /// The ID of the folder.
     pub fn folder_id(mut self, new_value: &str) -> ChildrenDeleteCall<'a, C, NC, A> {
         self._folder_id = new_value.to_string();
         self
@@ -10543,7 +10801,7 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the child.    
+    /// The ID of the child.
     pub fn child_id(mut self, new_value: &str) -> ChildrenDeleteCall<'a, C, NC, A> {
         self._child_id = new_value.to_string();
         self
@@ -10604,7 +10862,7 @@ impl<'a, C, NC, A> ChildrenDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Inserts a file into a folder.
 ///
 /// A builder for the *insert* method supported by a *children* resource.
-/// It is not used directly, but through a `ChildrenMethods`.
+/// It is not used directly, but through a `ChildrenMethods` instance.
 ///
 /// # Example
 ///
@@ -10669,7 +10927,7 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "folderId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10726,7 +10984,7 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10742,7 +11000,6 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10752,7 +11009,7 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10763,7 +11020,7 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10772,13 +11029,13 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10799,7 +11056,7 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the folder.    
+    /// The ID of the folder.
     pub fn folder_id(mut self, new_value: &str) -> ChildrenInsertCall<'a, C, NC, A> {
         self._folder_id = new_value.to_string();
         self
@@ -10860,7 +11117,7 @@ impl<'a, C, NC, A> ChildrenInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Stop watching resources through this channel
 ///
 /// A builder for the *stop* method supported by a *channel* resource.
-/// It is not used directly, but through a `ChannelMethods`.
+/// It is not used directly, but through a `ChannelMethods` instance.
 ///
 /// # Example
 ///
@@ -10923,7 +11180,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10955,7 +11212,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10971,7 +11228,6 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10981,7 +11237,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10992,12 +11248,12 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11069,7 +11325,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Lists a file's parents.
 ///
 /// A builder for the *list* method supported by a *parent* resource.
-/// It is not used directly, but through a `ParentMethods`.
+/// It is not used directly, but through a `ParentMethods` instance.
 ///
 /// # Example
 ///
@@ -11127,7 +11383,7 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11180,7 +11436,7 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11192,7 +11448,6 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11202,7 +11457,7 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11213,7 +11468,7 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11222,13 +11477,13 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11240,7 +11495,7 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ParentListCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -11301,7 +11556,7 @@ impl<'a, C, NC, A> ParentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Removes a parent from a file.
 ///
 /// A builder for the *delete* method supported by a *parent* resource.
-/// It is not used directly, but through a `ParentMethods`.
+/// It is not used directly, but through a `ParentMethods` instance.
 ///
 /// # Example
 ///
@@ -11361,7 +11616,7 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["fileId", "parentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11413,7 +11668,7 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11425,7 +11680,6 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11435,7 +11689,7 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11446,12 +11700,12 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11463,7 +11717,7 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ParentDeleteCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -11473,7 +11727,7 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the parent.    
+    /// The ID of the parent.
     pub fn parent_id(mut self, new_value: &str) -> ParentDeleteCall<'a, C, NC, A> {
         self._parent_id = new_value.to_string();
         self
@@ -11534,7 +11788,7 @@ impl<'a, C, NC, A> ParentDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Adds a parent folder for a file.
 ///
 /// A builder for the *insert* method supported by a *parent* resource.
-/// It is not used directly, but through a `ParentMethods`.
+/// It is not used directly, but through a `ParentMethods` instance.
 ///
 /// # Example
 ///
@@ -11599,7 +11853,7 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11656,7 +11910,7 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11672,7 +11926,6 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11682,7 +11935,7 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11693,7 +11946,7 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11702,13 +11955,13 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11729,7 +11982,7 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ParentInsertCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -11790,7 +12043,7 @@ impl<'a, C, NC, A> ParentInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Gets a specific parent reference.
 ///
 /// A builder for the *get* method supported by a *parent* resource.
-/// It is not used directly, but through a `ParentMethods`.
+/// It is not used directly, but through a `ParentMethods` instance.
 ///
 /// # Example
 ///
@@ -11850,7 +12103,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "fileId", "parentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11903,7 +12156,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11915,7 +12168,6 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11925,7 +12177,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11936,7 +12188,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11945,13 +12197,13 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11963,7 +12215,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ParentGetCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -11973,7 +12225,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the parent.    
+    /// The ID of the parent.
     pub fn parent_id(mut self, new_value: &str) -> ParentGetCall<'a, C, NC, A> {
         self._parent_id = new_value.to_string();
         self
@@ -12034,7 +12286,7 @@ impl<'a, C, NC, A> ParentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Updates an existing reply. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods`.
+/// It is not used directly, but through a `ReplyMethods` instance.
 ///
 /// # Example
 ///
@@ -12103,7 +12355,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "fileId", "commentId", "replyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12160,7 +12412,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12176,7 +12428,6 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12186,7 +12437,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12197,7 +12448,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12206,13 +12457,13 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12233,7 +12484,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -12243,7 +12494,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment.    
+    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -12253,7 +12504,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the reply.    
+    /// The ID of the reply.
     pub fn reply_id(mut self, new_value: &str) -> ReplyPatchCall<'a, C, NC, A> {
         self._reply_id = new_value.to_string();
         self
@@ -12314,7 +12565,7 @@ impl<'a, C, NC, A> ReplyPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Lists all of the replies to a comment.
 ///
 /// A builder for the *list* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods`.
+/// It is not used directly, but through a `ReplyMethods` instance.
 ///
 /// # Example
 ///
@@ -12389,7 +12640,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "fileId", "commentId", "pageToken", "maxResults", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12442,7 +12693,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12454,7 +12705,6 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12464,7 +12714,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12475,7 +12725,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12484,13 +12734,13 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12502,7 +12752,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyListCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -12512,7 +12762,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment.    
+    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyListCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -12520,7 +12770,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> ReplyListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -12528,7 +12778,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of replies to include in the response, used for paging.    
+    /// The maximum number of replies to include in the response, used for paging.
     pub fn max_results(mut self, new_value: i32) -> ReplyListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -12536,7 +12786,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *include deleted* query property to the given value.
     ///
     /// 
-    /// If set, all replies, including deleted replies (with content stripped) will be returned.    
+    /// If set, all replies, including deleted replies (with content stripped) will be returned.
     pub fn include_deleted(mut self, new_value: bool) -> ReplyListCall<'a, C, NC, A> {
         self._include_deleted = Some(new_value);
         self
@@ -12597,7 +12847,7 @@ impl<'a, C, NC, A> ReplyListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Gets a reply.
 ///
 /// A builder for the *get* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods`.
+/// It is not used directly, but through a `ReplyMethods` instance.
 ///
 /// # Example
 ///
@@ -12664,7 +12914,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "fileId", "commentId", "replyId", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12717,7 +12967,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12729,7 +12979,6 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12739,7 +12988,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12750,7 +12999,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12759,13 +13008,13 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12777,7 +13026,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -12787,7 +13036,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment.    
+    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -12797,7 +13046,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the reply.    
+    /// The ID of the reply.
     pub fn reply_id(mut self, new_value: &str) -> ReplyGetCall<'a, C, NC, A> {
         self._reply_id = new_value.to_string();
         self
@@ -12805,7 +13054,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *include deleted* query property to the given value.
     ///
     /// 
-    /// If set, this will succeed when retrieving a deleted reply.    
+    /// If set, this will succeed when retrieving a deleted reply.
     pub fn include_deleted(mut self, new_value: bool) -> ReplyGetCall<'a, C, NC, A> {
         self._include_deleted = Some(new_value);
         self
@@ -12866,7 +13115,7 @@ impl<'a, C, NC, A> ReplyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Creates a new reply to the given comment.
 ///
 /// A builder for the *insert* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods`.
+/// It is not used directly, but through a `ReplyMethods` instance.
 ///
 /// # Example
 ///
@@ -12933,7 +13182,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "fileId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12990,7 +13239,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13006,7 +13255,6 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13016,7 +13264,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13027,7 +13275,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13036,13 +13284,13 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13063,7 +13311,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -13073,7 +13321,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment.    
+    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyInsertCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -13134,7 +13382,7 @@ impl<'a, C, NC, A> ReplyInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Deletes a reply.
 ///
 /// A builder for the *delete* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods`.
+/// It is not used directly, but through a `ReplyMethods` instance.
 ///
 /// # Example
 ///
@@ -13196,7 +13444,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["fileId", "commentId", "replyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13248,7 +13496,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13260,7 +13508,6 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13270,7 +13517,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13281,12 +13528,12 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13298,7 +13545,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -13308,7 +13555,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment.    
+    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -13318,7 +13565,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the reply.    
+    /// The ID of the reply.
     pub fn reply_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C, NC, A> {
         self._reply_id = new_value.to_string();
         self
@@ -13379,7 +13626,7 @@ impl<'a, C, NC, A> ReplyDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates an existing reply.
 ///
 /// A builder for the *update* method supported by a *reply* resource.
-/// It is not used directly, but through a `ReplyMethods`.
+/// It is not used directly, but through a `ReplyMethods` instance.
 ///
 /// # Example
 ///
@@ -13448,7 +13695,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "fileId", "commentId", "replyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13505,7 +13752,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13521,7 +13768,6 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13531,7 +13777,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13542,7 +13788,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13551,13 +13797,13 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13578,7 +13824,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -13588,7 +13834,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment.    
+    /// The ID of the comment.
     pub fn comment_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -13598,7 +13844,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the reply.    
+    /// The ID of the reply.
     pub fn reply_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C, NC, A> {
         self._reply_id = new_value.to_string();
         self
@@ -13659,7 +13905,7 @@ impl<'a, C, NC, A> ReplyUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Deletes a permission from a file.
 ///
 /// A builder for the *delete* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods`.
+/// It is not used directly, but through a `PermissionMethods` instance.
 ///
 /// # Example
 ///
@@ -13719,7 +13965,7 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["fileId", "permissionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13771,7 +14017,7 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13783,7 +14029,6 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13793,7 +14038,7 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13804,12 +14049,12 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13821,7 +14066,7 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the file.    
+    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -13831,7 +14076,7 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the permission.    
+    /// The ID for the permission.
     pub fn permission_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, C, NC, A> {
         self._permission_id = new_value.to_string();
         self
@@ -13892,7 +14137,7 @@ impl<'a, C, NC, A> PermissionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Inserts a permission for a file.
 ///
 /// A builder for the *insert* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods`.
+/// It is not used directly, but through a `PermissionMethods` instance.
 ///
 /// # Example
 ///
@@ -13967,7 +14212,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "fileId", "sendNotificationEmails", "emailMessage"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14024,7 +14269,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14040,7 +14285,6 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14050,7 +14294,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14061,7 +14305,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14070,13 +14314,13 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14097,7 +14341,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the file.    
+    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionInsertCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -14105,7 +14349,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *send notification emails* query property to the given value.
     ///
     /// 
-    /// Whether to send notification emails when sharing to users or groups. This parameter is ignored and an email is sent if the role is owner.    
+    /// Whether to send notification emails when sharing to users or groups. This parameter is ignored and an email is sent if the role is owner.
     pub fn send_notification_emails(mut self, new_value: bool) -> PermissionInsertCall<'a, C, NC, A> {
         self._send_notification_emails = Some(new_value);
         self
@@ -14113,7 +14357,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *email message* query property to the given value.
     ///
     /// 
-    /// A custom message to include in notification emails.    
+    /// A custom message to include in notification emails.
     pub fn email_message(mut self, new_value: &str) -> PermissionInsertCall<'a, C, NC, A> {
         self._email_message = Some(new_value.to_string());
         self
@@ -14174,7 +14418,7 @@ impl<'a, C, NC, A> PermissionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Updates a permission.
 ///
 /// A builder for the *update* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods`.
+/// It is not used directly, but through a `PermissionMethods` instance.
 ///
 /// # Example
 ///
@@ -14246,7 +14490,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "fileId", "permissionId", "transferOwnership"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14303,7 +14547,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14319,7 +14563,6 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14329,7 +14572,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14340,7 +14583,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14349,13 +14592,13 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14376,7 +14619,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the file.    
+    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -14386,7 +14629,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the permission.    
+    /// The ID for the permission.
     pub fn permission_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, C, NC, A> {
         self._permission_id = new_value.to_string();
         self
@@ -14394,7 +14637,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *transfer ownership* query property to the given value.
     ///
     /// 
-    /// Whether changing a role to 'owner' downgrades the current owners to writers. Does nothing if the specified role is not 'owner'.    
+    /// Whether changing a role to 'owner' downgrades the current owners to writers. Does nothing if the specified role is not 'owner'.
     pub fn transfer_ownership(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, NC, A> {
         self._transfer_ownership = Some(new_value);
         self
@@ -14455,7 +14698,7 @@ impl<'a, C, NC, A> PermissionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Updates a permission. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods`.
+/// It is not used directly, but through a `PermissionMethods` instance.
 ///
 /// # Example
 ///
@@ -14527,7 +14770,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "fileId", "permissionId", "transferOwnership"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14584,7 +14827,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14600,7 +14843,6 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14610,7 +14852,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14621,7 +14863,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14630,13 +14872,13 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14657,7 +14899,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the file.    
+    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionPatchCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -14667,7 +14909,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the permission.    
+    /// The ID for the permission.
     pub fn permission_id(mut self, new_value: &str) -> PermissionPatchCall<'a, C, NC, A> {
         self._permission_id = new_value.to_string();
         self
@@ -14675,7 +14917,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *transfer ownership* query property to the given value.
     ///
     /// 
-    /// Whether changing a role to 'owner' downgrades the current owners to writers. Does nothing if the specified role is not 'owner'.    
+    /// Whether changing a role to 'owner' downgrades the current owners to writers. Does nothing if the specified role is not 'owner'.
     pub fn transfer_ownership(mut self, new_value: bool) -> PermissionPatchCall<'a, C, NC, A> {
         self._transfer_ownership = Some(new_value);
         self
@@ -14736,7 +14978,7 @@ impl<'a, C, NC, A> PermissionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Lists a file's permissions.
 ///
 /// A builder for the *list* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods`.
+/// It is not used directly, but through a `PermissionMethods` instance.
 ///
 /// # Example
 ///
@@ -14794,7 +15036,7 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14847,7 +15089,7 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14859,7 +15101,6 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14869,7 +15110,7 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14880,7 +15121,7 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14889,13 +15130,13 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14907,7 +15148,7 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the file.    
+    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionListCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -14968,7 +15209,7 @@ impl<'a, C, NC, A> PermissionListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Gets a permission by ID.
 ///
 /// A builder for the *get* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods`.
+/// It is not used directly, but through a `PermissionMethods` instance.
 ///
 /// # Example
 ///
@@ -15028,7 +15269,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "fileId", "permissionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15081,7 +15322,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15093,7 +15334,6 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15103,7 +15343,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15114,7 +15354,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15123,13 +15363,13 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15141,7 +15381,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the file.    
+    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> PermissionGetCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -15151,7 +15391,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the permission.    
+    /// The ID for the permission.
     pub fn permission_id(mut self, new_value: &str) -> PermissionGetCall<'a, C, NC, A> {
         self._permission_id = new_value.to_string();
         self
@@ -15212,7 +15452,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Returns the permission ID for an email address.
 ///
 /// A builder for the *getIdForEmail* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods`.
+/// It is not used directly, but through a `PermissionMethods` instance.
 ///
 /// # Example
 ///
@@ -15270,7 +15510,7 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "email"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15323,7 +15563,7 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15335,7 +15575,6 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15345,7 +15584,7 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15356,7 +15595,7 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15365,13 +15604,13 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15383,7 +15622,7 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The email address for which to return a permission ID    
+    /// The email address for which to return a permission ID
     pub fn email(mut self, new_value: &str) -> PermissionGetIdForEmailCall<'a, C, NC, A> {
         self._email = new_value.to_string();
         self
@@ -15444,7 +15683,7 @@ impl<'a, C, NC, A> PermissionGetIdForEmailCall<'a, C, NC, A> where NC: hyper::ne
 /// Subscribe to changes for a user.
 ///
 /// A builder for the *watch* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods`.
+/// It is not used directly, but through a `ChangeMethods` instance.
 ///
 /// # Example
 ///
@@ -15532,7 +15771,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "startChangeId", "pageToken", "maxResults", "includeSubscribed", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15565,7 +15804,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15581,7 +15820,6 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15591,7 +15829,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15602,7 +15840,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15611,13 +15849,13 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15636,7 +15874,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *start change id* query property to the given value.
     ///
     /// 
-    /// Change ID to start listing changes from.    
+    /// Change ID to start listing changes from.
     pub fn start_change_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C, NC, A> {
         self._start_change_id = Some(new_value.to_string());
         self
@@ -15644,7 +15882,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token for changes.    
+    /// Page token for changes.
     pub fn page_token(mut self, new_value: &str) -> ChangeWatchCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -15652,7 +15890,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of changes to return.    
+    /// Maximum number of changes to return.
     pub fn max_results(mut self, new_value: i32) -> ChangeWatchCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -15660,7 +15898,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *include subscribed* query property to the given value.
     ///
     /// 
-    /// Whether to include public files the user has opened and shared files. When set to false, the list only includes owned files plus any shared or public files the user has explicitly added to a folder they own.    
+    /// Whether to include public files the user has opened and shared files. When set to false, the list only includes owned files plus any shared or public files the user has explicitly added to a folder they own.
     pub fn include_subscribed(mut self, new_value: bool) -> ChangeWatchCall<'a, C, NC, A> {
         self._include_subscribed = Some(new_value);
         self
@@ -15668,7 +15906,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *include deleted* query property to the given value.
     ///
     /// 
-    /// Whether to include deleted items.    
+    /// Whether to include deleted items.
     pub fn include_deleted(mut self, new_value: bool) -> ChangeWatchCall<'a, C, NC, A> {
         self._include_deleted = Some(new_value);
         self
@@ -15729,7 +15967,7 @@ impl<'a, C, NC, A> ChangeWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Lists the changes for a user.
 ///
 /// A builder for the *list* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods`.
+/// It is not used directly, but through a `ChangeMethods` instance.
 ///
 /// # Example
 ///
@@ -15810,7 +16048,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "startChangeId", "pageToken", "maxResults", "includeSubscribed", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15839,7 +16077,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15851,7 +16089,6 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15861,7 +16098,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15872,7 +16109,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15881,13 +16118,13 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15897,7 +16134,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *start change id* query property to the given value.
     ///
     /// 
-    /// Change ID to start listing changes from.    
+    /// Change ID to start listing changes from.
     pub fn start_change_id(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
         self._start_change_id = Some(new_value.to_string());
         self
@@ -15905,7 +16142,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token for changes.    
+    /// Page token for changes.
     pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -15913,7 +16150,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of changes to return.    
+    /// Maximum number of changes to return.
     pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -15921,7 +16158,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *include subscribed* query property to the given value.
     ///
     /// 
-    /// Whether to include public files the user has opened and shared files. When set to false, the list only includes owned files plus any shared or public files the user has explicitly added to a folder they own.    
+    /// Whether to include public files the user has opened and shared files. When set to false, the list only includes owned files plus any shared or public files the user has explicitly added to a folder they own.
     pub fn include_subscribed(mut self, new_value: bool) -> ChangeListCall<'a, C, NC, A> {
         self._include_subscribed = Some(new_value);
         self
@@ -15929,7 +16166,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *include deleted* query property to the given value.
     ///
     /// 
-    /// Whether to include deleted items.    
+    /// Whether to include deleted items.
     pub fn include_deleted(mut self, new_value: bool) -> ChangeListCall<'a, C, NC, A> {
         self._include_deleted = Some(new_value);
         self
@@ -15990,7 +16227,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Gets a specific change.
 ///
 /// A builder for the *get* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods`.
+/// It is not used directly, but through a `ChangeMethods` instance.
 ///
 /// # Example
 ///
@@ -16048,7 +16285,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "changeId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16101,7 +16338,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16113,7 +16350,6 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16123,7 +16359,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16134,7 +16370,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16143,13 +16379,13 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16161,7 +16397,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the change.    
+    /// The ID of the change.
     pub fn change_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, NC, A> {
         self._change_id = new_value.to_string();
         self
@@ -16222,7 +16458,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Updates a property. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *property* resource.
-/// It is not used directly, but through a `PropertyMethods`.
+/// It is not used directly, but through a `PropertyMethods` instance.
 ///
 /// # Example
 ///
@@ -16294,7 +16530,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "fileId", "propertyKey", "visibility"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16351,7 +16587,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16367,7 +16603,6 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16377,7 +16612,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16388,7 +16623,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16397,13 +16632,13 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16424,7 +16659,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyPatchCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -16434,7 +16669,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The key of the property.    
+    /// The key of the property.
     pub fn property_key(mut self, new_value: &str) -> PropertyPatchCall<'a, C, NC, A> {
         self._property_key = new_value.to_string();
         self
@@ -16442,7 +16677,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *visibility* query property to the given value.
     ///
     /// 
-    /// The visibility of the property.    
+    /// The visibility of the property.
     pub fn visibility(mut self, new_value: &str) -> PropertyPatchCall<'a, C, NC, A> {
         self._visibility = Some(new_value.to_string());
         self
@@ -16503,7 +16738,7 @@ impl<'a, C, NC, A> PropertyPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes a property.
 ///
 /// A builder for the *delete* method supported by a *property* resource.
-/// It is not used directly, but through a `PropertyMethods`.
+/// It is not used directly, but through a `PropertyMethods` instance.
 ///
 /// # Example
 ///
@@ -16568,7 +16803,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["fileId", "propertyKey", "visibility"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16620,7 +16855,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16632,7 +16867,6 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16642,7 +16876,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16653,12 +16887,12 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16670,7 +16904,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -16680,7 +16914,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The key of the property.    
+    /// The key of the property.
     pub fn property_key(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, NC, A> {
         self._property_key = new_value.to_string();
         self
@@ -16688,7 +16922,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *visibility* query property to the given value.
     ///
     /// 
-    /// The visibility of the property.    
+    /// The visibility of the property.
     pub fn visibility(mut self, new_value: &str) -> PropertyDeleteCall<'a, C, NC, A> {
         self._visibility = Some(new_value.to_string());
         self
@@ -16749,7 +16983,7 @@ impl<'a, C, NC, A> PropertyDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Adds a property to a file.
 ///
 /// A builder for the *insert* method supported by a *property* resource.
-/// It is not used directly, but through a `PropertyMethods`.
+/// It is not used directly, but through a `PropertyMethods` instance.
 ///
 /// # Example
 ///
@@ -16814,7 +17048,7 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16871,7 +17105,7 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16887,7 +17121,6 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16897,7 +17130,7 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16908,7 +17141,7 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16917,13 +17150,13 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16944,7 +17177,7 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyInsertCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -17005,7 +17238,7 @@ impl<'a, C, NC, A> PropertyInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Lists a file's properties.
 ///
 /// A builder for the *list* method supported by a *property* resource.
-/// It is not used directly, but through a `PropertyMethods`.
+/// It is not used directly, but through a `PropertyMethods` instance.
 ///
 /// # Example
 ///
@@ -17063,7 +17296,7 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17116,7 +17349,7 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17128,7 +17361,6 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17138,7 +17370,7 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17149,7 +17381,7 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17158,13 +17390,13 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17176,7 +17408,7 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyListCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -17237,7 +17469,7 @@ impl<'a, C, NC, A> PropertyListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Updates a property.
 ///
 /// A builder for the *update* method supported by a *property* resource.
-/// It is not used directly, but through a `PropertyMethods`.
+/// It is not used directly, but through a `PropertyMethods` instance.
 ///
 /// # Example
 ///
@@ -17309,7 +17541,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "fileId", "propertyKey", "visibility"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17366,7 +17598,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17382,7 +17614,6 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17392,7 +17623,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17403,7 +17634,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17412,13 +17643,13 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17439,7 +17670,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -17449,7 +17680,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The key of the property.    
+    /// The key of the property.
     pub fn property_key(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, NC, A> {
         self._property_key = new_value.to_string();
         self
@@ -17457,7 +17688,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *visibility* query property to the given value.
     ///
     /// 
-    /// The visibility of the property.    
+    /// The visibility of the property.
     pub fn visibility(mut self, new_value: &str) -> PropertyUpdateCall<'a, C, NC, A> {
         self._visibility = Some(new_value.to_string());
         self
@@ -17518,7 +17749,7 @@ impl<'a, C, NC, A> PropertyUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Gets a property by its key.
 ///
 /// A builder for the *get* method supported by a *property* resource.
-/// It is not used directly, but through a `PropertyMethods`.
+/// It is not used directly, but through a `PropertyMethods` instance.
 ///
 /// # Example
 ///
@@ -17583,7 +17814,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "fileId", "propertyKey", "visibility"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17636,7 +17867,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17648,7 +17879,6 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17658,7 +17888,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17669,7 +17899,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17678,13 +17908,13 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17696,7 +17926,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> PropertyGetCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -17706,7 +17936,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The key of the property.    
+    /// The key of the property.
     pub fn property_key(mut self, new_value: &str) -> PropertyGetCall<'a, C, NC, A> {
         self._property_key = new_value.to_string();
         self
@@ -17714,7 +17944,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *visibility* query property to the given value.
     ///
     /// 
-    /// The visibility of the property.    
+    /// The visibility of the property.
     pub fn visibility(mut self, new_value: &str) -> PropertyGetCall<'a, C, NC, A> {
         self._visibility = Some(new_value.to_string());
         self
@@ -17775,7 +18005,7 @@ impl<'a, C, NC, A> PropertyGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Gets a specific revision.
 ///
 /// A builder for the *get* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods`.
+/// It is not used directly, but through a `RevisionMethods` instance.
 ///
 /// # Example
 ///
@@ -17835,7 +18065,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "fileId", "revisionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17888,7 +18118,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17900,7 +18130,6 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17910,7 +18139,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17921,7 +18150,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17930,13 +18159,13 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17948,7 +18177,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -17958,7 +18187,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the revision.    
+    /// The ID of the revision.
     pub fn revision_id(mut self, new_value: &str) -> RevisionGetCall<'a, C, NC, A> {
         self._revision_id = new_value.to_string();
         self
@@ -18019,7 +18248,7 @@ impl<'a, C, NC, A> RevisionGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Removes a revision.
 ///
 /// A builder for the *delete* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods`.
+/// It is not used directly, but through a `RevisionMethods` instance.
 ///
 /// # Example
 ///
@@ -18079,7 +18308,7 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["fileId", "revisionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18131,7 +18360,7 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18143,7 +18372,6 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18153,7 +18381,7 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18164,12 +18392,12 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18181,7 +18409,7 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -18191,7 +18419,7 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the revision.    
+    /// The ID of the revision.
     pub fn revision_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, C, NC, A> {
         self._revision_id = new_value.to_string();
         self
@@ -18252,7 +18480,7 @@ impl<'a, C, NC, A> RevisionDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Updates a revision.
 ///
 /// A builder for the *update* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods`.
+/// It is not used directly, but through a `RevisionMethods` instance.
 ///
 /// # Example
 ///
@@ -18319,7 +18547,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "fileId", "revisionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18376,7 +18604,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18392,7 +18620,6 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18402,7 +18629,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18413,7 +18640,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18422,13 +18649,13 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18449,7 +18676,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the file.    
+    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -18459,7 +18686,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the revision.    
+    /// The ID for the revision.
     pub fn revision_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, C, NC, A> {
         self._revision_id = new_value.to_string();
         self
@@ -18520,7 +18747,7 @@ impl<'a, C, NC, A> RevisionUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Lists a file's revisions.
 ///
 /// A builder for the *list* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods`.
+/// It is not used directly, but through a `RevisionMethods` instance.
 ///
 /// # Example
 ///
@@ -18578,7 +18805,7 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "fileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18631,7 +18858,7 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18643,7 +18870,6 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18653,7 +18879,7 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18664,7 +18890,7 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18673,13 +18899,13 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18691,7 +18917,7 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the file.    
+    /// The ID of the file.
     pub fn file_id(mut self, new_value: &str) -> RevisionListCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -18752,7 +18978,7 @@ impl<'a, C, NC, A> RevisionListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Updates a revision. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods`.
+/// It is not used directly, but through a `RevisionMethods` instance.
 ///
 /// # Example
 ///
@@ -18819,7 +19045,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "fileId", "revisionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18876,7 +19102,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18892,7 +19118,6 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18902,7 +19127,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18913,7 +19138,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18922,13 +19147,13 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18949,7 +19174,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the file.    
+    /// The ID for the file.
     pub fn file_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, NC, A> {
         self._file_id = new_value.to_string();
         self
@@ -18959,7 +19184,7 @@ impl<'a, C, NC, A> RevisionPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the revision.    
+    /// The ID for the revision.
     pub fn revision_id(mut self, new_value: &str) -> RevisionPatchCall<'a, C, NC, A> {
         self._revision_id = new_value.to_string();
         self
